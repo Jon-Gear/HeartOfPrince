@@ -1978,8 +1978,13 @@ MonoBehaviour:
     m_Keys: []
     m_Values: []
   m_OverrideStats:
-    m_Keys: []
-    m_Values: []
+    m_Keys:
+    - m_String: faith
+    m_Values:
+    - m_IsExpanded: 0
+      m_ChangeBase:
+        m_IsEnabled: 0
+        m_Value: 1
 --- !u!1 &4746549492132298227
 GameObject:
   m_ObjectHideFlags: 0

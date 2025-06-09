@@ -12,7 +12,7 @@ AnimatorOverrideController:
   - m_OriginalClip: {fileID: 7400000, guid: 134f748d7ce0049f1b4827c6a710697e, type: 2}
     m_OverrideClip: {fileID: 1827226128182048838, guid: a4b8f2deec6a99945987cfc59b1b4e54, type: 3}
   - m_OriginalClip: {fileID: 7400000, guid: 4ee53f6c9d28a4e2ab78924219e1314c, type: 2}
-    m_OverrideClip: {fileID: 0}
+    m_OverrideClip: {fileID: -1822576197682980721, guid: 766f853da4905c64891e58408ec797c5, type: 3}
   - m_OriginalClip: {fileID: 7400000, guid: 06adbf3a4686a4901884ac6bccb86be7, type: 2}
     m_OverrideClip: {fileID: 0}
   - m_OriginalClip: {fileID: 7400000, guid: 505019e3f98744942a48950d518a4916, type: 2}
@@ -147,13 +147,13 @@ MonoBehaviour:
       m_IsEnabled: 0
       m_Value: -53
     m_UseAcceleration:
-      m_IsEnabled: 0
+      m_IsEnabled: 1
       m_Value: 1
     m_Acceleration:
-      m_IsEnabled: 0
+      m_IsEnabled: 1
       m_Value: 10
     m_Deceleration:
-      m_IsEnabled: 0
+      m_IsEnabled: 1
       m_Value: 4
     m_CanJump:
       m_IsEnabled: 0
@@ -183,7 +183,7 @@ MonoBehaviour:
   m_AirborneMode: 0
   m_Stand16Points:
     m_Idle: {fileID: 1827226128182048838, guid: a4b8f2deec6a99945987cfc59b1b4e54, type: 3}
-    m_ForwardFast: {fileID: 0}
+    m_ForwardFast: {fileID: -1822576197682980721, guid: 766f853da4905c64891e58408ec797c5, type: 3}
     m_BackwardFast: {fileID: 0}
     m_RightFast: {fileID: 0}
     m_LeftFast: {fileID: 0}
