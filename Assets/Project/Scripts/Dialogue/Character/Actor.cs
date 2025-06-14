@@ -9,10 +9,10 @@ using UnityEngine;
 public class Actor : MonoBehaviour
 {
     [SerializeField] public string actorName = "Actor";
+    [SerializeField] private List<AnimationStateEntry> animationStates = new List<AnimationStateEntry>();
     [SerializeField] private List<GestureEntry> gestures = new List<GestureEntry>();
-
-
-    [SerializeField ]private Character character;
+    
+    private Character character;
 
     public Vector3 messageBubbleOffset = new Vector3(0f, 1.8f, 0f);
     public Vector3 positionWithOffset
@@ -46,23 +46,47 @@ public class Actor : MonoBehaviour
         }
     }
 
-    public void Emote(string emoteName)
+    public void Gesture(string gestureName)
     {
-        GestureEntry gesture = gestures.FirstOrDefault(g => g.m_Name == emoteName);
+        GestureEntry gesture = gestures.FirstOrDefault(g => g.m_Name == gestureName);
         
-        Debug.Log($"Emote called: {emoteName} for actor: {actorName}");
+        Debug.Log($"Emote called: {gestureName} for actor: {actorName}");
 
         Debug.Log($"Gesture found: {gesture != null} with name {gesture.m_Name}");
 
 
         if (gesture == null)
         {
-            Debug.LogError($"Emote '{emoteName}' not found for actor '{actorName}'");
+            Debug.LogError($"Emote '{gestureName}' not found for actor '{actorName}'");
             return;
         }
 
         gesture.PlayGesture(character, null);
     }
+
+    public void EnterState(string animationStateName)
+    {
+        AnimationStateEntry animationState = animationStates.FirstOrDefault(s => s.m_Name == animationStateName);
+
+        if(animationState == null)
+        {
+            Debug.LogError($"Animation state '{animationStateName}' not found for actor '{actorName}'");
+            return;
+        }
+        animationState.EnterAnimationState(character, null);
+    }
+    
+    public void ExitState(string animationStateName)
+    {
+        AnimationStateEntry animationState = animationStates.FirstOrDefault(s => s.m_Name == animationStateName);
+        if(animationState == null)
+        {
+            Debug.LogError($"Animation state '{animationStateName}' not found for actor '{actorName}'");
+            return;
+        }
+        animationState.ExitAnimationState(character, null);
+    }
+
 
     private void OnDestroy()
     {

@@ -1,0 +1,100 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 232752578b594dac8363ce5618d051fa, type: 3}
+  m_Name: WaveSmall
+  m_EditorClassIdentifier: 
+  m_StateMask: {fileID: 0}
+  m_Entry:
+    m_EntryClip: {fileID: -5921862386817995785, guid: 1961d4fc47046324fa054208bea29e99, type: 3}
+    m_EntryMask: {fileID: 0}
+    m_RootMotion: 0
+  m_Exit:
+    m_ExitClip: {fileID: 4102658666146598463, guid: c4b4afc7d3733444cb559af268578016, type: 3}
+    m_ExitMask: {fileID: 0}
+    m_RootMotion: 0
+  m_Properties:
+    m_IsControllable:
+      m_IsEnabled: 0
+      m_Value: 1
+    m_Speed:
+      m_IsEnabled: 0
+      m_Value: 4
+    m_Rotation:
+      m_IsEnabled: 0
+      m_Value: 1800
+    m_Mass:
+      m_IsEnabled: 0
+      m_Value: 80
+    m_Height:
+      m_IsEnabled: 0
+      m_Value: 2
+    m_Radius:
+      m_IsEnabled: 0
+      m_Value: 0.2
+    m_GravityUpwards:
+      m_IsEnabled: 0
+      m_Value: -9.81
+    m_GravityDownwards:
+      m_IsEnabled: 0
+      m_Value: -9.81
+    m_TerminalVelocity:
+      m_IsEnabled: 0
+      m_Value: -53
+    m_UseAcceleration:
+      m_IsEnabled: 0
+      m_Value: 1
+    m_Acceleration:
+      m_IsEnabled: 0
+      m_Value: 10
+    m_Deceleration:
+      m_IsEnabled: 0
+      m_Value: 4
+    m_CanJump:
+      m_IsEnabled: 0
+      m_Value: 1
+    m_AirJumps:
+      m_IsEnabled: 0
+      m_Value: 0
+    m_JumpForce:
+      m_IsEnabled: 0
+      m_Value: 5
+    m_JumpCooldown:
+      m_IsEnabled: 0
+      m_Value: 0.5
+    m_DashInSuccession:
+      m_IsEnabled: 0
+      m_Value: 0
+    m_DashInAir:
+      m_IsEnabled: 0
+      m_Value: 0
+    m_DashCooldown:
+      m_IsEnabled: 0
+      m_Value: 1
+  m_OnChange:
+    m_Instructions:
+      m_Instructions: []
+  m_Controller: {fileID: 7122678605306676836}
+  m_StateClip: {fileID: -1385189296012812136, guid: b785a4dc9b015464cab2beaa4cad4ca2, type: 3}
+  references:
+    version: 2
+    RefIds: []
+--- !u!221 &7122678605306676836
+AnimatorOverrideController:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Animation
+  m_Controller: {fileID: 9100000, guid: 2c8b7312f36f04157932300782d990e0, type: 2}
+  m_Clips:
+  - m_OriginalClip: {fileID: 7400000, guid: 3fd1b37d27b754527950ef1a42916157, type: 2}
+    m_OverrideClip: {fileID: -1385189296012812136, guid: b785a4dc9b015464cab2beaa4cad4ca2, type: 3}

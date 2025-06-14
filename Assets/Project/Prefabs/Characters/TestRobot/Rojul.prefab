@@ -1306,19 +1306,19 @@ MonoBehaviour:
       rid: 3582672023768269325
   m_RuntimeData:
     m_Overrides:
-    - rid: 1724515054854078982
+    - rid: 1724515056827760780
   references:
     version: 2
     RefIds:
-    - rid: 1724515054854078982
+    - rid: 1724515056827760780
       type: {class: Parameter, ns: GameCreator.Runtime.Behavior, asm: GameCreator.Runtime.Behavior}
       data:
         m_Breakpoint: 0
         m_IsEnabled: 1
         m_Value:
-          rid: 1724515054854078983
+          rid: 1724515056827760781
         m_Name: Social
-    - rid: 1724515054854078983
+    - rid: 1724515056827760781
       type: {class: ValueStat, ns: GameCreator.Runtime.Stats, asm: GameCreator.Runtime.Stats}
       data:
         m_Breakpoint: 0
@@ -1375,11 +1375,40 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   actorName: Rojul
+  animationStates:
+  - m_Name: FoldArmsCasual
+    m_State:
+      m_StateType: 2
+      m_AnimationClip:
+        m_Property:
+          rid: 1724515056690135375
+      m_RuntimeController: {fileID: 0}
+      m_State: {fileID: 11400000, guid: 7b94707a5c5d2d342ba4f4d10be175cc, type: 2}
+      m_AvatarMask: {fileID: 0}
+    m_Layer: 1
+    m_BlendMode: 0
+    m_Delay: 0
+    m_Speed: 1
+    m_Weight: 1
+    m_Transition: 0.1
+  - m_Name: WaveSmall
+    m_State:
+      m_StateType: 2
+      m_AnimationClip:
+        m_Property:
+          rid: 1724515056690135375
+      m_RuntimeController: {fileID: 0}
+      m_State: {fileID: 11400000, guid: 6f3cdf44120725b439ec9ab4a2155d92, type: 2}
+      m_AvatarMask: {fileID: 0}
+    m_Layer: 1
+    m_BlendMode: 0
+    m_Delay: 0
+    m_Speed: 1
+    m_Weight: 1
+    m_Transition: 0.1
   gestures:
   - m_Name: Kick
-    m_AnimationClip:
-      m_Property:
-        rid: 1724515054356791435
+    m_AnimationClip: {fileID: 7400000, guid: 25d0bcae4b1b5422a9ea5491e20a2afe, type: 2}
     m_AvatarMask: {fileID: 0}
     m_BlendMode: 0
     m_Delay: 0
@@ -1387,15 +1416,23 @@ MonoBehaviour:
     m_UseRootMotion: 1
     m_TransitionIn: 0.1
     m_TransitionOut: 0.1
-  character: {fileID: 0}
+  - m_Name: Kick
+    m_AnimationClip: {fileID: 7400000, guid: 25d0bcae4b1b5422a9ea5491e20a2afe, type: 2}
+    m_AvatarMask: {fileID: 0}
+    m_BlendMode: 0
+    m_Delay: 0
+    m_Speed: 1
+    m_UseRootMotion: 1
+    m_TransitionIn: 0.1
+    m_TransitionOut: 0.1
   messageBubbleOffset: {x: 0, y: 1.8, z: 0}
   references:
     version: 2
     RefIds:
-    - rid: 1724515054356791435
+    - rid: 1724515056690135375
       type: {class: GetAnimationInstance, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
-        m_Value: {fileID: 7400000, guid: 25d0bcae4b1b5422a9ea5491e20a2afe, type: 2}
+        m_Value: {fileID: 0}
 --- !u!1 &4828195369937384202
 GameObject:
   m_ObjectHideFlags: 0

@@ -1425,19 +1425,19 @@ MonoBehaviour:
       rid: 3582672023768269325
   m_RuntimeData:
     m_Overrides:
-    - rid: 1724515054854079086
+    - rid: 1724515056104243298
   references:
     version: 2
     RefIds:
-    - rid: 1724515054854079086
+    - rid: 1724515056104243298
       type: {class: Parameter, ns: GameCreator.Runtime.Behavior, asm: GameCreator.Runtime.Behavior}
       data:
         m_Breakpoint: 0
         m_IsEnabled: 1
         m_Value:
-          rid: 1724515054854079087
+          rid: 1724515056104243299
         m_Name: Social
-    - rid: 1724515054854079087
+    - rid: 1724515056104243299
       type: {class: ValueStat, ns: GameCreator.Runtime.Stats, asm: GameCreator.Runtime.Stats}
       data:
         m_Breakpoint: 0
@@ -1497,9 +1497,6 @@ MonoBehaviour:
   gestures: []
   character: {fileID: 0}
   messageBubbleOffset: {x: 0, y: 1.5, z: 0}
-  references:
-    version: 2
-    RefIds: []
 --- !u!1 &4828195369937384202
 GameObject:
   m_ObjectHideFlags: 0

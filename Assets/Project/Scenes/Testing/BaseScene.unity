@@ -695,6 +695,10 @@ PrefabInstance:
       value: GameCreator.Runtime.Core GameCreator.Runtime.Common.GetDecimalDecimal
       objectReference: {fileID: 0}
     - target: {fileID: 7206668920010851156, guid: 3ec786f78a09440d7a16f499733531cf, type: 3}
+      propertyPath: managedReferences[1724515054356791435].m_Value
+      value: 
+      objectReference: {fileID: 7400000, guid: 25d0bcae4b1b5422a9ea5491e20a2afe, type: 2}
+    - target: {fileID: 7206668920010851156, guid: 3ec786f78a09440d7a16f499733531cf, type: 3}
       propertyPath: managedReferences[1724515054387462691].m_Value
       value: 0
       objectReference: {fileID: 0}
@@ -1604,6 +1608,7 @@ GameObject:
   - component: {fileID: 1211053084}
   - component: {fileID: 1211053087}
   - component: {fileID: 1211053088}
+  - component: {fileID: 1211053089}
   m_Layer: 0
   m_Name: DialogueManager
   m_TagString: Untagged
@@ -1727,6 +1732,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 24804040b56554a2f8b43e7e809f78dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1211053089
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1211053083}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10a8d493330d8df408fc46ab71daca71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1244262921

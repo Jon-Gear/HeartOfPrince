@@ -4,8 +4,8 @@ using Yarn.Unity;
 public class YarnCommands : MonoBehaviour
 {
 
-    [YarnCommand("emote")]
-    public static void Emote(string actorName, string emoteName)
+    [YarnCommand("gesture")]
+    public static void Gesture(string actorName, string emoteName)
     {
         // Find the actor by name
         Actor actor = ActorRegistry.Instance.GetActorByName(actorName);
@@ -16,18 +16,35 @@ public class YarnCommands : MonoBehaviour
         }
 
         // Trigger the emote on the actor
-        actor.Emote(emoteName);
+        actor.Gesture(emoteName);
     }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [YarnCommand("enterState")]
+    public static void EnterState(string actorName, string stateName)
     {
-        
+        // Find the actor by name
+        Actor actor = ActorRegistry.Instance.GetActorByName(actorName);
+        if (actor == null)
+        {
+            Debug.LogWarningFormat("Cannot find actor named {0}!", actorName);
+            return;
+        }
+
+        // Enter the specified state on the actor
+        actor.EnterState(stateName);
     }
 
-    // Update is called once per frame
-    void Update()
+    [YarnCommand("exitState")]
+    public static void StopState(string actorName, string stateName)
     {
-        
+        // Find the actor by name
+        Actor actor = ActorRegistry.Instance.GetActorByName(actorName);
+        if (actor == null)
+        {
+            Debug.LogWarningFormat("Cannot find actor named {0}!", actorName);
+            return;
+        }
+        // Exit the specified state on the actor
+        actor.ExitState(stateName);
     }
 }

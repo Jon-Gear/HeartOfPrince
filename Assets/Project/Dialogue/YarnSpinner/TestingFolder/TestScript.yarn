@@ -1,16 +1,27 @@
 ﻿title: Test_Rojul_1
 tags:
 ---
+<<enterState Rojul WaveSmall>>
 Rojul: Assalamaleykum!
+<<exitState Rojul WaveSmall>>
+
 Prince: Walaikum as salaam.
+
+<<enterState Rojul FoldArmsCasual>>
+Rojul: How are you doing, Prince?
+
+Prince: I am doing well.
+
+<<exitState Rojul FoldArmsCasual>>
 
 Rojul: Check out this sick kick that I can do.
 
-<<emote Rojul Kick>>
+<<gesture Rojul Kick>>
 
 Rojul: Hi-ya!
 
 Rojul: Pretty cool right?
 
 Prince: For real.
+
 ===
