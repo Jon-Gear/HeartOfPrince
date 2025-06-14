@@ -5,12 +5,17 @@ tags:
 Rojul: Assalamaleykum!
 <<exitState Rojul WaveSmall>>
 
+<<enterState Prince WaveSmall>>
 Prince: Walaikum as salaam.
+<<exitState Prince WaveSmall>>
+
 
 <<enterState Rojul FoldArmsCasual>>
 Rojul: How are you doing, Prince?
 
+<<enterState Prince FoldArmsCasual>>
 Prince: I am doing well.
+<<exitState Prince FoldArmsCasual>>
 
 <<exitState Rojul FoldArmsCasual>>
 
@@ -24,4 +29,13 @@ Rojul: Pretty cool right?
 
 Prince: For real.
 
+Rojul: Alright, I will see you later.
+
+<<enterState Rojul WaveBig>>
+Rojul: Assalamaleykum!
+<<exitState Rojul WaveBig>>
+
+<<enterState Prince WaveBig>>
+Prince: Walaikum as salaam!
+<<exitState Prince WaveBig>>
 ===

@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!221 &-6691295725433615775
+--- !u!221 &-4998918638289638073
 AnimatorOverrideController:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -10,7 +10,7 @@ AnimatorOverrideController:
   m_Controller: {fileID: 9100000, guid: 2c8b7312f36f04157932300782d990e0, type: 2}
   m_Clips:
   - m_OriginalClip: {fileID: 7400000, guid: 3fd1b37d27b754527950ef1a42916157, type: 2}
-    m_OverrideClip: {fileID: 3500441788533752169, guid: 91511b5a45e1ba74ea9a4fe911a9b831, type: 3}
+    m_OverrideClip: {fileID: -137062656967768163, guid: 0328796399b375d4d8af43dde6ae3633, type: 3}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21,16 +21,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 232752578b594dac8363ce5618d051fa, type: 3}
-  m_Name: FoldArmsCasual
+  m_Name: Think
   m_EditorClassIdentifier: 
-  m_StateMask: {fileID: 31900000, guid: 539c3c42026292347b5778eaa68c6f02, type: 2}
+  m_StateMask: {fileID: 31900000, guid: 48ca0322e71cd7341b357c1a1faab43f, type: 2}
   m_Entry:
-    m_EntryClip: {fileID: 1110920907793681827, guid: 5b8ebea86d25c984b984a806990755a1, type: 3}
-    m_EntryMask: {fileID: 31900000, guid: 539c3c42026292347b5778eaa68c6f02, type: 2}
+    m_EntryClip: {fileID: 6837368435842910968, guid: e1ad3d34bb6684e44a2a030d9af3187b, type: 3}
+    m_EntryMask: {fileID: 31900000, guid: 48ca0322e71cd7341b357c1a1faab43f, type: 2}
     m_RootMotion: 0
   m_Exit:
-    m_ExitClip: {fileID: -1050652194854820439, guid: 823dd288fed686345974348de0714c03, type: 3}
-    m_ExitMask: {fileID: 31900000, guid: 539c3c42026292347b5778eaa68c6f02, type: 2}
+    m_ExitClip: {fileID: -4715732123056434905, guid: 3ddd195c1c6b3514a9c1d634dec9c0b8, type: 3}
+    m_ExitMask: {fileID: 31900000, guid: 48ca0322e71cd7341b357c1a1faab43f, type: 2}
     m_RootMotion: 0
   m_Properties:
     m_IsControllable:
@@ -93,8 +93,8 @@ MonoBehaviour:
   m_OnChange:
     m_Instructions:
       m_Instructions: []
-  m_Controller: {fileID: -6691295725433615775}
-  m_StateClip: {fileID: 3500441788533752169, guid: 91511b5a45e1ba74ea9a4fe911a9b831, type: 3}
+  m_Controller: {fileID: -4998918638289638073}
+  m_StateClip: {fileID: -137062656967768163, guid: 0328796399b375d4d8af43dde6ae3633, type: 3}
   references:
     version: 2
     RefIds: []

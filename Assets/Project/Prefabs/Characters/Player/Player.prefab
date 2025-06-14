@@ -1659,7 +1659,8 @@ MonoBehaviour:
     rid: 6678815558586859523
   m_InverseKinematics:
     m_RigLayers:
-      m_Rigs: []
+      m_Rigs:
+      - rid: 1724515058030216131
   m_Footsteps:
     m_Feet:
     - rid: 6678815558586859524
@@ -1678,6 +1679,23 @@ MonoBehaviour:
     - rid: 1724515045396972401
       type: {class: AxonometryNone, ns: GameCreator.Runtime.Characters, asm: GameCreator.Runtime.Core}
       data: 
+    - rid: 1724515058030216131
+      type: {class: RigLookTo, ns: GameCreator.Runtime.Characters.IK, asm: GameCreator.Runtime.Core}
+      data:
+        m_Breakpoint: 0
+        m_IsEnabled: 1
+        m_TrackSpeed: 270
+        m_MaxAngle: 120
+        m_Sections:
+        - m_Bone: 8
+          m_Euler: {x: 0, y: 1, z: 0}
+          m_Weight: 1
+        - m_Bone: 9
+          m_Euler: {x: 0, y: 1, z: 0}
+          m_Weight: 3
+        - m_Bone: 10
+          m_Euler: {x: 0, y: 1, z: 0}
+          m_Weight: 3
     - rid: 6678815558586859523
       type: {class: CharacterKernel, ns: GameCreator.Runtime.Characters, asm: GameCreator.Runtime.Core}
       data:
@@ -1822,12 +1840,59 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   actorName: Prince
+  animationStates:
+  - m_Name: FoldArmsCasual
+    m_State:
+      m_StateType: 2
+      m_AnimationClip:
+        m_Property:
+          rid: -2
+      m_RuntimeController: {fileID: 0}
+      m_State: {fileID: 11400000, guid: 7b94707a5c5d2d342ba4f4d10be175cc, type: 2}
+      m_AvatarMask: {fileID: 0}
+    m_Layer: 2
+    m_BlendMode: 0
+    m_Delay: 0
+    m_Speed: 1
+    m_Weight: 0.908
+    m_Transition: 0.1
+  - m_Name: WaveSmall
+    m_State:
+      m_StateType: 2
+      m_AnimationClip:
+        m_Property:
+          rid: -2
+      m_RuntimeController: {fileID: 0}
+      m_State: {fileID: 11400000, guid: 6f3cdf44120725b439ec9ab4a2155d92, type: 2}
+      m_AvatarMask: {fileID: 0}
+    m_Layer: 2
+    m_BlendMode: 0
+    m_Delay: 0
+    m_Speed: 1
+    m_Weight: 1
+    m_Transition: 0.1
+  - m_Name: WaveBig
+    m_State:
+      m_StateType: 2
+      m_AnimationClip:
+        m_Property:
+          rid: -2
+      m_RuntimeController: {fileID: 0}
+      m_State: {fileID: 11400000, guid: 07706819707e7174aaae9e0ebd2b5f3a, type: 2}
+      m_AvatarMask: {fileID: 0}
+    m_Layer: 2
+    m_BlendMode: 0
+    m_Delay: 0
+    m_Speed: 1
+    m_Weight: 1
+    m_Transition: 0.1
   gestures: []
-  character: {fileID: 0}
   messageBubbleOffset: {x: 0, y: 1.8, z: 0}
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
 --- !u!114 &8703177865891526281
 MonoBehaviour:
   m_ObjectHideFlags: 0

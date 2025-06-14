@@ -4,6 +4,8 @@ using Yarn.Unity;
 public class YarnCommands : MonoBehaviour
 {
 
+
+
     [YarnCommand("gesture")]
     public static void Gesture(string actorName, string emoteName)
     {
@@ -35,7 +37,7 @@ public class YarnCommands : MonoBehaviour
     }
 
     [YarnCommand("exitState")]
-    public static void StopState(string actorName, string stateName)
+    public static void ExitState(string actorName, string stateName)
     {
         // Find the actor by name
         Actor actor = ActorRegistry.Instance.GetActorByName(actorName);
