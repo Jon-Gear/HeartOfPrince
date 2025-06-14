@@ -1394,7 +1394,7 @@ MonoBehaviour:
         m_SmoothTime: 0.5
         m_Mannequin: {fileID: 7399950581611613642}
         m_Animator: {fileID: 6627684370178030370}
-        m_StartState: {fileID: 11400000, guid: c593db8e677654bb189c6e98a6199720, type: 2}
+        m_StartState: {fileID: 11400000, guid: a485303e4dd781546a2c4086548e7cb5, type: 2}
         m_Reaction: {fileID: 0}
     - rid: 6678815558586859532
       type: {class: InputValueVector2MotionPrimary, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
@@ -1425,19 +1425,19 @@ MonoBehaviour:
       rid: 3582672023768269325
   m_RuntimeData:
     m_Overrides:
-    - rid: 1724515050188964021
+    - rid: 1724515054854079086
   references:
     version: 2
     RefIds:
-    - rid: 1724515050188964021
+    - rid: 1724515054854079086
       type: {class: Parameter, ns: GameCreator.Runtime.Behavior, asm: GameCreator.Runtime.Behavior}
       data:
         m_Breakpoint: 0
         m_IsEnabled: 1
         m_Value:
-          rid: 1724515050188964022
+          rid: 1724515054854079087
         m_Name: Social
-    - rid: 1724515050188964022
+    - rid: 1724515054854079087
       type: {class: ValueStat, ns: GameCreator.Runtime.Stats, asm: GameCreator.Runtime.Stats}
       data:
         m_Breakpoint: 0
@@ -1494,9 +1494,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   actorName: Walad
-  isPlayerCharacter: 0
+  gestures: []
+  character: {fileID: 0}
   messageBubbleOffset: {x: 0, y: 1.5, z: 0}
-  offsetUsesRotation: 0
+  references:
+    version: 2
+    RefIds: []
 --- !u!1 &4828195369937384202
 GameObject:
   m_ObjectHideFlags: 0

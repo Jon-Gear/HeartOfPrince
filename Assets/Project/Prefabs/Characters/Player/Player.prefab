@@ -1612,6 +1612,7 @@ GameObject:
   - component: {fileID: 2596650277260859950}
   - component: {fileID: 8908693421579515348}
   - component: {fileID: 1665693158485693602}
+  - component: {fileID: 8703177865891526281}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -1772,7 +1773,7 @@ MonoBehaviour:
         m_SmoothTime: 0.5
         m_Mannequin: {fileID: 7399950581611613642}
         m_Animator: {fileID: 3383169220290761293}
-        m_StartState: {fileID: 11400000, guid: a193bdf13dbac4b739a4fb0db8c5e90e, type: 2}
+        m_StartState: {fileID: 11400000, guid: a485303e4dd781546a2c4086548e7cb5, type: 2}
         m_Reaction: {fileID: 0}
     - rid: 6678815558586859532
       type: {class: InputValueVector2MotionPrimary, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
@@ -1821,9 +1822,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   actorName: Prince
-  isPlayerCharacter: 1
+  gestures: []
+  character: {fileID: 0}
   messageBubbleOffset: {x: 0, y: 1.8, z: 0}
-  offsetUsesRotation: 0
+  references:
+    version: 2
+    RefIds: []
+--- !u!114 &8703177865891526281
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4715974037236951035}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e913cd1061e436087d7629ff35a332c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_TrackMode: 0
+  m_Quests:
+    m_Quests:
+      m_Keys: []
+      m_Values: []
+  m_Tasks:
+    m_Tasks:
+      m_Keys: []
+      m_Values: []
 --- !u!1 &4746549492132298227
 GameObject:
   m_ObjectHideFlags: 0

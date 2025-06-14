@@ -1,5 +1,97 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &116113855708464666
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2465985659367620890}
+  - component: {fileID: 3389015985003205845}
+  - component: {fileID: 4629552757498152351}
+  m_Layer: 0
+  m_Name: Dialogue
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2465985659367620890
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 116113855708464666}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1793972296288166232}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3389015985003205845
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 116113855708464666}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ecd922218e245e2b85d51f9f08338c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Instructions:
+    m_Instructions:
+    - rid: 1724515053163512661
+  m_TriggerEvent:
+    rid: 1724515053163512610
+  references:
+    version: 2
+    RefIds:
+    - rid: 1724515053163512610
+      type: {class: EventTriggerEnter, ns: GameCreator.Runtime.VisualScripting, asm: GameCreator.Runtime.Core}
+      data:
+        m_Collider:
+          m_Option: 1
+          m_GameObject:
+            m_Property:
+              rid: 1724515053163512611
+    - rid: 1724515053163512611
+      type: {class: GetGameObjectPlayer, ns: GameCreator.Runtime.Characters, asm: GameCreator.Runtime.Core}
+      data: 
+    - rid: 1724515053163512661
+      type: {class: PlayDialogueYarn, ns: , asm: Assembly-CSharp}
+      data:
+        m_Breakpoint: 0
+        m_IsEnabled: 1
+        m_WaitToFinish: 1
+        startNodeName: Test_Rojul_1
+--- !u!135 &4629552757498152351
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 116113855708464666}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &134469726042633124
 GameObject:
   m_ObjectHideFlags: 0
@@ -1051,6 +1143,7 @@ Transform:
   - {fileID: 7399950581611613642}
   - {fileID: 6698278384103419117}
   - {fileID: 6415659808457242585}
+  - {fileID: 2465985659367620890}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2596650277260859950
@@ -1182,7 +1275,7 @@ MonoBehaviour:
         m_SmoothTime: 0.5
         m_Mannequin: {fileID: 7399950581611613642}
         m_Animator: {fileID: 3708889818676311362}
-        m_StartState: {fileID: 11400000, guid: c593db8e677654bb189c6e98a6199720, type: 2}
+        m_StartState: {fileID: 11400000, guid: a485303e4dd781546a2c4086548e7cb5, type: 2}
         m_Reaction: {fileID: 0}
     - rid: 6678815558586859532
       type: {class: InputValueVector2MotionPrimary, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
@@ -1213,19 +1306,19 @@ MonoBehaviour:
       rid: 3582672023768269325
   m_RuntimeData:
     m_Overrides:
-    - rid: 1724515050188963871
+    - rid: 1724515054854078982
   references:
     version: 2
     RefIds:
-    - rid: 1724515050188963871
+    - rid: 1724515054854078982
       type: {class: Parameter, ns: GameCreator.Runtime.Behavior, asm: GameCreator.Runtime.Behavior}
       data:
         m_Breakpoint: 0
         m_IsEnabled: 1
         m_Value:
-          rid: 1724515050188963872
+          rid: 1724515054854078983
         m_Name: Social
-    - rid: 1724515050188963872
+    - rid: 1724515054854078983
       type: {class: ValueStat, ns: GameCreator.Runtime.Stats, asm: GameCreator.Runtime.Stats}
       data:
         m_Breakpoint: 0
@@ -1282,9 +1375,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   actorName: Rojul
-  isPlayerCharacter: 0
+  gestures:
+  - m_Name: Kick
+    m_AnimationClip:
+      m_Property:
+        rid: 1724515054356791435
+    m_AvatarMask: {fileID: 0}
+    m_BlendMode: 0
+    m_Delay: 0
+    m_Speed: 1
+    m_UseRootMotion: 1
+    m_TransitionIn: 0.1
+    m_TransitionOut: 0.1
+  character: {fileID: 0}
   messageBubbleOffset: {x: 0, y: 1.8, z: 0}
-  offsetUsesRotation: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 1724515054356791435
+      type: {class: GetAnimationInstance, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_Value: {fileID: 7400000, guid: 25d0bcae4b1b5422a9ea5491e20a2afe, type: 2}
 --- !u!1 &4828195369937384202
 GameObject:
   m_ObjectHideFlags: 0

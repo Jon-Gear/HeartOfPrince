@@ -1,38 +1,40 @@
+using GameCreator.Runtime.Characters;
+using GameCreator.Runtime.Common;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
+
 
 public class Actor : MonoBehaviour
 {
-    [Tooltip("This must match the character name used in Yarn dialogue scripts.")]
-    public string actorName = "Actor";
-    public bool isPlayerCharacter = false;
+    [SerializeField] public string actorName = "Actor";
+    [SerializeField] private List<GestureEntry> gestures = new List<GestureEntry>();
 
-    [Tooltip("When positioning the message bubble in worldspace, YarnCharacterManager adds this additional offset to this gameObject's position. Taller characters should use taller offsets, etc.")]
+
+    [SerializeField ]private Character character;
+
     public Vector3 messageBubbleOffset = new Vector3(0f, 1.8f, 0f);
-
-    [Tooltip("if true, then apply messageBubbleOffset relative to this transform's rotation and scale")]
-    public bool offsetUsesRotation = false;
-
     public Vector3 positionWithOffset
     {
         get
         {
-            if (!offsetUsesRotation)
-            {
-                return transform.position + messageBubbleOffset;
-            }
-            else
-            {
-                return transform.position + transform.TransformPoint(messageBubbleOffset); // convert offset into local space
-            }
+            return transform.position + messageBubbleOffset;   
         }
     }
+
+
+    
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private void Start()
     {
+        character = GetComponent<Character>();
+
         ActorRegistry.Instance.RegisterActor(this);
-        if (isPlayerCharacter)
+        
+        if (character.IsPlayer)
         {
             if (ActorRegistry.Instance.playerActor != null)
             {
@@ -42,6 +44,24 @@ public class Actor : MonoBehaviour
 
             ActorRegistry.Instance.playerActor = this;
         }
+    }
+
+    public void Emote(string emoteName)
+    {
+        GestureEntry gesture = gestures.FirstOrDefault(g => g.m_Name == emoteName);
+        
+        Debug.Log($"Emote called: {emoteName} for actor: {actorName}");
+
+        Debug.Log($"Gesture found: {gesture != null} with name {gesture.m_Name}");
+
+
+        if (gesture == null)
+        {
+            Debug.LogError($"Emote '{emoteName}' not found for actor '{actorName}'");
+            return;
+        }
+
+        gesture.PlayGesture(character, null);
     }
 
     private void OnDestroy()
