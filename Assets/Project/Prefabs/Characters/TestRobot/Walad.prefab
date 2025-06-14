@@ -1239,6 +1239,7 @@ GameObject:
   - component: {fileID: 2596650277260859950}
   - component: {fileID: 1389103995142261500}
   - component: {fileID: 4365629744012632062}
+  - component: {fileID: 8428202570901555147}
   m_Layer: 0
   m_Name: Walad
   m_TagString: Untagged
@@ -1424,28 +1425,28 @@ MonoBehaviour:
       rid: 3582672023768269325
   m_RuntimeData:
     m_Overrides:
-    - rid: 3582672036684628489
+    - rid: 1724515050188964021
   references:
     version: 2
     RefIds:
-    - rid: 3582672023768269325
-      type: {class: GetDecimalDecimal, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
-      data:
-        m_Value: 0.5
-    - rid: 3582672036684628489
+    - rid: 1724515050188964021
       type: {class: Parameter, ns: GameCreator.Runtime.Behavior, asm: GameCreator.Runtime.Behavior}
       data:
         m_Breakpoint: 0
         m_IsEnabled: 1
         m_Value:
-          rid: 3582672036684628490
+          rid: 1724515050188964022
         m_Name: Social
-    - rid: 3582672036684628490
+    - rid: 1724515050188964022
       type: {class: ValueStat, ns: GameCreator.Runtime.Stats, asm: GameCreator.Runtime.Stats}
       data:
         m_Breakpoint: 0
         m_IsEnabled: 1
         m_Value: {fileID: 0}
+    - rid: 3582672023768269325
+      type: {class: GetDecimalDecimal, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_Value: 0.5
 --- !u!114 &4365629744012632062
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1480,6 +1481,22 @@ MonoBehaviour:
       m_ChangeBase:
         m_IsEnabled: 0
         m_Value: 1
+--- !u!114 &8428202570901555147
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4715974037236951035}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f818a245fddec840a75fda0becbfa37, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  actorName: Walad
+  isPlayerCharacter: 0
+  messageBubbleOffset: {x: 0, y: 1.5, z: 0}
+  offsetUsesRotation: 0
 --- !u!1 &4828195369937384202
 GameObject:
   m_ObjectHideFlags: 0
