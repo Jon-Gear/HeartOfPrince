@@ -1660,7 +1660,7 @@ MonoBehaviour:
   m_InverseKinematics:
     m_RigLayers:
       m_Rigs:
-      - rid: 1724515058030216131
+      - rid: 1724515069182869807
   m_Footsteps:
     m_Feet:
     - rid: 6678815558586859524
@@ -1679,23 +1679,17 @@ MonoBehaviour:
     - rid: 1724515045396972401
       type: {class: AxonometryNone, ns: GameCreator.Runtime.Characters, asm: GameCreator.Runtime.Core}
       data: 
-    - rid: 1724515058030216131
+    - rid: 1724515069182869807
       type: {class: RigLookTo, ns: GameCreator.Runtime.Characters.IK, asm: GameCreator.Runtime.Core}
       data:
         m_Breakpoint: 0
         m_IsEnabled: 1
         m_TrackSpeed: 270
-        m_MaxAngle: 120
+        m_MaxAngle: 75
         m_Sections:
-        - m_Bone: 8
-          m_Euler: {x: 0, y: 1, z: 0}
-          m_Weight: 1
-        - m_Bone: 9
-          m_Euler: {x: 0, y: 1, z: 0}
-          m_Weight: 3
         - m_Bone: 10
           m_Euler: {x: 0, y: 1, z: 0}
-          m_Weight: 3
+          m_Weight: 0.4
     - rid: 6678815558586859523
       type: {class: CharacterKernel, ns: GameCreator.Runtime.Characters, asm: GameCreator.Runtime.Core}
       data:

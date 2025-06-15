@@ -9,6 +9,14 @@ Rojul: Assalamaleykum!
 Prince: Walaikum as salaam.
 <<exitState Prince WaveSmall>>
 
+Rojul: I have this quest for you.
+<<activateQuest MyQuest>>
+<<trackQuest MyQuest>>
+
+Rojul: Check your journal.
+
+<<completeTask MyQuest "Start talking to Rojul">>
+Rojul: One task was completed.
 
 <<enterState Rojul FoldArmsCasual>>
 Rojul: How are you doing, Prince?
@@ -30,6 +38,14 @@ Rojul: Pretty cool right?
 Prince: For real.
 
 Rojul: Alright, I will see you later.
+
+-> Prince: Wait, I wanted to ask, what is your favorite color?
+    Rojul: My favorite color is yellow.
+    <<completeTask MyQuest "Ask Rojul what is his favorite color">>
+    Prince: Ah, that is good to know.
+    Rojul: Alright, I should go now.
+-> Prince: Alright.
+
 
 <<enterState Rojul WaveBig>>
 Rojul: Assalamaleykum!

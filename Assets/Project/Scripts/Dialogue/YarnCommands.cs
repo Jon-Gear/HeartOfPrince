@@ -4,6 +4,23 @@ using Yarn.Unity;
 public class YarnCommands : MonoBehaviour
 {
 
+    [YarnCommand("activateQuest")]
+    public static void ActivateQuest(string questName)
+    {
+        QuestManager.Instance.ActivateQuest(questName);
+    }
+
+    [YarnCommand("trackQuest")]
+    public static void TrackQuest(string questName)
+    {
+        QuestManager.Instance.TrackQuest(questName);
+    }
+
+    [YarnCommand("completeTask")]
+    public static void CompleteTask(string questName, string taskName)
+    {
+        QuestManager.Instance.CompleteTask(questName, taskName);
+    }
 
 
     [YarnCommand("gesture")]
