@@ -1,13 +1,18 @@
 ﻿title: Test_Rojul_1
 tags:
 ---
+<<setCloseUpShot>>
+
 <<enterState Rojul WaveSmall>>
+<<addActorToShot Rojul>>
+
 Rojul: Assalamaleykum!
 <<exitState Rojul WaveSmall>>
 
 <<enterState Prince WaveSmall>>
 Prince: Walaikum as salaam.
 <<exitState Prince WaveSmall>>
+
 
 Rojul: I have this quest for you.
 <<activateQuest MyQuest>>
@@ -72,4 +77,8 @@ Rojul: Assalamaleykum!
 <<enterState Prince WaveBig>>
 Prince: Walaikum as salaam!
 <<exitState Prince WaveBig>>
+
+<<removeActorFromShot Rojul>>
+<<setLongShot>>
+
 ===

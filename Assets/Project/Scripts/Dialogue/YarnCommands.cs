@@ -4,6 +4,65 @@ using Yarn.Unity;
 public class YarnCommands : MonoBehaviour
 {
 
+    /*
+    
+    Ideas for commands:
+    - Checking a value of something
+
+
+    Other ideas:
+    - Background dialogue between other characters (like in NITW)
+    */
+    // Camera Control
+
+    [YarnCommand("setLongShot")]
+    public static void SetLongShot()
+    {
+        CinemachineManager.Instance.SetLongShot();
+    }
+
+    [YarnCommand("setCloseUpShot")]
+    public static void SetCloseUpShot()
+    {
+        CinemachineManager.Instance.SetCloseUpShot();
+    }
+
+    [YarnCommand("addActorToShot")]
+    public static void AddActorToShot(string actorName)
+    {
+        // Find the actor by name
+        Actor actor = ActorRegistry.Instance.GetActorByName(actorName);
+        if (actor == null)
+        {
+            Debug.LogWarningFormat("Cannot find actor named {0}!", actorName);
+            return;
+        }
+
+        // Add the target to the camera manager
+        CinemachineManager.Instance.cameraTarget.AddTarget(actor.transform);
+    }
+
+    [YarnCommand("removeActorFromShot")]
+    public static void RemoveActorFromShot(string actorName)
+    {
+        // Find the actor by name
+        Actor actor = ActorRegistry.Instance.GetActorByName(actorName);
+        if (actor == null)
+        {
+            Debug.LogWarningFormat("Cannot find actor named {0}!", actorName);
+            return;
+        }
+
+        // Add the target to the camera manager
+        CinemachineManager.Instance.cameraTarget.RemoveTarget(actor.transform);
+    }
+
+
+
+
+
+    // Quest Management
+
     [YarnCommand("activateQuest")]
     public static void ActivateQuest(string questName)
     {
@@ -28,7 +87,7 @@ public class YarnCommands : MonoBehaviour
         QuestManager.Instance.UpdateTaskProgressBy(questName, taskName, progress);
     }
 
-
+    // Actor Expressions
 
     [YarnCommand("gesture")]
     public static void Gesture(string actorName, string emoteName)

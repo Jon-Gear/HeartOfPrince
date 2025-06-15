@@ -24,7 +24,7 @@ public class Actor : MonoBehaviour
     }
 
 
-    
+
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -43,6 +43,7 @@ public class Actor : MonoBehaviour
             }
 
             ActorRegistry.Instance.playerActor = this;
+            CinemachineManager.Instance.cameraTarget.AddTarget(character.transform);
         }
     }
 
