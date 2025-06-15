@@ -32,40 +32,130 @@ MonoBehaviour:
   m_Tasks:
     rid: 3872144699144536112
   m_OnActivate:
-    m_Instructions: []
+    m_Instructions:
+      m_Instructions: []
   m_OnDeactivate:
-    m_Instructions: []
+    m_Instructions:
+      m_Instructions: []
   m_OnComplete:
-    m_Instructions: []
+    m_Instructions:
+      m_Instructions: []
   m_OnAbandon:
-    m_Instructions: []
+    m_Instructions:
+      m_Instructions: []
   m_OnFail:
-    m_Instructions: []
+    m_Instructions:
+      m_Instructions: []
   references:
     version: 2
     RefIds:
+    - rid: 1724515068867248368
+      type: {class: EventOnLateUpdate, ns: GameCreator.Runtime.VisualScripting, asm: GameCreator.Runtime.Core}
+      data: 
+    - rid: 1724515069182870341
+      type: {class: Task, ns: GameCreator.Runtime.Quests, asm: GameCreator.Runtime.Quests}
+      data:
+        m_Completion: 0
+        m_IsHidden: 0
+        m_Name:
+          m_Property:
+            rid: 1724515069182870342
+        m_Description:
+          m_Property:
+            rid: 1724515069182870343
+        m_Color:
+          m_Property:
+            rid: 1724515069182870344
+        m_Sprite:
+          m_Property:
+            rid: 1724515069182870345
+        m_UseCounter: 0
+        m_CountTo:
+          m_Property:
+            rid: 1724515069182870346
+        m_ValueFrom:
+          m_Property:
+            rid: 1724515069182870347
+        m_CheckWhen:
+          m_Event:
+            rid: 1724515069182870348
+        m_OnActivate:
+          m_Instructions:
+            m_Instructions: []
+        m_OnDeactivate:
+          m_Instructions:
+            m_Instructions: []
+        m_OnComplete:
+          m_Instructions:
+            m_Instructions: []
+        m_OnAbandon:
+          m_Instructions:
+            m_Instructions: []
+        m_OnFail:
+          m_Instructions:
+            m_Instructions: []
+    - rid: 1724515069182870342
+      type: {class: GetStringString, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_Value: Not kill boar
+    - rid: 1724515069182870343
+      type: {class: GetStringTextArea, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_Text:
+          m_Text: 
+    - rid: 1724515069182870344
+      type: {class: GetColorColorsWhite, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data: 
+    - rid: 1724515069182870345
+      type: {class: GetSpriteNone, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data: 
+    - rid: 1724515069182870346
+      type: {class: GetDecimalDecimal, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_Value: 3
+    - rid: 1724515069182870347
+      type: {class: GetDecimalGlobalName, ns: GameCreator.Runtime.Variables, asm: GameCreator.Runtime.Core}
+      data:
+        m_Variable:
+          m_TypeID:
+            m_String: number
+          m_Variable: {fileID: 0}
+          m_Name:
+            m_String: 
+            m_ID: 0
+    - rid: 1724515069182870348
+      type: {class: EventOnLateUpdate, ns: GameCreator.Runtime.VisualScripting, asm: GameCreator.Runtime.Core}
+      data: 
     - rid: 3872144699144536108
       type: {class: GetStringString, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
         m_Value: Kill 5 boars
     - rid: 3872144699144536110
       type: {class: GetColorColorsWhite, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data: 
     - rid: 3872144699144536112
       type: {class: TasksTree, ns: GameCreator.Runtime.Quests, asm: GameCreator.Runtime.Quests}
       data:
+        m_Dirty: 23236
         m_Data:
-          m_Keys: d6e96186
+          m_Keys: d6e961868301057b
           m_Values:
           - m_Id: -2040403498
             m_Value:
               rid: 3872144699144536114
+          - m_Id: 2063925635
+            m_Value:
+              rid: 1724515069182870341
         m_Nodes:
-          m_Keys: d6e96186
+          m_Keys: d6e961868301057b
           m_Values:
           - m_Id: -2040403498
             m_Parent: -1
             m_Children: 
-        m_Roots: d6e96186
+          - m_Id: 2063925635
+            m_Parent: -1
+            m_Children: 
+        m_Roots: d6e961868301057b
     - rid: 3872144699144536113
       type: {class: GetStringString, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
@@ -95,23 +185,30 @@ MonoBehaviour:
           m_Property:
             rid: 3872144699144536120
         m_CheckWhen:
-          rid: 3872144699144536121
+          m_Event:
+            rid: 1724515068867248368
         m_OnActivate:
-          m_Instructions: []
+          m_Instructions:
+            m_Instructions: []
         m_OnDeactivate:
-          m_Instructions: []
+          m_Instructions:
+            m_Instructions: []
         m_OnComplete:
-          m_Instructions: []
+          m_Instructions:
+            m_Instructions: []
         m_OnAbandon:
-          m_Instructions: []
+          m_Instructions:
+            m_Instructions: []
         m_OnFail:
-          m_Instructions: []
+          m_Instructions:
+            m_Instructions: []
     - rid: 3872144699144536115
       type: {class: GetStringString, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
         m_Value: Kill 5 boars
     - rid: 3872144699144536117
       type: {class: GetColorColorsWhite, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data: 
     - rid: 3872144699144536119
       type: {class: GetDecimalDecimal, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
@@ -126,8 +223,6 @@ MonoBehaviour:
           m_Name:
             m_String: 
             m_ID: 0
-    - rid: 3872144699144536121
-      type: {class: EventOnLateUpdate, ns: GameCreator.Runtime.VisualScripting, asm: GameCreator.Runtime.Core}
     - rid: 3872144699144536169
       type: {class: GetSpriteInstance, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
@@ -138,3 +233,4 @@ MonoBehaviour:
         m_Sprite: {fileID: 21300000, guid: c80866d85800f416eb8ae4d52d342f92, type: 3}
     - rid: 3872144747186356261
       type: {class: GetStringEmpty, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data: 

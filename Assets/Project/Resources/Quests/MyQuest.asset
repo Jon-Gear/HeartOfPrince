@@ -62,9 +62,9 @@ MonoBehaviour:
     - rid: 1724515069182870175
       type: {class: TasksTree, ns: GameCreator.Runtime.Quests, asm: GameCreator.Runtime.Quests}
       data:
-        m_Dirty: 81964
+        m_Dirty: 76539
         m_Data:
-          m_Keys: fd4d75ecf1ce1399
+          m_Keys: fd4d75ecf1ce1399e79d39c9
           m_Values:
           - m_Id: -327856643
             m_Value:
@@ -72,8 +72,11 @@ MonoBehaviour:
           - m_Id: -1726755087
             m_Value:
               rid: 1724515069182870239
+          - m_Id: -918970905
+            m_Value:
+              rid: 1724515069182870322
         m_Nodes:
-          m_Keys: fd4d75ecf1ce1399
+          m_Keys: fd4d75ecf1ce1399e79d39c9
           m_Values:
           - m_Id: -327856643
             m_Parent: -1
@@ -81,7 +84,10 @@ MonoBehaviour:
           - m_Id: -1726755087
             m_Parent: -1
             m_Children: 
-        m_Roots: fd4d75ecf1ce1399
+          - m_Id: -918970905
+            m_Parent: -1
+            m_Children: 
+        m_Roots: fd4d75ece79d39c9f1ce1399
     - rid: 1724515069182870176
       type: {class: GetStringTextArea, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
@@ -132,7 +138,7 @@ MonoBehaviour:
     - rid: 1724515069182870178
       type: {class: GetStringString, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
-        m_Value: Finish talking to Rojul
+        m_Value: Start talking to Rojul
     - rid: 1724515069182870179
       type: {class: GetStringTextArea, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
@@ -233,5 +239,79 @@ MonoBehaviour:
             m_String: 
             m_ID: 0
     - rid: 1724515069182870246
+      type: {class: EventOnLateUpdate, ns: GameCreator.Runtime.VisualScripting, asm: GameCreator.Runtime.Core}
+      data: 
+    - rid: 1724515069182870322
+      type: {class: Task, ns: GameCreator.Runtime.Quests, asm: GameCreator.Runtime.Quests}
+      data:
+        m_Completion: 0
+        m_IsHidden: 0
+        m_Name:
+          m_Property:
+            rid: 1724515069182870323
+        m_Description:
+          m_Property:
+            rid: 1724515069182870324
+        m_Color:
+          m_Property:
+            rid: 1724515069182870325
+        m_Sprite:
+          m_Property:
+            rid: 1724515069182870326
+        m_UseCounter: 0
+        m_CountTo:
+          m_Property:
+            rid: 1724515069182870327
+        m_ValueFrom:
+          m_Property:
+            rid: 1724515069182870328
+        m_CheckWhen:
+          m_Event:
+            rid: 1724515069182870329
+        m_OnActivate:
+          m_Instructions:
+            m_Instructions: []
+        m_OnDeactivate:
+          m_Instructions:
+            m_Instructions: []
+        m_OnComplete:
+          m_Instructions:
+            m_Instructions: []
+        m_OnAbandon:
+          m_Instructions:
+            m_Instructions: []
+        m_OnFail:
+          m_Instructions:
+            m_Instructions: []
+    - rid: 1724515069182870323
+      type: {class: GetStringString, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_Value: Check out Rojul's sick kick
+    - rid: 1724515069182870324
+      type: {class: GetStringTextArea, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_Text:
+          m_Text: 
+    - rid: 1724515069182870325
+      type: {class: GetColorColorsWhite, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data: 
+    - rid: 1724515069182870326
+      type: {class: GetSpriteNone, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data: 
+    - rid: 1724515069182870327
+      type: {class: GetDecimalDecimal, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_Value: 3
+    - rid: 1724515069182870328
+      type: {class: GetDecimalGlobalName, ns: GameCreator.Runtime.Variables, asm: GameCreator.Runtime.Core}
+      data:
+        m_Variable:
+          m_TypeID:
+            m_String: number
+          m_Variable: {fileID: 0}
+          m_Name:
+            m_String: 
+            m_ID: 0
+    - rid: 1724515069182870329
       type: {class: EventOnLateUpdate, ns: GameCreator.Runtime.VisualScripting, asm: GameCreator.Runtime.Core}
       data: 

@@ -22,6 +22,13 @@ public class YarnCommands : MonoBehaviour
         QuestManager.Instance.CompleteTask(questName, taskName);
     }
 
+    [YarnCommand("updateTaskProgressBy")]
+    public static void UpdateTaskProgressBy(string questName, string taskName, float progress)
+    {
+        QuestManager.Instance.UpdateTaskProgressBy(questName, taskName, progress);
+    }
+
+
 
     [YarnCommand("gesture")]
     public static void Gesture(string actorName, string emoteName)

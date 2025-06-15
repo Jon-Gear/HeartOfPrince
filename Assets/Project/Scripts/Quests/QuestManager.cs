@@ -37,6 +37,18 @@ public class QuestManager : Singleton<QuestManager>
         _ = journal.CompleteTask(quest, taskId);
     }
 
+    public void UpdateTaskProgressBy(string questName, string taskName, float value)
+    {
+        if (journal == null) return;
+        Quest quest = Resources.Load<Quest>("Quests/" + questName);
+        if (quest == null) return;
+        int taskId = FindTaskIdByName(quest.Tasks, taskName);
+
+        double newValue = journal.GetTaskValue(quest, taskId) + value;
+
+        _ = journal.SetTaskValue(quest, taskId, newValue);
+    }
+
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -51,7 +63,7 @@ public class QuestManager : Singleton<QuestManager>
         
     }
 
-    public static int FindTaskIdByName(TasksTree tasksTree, string name)
+    private static int FindTaskIdByName(TasksTree tasksTree, string name)
     {
         foreach (int rootId in tasksTree.RootIds)
         {
