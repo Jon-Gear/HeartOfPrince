@@ -4,24 +4,42 @@ using Yarn.Unity;
 // Wrapper class for DialogueRunner. Must be on the same GameObject as the DialogueRunner component.
 public class DialogueManager : Singleton<DialogueManager>
 {
-    private DialogueRunner dialogueRunner;
+    [SerializeField] private DialogueRunner mainDialogueRunner;
+    [SerializeField] private DialogueRunner backgroundDialogueRunner;
     private void Awake()
     {
-        dialogueRunner = GetComponent<Yarn.Unity.DialogueRunner>();
     }
 
     public bool IsDialogueRunning()
     {
-        return dialogueRunner.IsDialogueRunning;
+        return mainDialogueRunner.IsDialogueRunning;
     }
 
     public void StartDialogue(string startNodeName)
     {
-        dialogueRunner.StartDialogue(startNodeName);
+        if (IsBackgroundDialogueRunning())
+        {
+            StopBackgroundDialogue();
+        }
+        mainDialogueRunner.StartDialogue(startNodeName);
     }
 
     public void StopDialogue()
     {
-        dialogueRunner.Stop();
+        mainDialogueRunner.Stop();
+    }
+
+    public bool IsBackgroundDialogueRunning()
+    {
+        return backgroundDialogueRunner.IsDialogueRunning;
+    }
+    public void StartBackgroundDialogue(string startNodeName)
+    {
+        backgroundDialogueRunner.StartDialogue(startNodeName);
+    }
+
+    public void StopBackgroundDialogue()
+    {
+        backgroundDialogueRunner.Stop();
     }
 }
