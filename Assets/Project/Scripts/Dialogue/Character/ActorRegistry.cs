@@ -8,7 +8,7 @@ public class ActorRegistry : Singleton<ActorRegistry>
     
     public Actor playerActor;
     public Actor currentSpeaker;
-    
+
     public void RegisterActor(Actor actor)
     {
         if (!actors.Contains(actor))

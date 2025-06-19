@@ -15,7 +15,7 @@ public class CharacterView : DialogueViewBase
     public CanvasScaler canvasScaler;
 
     [Tooltip("for best results, set the rectTransform anchors to middle-center, and make sure the rectTransform's pivot Y is set to 0")]
-    public RectTransform dialogueBubbleRect, optionsBubbleRect, backgroundDialogueBubbleRect;
+    public RectTransform dialogueBubbleRect, optionsBubbleRect, backgroundDialogueBubbleRect, innerMonologueBubbleRect;
 
     [Tooltip("margin is 0-1.0 (0.1 means 10% of screen space)... -1 lets dialogue bubbles appear offscreen or get cutoff")]
     public float bubbleMargin = 0.1f;
@@ -92,21 +92,27 @@ public class CharacterView : DialogueViewBase
 
     void Update()
     {
-        if (!DialogueManager.Instance.IsDialogueRunning() && !DialogueManager.Instance.IsBackgroundDialogueRunning()) return;
-        
-        if(backgroundDialogueBubbleRect.gameObject.activeInHierarchy)
-        {
-            backgroundDialogueBubbleRect.anchoredPosition = WorldToAnchoredPosition(backgroundDialogueBubbleRect, ActorRegistry.Instance.currentSpeaker.positionWithOffset, bubbleMargin);
-        }
+        if (!DialogueManager.Instance.IsDialogueRunning() && !DialogueManager.Instance.IsBackgroundDialogueRunning() && !DialogueManager.Instance.IsInnerMonologueRunning()) return;
 
-        if (dialogueBubbleRect.gameObject.activeInHierarchy)
+        if (dialogueBubbleRect.gameObject.activeInHierarchy && DialogueManager.Instance.IsDialogueRunning())
         {
             dialogueBubbleRect.anchoredPosition = WorldToAnchoredPosition(dialogueBubbleRect, ActorRegistry.Instance.currentSpeaker.positionWithOffset, bubbleMargin);
         }
 
-        if (optionsBubbleRect.gameObject.activeInHierarchy)
+        if (optionsBubbleRect.gameObject.activeInHierarchy && DialogueManager.Instance.IsDialogueRunning())
         {
             optionsBubbleRect.anchoredPosition = WorldToAnchoredPosition(optionsBubbleRect, ActorRegistry.Instance.playerActor.positionWithOffset, bubbleMargin);
         }
+
+        if (innerMonologueBubbleRect.gameObject.activeInHierarchy && DialogueManager.Instance.IsInnerMonologueRunning())
+        {
+            innerMonologueBubbleRect.anchoredPosition = WorldToAnchoredPosition(innerMonologueBubbleRect, ActorRegistry.Instance.playerActor.positionWithOffset, bubbleMargin);
+        }
+
+        if (backgroundDialogueBubbleRect.gameObject.activeInHierarchy && DialogueManager.Instance.IsBackgroundDialogueRunning())
+        {
+            backgroundDialogueBubbleRect.anchoredPosition = WorldToAnchoredPosition(backgroundDialogueBubbleRect, ActorRegistry.Instance.currentSpeaker.positionWithOffset, bubbleMargin);
+        }
+
     }
 }

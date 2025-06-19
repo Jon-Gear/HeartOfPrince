@@ -1,7 +1,7 @@
-﻿title: Test_Rojul_1
+title: dialogue_Rojul_1
 tags:
 ---
-//<<setCloseUpShot>>
+<<setCloseUpShot>>
 
 <<enterState Rojul WaveSmall>>
 <<addActorToShot Rojul>>
@@ -79,6 +79,5 @@ Prince: Walaikum as salaam!
 <<exitState Prince WaveBig>>
 
 <<removeActorFromShot Rojul>>
-//<<setLongShot>>
-
+<<setLongShot>>
 ===

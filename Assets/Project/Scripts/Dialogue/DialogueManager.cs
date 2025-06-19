@@ -6,9 +6,8 @@ public class DialogueManager : Singleton<DialogueManager>
 {
     [SerializeField] private DialogueRunner mainDialogueRunner;
     [SerializeField] private DialogueRunner backgroundDialogueRunner;
-    private void Awake()
-    {
-    }
+    [SerializeField] private DialogueRunner innerMonologueRunner;
+
 
     public bool IsDialogueRunning()
     {
@@ -20,6 +19,10 @@ public class DialogueManager : Singleton<DialogueManager>
         if (IsBackgroundDialogueRunning())
         {
             StopBackgroundDialogue();
+        }
+        if (IsInnerMonologueRunning())
+        {
+            StopInnerMonologue();
         }
         mainDialogueRunner.StartDialogue(startNodeName);
     }
@@ -41,5 +44,23 @@ public class DialogueManager : Singleton<DialogueManager>
     public void StopBackgroundDialogue()
     {
         backgroundDialogueRunner.Stop();
+    }
+
+    public bool IsInnerMonologueRunning()
+    {
+        return innerMonologueRunner.IsDialogueRunning;
+    }
+    public void StartInnerMonologue(string startNodeName)
+    {
+        if (IsBackgroundDialogueRunning())
+        {
+            StopBackgroundDialogue();
+        }
+        innerMonologueRunner.StartDialogue(startNodeName);
+    }
+
+    public void StopInnerMonologue()
+    {
+        innerMonologueRunner.Stop();
     }
 }

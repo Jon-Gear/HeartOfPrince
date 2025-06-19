@@ -908,7 +908,7 @@ GameObject:
   - component: {fileID: 1623010325646008645}
   - component: {fileID: 3274460076930610513}
   m_Layer: 0
-  m_Name: Yapping
+  m_Name: BackgroundDialogue
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -941,24 +941,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b813a572fec77a3478eae3f407b9b0ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  backgroundNodes:
-  - Test_Walad_Yapping_1
-  - Test_Walad_Yapping_2
-  - Test_Walad_Yapping_3
-  - Test_Walad_Yapping_4
-  - Test_Walad_Yapping_5
-  - Test_Walad_Yapping_6
-  - Test_Walad_Yapping_7
-  - Test_Walad_Yapping_8
-  - Test_Walad_Yapping_9
-  - Test_Walad_Yapping_10
-  - Test_Walad_Yapping_11
-  - Test_Walad_Yapping_12
-  - Test_Walad_Yapping_13
-  - Test_Walad_Yapping_14
-  - Test_Walad_Yapping_15
-  minInterval: 1
-  maxInterval: 5
+  actor: {fileID: 8428202570901555147}
+  maxVariants: 15
+  minInterval: 5
+  maxInterval: 10
 --- !u!1 &4132396737561905825
 GameObject:
   m_ObjectHideFlags: 0
@@ -1471,19 +1457,19 @@ MonoBehaviour:
       rid: 3582672023768269325
   m_RuntimeData:
     m_Overrides:
-    - rid: 1724515073052115755
+    - rid: 1724515170107523506
   references:
     version: 2
     RefIds:
-    - rid: 1724515073052115755
+    - rid: 1724515170107523506
       type: {class: Parameter, ns: GameCreator.Runtime.Behavior, asm: GameCreator.Runtime.Behavior}
       data:
         m_Breakpoint: 0
         m_IsEnabled: 1
         m_Value:
-          rid: 1724515073052115756
+          rid: 1724515170107523507
         m_Name: Social
-    - rid: 1724515073052115756
+    - rid: 1724515170107523507
       type: {class: ValueStat, ns: GameCreator.Runtime.Stats, asm: GameCreator.Runtime.Stats}
       data:
         m_Breakpoint: 0
@@ -1542,7 +1528,7 @@ MonoBehaviour:
   actorName: Walad
   animationStates: []
   gestures: []
-  messageBubbleOffset: {x: 0, y: 0.9, z: 0}
+  messageBubbleOffset: {x: 0, y: 0.5, z: 0}
   references:
     version: 2
     RefIds: []

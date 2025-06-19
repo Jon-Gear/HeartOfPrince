@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2465985659367620890}
   - component: {fileID: 3389015985003205845}
+  - component: {fileID: 8907982425964217958}
   - component: {fileID: 4629552757498152351}
   m_Layer: 0
   m_Name: Dialogue
@@ -17,7 +18,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2465985659367620890
 Transform:
   m_ObjectHideFlags: 0
@@ -70,8 +71,7 @@ MonoBehaviour:
       data:
         m_Breakpoint: 0
         m_IsEnabled: 1
-        m_WaitToFinish: 1
-        startNodeName: Test_Rojul_1
+        characterDialogue: {fileID: 8907982425964217958}
     - rid: 1724515057276813700
       type: {class: InstructionGameObjectDestroy, ns: GameCreator.Runtime.VisualScripting, asm: GameCreator.Runtime.Core}
       data:
@@ -83,6 +83,20 @@ MonoBehaviour:
     - rid: 1724515057276813751
       type: {class: GetGameObjectSelf, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data: 
+--- !u!114 &8907982425964217958
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 116113855708464666}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a01d62c905fb914bb6d0c1d360753b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  actor: {fileID: 7206668920010851156}
+  maxVariants: 1
 --- !u!135 &4629552757498152351
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -168,6 +182,54 @@ Transform:
   - {fileID: 8488324226590503326}
   m_Father: {fileID: 5477873519772376211}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &330856535234398555
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2508610714823508939}
+  - component: {fileID: 8138529165284803698}
+  m_Layer: 0
+  m_Name: BackgroundDialogue
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2508610714823508939
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330856535234398555}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -1, z: -0, w: 0}
+  m_LocalPosition: {x: -4.6826596, y: -1.18, z: -1.1555699}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1793972296288166232}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8138529165284803698
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330856535234398555}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b813a572fec77a3478eae3f407b9b0ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  actor: {fileID: 7206668920010851156}
+  maxVariants: 15
+  minInterval: 1
+  maxInterval: 2
 --- !u!1 &354891109219564534
 GameObject:
   m_ObjectHideFlags: 0
@@ -1309,6 +1371,7 @@ Transform:
   - {fileID: 6698278384103419117}
   - {fileID: 6415659808457242585}
   - {fileID: 2465985659367620890}
+  - {fileID: 2508610714823508939}
   - {fileID: 4900734011802428147}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1484,19 +1547,19 @@ MonoBehaviour:
       rid: 3582672023768269325
   m_RuntimeData:
     m_Overrides:
-    - rid: 1724515072241566590
+    - rid: 1724515170107523619
   references:
     version: 2
     RefIds:
-    - rid: 1724515072241566590
+    - rid: 1724515170107523619
       type: {class: Parameter, ns: GameCreator.Runtime.Behavior, asm: GameCreator.Runtime.Behavior}
       data:
         m_Breakpoint: 0
         m_IsEnabled: 1
         m_Value:
-          rid: 1724515072241566591
+          rid: 1724515170107523620
         m_Name: Social
-    - rid: 1724515072241566591
+    - rid: 1724515170107523620
       type: {class: ValueStat, ns: GameCreator.Runtime.Stats, asm: GameCreator.Runtime.Stats}
       data:
         m_Breakpoint: 0
@@ -1618,7 +1681,7 @@ MonoBehaviour:
     m_UseRootMotion: 1
     m_TransitionIn: 0.1
     m_TransitionOut: 0.1
-  messageBubbleOffset: {x: 0, y: 1.8, z: 0}
+  messageBubbleOffset: {x: 0, y: 1, z: 0}
   references:
     version: 2
     RefIds:
