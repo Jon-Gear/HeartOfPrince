@@ -4,11 +4,7 @@ using UnityEngine;
 
 
 [ExecuteAlways] public class DayNightCycle : Singleton<DayNightCycle>
-{
-
-    [Header("Time")]
-    [SerializeField] private LightingPreset Preset;
-    
+{   
     [Header("Sun Light")]
     [SerializeField] private Light sun;
     [SerializeField] private float sunBaseIntensity = 1f;
@@ -33,11 +29,6 @@ using UnityEngine;
     // Update is called once per frame
     private void Update()
     {
-        if(Preset == null)
-        {
-            return;
-        }
-
         RotateSun();
         SetIntensity();
         AdjustColor();
@@ -45,7 +36,7 @@ using UnityEngine;
 
     private void RotateSun()
     {
-        float _sunAngle = TimeManager.Instance.GetTimePercentage() * 360f;
+        float _sunAngle = TimeManager.Instance.GetSunAngle();
 
         dailyRotation.transform.localRotation = Quaternion.Euler(new Vector3(_sunAngle, 0f, 0f));
     }

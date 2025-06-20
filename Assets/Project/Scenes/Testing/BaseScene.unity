@@ -20,7 +20,7 @@ RenderSettings:
   m_FogDensity: 0.01
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
-  m_AmbientSkyColor: {r: 0.95686275, g: 0.6156863, b: 0.21568628, a: 1}
+  m_AmbientSkyColor: {r: 0.92645806, g: 0.59747154, b: 0.21610662, a: 1}
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
   m_AmbientIntensity: 1
@@ -1196,7 +1196,6 @@ MonoBehaviour:
         m_Breakpoint: 0
         m_IsEnabled: 1
         commentMonologue: {fileID: 272048707}
-        waitToFinish: 1
     - rid: 1724515169484144727
       type: {class: EventTriggerEnter, ns: GameCreator.Runtime.VisualScripting, asm: GameCreator.Runtime.Core}
       data:
@@ -1720,7 +1719,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Do robots dream of electric sheep?
+  m_text: World-building background dialogue
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e0d1a6181bab04d7798f2c45bdbf213e, type: 2}
   m_sharedMaterial: {fileID: 486879446900443550, guid: e0d1a6181bab04d7798f2c45bdbf213e, type: 2}
@@ -1747,7 +1746,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 14.6
+  m_fontSize: 14
   m_fontSizeBase: 16
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -3449,7 +3448,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Wa alaykum assal\u0101m wa rahmatull\u0101hi wa barak\u0101tuh!"
+  m_text: Engaging responses
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e0d1a6181bab04d7798f2c45bdbf213e, type: 2}
   m_sharedMaterial: {fileID: 486879446900443550, guid: e0d1a6181bab04d7798f2c45bdbf213e, type: 2}
@@ -3476,7 +3475,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 25.3
+  m_fontSize: 32
   m_fontSizeBase: 16
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -5728,7 +5727,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Wa alaykum assal\u0101m wa rahmatull\u0101hi wa barak\u0101tuh!"
+  m_text: Engaging dialogue
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e0d1a6181bab04d7798f2c45bdbf213e, type: 2}
   m_sharedMaterial: {fileID: 486879446900443550, guid: e0d1a6181bab04d7798f2c45bdbf213e, type: 2}
@@ -5755,7 +5754,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24.55
+  m_fontSize: 32
   m_fontSizeBase: 16
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -6105,8 +6104,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dayNumber: 0
   now: 0.5
-  targetDayLengthInMinutes: 1
-  lightingPreset: {fileID: 11400000, guid: 9c4eb2ff991f94f50aa3341af7958c24, type: 2}
+  targetDayLengthInMinutes: 12
+  prayerTimes: {fileID: 11400000, guid: 88189400d8c3e684a8e71f17ed85b0f4, type: 2}
 --- !u!114 &159114645836102857
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6215,19 +6214,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7133505055774934086, guid: 7131fe10b032f4ed18e1083760662655, type: 3}
       propertyPath: m_Color.b
-      value: 1
+      value: 0.9426988
       objectReference: {fileID: 0}
     - target: {fileID: 7133505055774934086, guid: 7131fe10b032f4ed18e1083760662655, type: 3}
       propertyPath: m_Color.g
-      value: 0.99738085
+      value: 0.9794358
       objectReference: {fileID: 0}
     - target: {fileID: 7133505055774934086, guid: 7131fe10b032f4ed18e1083760662655, type: 3}
       propertyPath: m_Color.r
-      value: 0.9481132
+      value: 0.9510864
       objectReference: {fileID: 0}
     - target: {fileID: 7133505055774934086, guid: 7131fe10b032f4ed18e1083760662655, type: 3}
       propertyPath: m_Intensity
-      value: 1
+      value: 0.98213553
       objectReference: {fileID: 0}
     - target: {fileID: 7469980814372355169, guid: 7131fe10b032f4ed18e1083760662655, type: 3}
       propertyPath: m_Color.b
@@ -6247,11 +6246,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7911859537121111428, guid: 7131fe10b032f4ed18e1083760662655, type: 3}
       propertyPath: m_LocalRotation.w
-      value: -0.00000004371139
+      value: -0.13365817
       objectReference: {fileID: 0}
     - target: {fileID: 7911859537121111428, guid: 7131fe10b032f4ed18e1083760662655, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 1
+      value: 0.9910275
       objectReference: {fileID: 0}
     - target: {fileID: 8056362267222388149, guid: 7131fe10b032f4ed18e1083760662655, type: 3}
       propertyPath: m_Name

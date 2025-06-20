@@ -63,13 +63,14 @@ public class TimeManager : EditorSingleton<TimeManager>
 
     public DAYTIME GetDayTime()
     {
-        if (lightingPreset == null)
+        if (prayerTimes == null)
         {
-            Debug.LogWarning("Lighting preset is not set.");
+            Debug.LogWarning("Prayer times is not set.");
             return DAYTIME.Night;
         }
-        return lightingPreset.GetDayTime(now);
+        return prayerTimes.GetDayTime(now);
     }
+
 
     public WEEKDAY GetWeekDay()
     {
@@ -96,42 +97,14 @@ public class TimeManager : EditorSingleton<TimeManager>
         return now;
     }
 
-    public bool IsMonday()
+    public float GetSunAngle()
     {
-        return dayNumber % 7 == 0;
-    }
-    
-    public bool IsTuesday()
-    {
-        return dayNumber % 7 == 1;
-    }
-
-
-    public bool IsWednesday()
-    {
-        return dayNumber % 7 == 2;
-    }
-
-    public bool IsThursday()
-    {
-        return dayNumber % 7 == 3;
-    }
-
-
-    public bool IsFriday()
-    {
-        return dayNumber % 7 == 4;
-    }
-
-
-    public bool IsSaturday()
-    {
-        return dayNumber % 7 == 5;
-    }
-
-    public bool IsSunday()
-    {
-        return dayNumber % 7 == 6;
+        if (prayerTimes == null)
+        {
+            Debug.LogWarning("Prayer times is not set.");
+            return 0.0f;
+        }
+        return prayerTimes.GetSunAngle(now);
     }
 
 
@@ -143,7 +116,7 @@ public class TimeManager : EditorSingleton<TimeManager>
     [Header("Settings")]
     [SerializeField][Range(0f, 1f)] private float now;
     [SerializeField] private float targetDayLengthInMinutes = 24f;
-    [SerializeField] LightingPreset lightingPreset;
+    [SerializeField] public PrayerTimes prayerTimes;
 
     private int hours => Mathf.FloorToInt(now * 24f);
     private int minutes => Mathf.FloorToInt(((now * 24f) - hours) * 60f);

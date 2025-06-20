@@ -50,7 +50,7 @@ public class StopDialogueYarn : Instruction
 public class PlayCommentMonologue : Instruction
 {
     [SerializeField] private CommentMonologue commentMonologue;
-    [SerializeField] private bool waitToFinish = true;
+    
 
     public override string Title => string.Format("Play monologue");
 

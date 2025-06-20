@@ -229,7 +229,6 @@ MonoBehaviour:
   actor: {fileID: 7206668920010851156}
   maxVariants: 15
   nodeTemplates:
-  - background_dialogue_{actor}_{index}
   - background_dialogue_{actor}_{time}_{index}
   minInterval: 1
   maxInterval: 2
@@ -1550,19 +1549,19 @@ MonoBehaviour:
       rid: 3582672023768269325
   m_RuntimeData:
     m_Overrides:
-    - rid: 1724515171202236859
+    - rid: 1724515181521797585
   references:
     version: 2
     RefIds:
-    - rid: 1724515171202236859
+    - rid: 1724515181521797585
       type: {class: Parameter, ns: GameCreator.Runtime.Behavior, asm: GameCreator.Runtime.Behavior}
       data:
         m_Breakpoint: 0
         m_IsEnabled: 1
         m_Value:
-          rid: 1724515171202236860
+          rid: 1724515181521797586
         m_Name: Social
-    - rid: 1724515171202236860
+    - rid: 1724515181521797586
       type: {class: ValueStat, ns: GameCreator.Runtime.Stats, asm: GameCreator.Runtime.Stats}
       data:
         m_Breakpoint: 0
