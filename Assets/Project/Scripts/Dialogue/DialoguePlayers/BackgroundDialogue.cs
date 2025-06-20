@@ -11,10 +11,20 @@ public class BackgroundDialogue: MonoBehaviour
     [SerializeField] private Actor actor;
     [SerializeField] private int maxVariants = 3;             // Number of monologue variants available per context
 
-    [Tooltip("Minimum time between yaps (seconds).")]
+    [Header("Node Template Options")]
+    public List<string> nodeTemplates = new List<string>
+    {
+        "background_dialogue_{actor}_{index}",
+        //"background_dialogue_{actor}_{location}_{index}",
+        "background_dialogue_{actor}_{time}_{index}"
+        //"background_dialogue_{actor}_{location}_{time}_{index}",
+        //"background_dialogue_{actor}_{mood}_{index}"
+    };
+
+    [Tooltip("Minimum time between dialogues (seconds).")]
     public float minInterval = 1.0f;
 
-    [Tooltip("Maximum time between yaps (seconds).")]
+    [Tooltip("Maximum time between dialogues (seconds).")]
     public float maxInterval = 2.0f;
 
     void Start()
@@ -44,8 +54,15 @@ public class BackgroundDialogue: MonoBehaviour
     string GetRandomBackgroundDialogueNode()
     {
         int index = Random.Range(1, maxVariants + 1);
-        return $"background_dialogue_{actor.actorName}_{index}";
+        string template = nodeTemplates[Random.Range(0, nodeTemplates.Count)];
 
-        //return $"dialogue_{actor.actorName}_{location}_{situation}_{index}";
+        string nodeName = template
+            .Replace("{actor}", actor.actorName.ToLower())
+            //.Replace("{location}", location.ToLower())
+            .Replace("{time}", TimeManager.Instance.ToString(TimeManager.Instance.GetDayTime()).ToLower())
+            //.Replace("{mood}", mood.ToLower())
+            .Replace("{index}", index.ToString());
+
+        return nodeName;
     }
 }
