@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7616124706664191044}
   - component: {fileID: 6775929953003449206}
   m_Layer: 5
-  m_Name: WeatherIcon
+  m_Name: DayIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -329,6 +329,13 @@ MonoBehaviour:
   clockText: {fileID: 4698211809814682567}
   weekDayText: {fileID: 777207629111235202}
   dayTimeText: {fileID: 3817928797812425010}
+  DayIcon: {fileID: 6775929953003449206}
+  morningIcon: {fileID: 21300000, guid: f57614ca5f44e4b4e81a312af19932fb, type: 3}
+  sunriseIcon: {fileID: 21300000, guid: b68560d10b485b045b93d4584506dea0, type: 3}
+  noonIcon: {fileID: 21300000, guid: 0d5eaa60752801c41a69c74c5e1bd4d1, type: 3}
+  afternoonIcon: {fileID: 21300000, guid: 6d8a2a59109ba3e40a3367161778ba35, type: 3}
+  eveningIcon: {fileID: 21300000, guid: a29fbfc707407e64fa05e90be6124218, type: 3}
+  nightIcon: {fileID: 21300000, guid: 51838cc623cb8044f9064ce24bf6e503, type: 3}
 --- !u!114 &4365457045853408870
 MonoBehaviour:
   m_ObjectHideFlags: 0
