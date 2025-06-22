@@ -116,11 +116,13 @@ namespace PluginMaster
             UnityEditor.Undo.undoRedoPerformed += OnUndoPerformed;
             UnityEditor.SceneView.duringSceneGui += DuringSceneGUI;
             PaletteManager.OnPaletteChanged += OnPaletteChanged;
-            PaletteManager.OnBrushChanged += OnBrushChanged;
+            PaletteManager.OnBrushSelectionChanged += OnBrushSelectionChanged;
             ToolManager.OnToolModeChanged += OnEditModeChanged;
             LineInitializeOnLoad();
             ShapeInitializeOnLoad();
             TilingInitializeOnLoad();
+            FloorInitializeOnLoad();
+            WallInitializeOnLoad();
         }
 
         private static void OnPaletteChanged()
@@ -135,6 +137,7 @@ namespace PluginMaster
                 case ToolManager.PaintTool.REPLACER:
                     if (ReplacerManager.settings.command == ModifierToolSettings.Command.SELECT_PALETTE_PREFABS)
                         UpdateOctree();
+                    BrushstrokeManager.ClearReplacerDictionary();
                     break;
                 case ToolManager.PaintTool.CIRCLE_SELECT:
                     if (CircleSelectManager.settings.command == ModifierToolSettings.Command.SELECT_PALETTE_PREFABS)
@@ -143,10 +146,13 @@ namespace PluginMaster
             }
         }
 
-        private static void OnBrushChanged()
+        private static void OnBrushSelectionChanged()
         {
             switch (ToolManager.tool)
             {
+                case ToolManager.PaintTool.GRAVITY:
+                    InitializeGravityHeight();
+                    break;
                 case ToolManager.PaintTool.LINE:
                     ClearLineStroke();
                     break;
@@ -166,10 +172,17 @@ namespace PluginMaster
                 case ToolManager.PaintTool.REPLACER:
                     if (ReplacerManager.settings.command == ModifierToolSettings.Command.SELECT_BRUSH_PREFABS)
                         UpdateOctree();
+                    BrushstrokeManager.ClearReplacerDictionary();
                     break;
                 case ToolManager.PaintTool.CIRCLE_SELECT:
-                    if(CircleSelectManager.settings.command == ModifierToolSettings.Command.SELECT_BRUSH_PREFABS)
+                    if (CircleSelectManager.settings.command == ModifierToolSettings.Command.SELECT_BRUSH_PREFABS)
                         UpdateOctree();
+                    break;
+                case ToolManager.PaintTool.FLOOR:
+                    UpdateFloorSettingsOnBrushChanged();
+                    break;
+                case ToolManager.PaintTool.WALL:
+                    UpdateWallSettingsOnBrushChanged();
                     break;
             }
         }
@@ -190,14 +203,30 @@ namespace PluginMaster
                 sceneView.Repaint();
                 repaint = false;
             }
-
+            GizmosInput();
+            if (_offsetPicking)
+            {
+                OffsetPicking(sceneView.camera);
+                var labelTexts = new string[] { $"Offset: {_offsetPickingValue.ToString("F5")}" };
+                InfoText.Draw(sceneView, labelTexts.ToArray());
+                if (Event.current.button == 0 && Event.current.type == EventType.MouseDown)
+                {
+                    _offsetPickingBrush.SetLocalPositionOffset(_offsetPickingValue, _offsetPickingAxis);
+                    BrushProperties.RepaintWindow();
+                    _offsetPicking = false;
+                }
+                if (Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Escape)
+                    _offsetPicking = false;
+                sceneView.Repaint();
+            }
             PaletteInput(sceneView);
             _sceneViewCamera = sceneView.camera;
 
             if (Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Escape
                 && (tool == ToolManager.PaintTool.PIN || tool == ToolManager.PaintTool.BRUSH
                 || tool == ToolManager.PaintTool.GRAVITY || tool == ToolManager.PaintTool.ERASER
-                || tool == ToolManager.PaintTool.REPLACER || tool == ToolManager.PaintTool.CIRCLE_SELECT))
+                || tool == ToolManager.PaintTool.REPLACER || tool == ToolManager.PaintTool.CIRCLE_SELECT
+                || tool == ToolManager.PaintTool.FLOOR || tool == ToolManager.PaintTool.WALL))
                 ToolManager.DeselectTool();
             var repaintScene = _wasPickingBrushes == PaletteManager.pickingBrushes;
             _wasPickingBrushes = PaletteManager.pickingBrushes;
@@ -238,7 +267,6 @@ namespace PluginMaster
                     else if (tool == ToolManager.PaintTool.TILING
                         && _tilingData != null && _tilingData.state != ToolManager.ToolState.NONE)
                         ResetTilingState();
-                    return;
                 }
 
                 if (Event.current.type == EventType.MouseEnterWindow) _pinned = false;
@@ -299,16 +327,24 @@ namespace PluginMaster
                     case ToolManager.PaintTool.MIRROR:
                         MirrorDuringSceneGUI(sceneView);
                         break;
+                    case ToolManager.PaintTool.FLOOR:
+                        FloorToolDuringSceneGUI(sceneView);
+                        break;
+                    case ToolManager.PaintTool.WALL:
+                        WallToolDuringSceneGUI(sceneView);
+                        break;
                 }
 
                 if ((tool != ToolManager.PaintTool.EXTRUDE && tool != ToolManager.PaintTool.SELECTION
-                    && tool != ToolManager.PaintTool.MIRROR) && Event.current.type == EventType.Layout && !ToolManager.editMode)
+                    && tool != ToolManager.PaintTool.MIRROR) && Event.current.type == EventType.Layout
+                    && !ToolManager.editMode)
                 {
                     UnityEditor.Tools.current = UnityEditor.Tool.None;
                     UnityEditor.HandleUtility.AddDefaultControl(_controlId);
                 }
             }
             GridDuringSceneGui(sceneView);
+            sceneView.autoRepaintOnSceneChange = true;
         }
 
         private static float UpdateRadius(float radius)
@@ -484,7 +520,7 @@ namespace PluginMaster
                 periPoints.Add(center + (worldDir * radius));
             }
             UnityEditor.Handles.zTest = UnityEngine.Rendering.CompareFunction.Always;
-            
+
             UnityEditor.Handles.color = new Color(1f, 1f, 1f, 1f);
             UnityEditor.Handles.DrawAAPolyLine(5, periPoints.ToArray());
             UnityEditor.Handles.color = color;
@@ -495,7 +531,7 @@ namespace PluginMaster
             float radius, System.Collections.Generic.HashSet<GameObject> targets)
         {
             var nearbyObjects = octree.GetNearby(mouseRay, radius).Where(o => o != null);
-            
+
             targets.Clear();
             if (selectionBrushTool.outermostPrefabFilter)
             {
@@ -541,6 +577,7 @@ namespace PluginMaster
         public static void OnUndoPerformed()
         {
             _octree = null;
+            _boundsOctree = null;
             if (tool == ToolManager.PaintTool.LINE && UnityEditor.Undo.GetCurrentGroupName() == LineData.COMMAND_NAME)
             {
                 OnUndoLine();
@@ -560,7 +597,11 @@ namespace PluginMaster
                 || ToolManager.tool == ToolManager.PaintTool.SHAPE
                 || ToolManager.tool == ToolManager.PaintTool.TILING)
                 PWBCore.staticData.SaveAndUpdateVersion();
-            else BrushstrokeManager.UpdateBrushstroke();
+            else
+            {
+                if (ToolManager.tool == ToolManager.PaintTool.REPLACER) BrushstrokeManager.ClearReplacerDictionary();
+                BrushstrokeManager.UpdateBrushstroke();
+            }
             UnityEditor.SceneView.RepaintAll();
         }
 
@@ -621,7 +662,7 @@ namespace PluginMaster
             (PersistentToolManagerBase<TOOL_NAME, TOOL_SETTINGS, CONTROL_POINT, TOOL_DATA, SCENE_DATA> manager,
             ref bool editingPersistentObject, TOOL_DATA initialPersistentData)
             where TOOL_NAME : IToolName, new()
-            where TOOL_SETTINGS : ICloneableToolSettings, new()
+            where TOOL_SETTINGS : IToolSettings, new()
             where CONTROL_POINT : ControlPoint, new()
             where TOOL_DATA : PersistentData<TOOL_NAME, TOOL_SETTINGS, CONTROL_POINT>, new()
             where SCENE_DATA : SceneData<TOOL_NAME, TOOL_SETTINGS, CONTROL_POINT, TOOL_DATA>, new()
@@ -631,24 +672,19 @@ namespace PluginMaster
             var selectedItem = manager.GetItem(initialPersistentData.id);
             if (selectedItem == null) return;
             selectedItem.ResetPoses(initialPersistentData);
-            selectedItem.selectedPointIdx = -1;
             selectedItem.ClearSelection();
         }
 
         private static void DeselectPersistentItems<TOOL_NAME, TOOL_SETTINGS, CONTROL_POINT, TOOL_DATA, SCENE_DATA>
             (PersistentToolManagerBase<TOOL_NAME, TOOL_SETTINGS, CONTROL_POINT, TOOL_DATA, SCENE_DATA> manager)
             where TOOL_NAME : IToolName, new()
-            where TOOL_SETTINGS : ICloneableToolSettings, new()
+            where TOOL_SETTINGS : IToolSettings, new()
             where CONTROL_POINT : ControlPoint, new()
             where TOOL_DATA : PersistentData<TOOL_NAME, TOOL_SETTINGS, CONTROL_POINT>, new()
             where SCENE_DATA : SceneData<TOOL_NAME, TOOL_SETTINGS, CONTROL_POINT, TOOL_DATA>, new()
         {
             var persitentTilings = manager.GetPersistentItems();
-            foreach (var i in persitentTilings)
-            {
-                i.selectedPointIdx = -1;
-                i.ClearSelection();
-            }
+            foreach (var i in persitentTilings) i.ClearSelection();
         }
 
         private static bool ApplySelectedPersistentObject<TOOL_NAME, TOOL_SETTINGS, CONTROL_POINT, TOOL_DATA, SCENE_DATA>
@@ -656,7 +692,7 @@ namespace PluginMaster
             ref TOOL_DATA selectedPersistentData,
             PersistentToolManagerBase<TOOL_NAME, TOOL_SETTINGS, CONTROL_POINT, TOOL_DATA, SCENE_DATA> manager)
             where TOOL_NAME : IToolName, new()
-            where TOOL_SETTINGS : ICloneableToolSettings, new()
+            where TOOL_SETTINGS : IToolSettings, new()
             where CONTROL_POINT : ControlPoint, new()
             where TOOL_DATA : PersistentData<TOOL_NAME, TOOL_SETTINGS, CONTROL_POINT>, new()
             where SCENE_DATA : SceneData<TOOL_NAME, TOOL_SETTINGS, CONTROL_POINT, TOOL_DATA>, new()
@@ -691,44 +727,107 @@ namespace PluginMaster
             PWBCore.staticData.SaveAndUpdateVersion();
             if (!deselectPoint) return true;
             var persistentObjects = manager.GetPersistentItems();
-            foreach (var item in persistentObjects)
-            {
-                item.selectedPointIdx = -1;
-                item.ClearSelection();
-            }
+            foreach (var item in persistentObjects) item.ClearSelection();
             return true;
         }
 
         static bool _persistentItemWasEdited = false;
+
+
+        public static void DuplicateItem(long itemId)
+        {
+            var toolMan = ToolManager.GetCurrentPersistentToolManager();
+            var clone = toolMan.Duplicate(itemId);
+            ToolManager.editMode = true;
+            clone.isSelected = true;
+            var allItems = toolMan.GetItems();
+            foreach (var item in allItems)
+            {
+                if (item == clone) continue;
+                item.isSelected = false;
+                item.ClearSelection();
+            }
+            var bounds = clone.GetBounds(1.1f);
+            UnityEditor.SceneView.lastActiveSceneView.Frame(bounds, false);
+
+            if (ToolManager.tool == ToolManager.PaintTool.LINE)
+            {
+                LineManager.editModeType = LineManager.EditModeType.LINE_POSE;
+                PWBIO.SelectLine(clone as LineData);
+            }
+            else if (ToolManager.tool == ToolManager.PaintTool.SHAPE) PWBIO.SelectShape(clone as ShapeData);
+            else if (ToolManager.tool == ToolManager.PaintTool.TILING) PWBIO.SelectTiling(clone as TilingData);
+        }
+
+        public static void PersistentItemContextMenu(UnityEditor.GenericMenu menu,
+            IPersistentData data, Vector2 mousePosition)
+        {
+            void DeleteItem(bool deleteObjects)
+            {
+                var toolMan = ToolManager.GetCurrentPersistentToolManager();
+                toolMan.DeletePersistentItem(data.id, deleteObjects);
+                UnityEditor.SceneView.RepaintAll();
+            }
+            menu.AddItem(new GUIContent("Select parent object ... "
+               + PWBSettings.shortcuts.editModeSelectParent.combination.ToString()), on: false, () =>
+               {
+                   var parent = data.GetParent();
+                   if (parent != null) UnityEditor.Selection.activeGameObject = parent;
+               });
+            menu.AddItem(new GUIContent("Duplicate ... "
+                + PWBSettings.shortcuts.editModeDuplicate.combination.ToString()), on: false, () => DuplicateItem(data.id));
+            menu.AddItem(new GUIContent("Delete item and its children ... "
+                + PWBSettings.shortcuts.editModeDeleteItemAndItsChildren.combination.ToString()),
+                on: false, () => DeleteItem(deleteObjects: true));
+            menu.AddItem(new GUIContent("Delete item but not its children ... "
+                + PWBSettings.shortcuts.editModeDeleteItemButNotItsChildren.combination.ToString()), on: false,
+                () => DeleteItem(deleteObjects: false));
+            menu.AddSeparator(string.Empty);
+            menu.AddItem(new GUIContent(data.toolName + " properties..."), on: false,
+                           () => ItemPropertiesWindow.ShowItemProperties(data, mousePosition));
+        }
         #endregion
 
         #region OCTREE
         private const float MIN_OCTREE_NODE_SIZE = 0.5f;
         private static PointOctree<GameObject> _octree = new PointOctree<GameObject>(10, Vector3.zero, MIN_OCTREE_NODE_SIZE);
+        private static BoundsOctree<GameObject> _boundsOctree = new BoundsOctree<GameObject>(initialWorldSize: 10,
+            initialWorldPos: Vector3.zero, MIN_OCTREE_NODE_SIZE, MIN_OCTREE_NODE_SIZE);
         private static System.Collections.Generic.HashSet<GameObject> _paintedObjects
             = new System.Collections.Generic.HashSet<GameObject>();
+        private static bool _octreeUpdatePending = false;
+        public static void SetOctreeUpdatePending() => _octreeUpdatePending|= true;
         public static PointOctree<GameObject> octree
         {
             get
             {
-                if (_octree == null) UpdateOctree();
+                if (_octree == null || _octreeUpdatePending) UpdateOctree();
                 return _octree;
             }
-            set => _octree = value;
+        }
+
+        public static BoundsOctree<GameObject> boundsOctree
+        {
+            get
+            {
+                if (_boundsOctree == null || _octreeUpdatePending) UpdateOctree();
+                return _boundsOctree;
+            }
         }
         public static void UpdateOctree()
         {
+            _octreeUpdatePending = false;
+            _octree = new PointOctree<GameObject>(10, Vector3.zero, MIN_OCTREE_NODE_SIZE);
+            _boundsOctree = new BoundsOctree<GameObject>(initialWorldSize: 10,
+           initialWorldPos: Vector3.zero, MIN_OCTREE_NODE_SIZE, MIN_OCTREE_NODE_SIZE);
             if (PaletteManager.paletteCount == 0) return;
             if ((tool == ToolManager.PaintTool.PIN || tool == ToolManager.PaintTool.BRUSH
-                || tool == ToolManager.PaintTool.GRAVITY || tool == ToolManager.PaintTool.LINE
-                || tool == ToolManager.PaintTool.SHAPE || tool == ToolManager.PaintTool.TILING)
-                && PaletteManager.selectedBrushIdx < 0) return;
+                || tool == ToolManager.PaintTool.GRAVITY) && PaletteManager.selectedBrushIdx < 0) return;
 #if UNITY_2022_2_OR_NEWER
             var allObjects = GameObject.FindObjectsByType<GameObject>(FindObjectsSortMode.None);
 #else
             var allObjects = GameObject.FindObjectsOfType<GameObject>();
 #endif
-            _octree = null;
             _paintedObjects.Clear();
             var allPrefabsPaths = new System.Collections.Generic.HashSet<string>();
             bool AddPrefabPath(MultibrushItemSettings item)
@@ -784,13 +883,20 @@ namespace PluginMaster
                     if (isBrush) AddPaintedObject(obj);
                 }
             }
-            if (_octree == null) _octree = new PointOctree<GameObject>(10, Vector3.zero, MIN_OCTREE_NODE_SIZE);
         }
 
-        private static void AddPaintedObject(GameObject obj)
+        public static void AddPaintedObject(GameObject obj)
         {
             if (_octree == null) _octree = new PointOctree<GameObject>(10, obj.transform.position, MIN_OCTREE_NODE_SIZE);
             _octree.Add(obj, obj.transform.position);
+            if (_boundsOctree == null) _boundsOctree = new BoundsOctree<GameObject>(initialWorldSize: 10,
+           initialWorldPos: Vector3.zero, MIN_OCTREE_NODE_SIZE, MIN_OCTREE_NODE_SIZE);
+            Bounds bounds;
+            if (ToolManager.tool == ToolManager.PaintTool.FLOOR)
+                bounds = BoundsUtils.GetBoundsRecursive(obj.transform, SnapManager.settings.rotation);
+            else bounds = BoundsUtils.GetBoundsRecursive(obj.transform);
+
+            _boundsOctree.Add(obj, bounds);
             _paintedObjects.Add(obj);
         }
 
@@ -1085,7 +1191,8 @@ namespace PluginMaster
                 obj.transform.SetPositionAndRotation(item.position, item.rotation);
                 obj.transform.localScale = item.scale;
                 var root = UnityEditor.PrefabUtility.GetOutermostPrefabInstanceRoot(obj);
-                item.parent = GetParent(settings, item.prefab.name, true, item.surface, persistentParentId);
+                item.parent = GetParent(settings, item.prefab.name,
+                    true, item.surface, persistentParentId);
                 if (addTempCollider) PWBCore.AddTempCollider(obj);
                 if (!paintedObjects.ContainsKey(persistentParentId))
                     paintedObjects.Add(persistentParentId, new System.Collections.Generic.List<(GameObject, int)>());
@@ -1108,7 +1215,6 @@ namespace PluginMaster
                     if (item.flipY) delta.y = pivotToCenter.y * -2;
                     spriteRenderer.transform.position += delta;
                 }
-
                 AddPaintedObject(obj);
                 UnityEditor.Undo.RegisterCreatedObjectUndo(obj, commandName);
                 if (root != null) UnityEditor.Undo.SetTransformParent(root.transform, item.parent, commandName);
@@ -1128,7 +1234,7 @@ namespace PluginMaster
         private const string NO_PREFAB_NAME = "<#PREFAB@>";
         private const string PARENT_KEY_SEPARATOR = "<#@>";
 
-        private static Transform GetParent(IPaintToolSettings settings, string prefabName,
+        public static Transform GetParent(IPaintToolSettings settings, string prefabName,
             bool create, Transform surface, string toolObjectId = "")
         {
             if (!create) return settings.parent;
@@ -1143,14 +1249,17 @@ namespace PluginMaster
                 && !settings.createSubparentPerBrush && !settings.createSubparentPerPrefab) return _autoParent;
 
             var _autoParentId = _autoParent == null ? -1 : _autoParent.gameObject.GetInstanceID();
-            string GetSubParentKey(int parentId = -1, string palette = NO_PALETTE_NAME, string tool = NO_TOOL_NAME,
-                string id = NO_OBJ_ID, string brush = NO_BRUSH_NAME, string prefab = NO_PREFAB_NAME)
-                => parentId + PARENT_KEY_SEPARATOR + palette + PARENT_KEY_SEPARATOR + tool + PARENT_KEY_SEPARATOR
-                + id + PARENT_KEY_SEPARATOR + brush + PARENT_KEY_SEPARATOR + prefab;
+            string GetSubParentKey(int parentId = -1, string palette = NO_PALETTE_NAME,
+                string tool = NO_TOOL_NAME, string id = NO_OBJ_ID,
+                string brush = NO_BRUSH_NAME, string prefab = NO_PREFAB_NAME)
+                => parentId + PARENT_KEY_SEPARATOR + palette + PARENT_KEY_SEPARATOR
+                + tool + PARENT_KEY_SEPARATOR + id + PARENT_KEY_SEPARATOR + brush
+                + PARENT_KEY_SEPARATOR + prefab;
 
             string subParentKey = GetSubParentKey(_autoParentId,
                 settings.createSubparentPerPalette ? PaletteManager.selectedPalette.name : NO_PALETTE_NAME,
-                settings.createSubparentPerTool ? ToolManager.tool.ToString() : NO_TOOL_NAME,
+                settings.createSubparentPerTool
+                ? ToolManager.GetToolFromSettings(settings as IToolSettings).ToString(): NO_TOOL_NAME,
                 string.IsNullOrEmpty(toolObjectId) ? NO_OBJ_ID : toolObjectId,
                 settings.createSubparentPerBrush ? PaletteManager.selectedBrush.name : NO_BRUSH_NAME,
                 settings.createSubparentPerPrefab ? prefabName : NO_PREFAB_NAME);
@@ -1213,7 +1322,8 @@ namespace PluginMaster
                     CreateSubParentIfDoesntExist(keyToolObjId, keyPlaletteName, keyToolName, keyToolObjId);
             }
             if (keyBrushName != NO_BRUSH_NAME)
-                CreateSubParentIfDoesntExist(keyBrushName, keyPlaletteName, keyToolName, keyToolObjId, keyBrushName);
+                CreateSubParentIfDoesntExist(keyBrushName, keyPlaletteName, keyToolName,
+                    keyToolObjId, keyBrushName);
             if (keyPrefabName != NO_PREFAB_NAME)
                 CreateSubParentIfDoesntExist(keyPrefabName, keyPlaletteName,
                     keyToolName, keyToolObjId, keyBrushName, keyPrefabName);
@@ -1314,13 +1424,13 @@ namespace PluginMaster
 
                 var terrain = obj.GetComponent<Terrain>();
                 if (terrain == null) return true;
-
                 var instanceId = terrain.GetInstanceID();
                 int alphamapW = 0;
                 int alphamapH = 0;
                 float[,,] alphamaps;
                 Vector3 terrainSize;
                 TerrainLayer[] layers;
+
                 if (_terrainAlphamaps.ContainsKey(instanceId))
                 {
                     alphamaps = _terrainAlphamaps[instanceId].alphamaps;
@@ -1332,6 +1442,7 @@ namespace PluginMaster
                 else
                 {
                     var terrainData = terrain.terrainData;
+                    if (terrainData == null) return false;
                     alphamapW = terrainData.alphamapWidth;
                     alphamapH = terrainData.alphamapHeight;
                     alphamaps = terrainData.GetAlphamaps(0, 0, alphamapW, alphamapH);
@@ -1374,10 +1485,12 @@ namespace PluginMaster
             collider = null;
             bool physicsValidHit = Physics.Raycast(mouseRay, out mouseHit,
                 maxDistance, layerMask, QueryTriggerInteraction.Ignore);
-            if (physicsValidHit) collider = mouseHit.collider.gameObject;
+            if (physicsValidHit && mouseHit.collider != null) collider = mouseHit.collider.gameObject;
+            var originPlane = new Plane(-mouseRay.direction, origin);
+            if (!sameOriginAsRay) mouseHit.distance = originPlane.GetDistanceToPoint(mouseHit.point);
             GameObject[] nearbyObjects = null;
             var meshValidHit = false;
-            if (castOnMeshesWithoutCollider)
+            if (castOnMeshesWithoutCollider && octree != null)
             {
                 nearbyObjects = octree.GetNearby(mouseRay, 1f);
                 if (nearbyObjects.Length > 0)
@@ -1387,9 +1500,7 @@ namespace PluginMaster
                 if (MeshUtils.Raycast(mouseRay, out RaycastHit meshHit, out GameObject meshCollider,
                     nearbyObjects, maxDistance, sameOriginAsRay, origin))
                 {
-                    var meshHitDistance = sameOriginAsRay ? meshHit.distance : (meshHit.point - origin).magnitude;
-                    var mouseHitDistance = sameOriginAsRay ? mouseHit.distance : (mouseHit.point - origin).magnitude;
-                    if (!physicsValidHit || meshHitDistance < mouseHitDistance)
+                    if (!physicsValidHit || meshHit.distance < mouseHit.distance)
                     {
                         mouseHit = meshHit;
                         collider = meshCollider;
@@ -1411,23 +1522,24 @@ namespace PluginMaster
                         return true;
                     }
                 }
-                foreach (var hit in hits)
+                for (int i = 0; i < hits.Length; ++i)
                 {
-                    var obj = hit.collider.gameObject;
-                    if (!hitDictionary.ContainsKey(obj)) hitDictionary.Add(obj, hit);
+                    var obj = hits[i].collider.gameObject;
+                    if (!hitDictionary.ContainsKey(obj)) hitDictionary.Add(obj, hits[i]);
                     else
                     {
-                        var hitDistance = sameOriginAsRay ? hit.distance : (hit.point - origin).magnitude;
+                        if(!sameOriginAsRay)
+                            hits[i].distance = originPlane.GetDistanceToPoint(hits[i].point);
                         var dicDistance = sameOriginAsRay ? hitDictionary[obj].distance
-                            : (hitDictionary[obj].point - origin).magnitude;
-                        if (hitDistance < dicDistance) hitDictionary[obj] = hit;
+                            : originPlane.GetDistanceToPoint(hitDictionary[obj].point);
+                        if (hits[i].distance < dicDistance) hitDictionary[obj] = hits[i];
                     }
                 }
             }
             if (castOnMeshesWithoutCollider && meshValidHit)
             {
                 if (MeshUtils.RaycastAll(mouseRay, out RaycastHit[] hitArray, out GameObject[] colliders,
-                    nearbyObjects, maxDistance))
+                    nearbyObjects, maxDistance, sameOriginAsRay, origin))
                 {
                     for (int i = 0; i < hitArray.Length; ++i)
                     {
@@ -1436,10 +1548,9 @@ namespace PluginMaster
                         if (!hitDictionary.ContainsKey(obj)) hitDictionary.Add(obj, hit);
                         else
                         {
-                            var hitDistance = sameOriginAsRay ? hit.distance : (hit.point - origin).magnitude;
                             var dicDistance = sameOriginAsRay ? hitDictionary[obj].distance
-                                : (hitDictionary[obj].point - origin).magnitude;
-                            if (hitDistance < dicDistance) hitDictionary[obj] = hit;
+                                : originPlane.GetDistanceToPoint(hitDictionary[obj].point);
+                            if (hit.distance < dicDistance) hitDictionary[obj] = hit;
                         }
                     }
                 }
@@ -1465,7 +1576,7 @@ namespace PluginMaster
         }
 
         public static float GetDistanceToSurface(Vector3[] vertices, Matrix4x4 TRS, Vector3 direction, float magnitude,
-          bool paintOnPalettePrefabs, bool castOnMeshesWithoutCollider, out Transform surface, GameObject prefab, 
+          bool paintOnPalettePrefabs, bool castOnMeshesWithoutCollider, out Transform surface, GameObject prefab,
           System.Collections.Generic.HashSet<GameObject> exceptions = null)
         {
             surface = null;
@@ -1638,7 +1749,7 @@ namespace PluginMaster
         private static void DrawCricleIndicator(Vector3 hitPoint, Vector3 hitNormal,
             float radius, float height, Vector3 tangent, Vector3 bitangent,
             Vector3 normal, bool paintOnPalettePrefabs, bool castOnMeshesWithoutCollider,
-            int layerMask = -1, string[] tags = null)
+            int layerMask = -1, string[] tags = null, bool drawDropArea = false)
         {
             UnityEditor.Handles.zTest = UnityEngine.Rendering.CompareFunction.Always;
             const float normalOffset = 0.01f;
@@ -1650,12 +1761,14 @@ namespace PluginMaster
             UnityEditor.Handles.color = new Color(0f, 0f, 0f, 0.5f);
             var periPoints = new System.Collections.Generic.List<Vector3>();
             var periPointsShadow = new System.Collections.Generic.List<Vector3>();
+            var dropAreaPeriPoints = new System.Collections.Generic.List<Vector3>();
             for (int i = 0; i < polygonSides; ++i)
             {
                 var radians = TAU * i / (polygonSides - 1f);
                 var tangentDir = new Vector2(Mathf.Cos(radians), Mathf.Sin(radians));
                 var worldDir = TangentSpaceToWorld(tangent, bitangent, tangentDir);
                 var periPoint = hitPoint + (worldDir * (radius));
+                if (drawDropArea) dropAreaPeriPoints.Add(periPoint + Vector3.up * height);
                 var periRay = new Ray(periPoint + normal * height, -normal);
                 if (MouseRaycast(periRay, out RaycastHit periHit, out GameObject collider,
                     height * 2, layerMask, paintOnPalettePrefabs, castOnMeshesWithoutCollider, tags))
@@ -1714,12 +1827,17 @@ namespace PluginMaster
                 UnityEditor.Handles.color = new Color(0f, 0f, 0f, 0.5f);
                 UnityEditor.Handles.DrawWireDisc(hitPoint + hitNormal * normalOffset, hitNormal, radius + 0.2f);
             }
+            if (drawDropArea && dropAreaPeriPoints.Count > 0)
+            {
+                UnityEditor.Handles.color = new Color(1f, 1f, 1f, 0.5f);
+                UnityEditor.Handles.DrawAAPolyLine(3, dropAreaPeriPoints.ToArray());
+            }
         }
 
         private static void DrawSquareIndicator(Vector3 hitPoint, Vector3 hitNormal,
             float radius, float height, Vector3 tangent, Vector3 bitangent,
             Vector3 normal, bool paintOnPalettePrefabs, bool castOnMeshesWithoutCollider,
-            int layerMask = -1, string[] tags = null)
+            int layerMask = -1, string[] tags = null, bool drawDropArea = false)
         {
             UnityEditor.Handles.zTest = UnityEngine.Rendering.CompareFunction.Always;
             const float normalOffset = 0.01f;
@@ -1732,7 +1850,7 @@ namespace PluginMaster
             float SQRT2 = Mathf.Sqrt(2f);
             UnityEditor.Handles.color = new Color(0f, 0f, 0f, 0.5f);
             var periPoints = new System.Collections.Generic.List<Vector3>();
-
+            var dropAreaPeriPoints = new System.Collections.Generic.List<Vector3>();
             for (int i = 0; i < segmentCount; ++i)
             {
                 int sideIdx = i / segmentsPerSide;
@@ -1742,6 +1860,7 @@ namespace PluginMaster
                 else if (sideIdx == 1) periPoint += bitangent * (radius - segmentSize * segmentIdx) + tangent * radius;
                 else if (sideIdx == 2) periPoint += tangent * (radius - segmentSize * segmentIdx) - bitangent * radius;
                 else periPoint += bitangent * (segmentSize * segmentIdx - radius) - tangent * radius;
+                if (drawDropArea) dropAreaPeriPoints.Add(periPoint + Vector3.up * height);
                 var worldDir = (periPoint - hitPoint).normalized;
                 var periRay = new Ray(periPoint + normal * height, -normal);
                 if (MouseRaycast(periRay, out RaycastHit periHit, out GameObject collider,
@@ -1786,6 +1905,12 @@ namespace PluginMaster
 
                 UnityEditor.Handles.color = new Color(1f, 1f, 1f, 0.7f);
                 UnityEditor.Handles.DrawAAPolyLine(4, periPoints.ToArray());
+            }
+            if (drawDropArea && dropAreaPeriPoints.Count > 0)
+            {
+                dropAreaPeriPoints.Add(dropAreaPeriPoints[0]);
+                UnityEditor.Handles.color = new Color(1f, 1f, 1f, 0.5f);
+                UnityEditor.Handles.DrawAAPolyLine(3, dropAreaPeriPoints.ToArray());
             }
         }
         #endregion
@@ -1841,6 +1966,18 @@ namespace PluginMaster
         #endregion
 
         #region PALETTE
+        public static void ReplaceSelected()
+        {
+            var replacerSettings = new ReplacerSettings();
+            _paintStroke.Clear();
+            SelectionManager.UpdateSelection();
+            var targets = SelectionManager.topLevelSelection;
+            BrushstrokeManager.UpdateReplacerBrushstroke(clearDictionary: true, targets);
+            ReplacePreview(UnityEditor.SceneView.lastActiveSceneView.camera, replacerSettings, targets);
+            var newObjects = Replace();
+            if (newObjects != null)
+                if (newObjects.Length > 0) UnityEditor.Selection.objects = newObjects;
+        }
         private static void PaletteInput(UnityEditor.SceneView sceneView)
         {
             void Repaint()
@@ -1884,6 +2021,10 @@ namespace PluginMaster
                 PaletteManager.SelectNextPalette();
                 Repaint();
             }
+            if (PWBSettings.shortcuts.paletteReplaceSceneSelection.Check())
+            {
+                ReplaceSelected();
+            }
             var pickShortcutOn = PWBSettings.shortcuts.palettePickBrush.Check();
             var pickBrush = PaletteManager.pickingBrushes && Event.current.button == 0
                 && Event.current.type == EventType.MouseDown;
@@ -1907,6 +2048,27 @@ namespace PluginMaster
                 Event.current.Use();
                 if (!pickShortcutOn && pickBrush) PaletteManager.pickingBrushes = false;
             }
+            if (PaletteManager.pickingBrushes
+                && Event.current.type == EventType.KeyDown
+                && Event.current.keyCode == KeyCode.Escape)
+            {
+                PaletteManager.pickingBrushes = false;
+            }
+            if (PaletteManager.pickingBrushes)
+            {
+                var labelTexts = new string[] { $"Brush Picker", "Object: " };
+                var mouseRay = UnityEditor.HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
+                var objName = "None";
+                if (MouseRaycast(mouseRay, out RaycastHit mouseHit, out GameObject collider,
+                    float.MaxValue, -1, true, true))
+                {
+                    var target = collider.gameObject;
+                    var outermostPrefab = UnityEditor.PrefabUtility.GetOutermostPrefabInstanceRoot(target);
+                    if (outermostPrefab != null) objName = outermostPrefab.name;
+                }
+                labelTexts[1] += objName;
+                InfoText.Draw(sceneView, labelTexts.ToArray());
+            }
             if (PWBSettings.shortcuts.palettePickBrush.holdKeysAndClickCombination.holdingChanged)
                 PaletteManager.pickingBrushes = PWBSettings.shortcuts.palettePickBrush.holdKeysAndClickCombination.holdingKeys;
         }
@@ -1926,6 +2088,145 @@ namespace PluginMaster
 #endif
             ToolManager.tool = ToolManager.tool == tool ? ToolManager.PaintTool.NONE : tool;
             PWBToolbar.RepaintWindow();
+        }
+        #endregion
+
+        #region MODULAR
+        private static bool _modularDeleteMode = false;
+        private static Vector3 GetCenterToPivot(GameObject prefab, Vector3 scaleMult, Quaternion rotation)
+        {
+            var itemBounds = BoundsUtils.GetBoundsRecursive(prefab.transform, prefab.transform.rotation);
+            var centerToPivotGlobal = prefab.transform.position - itemBounds.center;
+            var centerToPivotLocal = Quaternion.Inverse(prefab.transform.rotation) * centerToPivotGlobal;
+            var result = rotation * Vector3.Scale(centerToPivotLocal, scaleMult);
+            return result;
+        }
+        #endregion
+
+        #region GIZMOS
+        private static void GizmosInput()
+        {
+            if (PWBSettings.shortcuts.gizmosToggleInfotext.Check())
+            {
+                PWBCore.staticData.ToggleInfoText();
+            }
+        }
+        #endregion
+
+        #region BRUSH PROPERTIES
+        private static bool _offsetPicking = false;
+        private static AxesUtils.Axis _offsetPickingAxis;
+        private static float _offsetPickingValue = 0f;
+        private static BrushSettings _offsetPickingBrush = null;
+        public static void EnableOffsetPicking(AxesUtils.Axis axis, BrushSettings brush)
+        {
+            _offsetPickingBrush = brush;
+            ToolManager.tool = ToolManager.PaintTool.NONE;
+            _offsetPicking = true;
+            _offsetPickingAxis = axis;
+            _offsetPickingValue = 0f;
+            UpdateOctree();
+            if (UnityEditor.SceneView.sceneViews.Count > 0)
+                ((UnityEditor.SceneView)UnityEditor.SceneView.sceneViews[0]).Focus();
+        }
+
+        public static bool OffsetRaycast(out RaycastHit mouseHit, out GameObject collider)
+        {
+            mouseHit = new RaycastHit();
+            collider = null;
+            if (boundsOctree == null) return false;
+
+            var mouseRay = UnityEditor.HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
+            GameObject[] nearbyObjects = null;
+
+            nearbyObjects = boundsOctree.GetColliding(mouseRay);
+            if (nearbyObjects.Length == 0) return false;
+            nearbyObjects = nearbyObjects.Where(o => o != null).ToArray();
+            if (nearbyObjects.Length == 0) return false;
+
+            var validHit = false;
+            var minDistance = float.MaxValue;
+
+            foreach (var obj in nearbyObjects)
+            {
+                if (!MeshUtils.RayIntersectsGameObject(mouseRay, obj, includeInactive: false,
+                    out float distance, out Vector3 hitNormal)) continue;
+                if (distance >= minDistance) continue;
+                minDistance = distance;
+                mouseHit.point = mouseRay.origin + mouseRay.direction.normalized * distance;
+                mouseHit.distance = distance;
+                collider = obj;
+                validHit = true;
+            }
+            return validHit;
+        }
+
+        private static void OffsetPicking(Camera sceneCamera)
+        {
+            _offsetPickingValue = 0;
+            if (!OffsetRaycast(out RaycastHit hit, out GameObject obj)) return;
+            if (obj == null) return;
+            var bounds = BoundsUtils.GetBoundsRecursive(obj.transform, obj.transform.rotation);
+            var localHit = obj.transform.InverseTransformPoint(hit.point);
+
+            var localCenter = obj.transform.InverseTransformPoint(bounds.center);
+            var halfLocalSize = new Vector3(bounds.size.x / obj.transform.lossyScale.x,
+                bounds.size.y / obj.transform.lossyScale.y,
+                bounds.size.z / obj.transform.lossyScale.z) * 0.5f;
+            var localMin = localCenter - halfLocalSize;
+            var localMax = localCenter + halfLocalSize;
+
+            var minShift = AxesUtils.GetAxisValue(localMin, _offsetPickingAxis);
+            var maxShift = AxesUtils.GetAxisValue(localMax, _offsetPickingAxis);
+            var hitShift = AxesUtils.GetAxisValue(localHit, _offsetPickingAxis);
+
+            _offsetPickingValue = Mathf.Abs(hitShift >= 0f ? maxShift - hitShift : hitShift - minShift);
+            _offsetPickingValue = System.MathF.Round(_offsetPickingValue, digits: 5);
+        }
+        #endregion
+
+        #region MATERIALS & MESHES
+        private static Material _transparentRedMaterial = null;
+        public static Material transparentRedMaterial
+        {
+            get
+            {
+                if (_transparentRedMaterial == null)
+                    _transparentRedMaterial = new Material(Shader.Find("PluginMaster/TransparentRed"));
+                return _transparentRedMaterial;
+            }
+        }
+
+        private static Material _transparentRedMaterial2 = null;
+        public static Material transparentRedMaterial2
+        {
+            get
+            {
+                if (_transparentRedMaterial2 == null)
+                    _transparentRedMaterial2 = new Material(Shader.Find("PluginMaster/TransparentRed2"));
+                return _transparentRedMaterial2;
+            }
+        }
+
+        private static Material _snapBoxMaterial = null;
+        public static Material snapBoxMaterial
+        {
+            get
+            {
+                if (_snapBoxMaterial == null)
+                    _snapBoxMaterial = new Material(Shader.Find("PluginMaster/SnapBox"));
+                return _snapBoxMaterial;
+            }
+        }
+
+        private static Mesh _cubeMesh = null;
+        private static Mesh cubeMesh
+        {
+            get
+            {
+                if (_cubeMesh == null) _cubeMesh = Resources.GetBuiltinResource<Mesh>("Cube.fbx");
+                return _cubeMesh;
+            }
         }
         #endregion
     }

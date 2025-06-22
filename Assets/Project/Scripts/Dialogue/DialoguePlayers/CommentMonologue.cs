@@ -22,7 +22,5 @@ public class CommentMonologue : MonoBehaviour
     {
         int index = Random.Range(1, maxVariants + 1);
         return $"comment_{subject}_{index}";
-
-        //return $"comment_{object}_{mood}_{location}_{situation}_{index}";
     }
 }

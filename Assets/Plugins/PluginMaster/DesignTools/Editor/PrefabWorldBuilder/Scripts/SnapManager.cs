@@ -12,12 +12,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 using UnityEngine;
+using System.Linq;
 
 namespace PluginMaster
 {
     #region DATA & SETTINGS
     [System.Serializable]
-    public class SnapSettings
+    public struct GridOrigin
+    {
+        [SerializeField] private string _name;
+        [SerializeField] private Pose _pose;
+        public GridOrigin(string name, Pose point)
+        {
+            _name = name;
+            _pose = point;
+        }
+        public string name { get => _name; set => _name = value; }
+        public Vector3 position { get => _pose.position; set => _pose.position = value; }
+        public Quaternion rotation { get => _pose.rotation; set => _pose.rotation = value; }
+        public Pose pose { get => _pose; set => _pose = value; }
+    }
+    [System.Serializable]
+    public class SnapSettings : ISerializationCallbackReceiver
     {
         [System.Serializable]
         private struct Bool3
@@ -30,6 +46,7 @@ namespace PluginMaster
         [SerializeField] private bool _visibleGrid = false;
         [SerializeField] private Bool3 _gridOn = new Bool3(false, true, false);
         [SerializeField] private bool _lockedGrid = false;
+        [SerializeField] private bool _boundsSnapping = false;
         [SerializeField] private Vector3 _step = Vector3.one;
         [SerializeField] private Vector3 _origin = Vector3.zero;
         [SerializeField] private Quaternion _rotation = Quaternion.identity;
@@ -43,8 +60,15 @@ namespace PluginMaster
         [SerializeField] private bool _snapToCircunference = true;
         [SerializeField] private Vector3Int _majorLinesGap = Vector3Int.one * 10;
         [SerializeField] private bool _midpointSnapping = false;
+        [SerializeField] private GridOrigin[] _origins = null;
+        private const string DEFAULT_ORIGIN_NAME = "Default";
+        [SerializeField] private string _selectedOrigin = DEFAULT_ORIGIN_NAME;
+        private System.Collections.Generic.Dictionary<string, Pose> _originsDictionary
+            = new System.Collections.Generic.Dictionary<string, Pose>() { { DEFAULT_ORIGIN_NAME, Pose.identity } };
+
+        public System.Action OnGridOriginChange;
         public System.Action OnDataChanged;
-        private void DataChanged(bool repaint = true)
+        public void DataChanged(bool repaint = true)
         {
             if (!repaint)
             {
@@ -74,6 +98,7 @@ namespace PluginMaster
             {
                 if (_snappingEnabled == value) return;
                 _snappingEnabled = value;
+                if (_snappingEnabled) visibleGrid = true;
                 DataChanged();
             }
         }
@@ -115,6 +140,8 @@ namespace PluginMaster
             {
                 if (_origin == value) return;
                 _origin = value;
+                DataChanged(false);
+                if (OnGridOriginChange != null) OnGridOriginChange();
             }
         }
         public bool lockedGrid
@@ -186,6 +213,17 @@ namespace PluginMaster
             }
         }
 
+        public bool boundsSnapping
+        {
+            get => _boundsSnapping;
+            set
+            {
+                if (_boundsSnapping == value) return;
+                _boundsSnapping = value;
+                DataChanged();
+            }
+        }
+
         public AxesUtils.Axis gridAxis => gridOnX ? AxesUtils.Axis.X : (gridOnY ? AxesUtils.Axis.Y : AxesUtils.Axis.Z);
         public Quaternion rotation
         {
@@ -195,6 +233,7 @@ namespace PluginMaster
                 if (_rotation == value) return;
                 _rotation = value;
                 DataChanged(false);
+                if (OnGridOriginChange != null) OnGridOriginChange();
             }
         }
         public bool showPositionHandle
@@ -319,6 +358,56 @@ namespace PluginMaster
                 DataChanged();
             }
         }
+        #region ORIGINS
+        public string selectedOrigin
+        {
+            get => _selectedOrigin;
+            set
+            {
+                if (_selectedOrigin == value) return;
+                _selectedOrigin = value;
+                _origin = _originsDictionary[_selectedOrigin].position;
+                _rotation = _originsDictionary[_selectedOrigin].rotation;
+                DataChanged();
+                if (OnGridOriginChange != null) OnGridOriginChange();
+            }
+        }
+
+        public void SaveGridOrigin(string name)
+        {
+            if (_originsDictionary.ContainsKey(name)) _originsDictionary[name] = new Pose(origin, rotation);
+            else _originsDictionary.Add(name, new Pose(origin, rotation));
+            _selectedOrigin = name;
+            DataChanged();
+        }
+        public bool OriginsDictionaryContains(string name) => _originsDictionary.ContainsKey(name);
+        public Pose GetOrigin(string name) => _originsDictionary[name];
+        public string[] GetOriginNames() => _originsDictionary.Keys.ToArray();
+        public void DeleteSelectedOrigin()
+        {
+            _originsDictionary.Remove(_selectedOrigin);
+            selectedOrigin = DEFAULT_ORIGIN_NAME;
+        }
+        public int GetIndexOfOrigin(string name) => _originsDictionary.Keys.Select((key, index) => new { key, index })
+            .FirstOrDefault(pair => pair.key == name)?.index ?? -1;
+        public int GetIndexOfSelectedOrigin() => GetIndexOfOrigin(selectedOrigin);
+        public string GetOriginAt(int index) => _originsDictionary.Keys.ElementAt(index);
+        public void SelectOrigin(int index) => selectedOrigin = GetOriginAt(index);
+        public void SetNextOrigin()
+        {
+            var selectedOriginIdx = GetIndexOfSelectedOrigin();
+            if (selectedOriginIdx < _originsDictionary.Count - 1) ++selectedOriginIdx;
+            else selectedOriginIdx = 0;
+            SelectOrigin(selectedOriginIdx);
+        }
+        public void ResetOrigin()
+        {
+            _origin = _originsDictionary[_selectedOrigin].position;
+            _rotation = _originsDictionary[_selectedOrigin].rotation;
+            DataChanged();
+            if (OnGridOriginChange != null) OnGridOriginChange();
+        }
+        #endregion
         public void SetOriginHeight(Vector3 point, AxesUtils.Axis axis)
         {
             var originPos = origin;
@@ -338,7 +427,7 @@ namespace PluginMaster
 
         public Vector3 TransformToGridDirection(Vector3 direction)
         {
-            if(direction == Vector3.zero) return _rotation* Vector3.up;
+            if (direction == Vector3.zero) return _rotation * Vector3.up;
             var xProjection = Vector3.Project(direction, _rotation * Vector3.right);
             var yProjection = Vector3.Project(direction, _rotation * Vector3.up);
             var zProjection = Vector3.Project(direction, _rotation * Vector3.forward);
@@ -349,6 +438,17 @@ namespace PluginMaster
             if (xProjectionMagnitude == max) return xProjection.normalized;
             if (yProjectionMagnitude == max) return yProjection.normalized;
             return zProjection.normalized;
+        }
+
+        public void OnBeforeSerialize()
+        {
+            _origins = _originsDictionary.Select(pair => new GridOrigin(pair.Key, pair.Value)).ToArray();
+        }
+
+        public void OnAfterDeserialize()
+        {
+            if (_origins == null || _origins.Length == 0) return;
+            _originsDictionary = _origins.ToDictionary(origin => origin.name, origin => origin.pose);
         }
     }
 
@@ -401,7 +501,7 @@ namespace PluginMaster
     #region PWBIO
     public static partial class PWBIO
     {
-        private static bool _snappedToVertex = false;
+        #region SNAP TO GRID
         private static Vector3 SnapPosition(Vector3 position, bool onGrid, bool applySettings,
             float snapStepFactor = 1f, bool ignoreMidpoints = false)
         {
@@ -477,7 +577,218 @@ namespace PluginMaster
             UpdateGridOrigin(point);
             return point;
         }
+        private static Vector3 SnapFloorTilePosition(Vector3 position, out Vector3 localPosition)
+        {
+            var toolSettings = FloorManager.settings;
+            var brushOffset = Vector3.zero;
+            if (toolSettings.subtractBrushOffset)
+            {
+                BrushSettings brush = PaletteManager.selectedBrush;
+                if (toolSettings.overwriteBrushProperties) brush = toolSettings.brushSettings;
+                if (brush != null) brushOffset = brush.localPositionOffset;
+                if (FloorManager.quarterTurns > 0)
+                    brushOffset = Quaternion.AngleAxis(FloorManager.quarterTurns * 90,
+                        FloorManager.settings.upwardAxis) * brushOffset;
+            }
+            var localOriginOffset = (SnapManager.settings.step - brushOffset) * 0.5f
+               - Vector3.up * SnapManager.settings.step.y;
+            var origin = SnapManager.settings.origin + SnapManager.settings.rotation * localOriginOffset;
+            var localPos = Quaternion.Inverse(SnapManager.settings.rotation) * (position - origin);
+            float Snap(float step, float value) => Mathf.Round(value / step) * step;
+            var localSnappedPos = new Vector3(Snap(SnapManager.settings.step.x, localPos.x), 0f,
+                    Snap(SnapManager.settings.step.z, localPos.z));
+            localPosition = localSnappedPos;
+            var result = SnapManager.settings.rotation * localSnappedPos + origin;
+            return result;
+        }
 
+
+        private enum CellSide { R, L, F, B };
+        private static CellSide GetCellSide(Vector3 pointToGridLocal, AxesUtils.Axis axis)
+        {
+            CellSide cellSide;
+            if (axis == AxesUtils.Axis.Z)
+                cellSide = pointToGridLocal.x < 0 ? CellSide.L : CellSide.R;
+            else cellSide = pointToGridLocal.z < 0 ? CellSide.B : CellSide.F;
+            return cellSide;
+        }
+        private static Vector3 GetWallLocalBrushOffset(CellSide cellSide)
+        {
+            var toolSettings = WallManager.settings;
+            var brushOffset = Vector3.zero;
+            if (toolSettings.subtractBrushOffset)
+            {
+                BrushSettings brush = PaletteManager.selectedBrush;
+                if (toolSettings.overwriteBrushProperties) brush = toolSettings.brushSettings;
+                if (brush != null) brushOffset = brush.localPositionOffset;
+                if (cellSide == CellSide.L || cellSide == CellSide.R)
+                {
+                    var angle = cellSide == CellSide.L ? -90 : 90;
+                    brushOffset = Quaternion.AngleAxis(angle, FloorManager.settings.upwardAxis) * brushOffset;
+                }
+                else if (cellSide == CellSide.B)
+                    brushOffset = Quaternion.AngleAxis(180, FloorManager.settings.upwardAxis) * brushOffset;
+            }
+            return brushOffset;
+        }
+        private static Vector3 SnapWallPosition(Vector3 position, out AxesUtils.Axis axis,
+            out bool rotateHalfTurn, out Vector3 localPosition)
+        {
+            var toolSettings = WallManager.settings;
+
+            var snappedPoint = SnapPosition(position, onGrid: true, applySettings: true);
+            var localSnappedPoint = Quaternion.Inverse(SnapManager.settings.rotation)
+                * (snappedPoint - SnapManager.settings.origin);
+            var pointToGrid = snappedPoint - position;
+            var pointToGridLocal = Quaternion.Inverse(SnapManager.settings.rotation) * pointToGrid;
+            axis = Mathf.Abs(pointToGridLocal.x) < Mathf.Abs(pointToGridLocal.z) ? AxesUtils.Axis.Z : AxesUtils.Axis.X;
+
+            CellSide cellSide = GetCellSide(pointToGridLocal, axis);
+            var localBrushOffset = GetWallLocalBrushOffset(cellSide);
+            var localOriginOffset = SnapManager.settings.step * 0.5f;
+            localOriginOffset.y = 0f;
+            localOriginOffset -= localBrushOffset * 0.5f;
+            var origin = SnapManager.settings.origin + SnapManager.settings.rotation * localOriginOffset;
+
+            var localPos = Quaternion.Inverse(SnapManager.settings.rotation) * (position - origin);
+            float Snap(float step, float value) => Mathf.Round(value / step) * step;
+            var xSnappedToCenter = Snap(SnapManager.settings.step.x, localPos.x);
+            var zSnappedToCenter = Snap(SnapManager.settings.step.z, localPos.z);
+
+            var xSnappedToBorder = xSnappedToCenter;
+            var zSnappedToBorder = zSnappedToCenter;
+            rotateHalfTurn = false;
+            if (cellSide == CellSide.L || cellSide == CellSide.R)
+            {
+                if (cellSide == CellSide.L)
+                {
+                    xSnappedToBorder = localSnappedPoint.x
+                        + (WallManager.wallThickness - SnapManager.settings.step.x) * 0.5f;
+                    rotateHalfTurn = true;
+                }
+                else xSnappedToBorder = localSnappedPoint.x
+                        - (WallManager.wallThickness + SnapManager.settings.step.x) * 0.5f;
+            }
+            else
+            {
+                if (cellSide == CellSide.B)
+                {
+                    zSnappedToBorder = localSnappedPoint.z
+                        + (WallManager.wallThickness - SnapManager.settings.step.z) * 0.5f;
+                    rotateHalfTurn = true;
+                }
+                else zSnappedToBorder = localSnappedPoint.z
+                        - (WallManager.wallThickness + SnapManager.settings.step.x) * 0.5f;
+            }
+            var yOffset = toolSettings.moduleSize.y / 2;
+
+            var localSnappedPos = new Vector3(xSnappedToBorder, yOffset, zSnappedToBorder);
+
+            localPosition = localSnappedPos;
+            var result = SnapManager.settings.rotation * localSnappedPos + origin;
+            return result;
+        }
+
+        private static Vector3 SnapWallPosition(Vector3 startPoint, Vector3 endPoint,
+            out AxesUtils.Axis axis, out int cellsCount, out bool rotateHalfTurn, out Vector3 localPosition)
+        {
+            float Snap(float step, float value) => Mathf.Round(value / step) * step;
+            Vector3 SnapToCenter(Vector3 origin, Vector3 point)
+            {
+                var localPoint = Quaternion.Inverse(SnapManager.settings.rotation) * (point - origin);
+                var localXSnappedToCenter = Snap(SnapManager.settings.step.x, localPoint.x);
+                var localZSnappedTocenter = Snap(SnapManager.settings.step.z, localPoint.z);
+                var localCellCenter = new Vector3(localXSnappedToCenter, 0f, localZSnappedTocenter);
+                return localCellCenter;
+            }
+            var segment = endPoint - startPoint;
+            var localSegment = Quaternion.Inverse(SnapManager.settings.rotation) * segment;
+            var segmentMagnitudeX = Mathf.Abs(localSegment.x);
+            var segmentMagnitudeZ = Mathf.Abs(localSegment.z);
+
+            var localStartGridCenter = SnapToCenter(SnapManager.settings.origin, startPoint);
+            var localEndGridCenter = SnapToCenter(SnapManager.settings.origin, endPoint);
+            var centerToCenterSegment = localEndGridCenter - localStartGridCenter;
+            var centerToCenterMagnitudeX = Mathf.Abs(centerToCenterSegment.x);
+            var centerToCenterMagnitudeZ = Mathf.Abs(centerToCenterSegment.z);
+
+            var endPointSnappedToGrid = SnapPosition(endPoint, onGrid: true, applySettings: true);
+            var localEndPointSnappedToGrid = Quaternion.Inverse(SnapManager.settings.rotation)
+               * (endPointSnappedToGrid - SnapManager.settings.origin);
+            var pointToGrid = endPointSnappedToGrid - endPoint;
+            var pointToGridLocal = Quaternion.Inverse(SnapManager.settings.rotation) * pointToGrid;
+
+            axis = segmentMagnitudeX > segmentMagnitudeZ ? AxesUtils.Axis.X : AxesUtils.Axis.Z;
+            if (centerToCenterMagnitudeX < SnapManager.settings.step.x
+                && centerToCenterMagnitudeZ < SnapManager.settings.step.z)
+                axis = Mathf.Abs(pointToGridLocal.x) < Mathf.Abs(pointToGridLocal.z) ? AxesUtils.Axis.Z : AxesUtils.Axis.X;
+
+            CellSide cellSide = GetCellSide(pointToGridLocal, axis);
+            var localBrushOffset = GetWallLocalBrushOffset(cellSide);
+
+            var localOriginOffset = SnapManager.settings.step * 0.5f;
+            localOriginOffset.y = 0f;
+            localOriginOffset -= localBrushOffset * 0.5f;
+            var origin = SnapManager.settings.origin + SnapManager.settings.rotation * localOriginOffset;
+
+            var localStartCellCenter = SnapToCenter(origin, startPoint);
+            var localEndCellCenter = SnapToCenter(origin, endPoint);
+
+            var localSnappedSegment = localEndCellCenter - localStartCellCenter;
+            var snappedMagnitudeX = Mathf.Abs(localSnappedSegment.x);
+            var snappedMagnitudeZ = Mathf.Abs(localSnappedSegment.z);
+
+            var localXSnappedToBorder = localEndCellCenter.x;
+            var localZSnappedToBorder = localEndCellCenter.z;
+            rotateHalfTurn = false;
+
+            if (cellSide == CellSide.L || cellSide == CellSide.R)
+            {
+                if (cellSide == CellSide.L)
+                {
+                    localXSnappedToBorder = localEndPointSnappedToGrid.x
+                        + (WallManager.wallThickness - SnapManager.settings.step.x) * 0.5f;
+                    rotateHalfTurn = true;
+                }
+                else localXSnappedToBorder = localEndPointSnappedToGrid.x
+                        - (WallManager.wallThickness + SnapManager.settings.step.x) * 0.5f;
+                cellsCount = Mathf.RoundToInt(snappedMagnitudeZ / SnapManager.settings.step.z) + 1;
+            }
+            else
+            {
+                if (cellSide == CellSide.B)
+                {
+                    localZSnappedToBorder = localEndPointSnappedToGrid.z
+                        + (WallManager.wallThickness - SnapManager.settings.step.z) * 0.5f;
+                    rotateHalfTurn = true;
+                }
+                else localZSnappedToBorder = localEndPointSnappedToGrid.z
+                        - (WallManager.wallThickness + SnapManager.settings.step.x) * 0.5f;
+                cellsCount = Mathf.RoundToInt(snappedMagnitudeX / SnapManager.settings.step.x) + 1;
+            }
+
+            var yOffset = WallManager.settings.moduleSize.y / 2;
+
+            var localSnappedPos = new Vector3(localXSnappedToBorder, yOffset, localZSnappedToBorder);
+            localPosition = localSnappedPos;
+            var result = SnapManager.settings.rotation * localSnappedPos + origin;
+            return result;
+        }
+
+        private static void UpdateGridOrigin(Vector3 hitPoint)
+        {
+            var snapOrigin = SnapManager.settings.origin;
+            if (!SnapManager.settings.lockedGrid)
+            {
+                if (SnapManager.settings.gridOnX) snapOrigin.x = hitPoint.x;
+                else if (SnapManager.settings.gridOnY) snapOrigin.y = hitPoint.y;
+                else if (SnapManager.settings.gridOnZ) snapOrigin.z = hitPoint.z;
+            }
+            SnapManager.settings.origin = snapOrigin;
+        }
+        #endregion
+        #region SNAP TO VERTEX
+        private static bool _snappedToVertex = false;
         private static bool SnapToVertex(Ray ray, out RaycastHit closestVertexInfo,
             bool in2DMode, GameObject[] selection = null)
         {
@@ -602,18 +913,108 @@ namespace PluginMaster
 #endif
             return snappedToVertex;
         }
-        private static void UpdateGridOrigin(Vector3 hitPoint)
-        {
-            var snapOrigin = SnapManager.settings.origin;
-            if (!SnapManager.settings.lockedGrid)
-            {
-                if (SnapManager.settings.gridOnX) snapOrigin.x = hitPoint.x;
-                else if (SnapManager.settings.gridOnY) snapOrigin.y = hitPoint.y;
-                else if (SnapManager.settings.gridOnZ) snapOrigin.z = hitPoint.z;
-            }
-            SnapManager.settings.origin = snapOrigin;
-        }
+        #endregion
+        #region SNAP TO BOUNDING BOX
 
+
+        public static Vector3 SnapToBounds(Vector3 mousePos)
+        {
+            if (!SnapManager.settings.boundsSnapping) return mousePos;
+            var sceneView = UnityEditor.SceneView.lastActiveSceneView;
+            if (sceneView == null || sceneView.camera == null)
+                return mousePos;
+            Camera cam = sceneView.camera;
+            float maxDistance = float.MaxValue;
+            float radius = Mathf.Max(UnityEditor.HandleUtility.GetHandleSize(mousePos) * 0.1f, 0.02f);
+
+            Vector3 SnapToBoundsInDirection(Vector3 position, Vector3 direction)
+            {
+                (GameObject obj, Bounds bounds)[] objectsColliding = null;
+                var ray = new Ray(position, direction);
+                boundsOctree.GetCollidingtWithinFrustum(ray, radius, cam, out objectsColliding, maxDistance);
+                Vector3 bestPoint = position;
+                float bestDistanceToRay = radius;
+                Bounds bestBox = new Bounds();
+                float bestOriginToPointDistance = float.MaxValue;
+                foreach (var colliding in objectsColliding)
+                {
+                    var b = colliding.bounds;
+                    Vector3 min = b.min, max = b.max, mid = b.center;
+
+                    var pts = new Vector3[]
+                    {
+                        new Vector3(min.x, min.y, min.z),
+                        new Vector3(min.x, min.y, mid.z),
+                        new Vector3(min.x, min.y, max.z),
+                        new Vector3(min.x, mid.y, min.z),
+                        new Vector3(min.x, mid.y, mid.z),
+                        new Vector3(min.x, mid.y, max.z),
+                        new Vector3(min.x, max.y, min.z),
+                        new Vector3(min.x, max.y, mid.z),
+                        new Vector3(min.x, max.y, max.z),
+
+                        new Vector3(mid.x, min.y, min.z),
+                        new Vector3(mid.x, min.y, mid.z),
+                        new Vector3(mid.x, min.y, max.z),
+                        new Vector3(mid.x, mid.y, min.z),
+                        new Vector3(mid.x, mid.y, mid.z),
+                        new Vector3(mid.x, mid.y, max.z),
+                        new Vector3(mid.x, max.y, min.z),
+                        new Vector3(mid.x, max.y, mid.z),
+                        new Vector3(mid.x, max.y, max.z),
+
+                        new Vector3(max.x, min.y, min.z),
+                        new Vector3(max.x, min.y, mid.z),
+                        new Vector3(max.x, min.y, max.z),
+                        new Vector3(max.x, mid.y, min.z),
+                        new Vector3(max.x, mid.y, mid.z),
+                        new Vector3(max.x, mid.y, max.z),
+                        new Vector3(max.x, max.y, min.z),
+                        new Vector3(max.x, max.y, mid.z),
+                        new Vector3(max.x, max.y, max.z),
+                    };
+
+                    foreach (var p in pts)
+                    {
+                        var originToPoint = p - position;
+                        var distanceToRay = System.MathF.Round(Vector3.Cross(direction, originToPoint).magnitude, 5);
+                        if (distanceToRay > bestDistanceToRay) continue;
+                        var originToPointDistance = originToPoint.magnitude;
+                        if (distanceToRay == bestDistanceToRay && originToPointDistance > bestOriginToPointDistance) continue;
+                        bestDistanceToRay = distanceToRay;
+                        bestPoint = p;
+                        bestBox = b;
+                        bestOriginToPointDistance = originToPointDistance;
+                    }
+                }
+
+                var plane = new Plane(direction, position);
+                if (bestDistanceToRay < radius)
+                {
+                    var projectedPoint = plane.ClosestPointOnPlane(bestPoint);
+                    UnityEditor.Handles.zTest = UnityEngine.Rendering.CompareFunction.Always;
+                    UnityEditor.Handles.color = new Color(1f, 0.5f, 0.8f, 1f);
+                    UnityEditor.Handles.DrawLine(projectedPoint, bestPoint, thickness: 3f);
+
+                    float worldRadius = UnityEditor.HandleUtility.GetHandleSize(bestPoint) * 0.05f;
+                    UnityEditor.Handles.DrawSolidDisc(bestPoint, (cam.transform.position - bestPoint), worldRadius);
+                    var TRS = Matrix4x4.TRS(bestBox.center, Quaternion.identity, bestBox.size);
+                    Graphics.DrawMesh(cubeMesh, TRS, snapBoxMaterial, layer: 0, cam);
+
+                    return projectedPoint;
+                }
+                return position;
+            }
+            var result = SnapToBoundsInDirection(mousePos, Vector3.right);
+            result = SnapToBoundsInDirection(result, Vector3.forward);
+            result = SnapToBoundsInDirection(result, Vector3.up);
+            result = SnapToBoundsInDirection(result, Vector3.left);
+            result = SnapToBoundsInDirection(result, Vector3.back);
+            result = SnapToBoundsInDirection(result, Vector3.down);
+            return result;
+        }
+        #endregion
+        #region GRID
         private static void GridHandles()
         {
             if (!SnapManager.settings.lockedGrid) return;
@@ -857,6 +1258,23 @@ namespace PluginMaster
             }
             return maxCells;
         }
+        private static bool GridRaycast(Ray ray, out RaycastHit hitInfo)
+        {
+            hitInfo = new RaycastHit();
+            var plane = new Plane(SnapManager.settings.rotation * (SnapManager.settings.gridOnX ? Vector3.right
+                : SnapManager.settings.gridOnY ? Vector3.up : Vector3.forward), SnapManager.settings.origin);
+            if (Vector3.Cross(ray.direction, plane.normal).magnitude < 0.000001)
+                plane = new Plane(ray.direction, SnapManager.settings.origin);
+            if (plane.Raycast(ray, out float distance))
+            {
+                hitInfo.normal = plane.normal;
+                hitInfo.point = ray.GetPoint(distance);
+                return true;
+            }
+            return false;
+        }
+        #endregion
+        #region RADIAL GRID
         private static void DrawRadialGrid(AxesUtils.Axis axis, UnityEditor.SceneView sceneView, int maxCells, float snapSize)
         {
             var rotation = SnapManager.settings.rotation;
@@ -931,81 +1349,96 @@ namespace PluginMaster
                     Event.current.Use();
                 }
             }
-            if (_gridShorcutEnabled)
+            void MoveGridOrigin(AxesUtils.SignedAxis forwardAxis)
             {
-                void MoveGridOrigin(AxesUtils.SignedAxis forwardAxis)
-                {
-                    var fw = SnapManager.settings.rotation * forwardAxis;
-                    var stepSize = SnapManager.settings.radialGridEnabled ? SnapManager.settings.radialStep
-                    : AxesUtils.GetAxisValue(SnapManager.settings.step, forwardAxis);
-                    SnapManager.settings.origin += fw * stepSize;
-                    _gridShorcutEnabled = false;
-                }
-                if (PWBSettings.shortcuts.gridToggle.Check())
-                {
-                    SnapManager.settings.visibleGrid = !SnapManager.settings.visibleGrid;
-                    _gridShorcutEnabled = false;
-                }
-                else if (PWBSettings.shortcuts.gridToggleSnaping.Check())
-                {
-                    SnapManager.settings.snappingEnabled = !SnapManager.settings.snappingEnabled;
-                    _gridShorcutEnabled = false;
-                }
-                else if (PWBSettings.shortcuts.gridToggleLock.Check())
-                {
-                    SnapManager.settings.lockedGrid = !SnapManager.settings.lockedGrid;
-                    _gridShorcutEnabled = false;
-                }
-                else if (PWBSettings.shortcuts.gridSetOriginPosition.Check()
-                    && UnityEditor.Selection.activeTransform != null)
-                {
-                    SnapManager.settings.origin = UnityEditor.Selection.activeTransform.position;
-                    SnapManager.settings.showPositionHandle = true;
-                    _gridShorcutEnabled = false;
-                }
-                else if (PWBSettings.shortcuts.gridSetOriginRotation.Check()
-                    && UnityEditor.Selection.activeTransform != null)
-                {
-                    SnapManager.settings.rotation = UnityEditor.Selection.activeTransform.rotation;
-                    SnapManager.settings.showRotationHandle = true;
-                    _gridShorcutEnabled = false;
-                }
-                else if (PWBSettings.shortcuts.gridSetSize.Check()
-                    && UnityEditor.Selection.activeTransform != null)
-                {
-                    SnapManager.settings.step = BoundsUtils.GetBounds(UnityEditor.Selection.activeTransform,
-                        UnityEditor.Selection.activeTransform.rotation).size;
-                    SnapManager.settings.showScaleHandle = true;
-                    _gridShorcutEnabled = false;
-                }
-                else if (PWBSettings.shortcuts.gridFrameOrigin.Check())
-                {
-                    SnapManager.FrameGridOrigin();
-                    _gridShorcutEnabled = false;
-                }
-                else if (PWBSettings.shortcuts.gridTogglePositionHandle.Check())
-                {
-                    SnapManager.ToggleGridPositionHandle();
-                    _gridShorcutEnabled = false;
-                }
-                else if (PWBSettings.shortcuts.gridToggleRotationHandle.Check())
-                {
-                    SnapManager.ToggleGridRotationHandle();
-                    _gridShorcutEnabled = false;
-                }
-                else if (PWBSettings.shortcuts.gridToggleSpacingHandle.Check())
-                {
-                    SnapManager.ToggleGridScaleHandle();
-                    _gridShorcutEnabled = false;
-                }
-                else if (PWBSettings.shortcuts.gridMoveOriginUp.Check())
-                {
-                    MoveGridOrigin(AxesUtils.SignedAxis.UP);
-                }
-                else if (PWBSettings.shortcuts.gridMoveOriginDown.Check())
-                {
-                    MoveGridOrigin(AxesUtils.SignedAxis.DOWN);
-                }
+                var fw = SnapManager.settings.rotation * forwardAxis;
+                var stepSize = SnapManager.settings.radialGridEnabled ? SnapManager.settings.radialStep
+                : AxesUtils.GetAxisValue(SnapManager.settings.step, forwardAxis);
+                SnapManager.settings.origin += fw * stepSize;
+                _gridShorcutEnabled = false;
+            }
+            if (PWBSettings.shortcuts.gridToggle.Check())
+            {
+                SnapManager.settings.visibleGrid = !SnapManager.settings.visibleGrid;
+                _gridShorcutEnabled = false;
+            }
+            else if (PWBSettings.shortcuts.gridToggleSnaping.Check()
+                && (!PWBSettings.shortcuts.gridToggleSnaping.firstStepEnabled || _gridShorcutEnabled))
+            {
+                SnapManager.settings.snappingEnabled = !SnapManager.settings.snappingEnabled;
+                _gridShorcutEnabled = false;
+            }
+            else if (PWBSettings.shortcuts.gridToggleLock.Check()
+                && (!PWBSettings.shortcuts.gridToggleLock.firstStepEnabled || _gridShorcutEnabled))
+            {
+                SnapManager.settings.lockedGrid = !SnapManager.settings.lockedGrid;
+                _gridShorcutEnabled = false;
+            }
+            else if (PWBSettings.shortcuts.gridSetOriginPosition.Check() && UnityEditor.Selection.activeTransform != null
+                && (!PWBSettings.shortcuts.gridSetOriginPosition.firstStepEnabled || _gridShorcutEnabled))
+            {
+                SnapManager.settings.origin = UnityEditor.Selection.activeTransform.position;
+                SnapManager.settings.showPositionHandle = true;
+                _gridShorcutEnabled = false;
+            }
+            else if (PWBSettings.shortcuts.gridSetOriginRotation.Check() && UnityEditor.Selection.activeTransform != null
+                && (!PWBSettings.shortcuts.gridSetOriginRotation.firstStepEnabled || _gridShorcutEnabled))
+            {
+                SnapManager.settings.rotation = UnityEditor.Selection.activeTransform.rotation;
+                SnapManager.settings.showRotationHandle = true;
+                _gridShorcutEnabled = false;
+            }
+            else if (PWBSettings.shortcuts.gridSetSize.Check() && UnityEditor.Selection.activeTransform != null
+                && (!PWBSettings.shortcuts.gridSetSize.firstStepEnabled || _gridShorcutEnabled))
+            {
+                SnapManager.settings.step = BoundsUtils.GetBounds(UnityEditor.Selection.activeTransform,
+                    UnityEditor.Selection.activeTransform.rotation).size;
+                SnapManager.settings.showScaleHandle = true;
+                _gridShorcutEnabled = false;
+            }
+            else if (PWBSettings.shortcuts.gridFrameOrigin.Check()
+                && (!PWBSettings.shortcuts.gridFrameOrigin.firstStepEnabled || _gridShorcutEnabled))
+            {
+                SnapManager.FrameGridOrigin();
+                _gridShorcutEnabled = false;
+            }
+            else if (PWBSettings.shortcuts.gridTogglePositionHandle.Check()
+                && (!PWBSettings.shortcuts.gridTogglePositionHandle.firstStepEnabled || _gridShorcutEnabled))
+            {
+                SnapManager.ToggleGridPositionHandle();
+                _gridShorcutEnabled = false;
+            }
+            else if (PWBSettings.shortcuts.gridToggleRotationHandle.Check()
+                && (!PWBSettings.shortcuts.gridToggleRotationHandle.firstStepEnabled || _gridShorcutEnabled))
+            {
+                SnapManager.ToggleGridRotationHandle();
+                _gridShorcutEnabled = false;
+            }
+            else if (PWBSettings.shortcuts.gridToggleSpacingHandle.Check()
+                && (!PWBSettings.shortcuts.gridToggleSpacingHandle.firstStepEnabled || _gridShorcutEnabled))
+            {
+                SnapManager.ToggleGridScaleHandle();
+                _gridShorcutEnabled = false;
+            }
+            else if (PWBSettings.shortcuts.gridMoveOriginUp.Check()
+                && (!PWBSettings.shortcuts.gridMoveOriginUp.firstStepEnabled || _gridShorcutEnabled))
+            {
+                MoveGridOrigin(AxesUtils.SignedAxis.UP);
+            }
+            else if (PWBSettings.shortcuts.gridMoveOriginDown.Check()
+                && (!PWBSettings.shortcuts.gridMoveOriginDown.firstStepEnabled || _gridShorcutEnabled))
+            {
+                MoveGridOrigin(AxesUtils.SignedAxis.DOWN);
+            }
+            else if (PWBSettings.shortcuts.gridNextOrigin.Check()
+                && (!PWBSettings.shortcuts.gridNextOrigin.firstStepEnabled || _gridShorcutEnabled))
+            {
+                SnapManager.settings.SetNextOrigin();
+                SnapSettingsWindow.RepaintWindow();
+            }
+            else if (PWBSettings.shortcuts.snapToggleBoundsSnapping.Check())
+            {
+                SnapManager.settings.boundsSnapping = !SnapManager.settings.boundsSnapping;
             }
 
             if (!SnapManager.settings.visibleGrid) return;
@@ -1027,22 +1460,7 @@ namespace PluginMaster
             if (SnapManager.settings.radialGridEnabled) DrawRadialGrid(axis, sceneView, maxCells, snapSize.x);
             else DrawGrid(axis, focusPoint, maxCells, snapSize);
         }
-
-        private static bool GridRaycast(Ray ray, out RaycastHit hitInfo)
-        {
-            hitInfo = new RaycastHit();
-            var plane = new Plane(SnapManager.settings.rotation * (SnapManager.settings.gridOnX ? Vector3.right
-                : SnapManager.settings.gridOnY ? Vector3.up : Vector3.forward), SnapManager.settings.origin);
-            if (Vector3.Cross(ray.direction, plane.normal).magnitude < 0.000001)
-                plane = new Plane(ray.direction, SnapManager.settings.origin);
-            if (plane.Raycast(ray, out float distance))
-            {
-                hitInfo.normal = plane.normal;
-                hitInfo.point = ray.GetPoint(distance);
-                return true;
-            }
-            return false;
-        }
+        #endregion
     }
     #endregion
 }

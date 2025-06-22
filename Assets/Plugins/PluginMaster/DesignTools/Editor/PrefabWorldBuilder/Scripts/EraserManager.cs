@@ -58,16 +58,7 @@ namespace PluginMaster
     {
         private static float _lastHitDistance = 20f;
 
-        private static Material _transparentRedMaterial = null;
-        public static Material transparentRedMaterial
-        {
-            get
-            {
-                if (_transparentRedMaterial == null)
-                    _transparentRedMaterial = new Material(Shader.Find("PluginMaster/TransparentRed"));
-                return _transparentRedMaterial;
-            }
-        }
+        
         private static System.Collections.Generic.HashSet<GameObject> _toErase
             = new System.Collections.Generic.HashSet<GameObject>();
 

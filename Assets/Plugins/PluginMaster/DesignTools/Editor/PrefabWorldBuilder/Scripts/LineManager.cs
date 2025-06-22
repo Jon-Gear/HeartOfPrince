@@ -128,7 +128,11 @@ namespace PluginMaster
         public bool overwriteBrushProperties
         { get => _paintTool.overwriteBrushProperties; set => _paintTool.overwriteBrushProperties = value; }
         public BrushSettings brushSettings => _paintTool.brushSettings;
-
+        public bool overwriteParentingSettings
+        {
+            get => _paintTool.overwriteParentingSettings;
+            set => _paintTool.overwriteParentingSettings = value;
+        }
         public LineSettings() : base() => _paintTool.OnDataChanged += DataChanged;
 
         public override void DataChanged()
@@ -152,12 +156,6 @@ namespace PluginMaster
             _spacing = otherLineSettings._spacing;
             _paintTool.Copy(otherLineSettings._paintTool);
             _gapSize = otherLineSettings._gapSize;
-        }
-
-        public override void Clone(ICloneableToolSettings clone)
-        {
-            if (clone == null || !(clone is LineSettings)) clone = new LineSettings();
-            clone.Copy(this);
         }
     }
 
@@ -237,6 +235,7 @@ namespace PluginMaster
         {
             base.UpdatePoints();
             UpdatePath(forceUpdate: false, updateOnSurfacePoints: !deserializing);
+            if (!deserializing && ToolManager.editMode) PWBIO.ApplyPersistentLine(this);
         }
         public void ToggleSegmentType()
         {
@@ -292,8 +291,19 @@ namespace PluginMaster
             _closed = !_closed;
         }
 
-        public bool closed => _closed;
+        public bool closed
+        {
+            get => _closed;
+            set => _closed = value;
+        }
 
+        public override void ToggleSelection()
+        {
+            base.ToggleSelection();
+            if (isSelected) SelectAll();
+            else ClearSelection();
+            UnityEditor.SceneView.RepaintAll();
+        }
         protected override void Initialize()
         {
             base.Initialize();
@@ -468,25 +478,32 @@ namespace PluginMaster
             intersection += d * t;
             return true;
         }
-        public static Vector3 NearestPathPoint(Vector3 startPoint, float minPathLenght,
-            Vector3[] pathPoints, out int nearestPointIdx)
+        public static Vector3 NearestPathPoint(int startSegmentIdx, Vector3 startPoint, float minPathLenght,
+            Vector3[] pathPoints, out int nearestPointIdx, out float distanceFromNearestPoint)
         {
             nearestPointIdx = pathPoints.Length - 1;
             var result = pathPoints.Last();
-            for (int i = 1; i < pathPoints.Length; ++i)
+            distanceFromNearestPoint = 0f;
+            startSegmentIdx = Mathf.Max(startSegmentIdx, 1);
+            for (int i = startSegmentIdx; i < pathPoints.Length; ++i)
             {
                 var start = pathPoints[i - 1];
                 var end = pathPoints[i];
+                if(i == pathPoints.Length -1)
+                {
+                    end = (end - start) * 1000 + start;
+                }
                 if (SphereSegmentIntersection(start, end, startPoint, minPathLenght, out Vector3 intersection))
                 {
                     result = intersection;
                     nearestPointIdx = i - 1;
+                    distanceFromNearestPoint = (intersection - pathPoints[nearestPointIdx]).magnitude;
                     return result;
                 }
             }
+
             return result;
         }
-
 
         public float lenght => _lenght;
         public Vector3[] pathPoints => _pathPoints.ToArray();
@@ -531,6 +548,7 @@ namespace PluginMaster
         private static void LineInitializeOnLoad()
         {
             LineManager.settings.OnDataChanged += OnLineSettingsChanged;
+            BrushSettings.OnBrushSettingsChanged += PreviewSelectedPersistentLines;
         }
         private static void OnLineToolModeChanged()
         {
@@ -578,18 +596,22 @@ namespace PluginMaster
             _snappedToVertex = false;
             selectingLinePoints = false;
             _lineData.Reset();
+            OnLineSettingsChanged();
         }
 
         private static void LineStateNone(bool in2DMode)
         {
             if (Event.current.button == 0 && Event.current.type == EventType.MouseDown && !Event.current.alt)
             {
+                _lineData.name = LineData.nextHexId;
+                _lineData.closed = false;
                 _lineData.state = ToolManager.ToolState.PREVIEW;
                 Event.current.Use();
             }
             if (MouseDot(out Vector3 point, out Vector3 normal, LineManager.settings.mode, in2DMode,
                 LineManager.settings.paintOnPalettePrefabs, LineManager.settings.paintOnMeshesWithoutCollider, false))
             {
+                point = SnapToBounds(point);
                 point = _snapToVertex ? LinePointSnapping(point)
                     : SnapAndUpdateGridOrigin(point, SnapManager.settings.snappingEnabled,
                     LineManager.settings.paintOnPalettePrefabs, LineManager.settings.paintOnMeshesWithoutCollider,
@@ -610,6 +632,7 @@ namespace PluginMaster
             if (MouseDot(out Vector3 point, out Vector3 normal, LineManager.settings.mode, in2DMode,
                 LineManager.settings.paintOnPalettePrefabs, LineManager.settings.paintOnMeshesWithoutCollider, false))
             {
+                point = SnapToBounds(point);
                 point = _snapToVertex ? LinePointSnapping(point)
                     : SnapAndUpdateGridOrigin(point, SnapManager.settings.snappingEnabled,
                     LineManager.settings.paintOnPalettePrefabs, LineManager.settings.paintOnMeshesWithoutCollider,
@@ -641,13 +664,11 @@ namespace PluginMaster
             DrawSelectionRectangle();
             LineInput(false, sceneView, false);
 
-            if (selectingLinePoints && !Event.current.control)
-            {
-                _lineData.selectedPointIdx = -1;
-                _lineData.ClearSelection();
-            }
+            if (selectingLinePoints && !Event.current.control) _lineData.ClearSelection();
+
             bool clickOnPoint, wasEdited;
-            DrawLineControlPoints(_lineData, true, out clickOnPoint, out bool multiSelection, out bool addToselection,
+            DrawLineControlPoints(_lineData, isPersistent: false, showHandles: true,
+                out clickOnPoint, out bool multiSelection, out bool addToselection,
                 out bool removeFromSelection, out wasEdited, out Vector3 delta);
             if (wasEdited) updateStroke = true;
             SelectionRectangleInput(clickOnPoint);
@@ -666,6 +687,7 @@ namespace PluginMaster
             var objs = objDic[nextLineId].ToArray();
             var persistentData = new LineData(objs, initialBrushId, _lineData);
             LineManager.instance.AddPersistentItem(sceneGUID, persistentData);
+            PWBItemsWindow.RepainWindow();
         }
 
         private static void LineStrokePreview(UnityEditor.SceneView sceneView,
@@ -842,7 +864,8 @@ namespace PluginMaster
         private static Rect _selectionRect = new Rect();
 
         private static string _createProfileName = ToolProfile.DEFAULT;
-
+        public static LineData lineData
+            => (ToolManager.editMode && _selectedPersistentLineData != null) ? _selectedPersistentLineData : _lineData;
         public static bool selectingLinePoints
         {
             get => _selectingLinePoints;
@@ -873,19 +896,13 @@ namespace PluginMaster
             if (Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Escape)
             {
                 if (_lineData.state == ToolManager.ToolState.EDIT && _lineData.selectedPointIdx > 0)
-                {
-                    _lineData.selectedPointIdx = -1;
                     _lineData.ClearSelection();
-                }
                 else if (_lineData.state == ToolManager.ToolState.NONE && !ToolManager.editMode)
                     ToolManager.DeselectTool();
                 else if (ToolManager.editMode)
                 {
                     if (_editingPersistentLine) ResetSelectedPersistentLine();
-                    else
-                    {
-                        ToolManager.DeselectTool();
-                    }
+                    else ToolManager.DeselectTool();
                     DeselectPersistentLines();
                     _initialPersistentLineData = null;
                     _selectedPersistentLineData = null;
@@ -897,8 +914,10 @@ namespace PluginMaster
                 UpdateStroke();
                 BrushstrokeManager.ClearBrushstroke();
             }
-            if (ToolManager.editMode || LineManager.instance.showPreexistingElements) LineToolEditMode(sceneView);
+
+            LineToolEditMode(sceneView);
             if (ToolManager.editMode) return;
+
             switch (_lineData.state)
             {
                 case ToolManager.ToolState.NONE:
@@ -931,7 +950,103 @@ namespace PluginMaster
 
         public static void ResetLineRotation() => _lineRotation = Quaternion.identity;
 
-        private static bool DrawLineControlPoints(LineData lineData, bool showHandles,
+        public static void UpdateLinePathAndStroke(LineData data)
+        {
+            data.UpdatePath(forceUpdate: true, updateOnSurfacePoints: true);
+            PWBIO.PreviewPersistentLine(data);
+        }
+
+        public static void ApplyPersistentLineAndReset(LineData data)
+        {
+            data.UpdatePath(forceUpdate: true, updateOnSurfacePoints: true);
+            PreviewPersistentLine(data);
+            DeleteDisabledObjects();
+            ApplyPersistentLine(data);
+            _initialPersistentLineData = null;
+            _selectedPersistentLineData = null;
+            UnityEditor.SceneView.RepaintAll();
+        }
+        public static void DeleteLinePoints(LineData data, int[] indexes, bool isPersistent)
+        {
+            if (isPersistent && data.pointsCount - indexes.Length <= 1)
+            {
+                LineManager.instance.DeletePersistentItem(data.id, deleteObjects: true);
+                UnityEditor.SceneView.RepaintAll();
+                return;
+            }
+            data.RemovePoints(indexes);
+            if (isPersistent) ApplyPersistentLineAndReset(data);
+            if (data.pointsCount >= 2) updateStroke = true;
+        }
+        public static void ShowLineContextMenu(LineData data, bool isPersistent, Vector2 mousePosition, int pointIdx)
+        {
+            if (isPersistent && !ToolManager.editMode) return;
+            var menu = new UnityEditor.GenericMenu();
+           
+            menu.AddItem(new GUIContent("Delete point ... Delete"), on: false, () =>
+            {
+                if (isPersistent && data.pointsCount <= 2)
+                {
+                    LineManager.instance.DeletePersistentItem(data.id, deleteObjects: true);
+                    UnityEditor.SceneView.RepaintAll();
+                    return;
+                }
+                data.RemovePoint(pointIdx);
+                if (isPersistent)
+                {
+                    data.UpdatePath(forceUpdate: true, updateOnSurfacePoints: true);
+                    PreviewPersistentLine(data);
+                    DeleteDisabledObjects();
+                    ApplyPersistentLine(data);
+                    _initialPersistentLineData = null;
+                    _selectedPersistentLineData = null;
+                }
+                if (data.pointsCount >= 2) updateStroke = true;
+            });
+            menu.AddItem(new GUIContent("Delete selected points ... Delete"), on: false, () =>
+            {
+                if (isPersistent && data.pointsCount - data.selectionCount <= 1)
+                {
+                    LineManager.instance.DeletePersistentItem(data.id, deleteObjects: true);
+                    UnityEditor.SceneView.RepaintAll();
+                    return;
+                }
+                data.RemoveSelectedPoints();
+                if (isPersistent)
+                {
+                    data.UpdatePath(forceUpdate: true, updateOnSurfacePoints: true);
+                    PreviewPersistentLine(data);
+                    DeleteDisabledObjects();
+                    ApplyPersistentLine(data);
+                    _initialPersistentLineData = null;
+                    _selectedPersistentLineData = null;
+                }
+                if (data.pointsCount >= 2) updateStroke = true;
+            });
+            menu.AddItem(new GUIContent("Select all points ... "
+                + PWBSettings.shortcuts.lineSelectAllPoints.combination.ToString()), on: false, () => data.SelectAll());
+            menu.AddItem(new GUIContent("Deselect all points ... "
+                + PWBSettings.shortcuts.lineDeselectAllPoints.combination.ToString()), on: false,
+                () => data.ClearSelection());
+            menu.AddItem(new GUIContent("Set prev segment as straight or curved ... "
+                + PWBSettings.shortcuts.lineToggleCurve.combination.ToString()), on: false, () =>
+                {
+                    data.ToggleSegmentType();
+                    updateStroke = true;
+                });
+            menu.AddItem(new GUIContent("Close or open the path ... "
+                + PWBSettings.shortcuts.lineToggleClosed.combination.ToString()), on: false, () =>
+                {
+                    data.ToggleClosed();
+                    updateStroke = true;
+                });
+ 
+            menu.AddSeparator(string.Empty);
+            PersistentItemContextMenu(menu, data, mousePosition);
+            menu.ShowAsContext();
+        }
+
+        private static bool DrawLineControlPoints(LineData lineData, bool isPersistent, bool showHandles,
             out bool clickOnPoint, out bool multiSelection, out bool addToSelection,
             out bool removedFromSelection, out bool wasEdited, out Vector3 delta)
         {
@@ -946,7 +1061,6 @@ namespace PluginMaster
             bool selectionChanged = false;
             for (int i = 0; i < lineData.pointsCount; ++i)
             {
-                var controlId = GUIUtility.GetControlID(FocusType.Passive);
                 if (selectingLinePoints)
                 {
                     var GUIPos = UnityEditor.HandleUtility.WorldToGUIPoint(lineData.GetPoint(i));
@@ -967,47 +1081,55 @@ namespace PluginMaster
                         selectionChanged = true;
                     }
                 }
-                else if (!clickOnPoint)
+                else
                 {
-                    if (showHandles)
+                    var controlId = GUIUtility.GetControlID(FocusType.Passive);
+                    float distFromMouse = UnityEditor.HandleUtility.DistanceToRectangle(lineData.GetPoint(i),
+                        Quaternion.identity, 0f);
+                    UnityEditor.HandleUtility.AddControl(controlId, distFromMouse);
+
+                    if (!clickOnPoint && showHandles && leftMouseDown
+                    && UnityEditor.HandleUtility.nearestControl == controlId)
                     {
-                        float distFromMouse
-                            = UnityEditor.HandleUtility.DistanceToRectangle(lineData.GetPoint(i), Quaternion.identity, 0f);
-                        UnityEditor.HandleUtility.AddControl(controlId, distFromMouse);
-                        if (leftMouseDown && UnityEditor.HandleUtility.nearestControl == controlId)
+                        if (!Event.current.control)
                         {
-                            if (!Event.current.control)
-                            {
-                                lineData.selectedPointIdx = i;
-                                lineData.ClearSelection();
-                                selectionChanged = true;
-                            }
-                            if ((!ToolManager.editMode
-                                || (ToolManager.editMode && LineManager.editModeType == LineManager.EditModeType.NODES))
-                                && (Event.current.control || lineData.selectionCount == 0))
-                            {
-                                if (lineData.IsSelected(i))
-                                {
-                                    lineData.RemoveFromSelection(i);
-                                    lineData.selectedPointIdx = -1;
-                                    removedFromSelection = true;
-                                }
-                                else
-                                {
-                                    lineData.AddToSelection(i);
-                                    lineData.showHandles = true;
-                                    lineData.selectedPointIdx = i;
-                                    if (Event.current.control) addToSelection = true;
-                                }
-                                selectionChanged = true;
-                            }
-                            clickOnPoint = true;
-                            Event.current.Use();
+                            lineData.ClearSelection();
+                            lineData.selectedPointIdx = i;
+                            selectionChanged = true;
                         }
+                        if ((!ToolManager.editMode
+                            || (ToolManager.editMode && LineManager.editModeType == LineManager.EditModeType.NODES))
+                            && (Event.current.control || lineData.selectionCount == 0))
+                        {
+                            if (lineData.ControlPointIsSelected(i))
+                            {
+                                lineData.RemoveFromSelection(i);
+                                lineData.selectedPointIdx = -1;
+                                removedFromSelection = true;
+                            }
+                            else
+                            {
+                                lineData.AddToSelection(i);
+                                lineData.showHandles = true;
+                                lineData.selectedPointIdx = i;
+                                if (Event.current.control) addToSelection = true;
+                            }
+                            selectionChanged = true;
+                        }
+                        clickOnPoint = true;
+                        Event.current.Use();
+                    }
+                    if (Event.current.button == 1 && Event.current.type == EventType.MouseDown
+                        && !Event.current.control && !Event.current.shift && !Event.current.alt
+                            && UnityEditor.HandleUtility.nearestControl == controlId)
+                    {
+                        ShowLineContextMenu(lineData, isPersistent,
+                            UnityEditor.EditorGUIUtility.GUIToScreenPoint(Event.current.mousePosition), pointIdx: i);
+                        Event.current.Use();
                     }
                 }
                 if (Event.current.type != EventType.Repaint) continue;
-                DrawDotHandleCap(lineData.GetPoint(i), 1, 1, lineData.IsSelected(i));
+                DrawDotHandleCap(lineData.GetPoint(i), 1, 1, lineData.ControlPointIsSelected(i));
             }
             if (selectionChanged) ResetLineRotation();
             var midpoints = lineData.midpoints;
@@ -1029,8 +1151,8 @@ namespace PluginMaster
                     if (leftMouseDown)
                     {
                         lineData.InsertPoint(i + 1, new LinePoint(point));
-                        lineData.selectedPointIdx = i + 1;
                         lineData.ClearSelection();
+                        lineData.selectedPointIdx = i + 1;
                         updateStroke = true;
                         clickOnPoint = true;
                         Event.current.Use();
@@ -1049,8 +1171,9 @@ namespace PluginMaster
                 lineData.SetPoint(lineData.selectedPointIdx,
                     UnityEditor.Handles.PositionHandle(selectedPoint, Quaternion.identity),
                     registerUndo: true, selectAll);
-                var point = _snapToVertex ? LinePointSnapping(lineData.selectedPoint)
-                    : SnapAndUpdateGridOrigin(lineData.selectedPoint, SnapManager.settings.snappingEnabled,
+                var point = SnapToBounds(lineData.selectedPoint);
+                point = _snapToVertex ? LinePointSnapping(point)
+                    : SnapAndUpdateGridOrigin(point, SnapManager.settings.snappingEnabled,
                         LineManager.settings.paintOnPalettePrefabs, LineManager.settings.paintOnMeshesWithoutCollider,
                         false, Vector3.down);
                 lineData.SetPoint(lineData.selectedPointIdx, point, registerUndo: false, selectAll);
@@ -1161,6 +1284,13 @@ namespace PluginMaster
                 selectingLinePoints = false;
         }
 
+        public static void ApplyPersistentLine(LineData data)
+        {
+            data.UpdatePoses();
+            DeleteDisabledObjects();
+            PWBCore.staticData.SetSavePending();
+            AutoSave.QuickSave();
+        }
         private static void LineInput(bool persistent, UnityEditor.SceneView sceneView, bool skipPreview)
         {
             var lineData = persistent ? _selectedPersistentLineData : _lineData;
@@ -1171,11 +1301,11 @@ namespace PluginMaster
                 {
                     if (skipPreview)
                     {
-                        PreviewPersistentLine(_selectedPersistentLineData);
-                        LineStrokePreview(sceneView, _selectedPersistentLineData,
-                            persistent: true, forceUpdate: true, _firstNewObjIdx);
+                        PreviewPersistentLine(lineData);
+                        LineStrokePreview(sceneView, lineData, persistent: true, forceUpdate: true, _firstNewObjIdx);
                     }
                     DeleteDisabledObjects();
+                    _persistentItemWasEdited = true;
                     ApplySelectedPersistentLine(true);
                     DeleteDisabledObjects();
                     ToolProperties.RepainWindow();
@@ -1189,9 +1319,26 @@ namespace PluginMaster
             else if (Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Delete
                 && !Event.current.control && !Event.current.alt && !Event.current.shift)
             {
-                lineData.RemoveSelectedPoints();
-                if (persistent) PreviewPersistentLine(_selectedPersistentLineData);
-                else updateStroke = true;
+                if (persistent && lineData.pointsCount <= 2)
+                {
+                    LineManager.instance.DeletePersistentItem(lineData.id, deleteObjects: true);
+                    UnityEditor.SceneView.RepaintAll();
+                }
+                else
+                {
+                    lineData.RemoveSelectedPoints();
+                    if (persistent)
+                    {
+                        lineData.UpdatePath(forceUpdate: true, updateOnSurfacePoints: true);
+                        PreviewPersistentLine(lineData);
+                        LineStrokePreview(sceneView, lineData, persistent: true, forceUpdate: true, _firstNewObjIdx);
+                        DeleteDisabledObjects();
+                        ApplySelectedPersistentLine(true);
+                        _initialPersistentLineData = null;
+                        _selectedPersistentLineData = null;
+                    }
+                    if (lineData.pointsCount >= 2) updateStroke = true;
+                }
             }
             else if (Event.current.type == EventType.MouseDown && Event.current.button == 1
                 && Event.current.control && !Event.current.alt && !Event.current.shift
@@ -1200,6 +1347,7 @@ namespace PluginMaster
                 if (MouseDot(out Vector3 point, out Vector3 normal, lineData.settings.mode, sceneView.in2DMode,
                 lineData.settings.paintOnPalettePrefabs, lineData.settings.paintOnMeshesWithoutCollider, false))
                 {
+                    point = SnapToBounds(point);
                     point = _snapToVertex ? LinePointSnapping(point)
                         : SnapAndUpdateGridOrigin(point, SnapManager.settings.snappingEnabled,
                         lineData.settings.paintOnPalettePrefabs, lineData.settings.paintOnMeshesWithoutCollider,
@@ -1216,11 +1364,7 @@ namespace PluginMaster
             else if (PWBSettings.shortcuts.lineSelectAllPoints.Check()
                 && LineManager.editModeType == LineManager.EditModeType.NODES)
                 lineData.SelectAll();
-            else if (PWBSettings.shortcuts.lineDeselectAllPoints.Check())
-            {
-                lineData.selectedPointIdx = -1;
-                lineData.ClearSelection();
-            }
+            else if (PWBSettings.shortcuts.lineDeselectAllPoints.Check()) lineData.ClearSelection();
             else if (PWBSettings.shortcuts.lineToggleCurve.Check())
             {
                 lineData.ToggleSegmentType();
@@ -1247,6 +1391,7 @@ namespace PluginMaster
                 LineManager.instance.DeletePersistentItem(lineData.id, false);
             else if (PWBSettings.shortcuts.editModeDeleteItemAndItsChildren.Check())
                 LineManager.instance.DeletePersistentItem(lineData.id, true);
+            else if (PWBSettings.shortcuts.editModeDuplicate.Check()) DuplicateItem(lineData.id);
             else if (PWBSettings.shortcuts.lineEditModeTypeToggle.Check())
                 LineManager.ToggleEditModeType();
         }
@@ -1258,6 +1403,30 @@ namespace PluginMaster
         private static bool _editingPersistentLine = false;
         private static LineData _initialPersistentLineData = null;
         private static LineData _selectedPersistentLineData = null;
+
+        private static System.Collections.Generic.Dictionary<long, IPersistentData.Visibility> _prevDataVisibility
+            = new System.Collections.Generic.Dictionary<long, IPersistentData.Visibility>();
+
+        private static void UpdateDataPrevVisibility(IPersistentData data)
+        {
+            if (data.visibility == IPersistentData.Visibility.HIDE_ALL)
+                UnityEditor.SceneVisibilityManager.instance.Hide(data.objects, true);
+            else UnityEditor.SceneVisibilityManager.instance.Show(data.objects, true);
+            if (_prevDataVisibility.ContainsKey(data.id)) _prevDataVisibility[data.id] = data.visibility;
+            else _prevDataVisibility.Add(data.id, data.visibility);
+        }
+
+        public static void SelectLine(LineData data)
+        {
+            ApplySelectedPersistentLine(true);
+            _editingPersistentLine = true;
+            data.ClearSelection();
+            data.selectedPointIdx = 0;
+            data.showHandles = true;
+            _selectedPersistentLineData = data;
+            if (_initialPersistentLineData == null) _initialPersistentLineData = data.Clone();
+            LineManager.instance.CopyToolSettings(data.settings);
+        }
         private static void LineToolEditMode(UnityEditor.SceneView sceneView)
         {
             var persistentLines = LineManager.instance.GetPersistentItems();
@@ -1269,10 +1438,38 @@ namespace PluginMaster
             DrawSelectionRectangle();
             foreach (var lineData in persistentLines)
             {
+                if(lineData.pointsCount <= 2)
+                {
+                    void DeleteItem()
+                    {
+                        LineManager.instance.DeletePersistentItem(lineData.id, deleteObjects: true, registerUndo: false);
+                        PWBItemsWindow.RepainWindow();
+                    }
+                    if (lineData.pointsCount <= 1)
+                    {
+                        DeleteItem();
+                        continue;
+                    }
+                    var points = lineData.points;
+                    if (points[0] == points[1] && points[0] == Vector3.zero)
+                    {
+                        DeleteItem();
+                        continue;
+                    }
+                }
+                if (!_prevDataVisibility.ContainsKey(lineData.id) || lineData.visibility != _prevDataVisibility[lineData.id])
+                {
+                    if (lineData.visibility == IPersistentData.Visibility.HIDE_ALL)
+                        UnityEditor.SceneVisibilityManager.instance.Hide(lineData.objects, true);
+                    else UnityEditor.SceneVisibilityManager.instance.Show(lineData.objects, true);
+                    UpdateDataPrevVisibility(lineData);
+                }
+                if (lineData.visibility != IPersistentData.Visibility.SHOW_ALL) continue;
                 DrawLine(lineData, drawSurfacePath: lineData.selectionCount > 0);
 
-                if (DrawLineControlPoints(lineData, ToolManager.editMode, out bool clickOnPoint, out bool multiSelection,
-                     out bool addToselection, out bool removedFromSelection, out bool wasEdited, out Vector3 localDelta))
+                if (DrawLineControlPoints(lineData, isPersistent: true, ToolManager.editMode,
+                    out bool clickOnPoint, out bool multiSelection, out bool addToselection,
+                    out bool removedFromSelection, out bool wasEdited, out Vector3 localDelta))
                 {
                     if (clickOnPoint)
                     {
@@ -1290,7 +1487,6 @@ namespace PluginMaster
                                 {
                                     PWBCore.SetActiveTempColliders(selected.objects, true);
                                     selected.showHandles = false;
-                                    selected.selectedPointIdx = -1;
                                     selected.ClearSelection();
                                 }
                             }
@@ -1314,22 +1510,34 @@ namespace PluginMaster
                     }
                 }
             }
+
+            var repaintItemsWindow = false;
+            foreach (var lineData in persistentLines)
+            {
+                var isSelected = lineData.selectionCount > 0;
+                if (lineData.isSelected != isSelected) repaintItemsWindow = true;
+                lineData.isSelected = lineData.selectionCount > 0;
+            }
+            if (repaintItemsWindow) PWBItemsWindow.RepainWindow();
+
             var linesEdited = persistentLines.Where(i => i.selectionCount > 0).ToArray();
 
-            if (someLinesWereEdited && linesEdited.Length > 0)
-                _disabledObjects.Clear();
-            if (someLinesWereEdited && linesEdited.Length > 1)
+            if (someLinesWereEdited)
             {
-                _paintStroke.Clear();
-                foreach (var lineData in linesEdited)
+                if (linesEdited.Length > 0) _disabledObjects.Clear();
+                if (linesEdited.Length > 1)
                 {
-                    if (lineData != editedData) lineData.AddDeltaToSelection(delta);
-                    lineData.UpdatePath(forceUpdate: false, updateOnSurfacePoints: true);
-                    PreviewPersistentLine(lineData);
-                    LineStrokePreview(sceneView, lineData, persistent: true, forceUpdate: true, _firstNewObjIdx);
+                    _paintStroke.Clear();
+                    foreach (var lineData in linesEdited)
+                    {
+                        if (lineData != editedData) lineData.AddDeltaToSelection(delta);
+                        lineData.UpdatePath(forceUpdate: false, updateOnSurfacePoints: true);
+                        PreviewPersistentLine(lineData);
+                        LineStrokePreview(sceneView, lineData, persistent: true, forceUpdate: true, _firstNewObjIdx);
+                    }
+                    PWBCore.SetSavePending();
+                    return;
                 }
-                PWBCore.SetSavePending();
-                return;
             }
             if (linesEdited.Length > 1) PreviewPersistent(sceneView.camera);
 
@@ -1364,7 +1572,18 @@ namespace PluginMaster
         }
 
         private static int _firstNewObjIdx = 0;
-        private static void PreviewPersistentLine(LineData lineData)
+
+        public static void PreviewSelectedPersistentLines()
+        {
+            if (ToolManager.tool != ToolManager.PaintTool.LINE) return;
+            var persistentLines = LineManager.instance.GetPersistentItems();
+            foreach (var lineData in persistentLines)
+            {
+                if (!lineData.isSelected) continue;
+                PreviewPersistentLine(lineData);
+            }
+        }
+        public static void PreviewPersistentLine(LineData lineData)
         {
             PWBCore.UpdateTempCollidersIfHierarchyChanged();
 
@@ -1403,6 +1622,7 @@ namespace PluginMaster
                 if (i > 0) pathLength += (objPos[i].objPosition - objPos[i - 1].objPosition).magnitude;
 
                 var prefab = UnityEditor.PrefabUtility.GetCorrespondingObjectFromSource(obj);
+                if (prefab == null) prefab = obj;
                 var bounds = BoundsUtils.GetBoundsRecursive(prefab.transform, prefab.transform.rotation,
                     ignoreDissabled: true, BoundsUtils.ObjectProperty.BOUNDING_BOX, recursive: true, useDictionary: false);
 
@@ -1411,36 +1631,11 @@ namespace PluginMaster
                 var height = size.x + size.y + size.z + maxSurfaceHeight + pathLength;
                 Vector3 segmentDir = Vector3.zero;
                 var objOnLineSize = AxesUtils.GetAxisValue(size, toolSettings.axisOrientedAlongTheLine);
-                if (toolSettings.objectsOrientedAlongTheLine && objPos.Length > 1)
-                {
-                    if (i < objPos.Length - 1)
-                    {
-                        if (i + 1 < objPos.Length) segmentDir = objPos[i + 1].objPosition - objPos[i].objPosition;
-                        else if (strokePos.Length > 0) segmentDir = strokePos[0] - objPos[i].objPosition;
-                        prevSegmentDir = segmentDir;
-                    }
-                    else
-                    {
-                        var nearestPathPoint = LineData.NearestPathPoint(objPos[i].objPosition,
-                            objOnLineSize, lineData.pathPoints, out int nearestPointIdx);
-                        segmentDir = nearestPathPoint - objPos[i].objPosition;
-                        segmentDir = segmentDir.normalized * prevSegmentDir.magnitude;
-                    }
-                }
+               
+                segmentDir = objPos[i].brushstrokeDirection;
 
-                if (objPos.Length == 1) segmentDir = lineData.lastPathPoint - objPos[0].objPosition;
-                else if (i == objPos.Length - 1)
-                {
-                    var onLineSize = objOnLineSize + toolSettings.gapSize;
-                    var segmentSize = segmentDir.magnitude;
-                    if (segmentSize > onLineSize)
-                        segmentDir = segmentDir.normalized
-                            * (toolSettings.spacingType == LineSettings.SpacingType.BOUNDS
-                            ? onLineSize : toolSettings.spacing);
-                }
                 var perpendicularToTheSurface = toolSettings.perpendicularToTheSurface
                     || (brushSettings.rotateToTheSurface && !brushSettings.alwaysOrientUp);
-
                 if (toolSettings.objectsOrientedAlongTheLine && !perpendicularToTheSurface)
                 {
                     var projectionAxis = ((AxesUtils.SignedAxis)(toolSettings.projectionDirection)).axis;
@@ -1559,7 +1754,6 @@ namespace PluginMaster
             var selectedLine = LineManager.instance.GetItem(_initialPersistentLineData.id);
             if (selectedLine == null) return;
             selectedLine.ResetPoses(_initialPersistentLineData);
-            selectedLine.selectedPointIdx = -1;
             selectedLine.ClearSelection();
         }
 
@@ -1577,11 +1771,7 @@ namespace PluginMaster
         private static void DeselectPersistentLines()
         {
             var persistentLines = LineManager.instance.GetPersistentItems();
-            foreach (var l in persistentLines)
-            {
-                l.selectedPointIdx = -1;
-                l.ClearSelection();
-            }
+            foreach (var l in persistentLines) l.ClearSelection();
         }
 
         #endregion

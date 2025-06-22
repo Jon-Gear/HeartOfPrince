@@ -82,18 +82,18 @@ namespace PluginMaster
             UnityEditor.EditorGUIUtility.labelWidth = 110;
             using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
             {
-                settings.backgroudColor = UnityEditor.EditorGUILayout.ColorField("Background color:", settings.backgroudColor);
+                settings.backgroudColor = UnityEditor.EditorGUILayout.ColorField("Background color", settings.backgroudColor);
             }
             using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
             {
-                settings.lightColor = UnityEditor.EditorGUILayout.ColorField("Light color:", settings.lightColor);
+                settings.lightColor = UnityEditor.EditorGUILayout.ColorField("Light color", settings.lightColor);
                 settings.lightIntensity
-                    = UnityEditor.EditorGUILayout.Slider("Light intensity:", settings.lightIntensity, 0.1f, 2);
+                    = UnityEditor.EditorGUILayout.Slider("Light intensity", settings.lightIntensity, 0.1f, 2);
             }
             using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
             {
-                settings.zoom = UnityEditor.EditorGUILayout.Slider("Zoom:", settings.zoom, 0.5f, 10);
-                settings.targetEuler = UnityEditor.EditorGUILayout.Vector3Field("Rotation:", settings.targetEuler);
+                settings.zoom = UnityEditor.EditorGUILayout.Slider("Zoom", settings.zoom, 0.5f, 10);
+                settings.targetEuler = UnityEditor.EditorGUILayout.Vector3Field("Rotation", settings.targetEuler);
             }
         }
 
@@ -136,6 +136,7 @@ namespace PluginMaster
                 if (GUILayout.Button("Factory Reset"))
                 {
                     _settings = new ThumbnailSettings();
+                    if (_brush.isAsset2D) _settings.Copy(ThumbnailSettings.GetDefaultTAsset2DThumbnailSettings());
                     OnSettingsChange();
                     InitializePreview();
                 }

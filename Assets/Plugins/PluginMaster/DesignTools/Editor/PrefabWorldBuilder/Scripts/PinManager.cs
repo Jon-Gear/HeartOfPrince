@@ -280,7 +280,7 @@ namespace PluginMaster
     }
 
     [System.Serializable]
-    public class PinSettings : PaintOnSurfaceToolSettings, IPaintToolSettings
+    public class PinSettings : PaintOnSurfaceToolSettings, IPaintToolSettings, IToolParentingSettings
     {
         [SerializeField] private bool _repeat = false;
         [SerializeField] private TerrainFlatteningSettings _flatteningSettings = new TerrainFlatteningSettings();
@@ -367,7 +367,11 @@ namespace PluginMaster
             set => _paintTool.overwriteBrushProperties = value;
         }
         public BrushSettings brushSettings => _paintTool.brushSettings;
-
+        public bool overwriteParentingSettings
+        {
+            get => _paintTool.overwriteParentingSettings;
+            set => _paintTool.overwriteParentingSettings = value;
+        }
         public PinSettings() : base() => _paintTool.OnDataChanged += DataChanged;
         #endregion
 
@@ -520,8 +524,7 @@ namespace PluginMaster
             _pinBoundPoints.Clear();
             _initialPinBoundPoints.Clear();
 
-            var centerToPivot = prefab.transform.position - bounds.center;
-
+            var centerToPivot = GetCenterToPivot(prefab, strokeItem.scaleMultiplier, Quaternion.identity);
 
             var pointRotation = additionRotation;
 
@@ -542,7 +545,7 @@ namespace PluginMaster
                 maxProjectionMagnitude = xProjectionMagnitude;
             }
             if (zProjectionMagnitude > maxProjectionMagnitude) nearestAxisToSurfaceNormal = AxesUtils.Axis.Z;
-            var halfSize = bounds.size * 0.5f;
+            var halfSize = Vector3.Scale(bounds.size, strokeItem.scaleMultiplier) * 0.5f;
 
             int l = 0;
             var pointsNormalized = new Vector2[] { new Vector2(0,0),
@@ -696,7 +699,25 @@ namespace PluginMaster
                     else _paintStroke.Clear();
                 }
             }
+            PinInfoText(sceneView);
         }
+
+        private static void PinInfoText(UnityEditor.SceneView sceneView)
+        {
+            if (!PWBCore.staticData.showInfoText) return;
+            if (_paintStroke.Count == 0) return;
+            var p = _paintStroke[0].position;
+            var r = _paintStroke[0].rotation.eulerAngles;
+            var s = _paintStroke[0].scale;
+            var labelTexts = new System.Collections.Generic.List<string>
+            { _paintStroke[0].prefab.name, $"P: {p.x.ToString("F2")}, {p.y.ToString("F2")}, {p.z.ToString("F2")}"};
+            if (r != Vector3.zero) labelTexts.Add($"R: {r.x.ToString("F2")}, {r.y.ToString("F2")}, {r.z.ToString("F2")}");
+            if (s != Vector3.one) labelTexts.Add($"S: {s.x.ToString("F2")}, {s.y.ToString("F2")}, {s.z.ToString("F2")}");
+            if (!Mathf.Approximately(_pinDistanceFromSurface, 0f))
+                labelTexts.Add($"Surface offset: {_pinDistanceFromSurface.ToString("F2")}");
+            InfoText.Draw(sceneView, labelTexts.ToArray());
+        }
+
 
         private static Vector3 _prevPinHitNormal = Vector3.zero;
         private static void DrawPin(UnityEditor.SceneView sceneView, RaycastHit hit,
@@ -706,9 +727,10 @@ namespace PluginMaster
             PWBCore.UpdateTempCollidersIfHierarchyChanged();
             if (!_pinned)
             {
+                hit.point = SnapToBounds(hit.point);
                 hit.point = SnapAndUpdateGridOrigin(hit.point, snapToGrid,
                    PinManager.settings.paintOnPalettePrefabs, PinManager.settings.paintOnMeshesWithoutCollider,
-                   PinManager.settings.mode == PaintOnSurfaceToolSettings.PaintMode.ON_SHAPE, -hit.normal);
+                   PinManager.settings.mode == PaintOnSurfaceToolSettingsBase.PaintMode.ON_SHAPE, -hit.normal);
                 _pinHit = hit;
             }
             PinPreview(sceneView.camera);
@@ -756,6 +778,7 @@ namespace PluginMaster
 
             var itemRotation = Quaternion.identity;
             var itemPosition = _pinHit.point;
+
             if (brushSettings.rotateToTheSurface && !PinManager.settings.flattenTerrain)
             {
                 if (_pinHit.normal == Vector3.zero) _pinHit.normal = Vector3.up;
@@ -792,7 +815,7 @@ namespace PluginMaster
             if (PinManager.settings.paintOnSelectedOnly && objUnderMouse != null
                 && !SelectionManager.selection.Contains(objUnderMouse)) return;
             itemRotation *= Quaternion.Euler(strokeItem.additionalAngle);
-            
+
             var pinAngle = _pinAngle;
             if (PinManager.settings.snapRotationToGrid || snapPinRotationToGrid)
             {
@@ -804,7 +827,7 @@ namespace PluginMaster
                 }
             }
             itemRotation *= Quaternion.Euler(pinAngle);
-            
+
             if (brushSettings.rotateToTheSurface && brushSettings.alwaysOrientUp && !strokeItem.settings.isAsset2D)
             {
                 var fw = (Quaternion.Euler(strokeItem.additionalAngle) * Quaternion.Euler(_pinAngle)) * _pinHit.normal;
@@ -820,7 +843,10 @@ namespace PluginMaster
 
             UpdatePinValues(prefab, itemRotation * prefab.transform.rotation);
 
-            var previewPinOffset = _pinOffset / _pinScale;
+            var previewPinOffset = _pinOffset;
+            previewPinOffset.x /= scaleMult.x;
+            previewPinOffset.y /= scaleMult.y;
+            previewPinOffset.z /= scaleMult.z;
             var strokePinOffset = _pinOffset;
 
             if (brushSettings.embedInSurface && PinManager.settings.mode != PaintOnSurfaceToolSettingsBase.PaintMode.ON_SHAPE)
@@ -865,6 +891,9 @@ namespace PluginMaster
                     return;
                 }
             }
+
+
+
             var flipX = strokeItem.flipX ^ _pinFlipX;
             _paintStroke.Add(new PaintStrokeItem(prefab, itemPosition + strokePinOffset,
                 itemRotation * prefab.transform.rotation,

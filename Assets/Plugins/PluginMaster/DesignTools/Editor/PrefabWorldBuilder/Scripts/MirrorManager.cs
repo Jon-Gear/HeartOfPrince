@@ -18,7 +18,7 @@ namespace PluginMaster
     #region DATA & SETTINGS
     [System.Serializable]
     public class MirrorSettings : SelectionToolBase,
-        IPaintToolSettings, ISerializationCallbackReceiver
+        IPaintToolSettings, IToolParentingSettings, ISerializationCallbackReceiver
     {
         public enum MirrorAction { TRANSFORM, CREATE}
         [SerializeField] private bool _reflectRotation = true;
@@ -108,12 +108,6 @@ namespace PluginMaster
             _invertScale = otherMirrorSettings._invertScale;
         }
 
-        public override void Clone(ICloneableToolSettings clone)
-        {
-            if (clone == null || !(clone is MirrorSettings)) clone = new MirrorSettings();
-            clone.Copy(this);
-        }
-
         public void OnBeforeSerialize() { }
         public void OnAfterDeserialize() => PWBIO.repaint = true;
 
@@ -148,6 +142,11 @@ namespace PluginMaster
         public bool overwriteBrushProperties {get => _paintTool.overwriteBrushProperties;
             set => _paintTool.overwriteBrushProperties = value; }
         public BrushSettings brushSettings => _paintTool.brushSettings;
+        public bool overwriteParentingSettings
+        {
+            get => _paintTool.overwriteParentingSettings;
+            set => _paintTool.overwriteParentingSettings = value;
+        }
         #endregion
     }
 
@@ -176,6 +175,7 @@ namespace PluginMaster
                 MirrorManager.settings.mirrorPosition = hit.point;
             if (GridRaycast(camRay, out RaycastHit gridHit))
                 MirrorManager.settings.mirrorPosition = gridHit.point;
+            MirrorManager.settings.mirrorPosition = SnapToBounds(MirrorManager.settings.mirrorPosition);
             MirrorManager.settings.mirrorPosition = SnapAndUpdateGridOrigin(MirrorManager.settings.mirrorPosition,
                 SnapManager.settings.snappingEnabled, true, true, false, Vector3.down);
             MirrorManager.settings.mirrorRotation = Quaternion.LookRotation(Vector3.right, Vector3.up);
@@ -259,6 +259,7 @@ namespace PluginMaster
                     MirrorManager.settings.mirrorRotation);
                 MirrorManager.settings.mirrorPosition = SnapAndUpdateGridOrigin(MirrorManager.settings.mirrorPosition,
                 SnapManager.settings.snappingEnabled, true, true, false, Vector3.down);
+                MirrorManager.settings.mirrorPosition = SnapToBounds(MirrorManager.settings.mirrorPosition);
                 MirrorManager.settings.mirrorRotation = UnityEditor.Handles.RotationHandle(MirrorManager.settings.mirrorRotation,
                     MirrorManager.settings.mirrorPosition);
                 if (prevPose != MirrorManager.settings.mirrorPose) ToolProperties.RepainWindow();

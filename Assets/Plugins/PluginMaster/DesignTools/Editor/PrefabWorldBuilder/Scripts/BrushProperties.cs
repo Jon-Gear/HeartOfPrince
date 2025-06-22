@@ -48,13 +48,9 @@ namespace PluginMaster
         {
             _instance = this;
             _data = PWBCore.staticData;
-            PaletteManager.OnBrushChanged += OnBrushChanged;
+            PaletteManager.OnBrushSelectionChanged += OnBrushChanged;
             _skin = Resources.Load<GUISkin>("PWBSkin");
-            if (_skin == null)
-            {
-                Close();
-                return;
-            }
+            if (_skin == null) return;
             _itemStyle = _skin.GetStyle("PaletteToggle");
             _cursorStyle = _skin.GetStyle("Cursor");
             _thumbnailToggleStyle = _skin.GetStyle("ThumbnailToggle");
@@ -73,7 +69,7 @@ namespace PluginMaster
 
         private void OnDisable()
         {
-            PaletteManager.OnBrushChanged -= OnBrushChanged;
+            PaletteManager.OnBrushSelectionChanged -= OnBrushChanged;
             PaletteManager.OnSelectionChanged -= UpdateBrushSelectionSettings;
             UnityEditor.Undo.undoRedoPerformed -= Repaint;
         }
@@ -86,6 +82,7 @@ namespace PluginMaster
 
         private void OnGUI()
         {
+            if (UnityEditor.Lightmapping.isRunning) return;
             if (_skin == null)
             {
                 Close();
@@ -93,8 +90,6 @@ namespace PluginMaster
             }
             if (_itemAdded)
             {
-                if (PWBCore.staticData.undoBrushProperties)
-                    UnityEditor.Undo.RegisterCompleteObjectUndo(this, "Add Brush Item");
                 PaletteManager.selectedBrush.InsertItemAt(_newItem, _newItemIdx);
                 _newItem = null;
                 _selectedItemIdx = _newItemIdx;
@@ -122,8 +117,6 @@ namespace PluginMaster
                     if (PaletteManager.selectedBrush.items.Length == 0)
                     {
                         showBrushGroup = false;
-                        if (PWBCore.staticData.undoBrushProperties)
-                            UnityEditor.Undo.RegisterCompleteObjectUndo(this, "Delete Brush");
                         PaletteManager.selectedPalette.RemoveBrushAt(PaletteManager.selectedBrushIdx);
                     }
                 }
@@ -401,8 +394,9 @@ namespace PluginMaster
 
                             using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                             {
+                                UnityEditor.EditorGUIUtility.labelWidth = 110;
                                 brushSelectionSettings.randomSurfaceDistance
-                                    = UnityEditor.EditorGUILayout.Popup("Surface Distance:",
+                                    = UnityEditor.EditorGUILayout.Popup("Surface Distance",
                                     brushSelectionSettings.randomSurfaceDistance ? 1 : 0,
                                     new string[] { "Constant", "Random" }) == 1;
                                 if (check.changed)
@@ -437,8 +431,9 @@ namespace PluginMaster
 
                                 using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                                 {
+                                    UnityEditor.EditorGUIUtility.labelWidth = 100;
                                     brushSelectionSettings.surfaceDistance
-                                        = UnityEditor.EditorGUILayout.FloatField("Value:",
+                                        = UnityEditor.EditorGUILayout.FloatField("Value",
                                         brushSelectionSettings.surfaceDistance);
                                     if (check.changed)
                                         brushSelectionState.surfaceDistance = SelectionFieldState.CHANGED;
@@ -455,7 +450,7 @@ namespace PluginMaster
                         using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                         {
                             brushSelectionSettings.localPositionOffset
-                                = UnityEditor.EditorGUILayout.Vector3Field("Local Offset:",
+                                = UnityEditor.EditorGUILayout.Vector3Field("Local Offset",
                                 brushSelectionSettings.localPositionOffset);
                             if (check.changed) brushSelectionState.localPositionOffset = SelectionFieldState.CHANGED;
                         }
@@ -469,7 +464,7 @@ namespace PluginMaster
             {
                 using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
                 {
-                    
+
                     using (new GUILayout.HorizontalScope())
                     {
                         GUILayout.Box(GetStateGUIContent(brushSelectionState.rotateToTheSurface),
@@ -509,8 +504,9 @@ namespace PluginMaster
 
                             using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                             {
+                                UnityEditor.EditorGUIUtility.labelWidth = 100;
                                 brushSelectionSettings.addRandomRotation
-                                    = UnityEditor.EditorGUILayout.Popup("Add Rotation:",
+                                    = UnityEditor.EditorGUILayout.Popup("Add Rotation",
                                     brushSelectionSettings.addRandomRotation ? 1 : 0,
                                     new string[] { "Constant", "Random" }) == 1;
                                 if (check.changed)
@@ -569,7 +565,8 @@ namespace PluginMaster
 
                         using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                         {
-                            brushSelectionSettings.randomScaleMultiplier = UnityEditor.EditorGUILayout.Popup("Multiplier:",
+                            UnityEditor.EditorGUIUtility.labelWidth = 100;
+                            brushSelectionSettings.randomScaleMultiplier = UnityEditor.EditorGUILayout.Popup("Multiplier",
                                 brushSelectionSettings.randomScaleMultiplier ? 1
                                 : 0, new string[] { "Constant", "Random" }) == 1;
                             if (check.changed)
@@ -603,10 +600,25 @@ namespace PluginMaster
 
                                 using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                                 {
-                                    brushSelectionSettings.randomScaleMultiplierRange
-                                        = EditorGUIUtils.Range3Field(string.Empty,
+                                    var range3 = EditorGUIUtils.Range3Field(string.Empty,
                                         brushSelectionSettings.randomScaleMultiplierRange);
-                                    if (check.changed)
+                                    if (Mathf.Approximately(range3.x.v1, 0))
+                                        range3.x.v1 = brushSelectionSettings.randomScaleMultiplierRange.x.v1;
+                                    if (Mathf.Approximately(range3.x.v2, 0))
+                                        range3.x.v2 = brushSelectionSettings.randomScaleMultiplierRange.x.v2;
+
+                                    if (Mathf.Approximately(range3.y.v1, 0))
+                                        range3.y.v1 = brushSelectionSettings.randomScaleMultiplierRange.y.v1;
+                                    if (Mathf.Approximately(range3.y.v2, 0))
+                                        range3.y.v2 = brushSelectionSettings.randomScaleMultiplierRange.y.v2;
+
+                                    if (Mathf.Approximately(range3.z.v1, 0))
+                                        range3.z.v1 = brushSelectionSettings.randomScaleMultiplierRange.z.v1;
+                                    if (Mathf.Approximately(range3.z.v2, 0))
+                                        range3.z.v2 = brushSelectionSettings.randomScaleMultiplierRange.z.v2;
+
+                                    brushSelectionSettings.randomScaleMultiplierRange = range3;
+                                    if (check.changed && range3 != brushSelectionSettings.randomScaleMultiplierRange)
                                         brushSelectionState.randomScaleMultiplierRange = SelectionFieldState.CHANGED;
                                 }
                                 GUILayout.FlexibleSpace();
@@ -621,9 +633,12 @@ namespace PluginMaster
 
                                 using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                                 {
-                                    brushSelectionSettings.scaleMultiplier
-                                        = UnityEditor.EditorGUILayout.Vector3Field(string.Empty,
+                                    var mult = UnityEditor.EditorGUILayout.Vector3Field(string.Empty,
                                         brushSelectionSettings.scaleMultiplier);
+                                    if (Mathf.Approximately(mult.x, 0)) mult.x = brushSelectionSettings.scaleMultiplier.x;
+                                    if (Mathf.Approximately(mult.y, 0)) mult.y = brushSelectionSettings.scaleMultiplier.y;
+                                    if (Mathf.Approximately(mult.z, 0)) mult.z = brushSelectionSettings.scaleMultiplier.z;
+                                    brushSelectionSettings.scaleMultiplier = mult;
                                     if (check.changed)
                                         brushSelectionState.scaleMultiplier = SelectionFieldState.CHANGED;
                                 }
@@ -642,12 +657,17 @@ namespace PluginMaster
 
                                 using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                                 {
+                                    var range = EditorGUIUtils.RangeField(string.Empty,
+                                        brushSelectionSettings.randomScaleMultiplierRange.x);
+                                    if (Mathf.Approximately(range.v1, 0))
+                                        range.v1 = brushSelectionSettings.randomScaleMultiplierRange.x.v1;
+                                    if (Mathf.Approximately(range.v2, 0))
+                                        range.v1 = brushSelectionSettings.randomScaleMultiplierRange.x.v2;
                                     brushSelectionSettings.randomScaleMultiplierRange.z
                                         = brushSelectionSettings.randomScaleMultiplierRange.y
                                         = brushSelectionSettings.randomScaleMultiplierRange.x
-                                        = EditorGUIUtils.RangeField(string.Empty,
-                                        brushSelectionSettings.randomScaleMultiplierRange.x);
-                                    if (check.changed)
+                                        = range;
+                                    if (check.changed && range != brushSelectionSettings.randomScaleMultiplierRange.x)
                                         brushSelectionState.randomScaleMultiplierRange = SelectionFieldState.CHANGED;
                                 }
                                 GUILayout.FlexibleSpace();
@@ -662,11 +682,14 @@ namespace PluginMaster
 
                                 using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                                 {
-                                    brushSelectionSettings.scaleMultiplier = Vector3.one
-                                        * UnityEditor.EditorGUILayout.FloatField("Value:",
+                                    var multiplier = UnityEditor.EditorGUILayout.FloatField("Value",
                                         brushSelectionSettings.scaleMultiplier.x);
-                                    if (check.changed)
-                                        brushSelectionState.scaleMultiplier = SelectionFieldState.CHANGED;
+                                    if (!Mathf.Approximately(multiplier, 0))
+                                    {
+                                        brushSelectionSettings.scaleMultiplier = Vector3.one * multiplier;
+                                        if (check.changed)
+                                            brushSelectionState.scaleMultiplier = SelectionFieldState.CHANGED;
+                                    }
                                 }
                                 GUILayout.FlexibleSpace();
                             }
@@ -744,7 +767,6 @@ namespace PluginMaster
                 {
                     foreach (var idx in selection)
                     {
-                        if (PWBCore.staticData.undoBrushProperties) UnityEditor.Undo.RegisterCompleteObjectUndo(this, undoMsg);
                         var brush = isItem ? (BrushSettings)PaletteManager.selectedBrush.GetItemAt(idx)
                             : PaletteManager.selectedPalette.GetBrush(idx);
                         brush.surfaceDistance = brushSelectionSettings.surfaceDistance;
@@ -809,149 +831,351 @@ namespace PluginMaster
                 _itemSelectionState, _itemSelectionSettings);
         }
 
-        public static bool BrushFields(BrushSettings brush,
-            ref bool brushPosGroupOpen, ref bool brushRotGroupOpen, ref bool brushScaleGroupOpen, ref bool brushFlipGroupOpen,
-            UnityEngine.Object objToUndo, string undoMsg)
+
+        public static bool BrushFields(BrushSettings brush, ref bool brushPosGroupOpen, ref bool brushRotGroupOpen,
+            ref bool brushScaleGroupOpen, ref bool brush2DGroupOpen)
         {
             bool changed = false;
-            var tempBrush = new BrushSettings(brush);
-
-            using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+            DrawPositionSettings(brush, ref brushPosGroupOpen, ref changed);
+            DrawRotationSettings(brush, ref brushRotGroupOpen, ref changed);
+            DrawScaleSettings(brush, ref brushScaleGroupOpen, ref changed);
+            if (brush.isAsset2D) Draw2DSettings(brush, ref brush2DGroupOpen, ref changed);
+            if (changed)
             {
-                brushPosGroupOpen = UnityEditor.EditorGUILayout.Foldout(brushPosGroupOpen, "Position");
-                UnityEditor.EditorGUIUtility.labelWidth = 110;
-                if (brushPosGroupOpen)
+                brush.UpdateBottomVertices();
+                PaletteManager.selectedPalette.Save();
+                BrushstrokeManager.UpdateBrushstroke();
+                if (ToolManager.tool == ToolManager.PaintTool.TILING) PWBIO.UpdateCellSize();
+            }
+            return changed;
+        }
+        private static void DrawPositionSettings(BrushSettings brush, ref bool groupOpen, ref bool changed)
+        {
+            groupOpen = UnityEditor.EditorGUILayout.Foldout(groupOpen, "Position");
+            if (!groupOpen) return;
+            using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
+            {
+                using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
                 {
-                    using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
+                    using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                     {
-                        using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
+                        var embedInSurface = UnityEditor.EditorGUILayout.ToggleLeft("Embed On the Surface",
+                            brush.embedInSurface);
+                        if (check.changed)
                         {
-                            using (var checkEmbedSettings = new UnityEditor.EditorGUI.ChangeCheckScope())
+                            changed = true;
+                            brush.embedInSurface = embedInSurface;
+                        }
+                    }
+                    if (brush.embedInSurface)
+                    {
+                        using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                        {
+                            var embedAtPivotHeight = UnityEditor.EditorGUILayout.ToggleLeft("Embed At Pivot Height",
+                                brush.embedAtPivotHeight);
+                            if (check.changed)
                             {
-                                tempBrush.embedInSurface = UnityEditor.EditorGUILayout.ToggleLeft("Embed On the Surface",
-                                tempBrush.embedInSurface);
-                                if (tempBrush.embedInSurface)
-                                    tempBrush.embedAtPivotHeight
-                                        = UnityEditor.EditorGUILayout.ToggleLeft("Embed At Pivot Height",
-                                        tempBrush.embedAtPivotHeight);
+                                changed = true;
+                                brush.embedAtPivotHeight = embedAtPivotHeight;
                             }
                         }
-                        using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
-                        {
-                            tempBrush.randomSurfaceDistance = UnityEditor.EditorGUILayout.Popup("Surface distance:",
-                               tempBrush.randomSurfaceDistance ? 1 : 0, new string[] { "Constant", "Random" }) == 1;
-                            if (tempBrush.randomSurfaceDistance)
-                                tempBrush.randomSurfaceDistanceRange = EditorGUIUtils.RangeField(string.Empty,
-                                    tempBrush.randomSurfaceDistanceRange);
-                            else tempBrush.surfaceDistance = UnityEditor.EditorGUILayout.FloatField("Value:",
-                                tempBrush.surfaceDistance);
-                        }
-                        tempBrush.localPositionOffset = UnityEditor.EditorGUILayout.Vector3Field("Local Offset:",
-                            tempBrush.localPositionOffset);
                     }
-                }
 
-                brushRotGroupOpen = UnityEditor.EditorGUILayout.Foldout(brushRotGroupOpen, "Rotation");
-                if (brushRotGroupOpen)
-                {
                     using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
                     {
-
-                        tempBrush.rotateToTheSurface = UnityEditor.EditorGUILayout.ToggleLeft("Rotate to the Surface",
-                            tempBrush.rotateToTheSurface);
-                        if (tempBrush.rotateToTheSurface)
-                            tempBrush.alwaysOrientUp = UnityEditor.EditorGUILayout.ToggleLeft("Always orient up",
-                            tempBrush.alwaysOrientUp);
-                        using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
+                        using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                         {
-                            tempBrush.addRandomRotation = UnityEditor.EditorGUILayout.Popup("Add Rotation:",
-                                tempBrush.addRandomRotation ? 1 : 0, new string[] { "Constant", "Random" }) == 1;
-                            if (tempBrush.addRandomRotation)
+                            UnityEditor.EditorGUIUtility.labelWidth = 110;
+                            var randomSurfaceDistance = UnityEditor.EditorGUILayout.Popup("Surface distance",
+                                brush.randomSurfaceDistance ? 1 : 0, new string[] { "Constant", "Random" }) == 1;
+                            if (check.changed)
                             {
-                                tempBrush.randomEulerOffset = EditorGUIUtils.Range3Field(string.Empty,
-                                    tempBrush.randomEulerOffset);
-                                using (new GUILayout.HorizontalScope())
+                                changed = true;
+                                brush.randomSurfaceDistance = randomSurfaceDistance;
+                            }
+                        }
+                        if (brush.randomSurfaceDistance)
+                        {
+                            using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                            {
+                                var randomSurfaceDistanceRange = EditorGUIUtils.RangeField(string.Empty,
+                                brush.randomSurfaceDistanceRange);
+                                if (check.changed)
                                 {
-                                    UnityEditor.EditorGUIUtility.labelWidth = 80;
-                                    tempBrush.rotateInMultiples = UnityEditor.EditorGUILayout.ToggleLeft
-                                        ("Only in multiples of:", tempBrush.rotateInMultiples);
-                                    using (new UnityEditor.EditorGUI.DisabledGroupScope(!tempBrush.rotateInMultiples))
-                                        tempBrush.rotationFactor
-                                            = UnityEditor.EditorGUILayout.FloatField(tempBrush.rotationFactor);
+                                    changed = true;
+                                    brush.randomSurfaceDistanceRange = randomSurfaceDistanceRange;
                                 }
                             }
-                            else tempBrush.eulerOffset = UnityEditor.EditorGUILayout.Vector3Field(string.Empty,
-                                tempBrush.eulerOffset);
-                        }
-                    }
-                }
-
-                UnityEditor.EditorGUIUtility.labelWidth = 65;
-                brushScaleGroupOpen = UnityEditor.EditorGUILayout.Foldout(brushScaleGroupOpen, "Scale");
-                if (brushScaleGroupOpen)
-                {
-                    using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
-                    {
-                        using (new GUILayout.HorizontalScope())
-                        {
-                            tempBrush.randomScaleMultiplier = UnityEditor.EditorGUILayout.Popup("Multiplier:",
-                                tempBrush.randomScaleMultiplier ? 1 : 0, new string[] { "Constant", "Random" }) == 1;
-                            GUILayout.Space(4);
-                            tempBrush.separateScaleAxes = UnityEditor.EditorGUILayout.ToggleLeft("Separate Axes",
-                                tempBrush.separateScaleAxes, GUILayout.Width(102));
-                        }
-                        if (tempBrush.separateScaleAxes)
-                        {
-                            if (tempBrush.randomScaleMultiplier)
-                                tempBrush.randomScaleMultiplierRange = EditorGUIUtils.Range3Field(string.Empty,
-                                    tempBrush.randomScaleMultiplierRange);
-                            else tempBrush.scaleMultiplier = UnityEditor.EditorGUILayout.Vector3Field(string.Empty,
-                                tempBrush.scaleMultiplier);
                         }
                         else
                         {
-                            if (tempBrush.randomScaleMultiplier)
+                            using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                             {
-                                tempBrush.randomScaleMultiplierRange.z
-                                    = tempBrush.randomScaleMultiplierRange.y
-                                    = tempBrush.randomScaleMultiplierRange.x
-                                    = EditorGUIUtils.RangeField(string.Empty, tempBrush.randomScaleMultiplierRange.x);
-                            }
-                            else
-                            {
-                                var value = UnityEditor.EditorGUILayout.FloatField("Value: ", tempBrush.scaleMultiplier.x);
-                                tempBrush.scaleMultiplier = new Vector3(value, value, value);
+                                var surfaceDistance = UnityEditor.EditorGUILayout.FloatField("Value",
+                                    brush.surfaceDistance);
+                                if (check.changed)
+                                {
+                                    changed = true;
+                                    brush.surfaceDistance = surfaceDistance;
+                                }
                             }
                         }
                     }
-                }
-                if (brush.isAsset2D)
-                {
-                    brushFlipGroupOpen = UnityEditor.EditorGUILayout.Foldout(brushFlipGroupOpen, "Flip");
-                    if (brushFlipGroupOpen)
+                    using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
                     {
-                        using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
+                        using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                         {
-                            tempBrush.flipX = (BrushSettings.FlipAction)UnityEditor.EditorGUILayout.Popup("Flip X: ",
-                                (int)tempBrush.flipX, new string[] { "No", "Yes", "Random" });
-                            tempBrush.flipY = (BrushSettings.FlipAction)UnityEditor.EditorGUILayout.Popup("Flip Y: ",
-                                (int)tempBrush.flipY, new string[] { "No", "Yes", "Random" });
+                            var localPositionOffset = UnityEditor.EditorGUILayout.Vector3Field("Local Offset",
+                                brush.localPositionOffset);
+                            if (check.changed)
+                            {
+                                changed = true;
+                                brush.localPositionOffset = localPositionOffset;
+                            }
+                        }
+                        using (new GUILayout.HorizontalScope())
+                        {
+                            GUILayout.Label("Pick offset");
+                            if (GUILayout.Button("X")) PWBIO.EnableOffsetPicking(AxesUtils.Axis.X, brush);
+                            if (GUILayout.Button("Y")) PWBIO.EnableOffsetPicking(AxesUtils.Axis.Y, brush);
+                            if (GUILayout.Button("Z")) PWBIO.EnableOffsetPicking(AxesUtils.Axis.Z, brush);
                         }
                     }
-                }
-                if (check.changed)
-                {
-                    changed = true;
-                    if (PWBCore.staticData.undoBrushProperties)
-                        UnityEditor.Undo.RegisterCompleteObjectUndo(objToUndo, undoMsg);
-                    brush.Copy(tempBrush);
-                    brush.UpdateBottomVertices();
-                    PaletteManager.selectedPalette.Save();
-                    BrushstrokeManager.UpdateBrushstroke();
-                    if (ToolManager.tool == ToolManager.PaintTool.TILING) PWBIO.UpdateCellSize();
+
                 }
             }
-            return changed;
+        }
+        private static void DrawRotationSettings(BrushSettings brush, ref bool groupOpen, ref bool changed)
+        {
+            groupOpen = UnityEditor.EditorGUILayout.Foldout(groupOpen, "Rotation");
+            if (!groupOpen) return;
+            using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
+            {
+                using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                {
+                    var rotateToTheSurface = UnityEditor.EditorGUILayout.ToggleLeft("Rotate to the Surface",
+                            brush.rotateToTheSurface);
+                    if (check.changed)
+                    {
+                        changed = true;
+                        brush.rotateToTheSurface = rotateToTheSurface;
+                    }
+                }
+                if (brush.rotateToTheSurface)
+                {
+                    using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                    {
+                        var alwaysOrientUp = UnityEditor.EditorGUILayout.ToggleLeft("Always orient up",
+                        brush.alwaysOrientUp);
+                        if (check.changed)
+                        {
+                            changed = true;
+                            brush.alwaysOrientUp = alwaysOrientUp;
+                        }
+                    }
+                }
+                using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
+                {
+                    using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                    {
+                        UnityEditor.EditorGUIUtility.labelWidth = 100;
+                        var addRandomRotation = UnityEditor.EditorGUILayout.Popup("Add Rotation",
+                            brush.addRandomRotation ? 1 : 0, new string[] { "Constant", "Random" }) == 1;
+                        if (check.changed)
+                        {
+                            changed = true;
+                            brush.addRandomRotation = addRandomRotation;
+                        }
+                    }
+                    if (brush.addRandomRotation)
+                    {
+                        using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                        {
+                            var randomEulerOffset = EditorGUIUtils.Range3Field(string.Empty, brush.randomEulerOffset);
+                            if (check.changed)
+                            {
+                                changed = true;
+                                brush.randomEulerOffset = randomEulerOffset;
+                            }
+                        }
+                        using (new GUILayout.HorizontalScope())
+                        {
+                            using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                            {
+                                UnityEditor.EditorGUIUtility.labelWidth = 80;
+                                var rotateInMultiples = UnityEditor.EditorGUILayout.ToggleLeft
+                                    ("Only in multiples of", brush.rotateInMultiples);
+                                if (check.changed)
+                                {
+                                    changed = true;
+                                    brush.rotateInMultiples = rotateInMultiples;
+                                }
+                            }
+                            using (new UnityEditor.EditorGUI.DisabledGroupScope(!brush.rotateInMultiples))
+                            {
+                                using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                                {
+                                    var rotationFactor = UnityEditor.EditorGUILayout.FloatField(brush.rotationFactor);
+                                    if (check.changed)
+                                    {
+                                        changed = true;
+                                        brush.rotationFactor = rotationFactor;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else // constant
+                    {
+                        using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                        {
+                            var eulerOffset = UnityEditor.EditorGUILayout.Vector3Field(string.Empty, brush.eulerOffset);
+                            if (check.changed)
+                            {
+                                changed = true;
+                                brush.eulerOffset = eulerOffset;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        private static void DrawScaleSettings(BrushSettings brush, ref bool groupOpen, ref bool changed)
+        {
+            groupOpen = UnityEditor.EditorGUILayout.Foldout(groupOpen, "Scale");
+            if (!groupOpen) return;
+            using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
+            {
+                using (new GUILayout.HorizontalScope())
+                {
+                    using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                    {
+                        UnityEditor.EditorGUIUtility.labelWidth = 100;
+                        var randomScaleMultiplier = UnityEditor.EditorGUILayout.Popup("Multiplier",
+                            brush.randomScaleMultiplier ? 1 : 0, new string[] { "Constant", "Random" }) == 1;
+                        if (check.changed)
+                        {
+                            changed = true;
+                            brush.randomScaleMultiplier = randomScaleMultiplier;
+                        }
+                    }
+                    GUILayout.Space(4);
+                    using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                    {
+                        var separateScaleAxes = UnityEditor.EditorGUILayout.ToggleLeft("Separate Axes",
+                            brush.separateScaleAxes, GUILayout.Width(102));
+                        if (check.changed)
+                        {
+                            changed = true;
+                            brush.separateScaleAxes = separateScaleAxes;
+                        }
+                    }
+                }
+                if (brush.separateScaleAxes)
+                {
+                    if (brush.randomScaleMultiplier)
+                    {
+                        using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                        {
+                            var range3 = EditorGUIUtils.Range3Field(string.Empty, brush.randomScaleMultiplierRange);
+                            if (Mathf.Approximately(range3.x.v1, 0))
+                                range3.x.v1 = brush.randomScaleMultiplierRange.x.v1;
+                            if (Mathf.Approximately(range3.x.v2, 0))
+                                range3.x.v2 = brush.randomScaleMultiplierRange.x.v2;
+
+                            if (Mathf.Approximately(range3.y.v1, 0))
+                                range3.y.v1 = brush.randomScaleMultiplierRange.y.v1;
+                            if (Mathf.Approximately(range3.y.v2, 0))
+                                range3.y.v2 = brush.randomScaleMultiplierRange.y.v2;
+
+                            if (Mathf.Approximately(range3.z.v1, 0))
+                                range3.z.v1 = brush.randomScaleMultiplierRange.z.v1;
+                            if (Mathf.Approximately(range3.z.v2, 0))
+                                range3.z.v2 = brush.randomScaleMultiplierRange.z.v2;
+                            if (check.changed)
+                            {
+                                changed = true;
+                                brush.randomScaleMultiplierRange = range3;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                        {
+                            var mult = UnityEditor.EditorGUILayout.Vector3Field(string.Empty, brush.scaleMultiplier);
+                            if (Mathf.Approximately(mult.x, 0)) mult.x = brush.scaleMultiplier.x;
+                            if (Mathf.Approximately(mult.y, 0)) mult.y = brush.scaleMultiplier.y;
+                            if (Mathf.Approximately(mult.z, 0)) mult.z = brush.scaleMultiplier.z;
+                            if (check.changed)
+                            {
+                                changed = true;
+                                brush.scaleMultiplier = mult;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    if (brush.randomScaleMultiplier)
+                    {
+                        using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                        {
+                            var range = EditorGUIUtils.RangeField(string.Empty, brush.randomScaleMultiplierRange.x);
+                            if (Mathf.Approximately(range.v1, 0)) range.v1 = brush.randomScaleMultiplierRange.x.v1;
+                            if (Mathf.Approximately(range.v2, 0)) range.v2 = brush.randomScaleMultiplierRange.x.v2;
+                            if (check.changed)
+                            {
+                                changed = true;
+                                brush.randomScaleMultiplierRange.z = brush.randomScaleMultiplierRange.y
+                                = brush.randomScaleMultiplierRange.x = range;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                        {
+                            var value = UnityEditor.EditorGUILayout.FloatField("Value: ", brush.scaleMultiplier.x);
+                            var scaleMultiplier = brush.scaleMultiplier;
+                            if (!Mathf.Approximately(value, 0)) scaleMultiplier = new Vector3(value, value, value);
+                            if (check.changed)
+                            {
+                                changed = true;
+                                brush.scaleMultiplier = scaleMultiplier;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        private static void Draw2DSettings(BrushSettings brush, ref bool groupOpen, ref bool changed)
+        {
+            groupOpen = UnityEditor.EditorGUILayout.Foldout(groupOpen, "2D");
+            if (!groupOpen) return;
+            using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
+            {
+                using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                {
+                    var flipX = (BrushSettings.FlipAction)UnityEditor.EditorGUILayout.Popup("Flip X: ",
+                        (int)brush.flipX, new string[] { "No", "Yes", "Random" });
+                    if (check.changed)
+                    {
+                        changed = true;
+                        brush.flipX = flipX;
+                    }
+                }
+                using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                {
+                    var flipY = (BrushSettings.FlipAction)UnityEditor.EditorGUILayout.Popup("Flip Y: ",
+                        (int)brush.flipY, new string[] { "No", "Yes", "Random" });
+                    if (check.changed)
+                    {
+                        changed = true;
+                        brush.flipY = flipY;
+                    }
+                }
+            }
         }
         private void BrushGroup()
         {
@@ -960,10 +1184,9 @@ namespace PluginMaster
             using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
             {
                 UnityEditor.EditorGUIUtility.labelWidth = 50;
-                brush.name = UnityEditor.EditorGUILayout.DelayedTextField("Name:", brush.name);
+                brush.name = UnityEditor.EditorGUILayout.DelayedTextField("Name", brush.name);
                 if (BrushFields(brush, ref _brushPosGroupOpen, ref _brushRotGroupOpen,
-                    ref _brushScaleGroupOpen, ref _brushFlipGroupOpen,
-                    this, BRUSH_SETTINGS_UNDO_MSG)) PWBIO.UpdateSelectedPersistentObject();
+                    ref _brushScaleGroupOpen, ref _brushFlipGroupOpen)) PWBIO.UpdateSelectedPersistentObject();
             }
         }
         #endregion
@@ -992,8 +1215,6 @@ namespace PluginMaster
 
             if (_moveItem.perform)
             {
-                if (PWBCore.staticData.undoBrushProperties)
-                    UnityEditor.Undo.RegisterCompleteObjectUndo(this, "Change Multi Brush Item Order");
                 var selection = _selection.ToArray();
                 PaletteManager.selectedBrush.Swap(_moveItem.from, _moveItem.to, ref selection);
                 _selection = new System.Collections.Generic.List<int>(selection);
@@ -1051,8 +1272,6 @@ namespace PluginMaster
                         foreach (var droppedItem in droppedItems)
                         {
                             var item = new MultibrushItemSettings(droppedItem.obj, selectedBrush);
-                            if (PWBCore.staticData.undoBrushProperties)
-                                UnityEditor.Undo.RegisterCompleteObjectUndo(this, "Add Brush Item");
                             if (_moveItem.to == -1)
                             {
                                 selectedBrush.AddItem(item);
@@ -1093,8 +1312,6 @@ namespace PluginMaster
                                 selectedItem.overwriteSettings);
                             if (check.changed)
                             {
-                                if (PWBCore.staticData.undoBrushProperties)
-                                    UnityEditor.Undo.RegisterCompleteObjectUndo(this, MULTIBRUSH_SETTINGS_UNDO_MSG);
                                 selectedItem.overwriteSettings = overwriteSettings;
                                 if (selectedItem.overwriteSettings) selectedItem.Copy(selectedBrush);
                             }
@@ -1293,8 +1510,6 @@ namespace PluginMaster
         private void PasteThumbnailSettings(object idx)
         {
             if (PaletteManager.clipboardThumbnailSettings == null) return;
-            if (PWBCore.staticData.undoBrushProperties)
-                UnityEditor.Undo.RegisterCompleteObjectUndo(this, "Paste Thumbnail Settings");
             void Paste(MultibrushItemSettings item)
             {
                 if (PaletteManager.clipboardOverwriteThumbnailSettings != PaletteManager.Trit.SAME)
@@ -1316,8 +1531,6 @@ namespace PluginMaster
         private void DeleteItem(object obj)
         {
             var idx = (int)obj;
-            if (PWBCore.staticData.undoBrushProperties)
-                UnityEditor.Undo.RegisterCompleteObjectUndo(this, "Delete Brush Item");
             if (_selection.Contains(idx))
             {
                 var descendingSelection = _selection.ToArray();
@@ -1347,8 +1560,6 @@ namespace PluginMaster
             {
                 var item = items[i];
                 if (item.obj == null) continue;
-                if (PWBCore.staticData.undoBrushProperties)
-                    UnityEditor.Undo.RegisterCompleteObjectUndo(this, "Add Brush Item");
                 _newItem = new MultibrushItemSettings(item.obj, PaletteManager.selectedBrush);
                 PaletteManager.selectedBrush.InsertItemAt(_newItem, _newItemIdx + 1 + i);
             }
@@ -1364,8 +1575,6 @@ namespace PluginMaster
             {
                 var selectedObj = selectionPrefabs[i];
                 if (selectedObj == null) continue;
-                if (PWBCore.staticData.undoBrushProperties)
-                    UnityEditor.Undo.RegisterCompleteObjectUndo(this, "Add Brush Item");
                 _newItem = new MultibrushItemSettings(selectedObj, PaletteManager.selectedBrush);
                 PaletteManager.selectedBrush.InsertItemAt(_newItem, _newItemIdx + 1 + i);
             }
@@ -1413,8 +1622,6 @@ namespace PluginMaster
                 var include = GUI.Toggle(toggleRect, item.includeInThumbnail, GUIContent.none, _thumbnailToggleStyle);
                 if (check.changed)
                 {
-                    if (PWBCore.staticData.undoBrushProperties)
-                        UnityEditor.Undo.RegisterCompleteObjectUndo(this, "Edit thumbnail settings");
                     item.includeInThumbnail = include;
                     PaletteManager.selectedPalette.Save();
                     ThumbnailUtils.UpdateThumbnail(item.parentSettings, updateItemThumbnails: false, savePng: true);
@@ -1429,8 +1636,6 @@ namespace PluginMaster
 
         private void PasteItemSettings(object idx)
         {
-            if (PWBCore.staticData.undoBrushProperties)
-                UnityEditor.Undo.RegisterCompleteObjectUndo(this, "Paste Brush Item Settings");
             PaletteManager.selectedBrush.items[(int)idx].Copy(PaletteManager.clipboardSetting);
             PaletteManager.selectedPalette.Save();
         }
@@ -1438,8 +1643,6 @@ namespace PluginMaster
         private void DuplicateItem(object obj)
         {
             var idx = (int)obj;
-            if (PWBCore.staticData.undoBrushProperties)
-                UnityEditor.Undo.RegisterCompleteObjectUndo(this, "Duplicate Brush Item");
             if (_selection.Contains(idx))
             {
                 var descendingSelection = _selection.ToArray();
@@ -1635,8 +1838,7 @@ namespace PluginMaster
                 var item = GetSelectedItem(PaletteManager.selectedBrush);
                 if (_selection.Count <= 1)
                     BrushFields(item, ref _itemPosGroupOpen, ref _itemRotGroupOpen,
-                        ref _itemScaleGroupOpen, ref _itemFlipGroupOpen,
-                        this, MULTIBRUSH_SETTINGS_UNDO_MSG);
+                        ref _itemScaleGroupOpen, ref _itemFlipGroupOpen);
                 else ItemSelectionFields();
             }
         }
@@ -1659,134 +1861,157 @@ namespace PluginMaster
 
         private Texture2D _warningTexture = null;
         private string _patternWarningMsg = null;
-        private PatternMachine _previewPatternMachine = null;
         private void FrequencyGroup()
         {
             using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
             {
-                using (var brushCheck = new UnityEditor.EditorGUI.ChangeCheckScope())
-                {
-                    var brush = PaletteManager.selectedBrush;
-                    var tempBrush = brush.Clone() as MultibrushSettings;
-                    bool selectionFrequencyChanged = false;
-                    tempBrush.frequencyMode = (MultibrushSettings.FrequencyMode)
-                        UnityEditor.EditorGUILayout.Popup("Frequency Mode:", (int)tempBrush.frequencyMode, FREQUENCY_MODES);
-                    var tempItem = GetSelectedItem(tempBrush);
-                    if (tempBrush.frequencyMode == MultibrushSettings.FrequencyMode.RANDOM)
-                    {
-                        using (new GUILayout.HorizontalScope())
-                        {
-                            if (_selection.Count <= 1)
-                            {
-                                tempItem.frequency = UnityEditor.EditorGUILayout.FloatField("Frequency:", tempItem.frequency);
-                                GUILayout.Label("in " + tempBrush.totalFrequency);
-                            }
-                            else
-                            {
-                                GUILayout.Box(GetStateGUIContent(_itemSelectionState.frequency),
-                                    UnityEditor.EditorStyles.label);
-                                using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
-                                {
-                                    _itemSelectionSettings.frequency = UnityEditor.EditorGUILayout.FloatField("Frequency:",
-                                        _itemSelectionSettings.frequency);
-                                    var totalFrequency = _itemSelectionSettings.frequency * _selection.Count;
-                                    for (int i = 0; i < PaletteManager.selectedBrush.itemCount; ++i)
-                                    {
-                                        if (_selection.Contains(i)) continue;
-                                        totalFrequency += PaletteManager.selectedBrush.GetItemAt(i).frequency;
-                                    }
-                                    GUILayout.Label("in " + totalFrequency);
-                                    if (check.changed)
-                                    {
-                                        _itemSelectionState.frequency = SelectionFieldState.CHANGED;
-                                        selectionFrequencyChanged = true;
-                                    }
-                                }
-                                GUILayout.FlexibleSpace();
-                            }
-                        }
-                    }
-                    else
-                    {
-                        using (new GUILayout.HorizontalScope())
-                        {
-                            using (var patternCheck = new UnityEditor.EditorGUI.ChangeCheckScope())
-                            {
-                                tempBrush.pattern = UnityEditor.EditorGUILayout.TextField("Pattern:", tempBrush.pattern);
-                                if (patternCheck.changed || tempBrush.patternMachine != _previewPatternMachine
-                                    || tempBrush.patternMachine == null)
-                                {
-                                    _patternWarningMsg = null;
-                                    tempBrush.patternMachine = null;
-                                    switch (PatternMachine.Validate(tempBrush.pattern, tempBrush.items.Length,
-                                        out PatternMachine.Token[] tokens, out PatternMachine.Token[] endTokens))
-                                    {
-                                        case PatternMachine.ValidationResult.EMPTY:
-                                            _patternWarningMsg = "Empty pattern"; break;
-                                        case PatternMachine.ValidationResult.INDEX_OUT_OF_RANGE:
-                                            _patternWarningMsg = "Index out of range"; break;
-                                        case PatternMachine.ValidationResult.MISPLACED_PERIOD:
-                                            _patternWarningMsg = "Misplaced Period"; break;
-                                        case PatternMachine.ValidationResult.MISPLACED_ASTERISK:
-                                            _patternWarningMsg = "Misplaced asterisk"; break;
-                                        case PatternMachine.ValidationResult.MISPLACED_COMMA:
-                                            _patternWarningMsg = "Mispalced comma"; break;
-                                        case PatternMachine.ValidationResult.UNPAIRED_PARENTHESIS:
-                                            _patternWarningMsg = "Unpaired parenthesis"; break;
-                                        case PatternMachine.ValidationResult.EMPTY_PARENTHESIS:
-                                            _patternWarningMsg = "Empty parenthesis"; break;
-                                        case PatternMachine.ValidationResult.INVALID_MULTIPLIER:
-                                            _patternWarningMsg = "The multiplier must be greater than one"; break;
-                                        case PatternMachine.ValidationResult.INVALID_CHARACTER:
-                                            _patternWarningMsg = "Invalid character"; break;
-                                        default:
-                                            if (tempBrush.patternMachine == null)
-                                                tempBrush.patternMachine = new PatternMachine(tokens, endTokens);
-                                            else tempBrush.patternMachine.SetTokens(tokens, endTokens);
-                                            brush.patternMachine = tempBrush.patternMachine;
-                                            break;
-                                    }
-                                    _previewPatternMachine = tempBrush.patternMachine;
-                                }
-                                if (_patternWarningMsg != null && _patternWarningMsg != string.Empty)
-                                {
-                                    var style = new GUIStyle();
-                                    style.margin.top = 4;
-                                    if (_warningTexture == null)
-                                        _warningTexture = Resources.Load<Texture2D>("Sprites/Warning");
-                                    GUILayout.Box(new GUIContent(_warningTexture, _patternWarningMsg), style,
-                                        GUILayout.Width(14), GUILayout.Height(14));
-                                }
-                            }
-                        }
 
-                        using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
+                var brush = PaletteManager.selectedBrush;
+                var changed = false;
+                using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                {
+                    var frequencyMode = (MultibrushSettings.FrequencyMode)
+                        UnityEditor.EditorGUILayout.Popup("Frequency Mode", (int)brush.frequencyMode, FREQUENCY_MODES);
+                    if (check.changed)
+                    {
+                        changed = true;
+                        brush.frequencyMode = frequencyMode;
+                    }
+                }
+
+                var item = GetSelectedItem(brush);
+                if (brush.frequencyMode == MultibrushSettings.FrequencyMode.RANDOM)
+                {
+                    using (new GUILayout.HorizontalScope())
+                    {
+                        if (_selection.Count <= 1)
                         {
-                            tempBrush.restartPatternForEachStroke
-                                = UnityEditor.EditorGUILayout.ToggleLeft("Restart the pattern for each stroke",
-                                tempBrush.restartPatternForEachStroke, GUILayout.Width(220));
-                            if (!tempBrush.restartPatternForEachStroke)
+                            using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                             {
-                                if (GUILayout.Button("Restart Pattern"))
+                                var frequency = UnityEditor.EditorGUILayout.FloatField("Frequency", item.frequency);
+                                if (check.changed)
                                 {
-                                    brush.patternMachine.Reset();
-                                    BrushstrokeManager.UpdateBrushstroke();
+                                    changed = true;
+                                    item.frequency = frequency;
                                 }
+                            }
+                            GUILayout.Label("in " + brush.totalFrequency);
+                        }
+                        else
+                        {
+                            GUILayout.Box(GetStateGUIContent(_itemSelectionState.frequency),
+                                UnityEditor.EditorStyles.label);
+                            using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                            {
+                                _itemSelectionSettings.frequency = UnityEditor.EditorGUILayout.FloatField("Frequency",
+                                    _itemSelectionSettings.frequency);
+                                if (check.changed)
+                                {
+                                    foreach (var selectedIdx in _selection)
+                                    {
+                                        var selectedItem = PaletteManager.selectedBrush.GetItemAt(selectedIdx);
+                                        selectedItem.frequency = _itemSelectionSettings.frequency;
+                                    }
+                                    brush.UpdateTotalFrequency();
+                                    _itemSelectionState.frequency = SelectionFieldState.CHANGED;
+                                }
+                            }
+                            GUILayout.Label("in " + brush.totalFrequency);
+                            GUILayout.FlexibleSpace();
+                        }
+                    }
+                }
+                else
+                {
+                    using (new GUILayout.HorizontalScope())
+                    {
+                        using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                        {
+                            var pattern = UnityEditor.EditorGUILayout.TextField("Pattern", brush.pattern);
+                            if (check.changed || brush.patternMachine == null)
+                            {
+                                _patternWarningMsg = null;
+                                switch (PatternMachine.Validate(pattern, brush.items.Length,
+                                    out PatternMachine.Token[] tokens, out PatternMachine.Token[] endTokens))
+                                {
+                                    case PatternMachine.ValidationResult.EMPTY:
+                                        _patternWarningMsg = "Empty pattern"; break;
+                                    case PatternMachine.ValidationResult.INDEX_OUT_OF_RANGE:
+                                        _patternWarningMsg = "Index out of range"; break;
+                                    case PatternMachine.ValidationResult.MISPLACED_PERIOD:
+                                        _patternWarningMsg = "Misplaced period"; break;
+                                    case PatternMachine.ValidationResult.MISPLACED_ASTERISK:
+                                        _patternWarningMsg = "Misplaced asterisk"; break;
+                                    case PatternMachine.ValidationResult.MISSING_COMMA:
+                                        _patternWarningMsg = "Missing comma"; break;
+                                    case PatternMachine.ValidationResult.MISPLACED_COMMA:
+                                        _patternWarningMsg = "Mispalced comma"; break;
+                                    case PatternMachine.ValidationResult.UNPAIRED_PARENTHESIS:
+                                        _patternWarningMsg = "Unpaired parenthesis"; break;
+                                    case PatternMachine.ValidationResult.EMPTY_PARENTHESIS:
+                                        _patternWarningMsg = "Empty parenthesis"; break;
+                                    case PatternMachine.ValidationResult.INVALID_MULTIPLIER:
+                                        _patternWarningMsg = "The multiplier must be greater than one"; break;
+                                    case PatternMachine.ValidationResult.UNPAIRED_BRACKET:
+                                        _patternWarningMsg = "Unpaired bracket"; break;
+                                    case PatternMachine.ValidationResult.EMPTY_BRACKET:
+                                        _patternWarningMsg = "Empty bracket"; break;
+                                    case PatternMachine.ValidationResult.INVALID_NESTED_BRACKETS:
+                                        _patternWarningMsg = "Invalid nested bracket"; break;
+                                    case PatternMachine.ValidationResult.INVALID_PARENTHESES_WITHIN_BRACKETS:
+                                        _patternWarningMsg = "Invalid parentheses within brackets"; break;
+                                    case PatternMachine.ValidationResult.MISPLACED_VERTICAL_BAR:
+                                        _patternWarningMsg = "Misplaced vertical bar"; break;
+                                    case PatternMachine.ValidationResult.MISPLACED_COLON:
+                                        _patternWarningMsg = "Misplaced Colon"; break;
+                                    case PatternMachine.ValidationResult.INVALID_CHARACTER:
+                                        _patternWarningMsg = "Invalid character"; break;
+                                    default:
+                                        brush.pattern = pattern;
+                                        brush.patternMachine = new PatternMachine(tokens, endTokens);
+                                        break;
+                                }
+                            }
+                            if (_patternWarningMsg != null && _patternWarningMsg != string.Empty)
+                            {
+                                var style = new GUIStyle();
+                                style.margin.top = 4;
+                                if (_warningTexture == null)
+                                    _warningTexture = Resources.Load<Texture2D>("Sprites/Warning");
+                                GUILayout.Box(new GUIContent(_warningTexture, _patternWarningMsg), style,
+                                    GUILayout.Width(14), GUILayout.Height(14));
                             }
                         }
                     }
-                    if (brushCheck.changed && !selectionFrequencyChanged)
+
+                    using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
                     {
-                        if (PWBCore.staticData.undoBrushProperties)
-                            UnityEditor.Undo.RegisterCompleteObjectUndo(this, MULTIBRUSH_SETTINGS_UNDO_MSG);
-                        brush.Copy(tempBrush);
-                        var selectedItem = GetSelectedItem(PaletteManager.selectedBrush);
-                        selectedItem.Copy(tempItem);
-                        brush.UpdateTotalFrequency();
-                        BrushstrokeManager.UpdateBrushstroke(false);
-                        PaletteManager.selectedPalette.Save();
-                        UnityEditor.SceneView.RepaintAll();
+                        using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                        {
+                            var restartPatternForEachStroke
+                                = UnityEditor.EditorGUILayout.ToggleLeft("Restart the pattern for each stroke",
+                                brush.restartPatternForEachStroke, GUILayout.Width(220));
+                            if (check.changed)
+                            {
+                                changed = true;
+                                brush.restartPatternForEachStroke = restartPatternForEachStroke;
+                            }
+                        }
+                        if (!brush.restartPatternForEachStroke)
+                        {
+                            if (GUILayout.Button("Restart Pattern"))
+                            {
+                                brush.patternMachine.Reset();
+                                BrushstrokeManager.UpdateBrushstroke();
+                            }
+                        }
                     }
+                }
+                if (changed)
+                {
+                    BrushstrokeManager.UpdateBrushstroke(false);
+                    PaletteManager.selectedPalette.Save();
+                    UnityEditor.SceneView.RepaintAll();
                 }
             }
         }

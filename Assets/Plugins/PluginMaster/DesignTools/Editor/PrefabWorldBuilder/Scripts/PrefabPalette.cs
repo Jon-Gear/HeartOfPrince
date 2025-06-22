@@ -22,8 +22,6 @@ namespace PluginMaster
         private GUISkin _skin = null;
 
         [SerializeField] private PaletteManager _paletteManager = null;
-        private bool _loadFromFile = false;
-        private bool _undoRegistered = false;
 
         private static PrefabPalette _instance = null;
         public static PrefabPalette instance => _instance;
@@ -54,11 +52,7 @@ namespace PluginMaster
             _instance = this;
             _paletteManager = PaletteManager.instance;
             _skin = Resources.Load<GUISkin>("PWBSkin");
-            if (_skin == null)
-            {
-                CloseWindow();
-                return;
-            }
+            if (_skin == null) return;
             _toggleStyle = _skin.GetStyle("PaletteToggle");
             _loadingIcon = Resources.Load<Texture2D>("Sprites/Loading");
             _toggleStyle.margin = new RectOffset(4, 4, 4, 4);
@@ -66,6 +60,7 @@ namespace PluginMaster
             _labelIcon = new GUIContent(Resources.Load<Texture2D>("Sprites/Label"), "Filter by label");
             _selectionFilterIcon = new GUIContent(Resources.Load<Texture2D>("Sprites/SelectionFilter"),
                 "Filter by selection");
+            _folderFilterIcon = new GUIContent(Resources.Load<Texture2D>("Sprites/FolderFilter"), "Filter by folder");
             _newBrushIcon = new GUIContent(Resources.Load<Texture2D>("Sprites/New"), "New Brush");
             _deleteBrushIcon = new GUIContent(Resources.Load<Texture2D>("Sprites/Delete"), "Delete Brush");
             _pickerIcon = new GUIContent(Resources.Load<Texture2D>("Sprites/Picker"), "Brush Picker");
@@ -78,7 +73,7 @@ namespace PluginMaster
             UpdateFilteredList(false);
             PaletteManager.ClearSelection(false);
             UnityEditor.Undo.undoRedoPerformed += OnPaletteChange;
-            AutoSave.QuickSave();
+            PWBCore.SetSavePending();
             var paletteFiles = System.IO.Directory.GetFiles(PWBData.palettesDirectory, "*.txt",
                 System.IO.SearchOption.AllDirectories);
             if (paletteFiles.Length == 0) PaletteManager.instance.LoadPaletteFiles(true);
@@ -96,20 +91,19 @@ namespace PluginMaster
 
         private void OnGUI()
         {
-            if (PWBCore.refreshDatabase) PWBCore.AssetDatabaseRefresh();
-
+            if (UnityEditor.Lightmapping.isRunning) return;
             if (_skin == null)
             {
                 Close();
                 return;
             }
-            if (_loadFromFile && Event.current.type == EventType.Repaint)
+            if (PaletteManager.loadPaletteFilesPending)
             {
-                _loadFromFile = false;
-                if (!PWBCore.staticData.saving) PWBCore.LoadFromFile();
-                UpdateFilteredList(false);
-                return;
+                PaletteManager.instance.LoadPaletteFiles(true);
+                Reload(false);
+                UpdateTabBar();
             }
+            if (PWBCore.refreshDatabase) PWBCore.AssetDatabaseRefresh();
             if (_contextBrushAdded)
             {
                 RegisterUndo("Add Brush");
@@ -139,6 +133,7 @@ namespace PluginMaster
                 _showCursor = false;
             }
             else if (PWBSettings.shortcuts.paletteDeleteBrush.Check()) OnDelete();
+            if (PWBSettings.shortcuts.paletteReplaceSceneSelection.Check()) PWBIO.ReplaceSelected();
         }
 
         private void Update()
@@ -159,7 +154,6 @@ namespace PluginMaster
         }
         private void RegisterUndo(string name)
         {
-            _undoRegistered = true;
             if (PWBCore.staticData.undoPalette) UnityEditor.Undo.RegisterCompleteObjectUndo(this, name);
         }
 
@@ -167,7 +161,6 @@ namespace PluginMaster
         public void OnAfterDeserialize()
         {
             _repaint = true;
-            if (!_undoRegistered) _loadFromFile = true;
             PaletteManager.ClearSelection(false);
         }
 
@@ -612,12 +605,12 @@ namespace PluginMaster
                 System.Array.Sort<int>(descendingSelection, new System.Comparison<int>((i1, i2) => i2.CompareTo(i1)));
                 for (int i = 0; i < descendingSelection.Length; ++i)
                 {
-                    PaletteManager.selectedPalette.DuplicateBrush(descendingSelection[i]);
+                    PaletteManager.selectedPalette.DuplicateBrush(descendingSelection[i], out MultibrushSettings duplicate);
                     descendingSelection[i] += descendingSelection.Length - 1 - i;
                 }
                 PaletteManager.idxSelection = descendingSelection;
             }
-            else PaletteManager.selectedPalette.DuplicateBrush((int)idx);
+            else PaletteManager.selectedPalette.DuplicateBrush((int)idx, out MultibrushSettings duplicate);
             OnPaletteChange();
         }
 
@@ -628,30 +621,46 @@ namespace PluginMaster
             selection.Sort();
             var resultIdx = selection[0];
             var lastIdx = selection.Last() + 1;
-            PaletteManager.selectedPalette.DuplicateBrushAt(resultIdx, selection.Last() + 1);
+            PaletteManager.selectedPalette.DuplicateBrushAt(resultIdx, lastIdx, out MultibrushSettings duplicate);
+            if (duplicate == null)
+            {
+                PaletteManager.selectedPalette.Cleanup();
+                return;
+            }
             resultIdx = lastIdx;
-            var result = PaletteManager.selectedPalette.GetBrush(resultIdx);
-            var firstItem = result.GetItemAt(0);
-            if (!firstItem.overwriteSettings) firstItem.Copy(result);
+            var firstItem = duplicate.GetItemAt(0);
+            if (!firstItem.overwriteSettings) firstItem.Copy(duplicate);
             firstItem.overwriteSettings = true;
-            result.name += "_merged";
+            duplicate.name += "_merged";
 
             selection.RemoveAt(0);
+            bool cleanupPalette = false;
             for (int i = 0; i < selection.Count; ++i)
             {
                 var idx = selection[i];
                 var other = PaletteManager.selectedPalette.GetBrush(idx);
+                if (other == null)
+                {
+                    cleanupPalette = true;
+                    continue;
+                }
                 var otherItems = other.items;
                 foreach (var item in otherItems)
                 {
-                    var clone = new MultibrushItemSettings(item.prefab, result);
+                    if (item == null)
+                    {
+                        cleanupPalette = true;
+                        continue;
+                    }
+                    var clone = new MultibrushItemSettings(item.prefab, duplicate);
                     if (item.overwriteSettings) clone.Copy(item);
                     else clone.Copy(other);
                     clone.overwriteSettings = true;
-                    result.AddItem(clone);
+                    duplicate.AddItem(clone);
                 }
             }
-            result.Reset();
+            if (cleanupPalette) PaletteManager.selectedPalette.Cleanup();
+            duplicate.Reset();
             PaletteManager.ClearSelection();
             PaletteManager.AddToSelection(resultIdx);
             PaletteManager.selectedBrushIdx = resultIdx;
@@ -667,19 +676,36 @@ namespace PluginMaster
             selection.RemoveAt(0);
             selection.Reverse();
             var result = PaletteManager.selectedPalette.GetBrush(resultIdx);
+            if (result == null)
+            {
+                PaletteManager.selectedPalette.Cleanup();
+                return;
+            }
+            bool cleanupPalette = false;
             for (int i = 0; i < selection.Count; ++i)
             {
                 var idx = selection[i];
                 var other = PaletteManager.selectedPalette.GetBrush(idx);
+                if (other == null)
+                {
+                    cleanupPalette = true;
+                    continue;
+                }
                 var otherItems = other.items;
                 foreach (var item in otherItems)
                 {
+                    if (item == null)
+                    {
+                        cleanupPalette = true;
+                        continue;
+                    }
                     var clone = item.Clone() as MultibrushItemSettings;
                     clone.parentSettings = result;
                     result.AddItem(clone);
                 }
                 PaletteManager.selectedPalette.RemoveBrushAt(idx);
             }
+            if (cleanupPalette) PaletteManager.selectedPalette.Cleanup();
             PaletteManager.ClearSelection();
             PaletteManager.AddToSelection(resultIdx);
             PaletteManager.selectedBrushIdx = resultIdx;
@@ -773,7 +799,16 @@ namespace PluginMaster
 
         private void BrushContext(int idx)
         {
+            void ShowBrushProperties(object idx)
+            {
+                PaletteManager.ClearSelection();
+                PaletteManager.AddToSelection((int)idx);
+                PaletteManager.selectedBrushIdx = (int)idx;
+                BrushProperties.ShowWindow();
+            }
             var menu = new UnityEditor.GenericMenu();
+            menu.AddItem(new GUIContent("Brush Properties..."), false, ShowBrushProperties, idx);
+            menu.AddSeparator(string.Empty);
             var brush = PaletteManager.selectedPalette.GetBrush(idx);
             menu.AddItem(new GUIContent("Select Prefab" + (PaletteManager.selectionCount > 1
                 || brush.itemCount > 1 ? "s" : "")), false, SelectPrefabs, idx);
@@ -781,7 +816,7 @@ namespace PluginMaster
             menu.AddItem(new GUIContent("Select References In Scene"), false, SelectReferences, idx);
             menu.AddSeparator(string.Empty);
             menu.AddItem(new GUIContent("Update Thumbnail"), false, UpdateThumbnail, idx);
-            menu.AddItem(new GUIContent("Edit Thumbnail"), false, EditThumbnail, idx);
+            menu.AddItem(new GUIContent("Edit Thumbnail..."), false, EditThumbnail, idx);
             menu.AddItem(new GUIContent("Copy Thumbnail Settings"), false, CopyThumbnailSettings, idx);
             if (PaletteManager.clipboardThumbnailSettings != null)
                 menu.AddItem(new GUIContent("Paste Thumbnail Settings"), false, PasteThumbnailSettings, idx);
@@ -960,9 +995,9 @@ namespace PluginMaster
 
         private void PaletteContextAddMenuItems(UnityEditor.GenericMenu menu)
         {
-            menu.AddItem(new GUIContent("New Brush From Prefab"), false, CreateBrushFromPrefab);
-            menu.AddItem(new GUIContent("New MultiBrush From Folder"), false, CreateBrushFromFolder);
-            menu.AddItem(new GUIContent("New Brush From Each Prefab In Folder"), false,
+            menu.AddItem(new GUIContent("New Brush From Prefab..."), false, CreateBrushFromPrefab);
+            menu.AddItem(new GUIContent("New MultiBrush From Folder..."), false, CreateBrushFromFolder);
+            menu.AddItem(new GUIContent("New Brush From Each Prefab In Folder..."), false,
                 CreateBrushFromEachPrefabInFolder);
             menu.AddSeparator(string.Empty);
             menu.AddItem(new GUIContent("New MultiBrush From Selection"), false, CreateBrushFromSelection);
@@ -971,7 +1006,7 @@ namespace PluginMaster
             menu.AddSeparator(string.Empty);
             menu.AddItem(new GUIContent("Update all thumbnails"), false, UpdateAllThumbnails);
             menu.AddSeparator(string.Empty);
-            menu.AddItem(new GUIContent("Brush Creation And Drop Settings"), false,
+            menu.AddItem(new GUIContent("Brush Creation And Drop Settings..."), false,
                 BrushCreationSettingsWindow.ShowWindow);
             if (PaletteManager.selectedBrushIdx > 0 || PaletteManager.movingBrushes)
             {
@@ -1175,32 +1210,37 @@ namespace PluginMaster
         #region RENAME
         private class RenamePaletteWindow : UnityEditor.EditorWindow
         {
-            private string _currentName = string.Empty;
+            private string _name = string.Empty;
             private int _paletteIdx = -1;
             private System.Action<string, int> _onDone;
+            private bool _focusSet = false;
             public static void ShowWindow(RenameData data, System.Action<string, int> onDone)
             {
                 var window = GetWindow<RenamePaletteWindow>(true, "Rename Palette");
-                window._currentName = data.currentName;
+                window._name = data.currentName;
                 window._paletteIdx = data.paletteIdx;
                 window._onDone = onDone;
-                window.position = new Rect(data.mousePosition.x + 50, data.mousePosition.y + 50, 160, 50);
+                window.position = new Rect(data.mousePosition.x + 50, data.mousePosition.y + 50, 0, 0);
+                window.minSize = window.maxSize = new Vector2(160, 45);
+                window._focusSet = false;
             }
 
             private void OnGUI()
             {
-                UnityEditor.EditorGUIUtility.labelWidth = 70;
+                UnityEditor.EditorGUIUtility.labelWidth = 50;
                 UnityEditor.EditorGUIUtility.fieldWidth = 70;
-                using (new GUILayout.HorizontalScope())
+                GUI.SetNextControlName("NameField");
+                _name = UnityEditor.EditorGUILayout.TextField(string.Empty, _name);
+                if (!_focusSet)
                 {
-                    _currentName = UnityEditor.EditorGUILayout.TextField("New Name:", _currentName);
+                    UnityEditor.EditorGUI.FocusTextInControl("NameField");
+                    _focusSet = true;
                 }
-                using (new GUILayout.HorizontalScope())
+                using (new UnityEditor.EditorGUI.DisabledGroupScope(string.IsNullOrWhiteSpace(_name)))
                 {
-                    GUILayout.FlexibleSpace();
-                    if (GUILayout.Button("Apply", GUILayout.Width(50)))
+                    if (GUILayout.Button("Apply"))
                     {
-                        _onDone(_currentName, _paletteIdx);
+                        _onDone(_name, _paletteIdx);
                         Close();
                     }
                 }
@@ -1230,7 +1270,6 @@ namespace PluginMaster
             Repaint();
         }
         #endregion
-
 
         private void ShowDeleteConfirmation(object obj)
         {
@@ -1484,6 +1523,7 @@ namespace PluginMaster
         private string _filterText = string.Empty;
         private GUIContent _labelIcon = null;
         private GUIContent _selectionFilterIcon = null;
+        private GUIContent _folderFilterIcon = null;
         private GUIContent _clearFilterIcon = null;
 
         private struct FilteredBrush
@@ -1528,6 +1568,33 @@ namespace PluginMaster
             set => _filterText = value;
         }
 
+        private System.Collections.Generic.Dictionary<int, string[]> _hiddenFolders
+            = new System.Collections.Generic.Dictionary<int, string[]>();
+
+        private string[] hiddenFolders
+        {
+            get
+            {
+                if (_hiddenFolders.Count == 0 || !_hiddenFolders.ContainsKey(PaletteManager.selectedPaletteIdx))
+                    return new string[] { };
+                return _hiddenFolders[PaletteManager.selectedPaletteIdx];
+            }
+        }
+        public static string[] GetHiddenFolders()
+        {
+            if (instance == null) return new string[] { };
+            return instance.hiddenFolders;
+        }
+
+        public static void SetHiddenFolders(string[] value)
+        {
+            if (instance == null) return;
+            if (instance._hiddenFolders.ContainsKey(PaletteManager.selectedPaletteIdx))
+                instance._hiddenFolders[PaletteManager.selectedPaletteIdx] = value;
+            else instance._hiddenFolders.Add(PaletteManager.selectedPaletteIdx, value);
+            instance.UpdateFilteredList(false);
+            RepainWindow();
+        }
         private void ClearLabelFilter()
         {
             foreach (var key in labelFilter.Keys.ToArray()) labelFilter[key] = false;
@@ -1580,6 +1647,10 @@ namespace PluginMaster
                     GUI.FocusControl(null);
                     FilterBySelection();
                 }
+                if (GUILayout.Button(_folderFilterIcon, UnityEditor.EditorStyles.toolbarButton))
+                {
+                    FilterByFolderWindow.ShowWindow();
+                }
             }
             if (_updateLabelFilter)
             {
@@ -1615,7 +1686,7 @@ namespace PluginMaster
 
             //filter by label
             var filterTextArray = filterText.Split(',');
-            var filterTextList = new System.Collections.Generic.List<string>();
+            var filterTextSet = new System.Collections.Generic.List<string>();
             ClearLabelFilter();
             bool filterByLabel = false;
             for (int i = 0; i < filterTextArray.Length; ++i)
@@ -1632,10 +1703,10 @@ namespace PluginMaster
                     else return;
                     continue;
                 }
-                filterTextList.Add(filterText);
+                filterTextSet.Add(filterText);
             }
 
-            var tempFilteredBrushList = new System.Collections.Generic.List<FilteredBrush>();
+            var tempFilteredBrushList = new System.Collections.Generic.HashSet<FilteredBrush>();
             var brushes = PaletteManager.selectedPalette.brushes;
             if (!filterByLabel)
                 for (int i = 0; i < brushes.Length; ++i)
@@ -1668,12 +1739,13 @@ namespace PluginMaster
                     else RemoveFromSelection(i);
                 }
             }
+            if (tempFilteredBrushList.Count == 0) return;
             //filter by name
-            var listIsEmpty = filterTextList.Count == 0;
+            var listIsEmpty = filterTextSet.Count == 0;
             if (!listIsEmpty)
             {
                 listIsEmpty = true;
-                foreach (var filter in filterTextList)
+                foreach (var filter in filterTextSet)
                 {
                     if (filter != string.Empty)
                     {
@@ -1682,31 +1754,46 @@ namespace PluginMaster
                     }
                 }
             }
-            if (listIsEmpty)
-            {
-                filteredBrushList.AddRange(tempFilteredBrushList);
-                return;
-            }
 
+            if (!listIsEmpty)
+            {
+                foreach (var filteredItem in tempFilteredBrushList.ToArray())
+                {
+                    for (int i = 0; i < filterTextSet.Count; ++i)
+                    {
+                        var filterText = filterTextSet[i].Trim();
+                        bool wholeWordOnly = false;
+                        if (filterText == string.Empty) continue;
+                        if (filterText.Length >= 2 && filterText.Substring(0, 2) == "w:")
+                        {
+                            wholeWordOnly = true;
+                            filterText = filterText.Substring(2);
+                        }
+                        if (filterText == string.Empty) continue;
+                        filterText = filterText.ToLower();
+                        var brush = filteredItem.brush;
+                        if ((!wholeWordOnly && brush.name.ToLower().Contains(filterText))
+                            || (wholeWordOnly && brush.name.ToLower() == filterText))
+                            tempFilteredBrushList.Add(filteredItem);
+                        else
+                        {
+                            if(tempFilteredBrushList.Contains(filteredItem)) tempFilteredBrushList.Remove(filteredItem);
+                            RemoveFromSelection(filteredItem.index);
+                        }
+                    }
+                }
+            }
+            if (tempFilteredBrushList.Count == 0) return;
+            // Filter by folder
             foreach (var filteredItem in tempFilteredBrushList.ToArray())
             {
-                for (int i = 0; i < filterTextList.Count; ++i)
+                var brushItems = filteredItem.brush.items;
+                foreach (var brushItem in brushItems)
                 {
-                    var filterText = filterTextList[i].Trim();
-                    bool wholeWordOnly = false;
-                    if (filterText == string.Empty) continue;
-                    if (filterText.Length >= 2 && filterText.Substring(0, 2) == "w:")
-                    {
-                        wholeWordOnly = true;
-                        filterText = filterText.Substring(2);
-                    }
-                    if (filterText == string.Empty) continue;
-                    filterText = filterText.ToLower();
-                    var brush = filteredItem.brush;
-                    if ((!wholeWordOnly && brush.name.ToLower().Contains(filterText))
-                        || (wholeWordOnly && brush.name.ToLower() == filterText))
-                        filteredBrushList.Add(filteredItem);
-                    else RemoveFromSelection(filteredItem.index);
+                    if (filteredBrushList.Contains(filteredItem)) continue;
+                    if (hiddenFolders.Any(filter => brushItem.prefabPath.StartsWith(filter)))
+                        RemoveFromSelection(filteredItem.index);
+                    else filteredBrushList.Add(filteredItem);
                 }
             }
         }

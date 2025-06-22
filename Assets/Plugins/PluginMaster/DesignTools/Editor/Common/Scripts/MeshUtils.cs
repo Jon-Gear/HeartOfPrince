@@ -78,64 +78,40 @@ namespace PluginMaster
             return filterList.ToArray();
         }
 
-
-        private static System.Reflection.MethodInfo intersectRayMesh = null;
         public static bool Raycast(Ray ray, out RaycastHit hitInfo,
             out GameObject collider, GameObject[] filters, float maxDistance,
             bool sameOriginAsRay = true, Vector3 origin = new Vector3())
         {
             collider = null;
             hitInfo = new RaycastHit();
-            if (intersectRayMesh == null)
-            {
-                var editorTypes = typeof(UnityEditor.Editor).Assembly.GetTypes();
-                var type_HandleUtility = editorTypes.FirstOrDefault(t => t.Name == "HandleUtility");
-                intersectRayMesh = type_HandleUtility.GetMethod("IntersectRayMesh",
-                    System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
-            }
+            hitInfo.distance = maxDistance;
+
             var minDistance = float.MaxValue;
+            var resultHitNormal = Vector3.zero;
             var result = false;
+            var hitPoint = Vector3.zero;
+            var originPlane = new Plane(-ray.direction, origin);
             foreach (var filter in filters)
             {
                 if (filter == null) continue;
-                var meshFilter = filter.GetComponent<MeshFilter>();
-                Mesh mesh;
-                if (meshFilter == null)
+                if (RayIntersectsGameObject(ray, filter, includeInactive: false,
+                    out float hitDistance, out Vector3 hitNormal))
                 {
-                    var skinnedMeshRenderer = filter.GetComponent<SkinnedMeshRenderer>();
-                    if (skinnedMeshRenderer == null) continue;
-                    mesh = skinnedMeshRenderer.sharedMesh;
-                }
-                else if (meshFilter.sharedMesh == null) continue;
-                else mesh = meshFilter.sharedMesh;
-
-                var parameters = new object[] { ray, mesh, filter.transform.localToWorldMatrix, null };
-                if ((bool)intersectRayMesh.Invoke(null, parameters))
-                {
-                    if (sameOriginAsRay)
-                    {
-                        if (hitInfo.distance > maxDistance) continue;
-                    }
-                    else
-                    {
-                        var hitInfoDistance = (hitInfo.point - origin).magnitude;
-                        if (hitInfoDistance > maxDistance) continue;
-                    }
+                    hitPoint = ray.origin + ray.direction.normalized * hitDistance;
+                    if (!sameOriginAsRay) hitDistance = originPlane.GetDistanceToPoint(hitPoint);
+                    if (hitDistance > maxDistance) continue;
+                    if (hitDistance > minDistance) continue;
                     result = true;
-                    var hit = (RaycastHit)parameters[3];
-                    var hitDistance = hit.distance;
-                    if (!sameOriginAsRay) hitDistance = (hit.point - origin).magnitude;                    
-                    if (hitDistance < minDistance)
-                    {
-                        collider = filter;
-                        minDistance = hitDistance;
-                        hitInfo = hit;
-                    }
+                    collider = filter;
+                    minDistance = hitDistance;
+                    resultHitNormal = hitNormal;
                 }
             }
             if (result)
             {
-                hitInfo.normal = hitInfo.normal.normalized;
+                hitInfo.point = hitPoint;
+                hitInfo.distance = minDistance;
+                hitInfo.normal = resultHitNormal;
             }
             return result;
         }
@@ -148,35 +124,16 @@ namespace PluginMaster
         }
 
         public static bool RaycastAll(Ray ray, out RaycastHit[] hitInfo,
-            out GameObject[] colliders, GameObject[] filters, float maxDistance)
+            out GameObject[] colliders, GameObject[] filters, float maxDistance,
+            bool sameOriginAsRay = true, Vector3 origin = new Vector3())
         {
             System.Collections.Generic.List<RaycastHit> hitInfoList = new System.Collections.Generic.List<RaycastHit>();
             System.Collections.Generic.List<GameObject> colliderList = new System.Collections.Generic.List<GameObject>();
-            if (intersectRayMesh == null)
-            {
-                var editorTypes = typeof(UnityEditor.Editor).Assembly.GetTypes();
-                var type_HandleUtility = editorTypes.FirstOrDefault(t => t.Name == "HandleUtility");
-                intersectRayMesh = type_HandleUtility.GetMethod("IntersectRayMesh",
-                    System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
-            }
+
             foreach (var filter in filters)
             {
-                if (filter == null) continue;
-                var meshFilter = filter.GetComponent<MeshFilter>();
-                Mesh mesh;
-                if (meshFilter == null)
+                if (Raycast(ray, out RaycastHit hit, out GameObject collider, filters, maxDistance, sameOriginAsRay, origin))
                 {
-                    var skinnedMeshRenderer = filter.GetComponent<SkinnedMeshRenderer>();
-                    if (skinnedMeshRenderer == null) continue;
-                    mesh = skinnedMeshRenderer.sharedMesh;
-                }
-                else if (meshFilter.sharedMesh == null) continue;
-                else mesh = meshFilter.sharedMesh;
-
-                var parameters = new object[] { ray, mesh, filter.transform.localToWorldMatrix, null };
-                if ((bool)intersectRayMesh.Invoke(null, parameters))
-                {
-                    var hit = (RaycastHit)parameters[3];
                     if (hit.distance > maxDistance) continue;
                     hitInfoList.Add(hit);
                     colliderList.Add(filter);
@@ -186,5 +143,111 @@ namespace PluginMaster
             colliders = colliderList.ToArray();
             return hitInfoList.Count > 0;
         }
+
+
+        const string MeshRayIntersectComputeShaderPath = "Shaders/MeshRayIntersect";
+        const string KernelName = "CSMain";
+        static ComputeShader _meshRayIntersectComputeShader;
+
+        public static bool RayIntersectsMesh(Ray ray, Mesh mesh, Transform meshTransform,
+            out float distance, out Vector3 localNormal)
+        {
+            if (_meshRayIntersectComputeShader == null)
+                _meshRayIntersectComputeShader = Resources.Load<ComputeShader>(MeshRayIntersectComputeShaderPath);
+            var kernel = _meshRayIntersectComputeShader.FindKernel(KernelName);
+
+            var localOrigin = meshTransform.InverseTransformPoint(ray.origin);
+            var localDirection = meshTransform.InverseTransformDirection(ray.direction).normalized;
+
+            var verts = mesh.vertices;
+            var tris = mesh.triangles;
+            var triCount = tris.Length / 3;
+
+            var vertBuf = new ComputeBuffer(verts.Length, sizeof(float) * 3);
+            var triBuf = new ComputeBuffer(tris.Length, sizeof(int));
+            var distBuf = new ComputeBuffer(1, sizeof(uint));
+            var normBuf = new ComputeBuffer(1, sizeof(float) * 3);
+
+            vertBuf.SetData(verts);
+            triBuf.SetData(tris);
+            distBuf.SetData(new uint[] { 0x7F7FFFFFu });
+
+            _meshRayIntersectComputeShader.SetBuffer(kernel, "vertices", vertBuf);
+            _meshRayIntersectComputeShader.SetBuffer(kernel, "triangles", triBuf);
+            _meshRayIntersectComputeShader.SetBuffer(kernel, "minDistanceBits", distBuf);
+            _meshRayIntersectComputeShader.SetBuffer(kernel, "hitNormalBuffer", normBuf);
+            _meshRayIntersectComputeShader.SetVector("rayOrigin", localOrigin);
+            _meshRayIntersectComputeShader.SetVector("rayDirection", localDirection);
+
+            var groups = Mathf.CeilToInt(triCount / 64f);
+            _meshRayIntersectComputeShader.Dispatch(kernel, groups, 1, 1);
+
+            var bits = new uint[1];
+            distBuf.GetData(bits);
+
+            Vector3[] nbuf = new Vector3[1];
+            normBuf.GetData(nbuf);
+
+            vertBuf.Release();
+            triBuf.Release();
+            distBuf.Release();
+            normBuf.Release();
+
+            distance = 0;
+            localNormal = Vector3.zero;
+            var localT = System.BitConverter.ToSingle(System.BitConverter.GetBytes((int)bits[0]), 0);
+            if (localT == float.MaxValue) return false;
+
+            var localHitPoint = localOrigin + localDirection * localT;
+            var worldHitPoint = meshTransform.TransformPoint(localHitPoint);
+
+            distance = Vector3.Distance(ray.origin, worldHitPoint);
+            localNormal = nbuf[0];
+            return true;
+        }
+        public static (Mesh mesh, Transform transform)[] GetAllMeshses(GameObject obj, bool includeInactive)
+        {
+            var result = new System.Collections.Generic.HashSet<(Mesh, Transform)>();
+            var meshFilters = obj.GetComponentsInChildren<MeshFilter>(includeInactive);
+            foreach (var mf in meshFilters)
+            {
+                if (mf.sharedMesh == null) continue;
+                var renderer = mf.GetComponent<MeshRenderer>();
+                if (!renderer.enabled) continue;
+                result.Add((mf.sharedMesh, mf.transform));
+            }
+            var skinnedMeshRenderers = obj.GetComponentsInChildren<SkinnedMeshRenderer>(includeInactive);
+            foreach (var smr in skinnedMeshRenderers)
+            {
+                if (smr.sharedMesh == null || !smr.enabled) continue;
+                result.Add((smr.sharedMesh, smr.transform));
+            }
+            return result.ToArray();
+        }
+        public static bool RayIntersectsGameObject(Ray ray, GameObject gameObject, bool includeInactive,
+            out float distance, out Vector3 hitNormal)
+        {
+            distance = float.MaxValue;
+            hitNormal = Vector3.zero;
+            var hitAny = false;
+            var meshesAndTransforms = GetAllMeshses(gameObject, includeInactive);
+            foreach (var mt in meshesAndTransforms)
+            {
+                if (mt.mesh == null) continue;
+                if (RayIntersectsMesh(ray, mt.mesh, mt.transform, out float d, out Vector3 localN))
+                {
+                    hitAny = true;
+                    distance = Mathf.Min(distance, d);
+                    hitNormal = mt.transform.TransformDirection(localN).normalized;
+                }
+            }
+            if (!hitAny)
+            {
+                distance = 0f;
+                return false;
+            }
+            return true;
+        }
+
     }
 }

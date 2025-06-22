@@ -49,6 +49,7 @@ namespace PluginMaster
         [SerializeField] private TOOL_SETTINGS _unsavedProfile = _staticUnsavedProfile;
 
         protected ToolManagerBase() { }
+
         public static ToolManagerBase<TOOL_SETTINGS> instance
         {
             get
@@ -145,15 +146,20 @@ namespace PluginMaster
 
     public interface IPersistentToolManager
     {
-        bool showPreexistingElements { get; set; }
         bool applyBrushToExisting { get; set; }
+        IPersistentData[] GetItems();
+        void ToggleItemsVisibility();
+        void DeletePersistentItem(long itemId, bool deleteObjects, bool registerUndo = true);
+        void DeselectAllItems();
+        IPersistentData Duplicate(long itemId);
+        string GetToolName();
     }
 
     [System.Serializable]
     public class PersistentToolManagerBase<TOOL_NAME, TOOL_SETTINGS, CONTROL_POINT, TOOL_DATA, SCENE_DATA>
         : ToolManagerBase<TOOL_SETTINGS>, IPersistentToolManager
         where TOOL_NAME : IToolName, new()
-        where TOOL_SETTINGS : ICloneableToolSettings, new()
+        where TOOL_SETTINGS : IToolSettings, new()
         where CONTROL_POINT : ControlPoint, new()
         where TOOL_DATA : PersistentData<TOOL_NAME, TOOL_SETTINGS, CONTROL_POINT>, new()
         where SCENE_DATA : SceneData<TOOL_NAME, TOOL_SETTINGS, CONTROL_POINT, TOOL_DATA>, new()
@@ -167,6 +173,7 @@ namespace PluginMaster
         private static bool _staticApplyBrushToExisting = false;
         [SerializeField] private bool _applyBrushToExisting = _staticApplyBrushToExisting;
 
+        private static IPersistentData.Visibility _itemsVisibility = IPersistentData.Visibility.SHOW_ALL;
         protected PersistentToolManagerBase() { }
         public new static PersistentToolManagerBase<TOOL_NAME, TOOL_SETTINGS, CONTROL_POINT, TOOL_DATA, SCENE_DATA> instance
         {
@@ -178,6 +185,7 @@ namespace PluginMaster
                 return _instance as PersistentToolManagerBase<TOOL_NAME, TOOL_SETTINGS, CONTROL_POINT, TOOL_DATA, SCENE_DATA>;
             }
         }
+
         public void AddPersistentItem(string sceneGUID, TOOL_DATA data)
         {
             if (_staticSceneItems == null)
@@ -198,7 +206,7 @@ namespace PluginMaster
             PWBCore.staticData.SaveAndUpdateVersion();
         }
 
-
+        public string GetToolName() => (new TOOL_NAME()).value;
         public TOOL_DATA[] GetPersistentItems()
         {
             var items = new System.Collections.Generic.List<TOOL_DATA>();
@@ -221,6 +229,44 @@ namespace PluginMaster
             return items.ToArray();
         }
 
+        public IPersistentData[] GetItems() => GetPersistentItems();
+
+        public void DeselectAllItems()
+        {
+            var items = GetItems();
+            foreach (var item in items)
+            {
+                item.isSelected = false;
+                item.ClearSelection();
+            }
+        }
+
+        public IPersistentData Duplicate(long itemId)
+        {
+            var scenePath = UnityEngine.SceneManagement.SceneManager.GetActiveScene().path;
+            var sceneGUID = UnityEditor.AssetDatabase.AssetPathToGUID(scenePath);
+            var sceneItem = _staticSceneItems.Find(i => i.sceneGUID == sceneGUID);
+
+            var source = GetItem(itemId);
+            var clone = new TOOL_DATA();
+            clone.Duplicate(source);
+
+            sceneItem.AddItem(clone);
+            PWBCore.staticData.SaveAndUpdateVersion();
+            return clone;
+        }
+        public void ToggleItemsVisibility()
+        {
+            switch (_itemsVisibility)
+            {
+                case IPersistentData.Visibility.SHOW_ALL: _itemsVisibility = IPersistentData.Visibility.SHOW_OBJECTS; break;
+                case IPersistentData.Visibility.SHOW_OBJECTS: _itemsVisibility = IPersistentData.Visibility.HIDE_ALL; break;
+                case IPersistentData.Visibility.HIDE_ALL: _itemsVisibility = IPersistentData.Visibility.SHOW_ALL; break;
+            }
+            var items = GetItems();
+            foreach (var item in items) item.visibility = _itemsVisibility;
+        }
+
         public bool ReplaceObject(GameObject target, GameObject obj)
         {
             var items = GetPersistentItems();
@@ -234,9 +280,9 @@ namespace PluginMaster
             foreach (var item in _staticSceneItems) item.RemoveItemData(itemId);
             PWBCore.staticData.SaveAndUpdateVersion();
         }
-        public void DeletePersistentItem(long itemId, bool deleteObjects)
+        public void DeletePersistentItem(long itemId, bool deleteObjects, bool registerUndo = true)
         {
-            ToolProperties.RegisterUndo("Delete Item");
+            if (registerUndo) ToolProperties.RegisterUndo("Delete Item");
             var parents = new System.Collections.Generic.HashSet<GameObject>();
             foreach (var item in _staticSceneItems)
             {
@@ -249,7 +295,11 @@ namespace PluginMaster
             foreach (var parent in parents)
             {
                 var components = parent.GetComponentsInChildren<Component>();
-                if (components.Length == 1) UnityEditor.Undo.DestroyObjectImmediate(parent);
+                if (components.Length == 1)
+                {
+                    if (registerUndo) UnityEditor.Undo.DestroyObjectImmediate(parent);
+                    else Object.DestroyImmediate(parent);
+                }
             }
             PWBCore.staticData.SaveAndUpdateVersion();
         }
@@ -319,11 +369,136 @@ namespace PluginMaster
         void Copy(IToolSettings other);
     }
 
-    public interface ICloneableToolSettings : IToolSettings
+    public static class TilesUtils
     {
-        void Clone(ICloneableToolSettings clone);
+        public enum SizeType
+        {
+            SMALLEST_OBJECT,
+            BIGGEST_OBJECT,
+            CUSTOM
+        }
+
+        public static Vector3 GetCellSize(SizeType cellSizeType, MultibrushSettings multibrush,
+            Vector3 DefaultValue, bool subtractBrushOffset)
+        {
+            if (cellSizeType == SizeType.CUSTOM) return DefaultValue;
+
+            void SubtractBrushOffset(ref Vector3 size, MultibrushItemSettings brush)
+            {
+                var dv = size - brush.localPositionOffset;
+                dv.x = System.MathF.Round(dv.x, digits: 5);
+                dv.y = System.MathF.Round(dv.y, digits: 5);
+                dv.z = System.MathF.Round(dv.z, digits: 5);
+                if (dv.x <= 0) dv.x = size.x;
+                if (dv.y <= 0) dv.y = size.y;
+                if (dv.z <= 0) dv.z = size.z;
+                size = dv;
+            }
+
+            var cellSize = Vector3.one * (cellSizeType == SizeType.SMALLEST_OBJECT
+                   ? float.MaxValue : float.MinValue);
+            foreach (var item in multibrush.items)
+            {
+                var prefab = item.prefab;
+                if (prefab == null) continue;
+                var scaleMultiplier = cellSizeType == SizeType.SMALLEST_OBJECT
+                    ? item.minScaleMultiplier : item.maxScaleMultiplier;
+                var bounds = BoundsUtils.GetBoundsRecursive(prefab.transform,
+                    prefab.transform.rotation * Quaternion.Euler(multibrush.eulerOffset), ignoreDissabled: true,
+                    BoundsUtils.ObjectProperty.BOUNDING_BOX, recursive: true, useDictionary: false);
+                var localSize = bounds.size;
+                if (subtractBrushOffset) SubtractBrushOffset(ref localSize, item);
+                var itemSize = Vector3.Scale(localSize, scaleMultiplier);
+                cellSize = cellSizeType == SizeType.SMALLEST_OBJECT
+                    ? Vector3.Min(cellSize, itemSize) : Vector3.Max(cellSize, itemSize);
+            }
+            return cellSize;
+        }
+
+        public static Vector3 GetCellSize(SizeType cellSizeType, BrushSettings brush,
+            AxesUtils.SignedAxis upwardAxis, AxesUtils.SignedAxis forwardAxis,
+            Vector3 defaultValue, bool tangentSpace, int quarterTurns, bool subtractBrushOffset)
+        {
+            if (brush == null) return defaultValue;
+            void SubtractBrushOffset(ref Vector3 size)
+            {
+                var dv = size - brush.localPositionOffset;
+                dv.x = System.MathF.Round(dv.x, digits: 5);
+                dv.y = System.MathF.Round(dv.y, digits: 5);
+                dv.z = System.MathF.Round(dv.z, digits: 5);
+                if (dv.x <= 0) dv.x = size.x;
+                if (dv.y <= 0) dv.y = size.y;
+                if (dv.z <= 0) dv.z = size.z;
+                size = dv;
+            }
+
+            if (cellSizeType == SizeType.CUSTOM)
+            {
+                if (subtractBrushOffset) SubtractBrushOffset(ref defaultValue);
+                return defaultValue;
+            }
+
+            var cellSize = Vector3.one * (cellSizeType == SizeType.SMALLEST_OBJECT
+                    ? float.MaxValue : float.MinValue);
+            if (ToolManager.tool == ToolManager.PaintTool.TILING && ToolManager.editMode
+                && PWBIO.selectedPersistentTilingData != null)
+            {
+                var prefabs = new System.Collections.Generic.HashSet<GameObject>();
+                var objSet = PWBIO.selectedPersistentTilingData.objectSet;
+                var scaleMultiplier = cellSizeType == SizeType.SMALLEST_OBJECT
+                        ? brush.minScaleMultiplier : brush.maxScaleMultiplier;
+
+                foreach (var obj in objSet)
+                {
+                    if (obj == null) continue;
+                    var objSize = BoundsUtils.GetBoundsRecursive(obj.transform,
+                        obj.transform.rotation * Quaternion.Euler(brush.eulerOffset)).size;
+                    cellSize = cellSizeType == SizeType.SMALLEST_OBJECT
+                        ? Vector3.Min(cellSize, objSize) : Vector3.Max(cellSize, objSize);
+                    var prefab = UnityEditor.PrefabUtility.GetCorrespondingObjectFromSource(obj);
+                    if (prefab == null) continue;
+                    if (prefabs.Contains(prefab)) continue;
+                    prefabs.Add(prefab);
+                    var prefabSize = Vector3.Scale(BoundsUtils.GetBoundsRecursive(prefab.transform,
+                       prefab.transform.rotation * Quaternion.Euler(brush.eulerOffset)).size, scaleMultiplier);
+                    cellSize = cellSizeType == SizeType.SMALLEST_OBJECT
+                        ? Vector3.Min(cellSize, prefabSize) : Vector3.Max(cellSize, prefabSize);
+                }
+            }
+            else if (brush is MultibrushSettings)
+            {
+                var multibrush = brush as MultibrushSettings;
+                cellSize = GetCellSize(cellSizeType, multibrush, defaultValue, subtractBrushOffset);
+            }
+
+            if (cellSize == Vector3.one * float.MaxValue || cellSize == Vector3.one * float.MinValue) return defaultValue;
+            var rotation = Quaternion.Euler(AxesUtils.SignedAxis.GetEulerAnglesFromAxes(forwardAxis, upwardAxis));
+
+            if (tangentSpace)
+            {
+                if (upwardAxis.axis == AxesUtils.Axis.Y) cellSize.y = cellSize.z;
+                else if (upwardAxis.axis == AxesUtils.Axis.X)
+                {
+                    cellSize.x = cellSize.y;
+                    cellSize.y = cellSize.z;
+                }
+            }
+            else
+            {
+                cellSize = rotation * cellSize;
+                if (quarterTurns > 0) cellSize = Quaternion.AngleAxis(quarterTurns * 90, upwardAxis) * cellSize;
+                cellSize.x = Mathf.Abs(cellSize.x);
+                cellSize.y = Mathf.Abs(cellSize.y);
+                cellSize.z = Mathf.Abs(cellSize.z);
+            }
+            if (Mathf.Approximately(cellSize.x, 0)) cellSize.x = 0.5f;
+            if (Mathf.Approximately(cellSize.y, 0)) cellSize.y = 0.5f;
+            if (Mathf.Approximately(cellSize.z, 0)) cellSize.z = 0.5f;
+            return cellSize;
+        }
     }
 
+    #region CIRCLE TOOLS
     [System.Serializable]
     public class CircleToolBase : IToolSettings
     {
@@ -353,9 +528,8 @@ namespace PluginMaster
 
 
     }
-
     [System.Serializable]
-    public class BrushToolBase : CircleToolBase, IPaintToolSettings
+    public class BrushToolBase : CircleToolBase, IPaintToolSettings, IToolParentingSettings
     {
         [SerializeField] private PaintToolSettings _paintTool = new PaintToolSettings();
         public enum BrushShape { POINT, CIRCLE, SQUARE }
@@ -491,6 +665,12 @@ namespace PluginMaster
 
         public BrushSettings brushSettings => _paintTool.brushSettings;
 
+        public bool overwriteParentingSettings
+        {
+            get => _paintTool.overwriteParentingSettings;
+            set => _paintTool.overwriteParentingSettings = value;
+        }
+
         public override void DataChanged()
         {
             base.DataChanged();
@@ -512,6 +692,20 @@ namespace PluginMaster
             _randomizePositions = otherBrushToolBase._randomizePositions;
         }
     }
+    #endregion
+    #region PAINT TOOLS
+
+    public interface IToolParentingSettings
+    {
+        bool autoCreateParent { get; set; }
+        bool setSurfaceAsParent { get; set; }
+
+        bool createSubparentPerPalette { get; set; }
+        bool createSubparentPerTool { get; set; }
+        bool createSubparentPerBrush { get; set; }
+        bool createSubparentPerPrefab { get; set; }
+        Transform parent { get; set; }
+    }
 
     public interface IPaintToolSettings
     {
@@ -523,6 +717,8 @@ namespace PluginMaster
         bool createSubparentPerBrush { get; set; }
         bool createSubparentPerPrefab { get; set; }
         Transform parent { get; set; }
+        bool overwriteParentingSettings { get; set; }
+
         bool overwritePrefabLayer { get; set; }
         int layer { get; set; }
         bool overwriteBrushProperties { get; set; }
@@ -530,7 +726,7 @@ namespace PluginMaster
     }
 
     [System.Serializable]
-    public class PaintToolSettings : IPaintToolSettings, ISerializationCallbackReceiver, IToolSettings
+    public class ToolParentingSettings : IToolParentingSettings, ISerializationCallbackReceiver, IToolSettings
     {
         private Transform _parent = null;
         [SerializeField] private string _parentGlobalId = null;
@@ -539,18 +735,13 @@ namespace PluginMaster
         [SerializeField] private bool _createSubparentPerPalette = true;
         [SerializeField] private bool _createSubparentPerTool = true;
         [SerializeField] private bool _createSubparentPerBrush = false;
-        [SerializeField] private bool _createSubparentPerPrefab = true;
-        [SerializeField] private bool _overwritePrefabLayer = false;
-        [SerializeField] private int _layer = 0;
-        [SerializeField] private bool _overwriteBrushProperties = false;
-        [SerializeField] private BrushSettings _brushSettings = new BrushSettings();
+        [SerializeField] private bool _createSubparentPerPrefab = false;
 
         public System.Action OnDataChanged;
 
-        public PaintToolSettings()
+        public ToolParentingSettings()
         {
             OnDataChanged += DataChanged;
-            _brushSettings.OnDataChangedAction += DataChanged;
         }
 
         public Transform parent
@@ -639,6 +830,41 @@ namespace PluginMaster
                 OnDataChanged();
             }
         }
+        
+        public virtual void DataChanged() => PWBCore.SetSavePending();
+
+        public void OnBeforeSerialize() { }
+
+        public void OnAfterDeserialize() => _parent = null;
+
+        public virtual void Copy(IToolSettings other)
+        {
+            var otherPaintToolSettings = other as ToolParentingSettings;
+            if (otherPaintToolSettings == null) return;
+           
+            _autoCreateParent = otherPaintToolSettings._autoCreateParent;
+            _setSurfaceAsParent = otherPaintToolSettings._setSurfaceAsParent;
+            _createSubparentPerPalette = otherPaintToolSettings._createSubparentPerPalette;
+            _createSubparentPerTool = otherPaintToolSettings._createSubparentPerTool;
+            _createSubparentPerBrush = otherPaintToolSettings._createSubparentPerBrush;
+            _createSubparentPerPrefab = otherPaintToolSettings._createSubparentPerPrefab;
+        }
+    }
+
+    [System.Serializable]
+    public class PaintToolSettings : ToolParentingSettings, IPaintToolSettings
+    {
+        [SerializeField] private bool _overwritePrefabLayer = false;
+        [SerializeField] private int _layer = 0;
+        [SerializeField] private bool _overwriteBrushProperties = false;
+        [SerializeField] private BrushSettings _brushSettings = new BrushSettings();
+        [SerializeField] private bool _overwriteParentingSettings = false;
+
+        public PaintToolSettings()
+        {
+            _brushSettings.OnDataChangedAction += DataChanged;
+        }
+
         public bool overwritePrefabLayer
         {
             get => _overwritePrefabLayer;
@@ -674,27 +900,31 @@ namespace PluginMaster
 
         public BrushSettings brushSettings => _brushSettings;
 
-        public virtual void DataChanged() => PWBCore.SetSavePending();
+        public bool overwriteParentingSettings
+        {
+            get => _overwriteParentingSettings;
+            set
+            {
+                if(_overwriteParentingSettings == value) return;
+                _overwriteParentingSettings = value;
+                OnDataChanged();
+            }
+        }
 
-        public void OnBeforeSerialize() { }
-
-        public void OnAfterDeserialize() => _parent = null;
-
-        public virtual void Copy(IToolSettings other)
+        public override void Copy(IToolSettings other)
         {
             var otherPaintToolSettings = other as PaintToolSettings;
             if (otherPaintToolSettings == null) return;
-            _parent = otherPaintToolSettings._parent;
-            _parentGlobalId = otherPaintToolSettings._parentGlobalId;
+            base.Copy(otherPaintToolSettings);
             _overwritePrefabLayer = otherPaintToolSettings._overwritePrefabLayer;
             _layer = otherPaintToolSettings._layer;
-            _autoCreateParent = otherPaintToolSettings._autoCreateParent;
-            _createSubparentPerPrefab = otherPaintToolSettings._createSubparentPerPrefab;
             _overwriteBrushProperties = otherPaintToolSettings._overwriteBrushProperties;
             _brushSettings.Copy(otherPaintToolSettings._brushSettings);
+            _overwriteParentingSettings = otherPaintToolSettings._overwriteParentingSettings;
         }
     }
-
+    #endregion
+    #region PAINT ON SURFACE TOOLS
     public interface IPaintOnSurfaceToolSettings
     {
         bool paintOnMeshesWithoutCollider { get; set; }
@@ -717,7 +947,7 @@ namespace PluginMaster
 
     [System.Serializable]
     public class PaintOnSurfaceToolSettings : PaintOnSurfaceToolSettingsBase,
-        ISerializationCallbackReceiver, ICloneableToolSettings
+        ISerializationCallbackReceiver, IToolSettings
     {
         [SerializeField] private bool _paintOnMeshesWithoutCollider = false;
         [SerializeField] private bool _paintOnSelectedOnly = false;
@@ -806,17 +1036,11 @@ namespace PluginMaster
         public virtual void DataChanged() => PWBCore.SetSavePending();
         public void OnBeforeSerialize() { }
         public void OnAfterDeserialize() => _updateMeshColliders = _paintOnMeshesWithoutCollider;
-
-        public virtual void Clone(ICloneableToolSettings clone)
-        {
-            if (clone == null && !(clone is PaintToolSettings)) clone = new PaintOnSurfaceToolSettings();
-            var PaintOnSurfaceToolClone = clone as PaintOnSurfaceToolSettings;
-            PaintOnSurfaceToolClone.Copy(this);
-        }
     }
-
+    #endregion
+    #region SELECTION TOOLS
     [System.Serializable]
-    public class SelectionToolBaseBasic : ICloneableToolSettings
+    public class SelectionToolBaseBasic : IToolSettings
     {
         [SerializeField] private bool _embedInSurface = false;
         [SerializeField] private bool _embedAtPivotHeight = false;
@@ -871,13 +1095,6 @@ namespace PluginMaster
                 DataChanged();
             }
         }
-        public virtual void Clone(ICloneableToolSettings clone)
-        {
-            if (clone == null || !(clone is SelectionToolBaseBasic)) clone = new SelectionToolBaseBasic();
-            var selectionToolClone = clone as SelectionToolBaseBasic;
-            selectionToolClone.Copy(this);
-        }
-
         public virtual void Copy(IToolSettings other)
         {
             var otherSelectionTool = other as SelectionToolBaseBasic;
@@ -905,13 +1122,6 @@ namespace PluginMaster
                 _rotateToTheSurface = value;
                 DataChanged();
             }
-        }
-
-        public override void Clone(ICloneableToolSettings clone)
-        {
-            if (clone == null || !(clone is SelectionToolBase)) clone = new SelectionToolBase();
-            var selectionToolClone = clone as SelectionToolBase;
-            selectionToolClone.Copy(this);
         }
         public override void Copy(IToolSettings other)
         {
@@ -997,9 +1207,9 @@ namespace PluginMaster
     [System.Serializable]
     public class ModifierToolSettings : SelectionBrushToolSettings, IModifierTool
     {
-        
+
         [SerializeField] private bool _allButSelected = false;
-       
+
         public bool modifyAllButSelected
         {
             get => _allButSelected;
@@ -1019,6 +1229,183 @@ namespace PluginMaster
             _allButSelected = otherModifier.modifyAllButSelected;
         }
     }
+    #endregion
+    #region MODULAR TOOLS
+    public class ModularToolBase : IToolSettings, IPaintToolSettings
+    {
+        [SerializeField] private TilesUtils.SizeType _moduleSizeType = TilesUtils.SizeType.BIGGEST_OBJECT;
+        [SerializeField] protected Vector3 _moduleSize = Vector3.one;
+        [SerializeField] protected bool _subtractBrushOffset = false;
+        [SerializeField] private Vector3 _spacing = Vector3.zero;
+        [SerializeField] protected AxesUtils.SignedAxis _upwardAxis = AxesUtils.SignedAxis.UP;
+        [SerializeField] private AxesUtils.SignedAxis _forwardAxis = AxesUtils.SignedAxis.FORWARD;
+        public System.Action OnDataChanged;
+
+        public ModularToolBase() : base()
+        {
+            _paintTool.OnDataChanged += DataChanged;
+            OnDataChanged += DataChanged;
+        }
+        public virtual TilesUtils.SizeType moduleSizeType
+        {
+            get => _moduleSizeType;
+            set
+            {
+                if (_moduleSizeType == value) return;
+                _moduleSizeType = value;
+                UpdateCellSize();
+                OnDataChanged();
+            }
+        }
+        public virtual Vector3 moduleSize
+        {
+            get => _moduleSize;
+            set
+            {
+                if (_moduleSize == value) return;
+                _moduleSize = value;
+                OnDataChanged();
+            }
+        }
+        public bool subtractBrushOffset
+        {
+            get => _subtractBrushOffset;
+            set
+            {
+                if (_subtractBrushOffset == value) return;
+                _subtractBrushOffset = value;
+                UpdateCellSize();
+                OnDataChanged();
+            }
+        }
+        public Vector3 spacing
+        {
+            get => _spacing;
+            set
+            {
+                if (_spacing == value) return;
+                _spacing = value;
+                OnDataChanged();
+            }
+        }
+        public AxesUtils.SignedAxis upwardAxis
+        {
+            get => _upwardAxis;
+            set
+            {
+                if (_upwardAxis == value) return;
+                if (_forwardAxis.axis == value) _forwardAxis = _upwardAxis;
+                _upwardAxis = value;
+                UpdateCellSize();
+                OnDataChanged();
+            }
+        }
+        public AxesUtils.SignedAxis forwardAxis
+        {
+            get => _forwardAxis;
+            set
+            {
+                if (_forwardAxis == value) return;
+                if (_upwardAxis.axis == value) _upwardAxis = _forwardAxis;
+                _forwardAxis = value;
+                UpdateCellSize();
+                OnDataChanged();
+            }
+        }
+        public void SetUpwardAxis(AxesUtils.SignedAxis value) => _upwardAxis = value;
+        public void SetForwardAxis(AxesUtils.SignedAxis value) => _forwardAxis = value;
+        public virtual Vector3 GetCellSize(BrushSettings brush)
+        {
+            if (moduleSizeType == TilesUtils.SizeType.CUSTOM) return _moduleSize;
+            if (brush == null) return Vector3.one;
+            int quarterTurns = 0;
+            if (this is FloorSettings) quarterTurns = FloorManager.quarterTurns;
+            return TilesUtils.GetCellSize(moduleSizeType, brush, upwardAxis, forwardAxis,
+                moduleSize, tangentSpace: false, quarterTurns, FloorManager.settings.subtractBrushOffset);
+        }
+        public virtual void UpdateCellSize()
+        {
+            if (moduleSizeType == TilesUtils.SizeType.CUSTOM && !FloorManager.settings.subtractBrushOffset) return;
+
+            BrushSettings brush = PaletteManager.selectedBrush;
+            if (overwriteBrushProperties) brush = brushSettings;
+            if (brush == null) return;
+            
+            int quarterTurns = 0;
+            if (this is FloorSettings) quarterTurns = FloorManager.quarterTurns;
+            else if (this is WallSettings) quarterTurns = WallManager.halfTurn ? 2 : 0;
+            _moduleSize = TilesUtils.GetCellSize(moduleSizeType, brush, upwardAxis, forwardAxis,
+                moduleSize, tangentSpace: false, quarterTurns, FloorManager.settings.subtractBrushOffset);
+            ToolProperties.RepainWindow();
+            UnityEditor.SceneView.RepaintAll();
+        }
+
+        public void SetCellSize(Vector3 value)
+        {
+            _moduleSize = value;
+            ToolProperties.RepainWindow();
+            UnityEditor.SceneView.RepaintAll();
+        }
+        #region PAINT TOOL
+        [SerializeField] private PaintToolSettings _paintTool = new PaintToolSettings();
+        public Transform parent { get => _paintTool.parent; set => _paintTool.parent = value; }
+        public bool overwritePrefabLayer
+        {
+            get => _paintTool.overwritePrefabLayer;
+            set => _paintTool.overwritePrefabLayer = value;
+        }
+        public int layer { get => _paintTool.layer; set => _paintTool.layer = value; }
+        public bool autoCreateParent { get => _paintTool.autoCreateParent; set => _paintTool.autoCreateParent = value; }
+        public bool setSurfaceAsParent { get => _paintTool.setSurfaceAsParent; set => _paintTool.setSurfaceAsParent = value; }
+        public bool createSubparentPerPalette
+        {
+            get => _paintTool.createSubparentPerPalette;
+            set => _paintTool.createSubparentPerPalette = value;
+        }
+        public bool createSubparentPerTool
+        {
+            get => _paintTool.createSubparentPerTool;
+            set => _paintTool.createSubparentPerTool = value;
+        }
+        public bool createSubparentPerBrush
+        {
+            get => _paintTool.createSubparentPerBrush;
+            set => _paintTool.createSubparentPerBrush = value;
+        }
+        public bool createSubparentPerPrefab
+        {
+            get => _paintTool.createSubparentPerPrefab;
+            set => _paintTool.createSubparentPerPrefab = value;
+        }
+        public bool overwriteBrushProperties
+        {
+            get => _paintTool.overwriteBrushProperties;
+            set => _paintTool.overwriteBrushProperties = value;
+        }
+        public BrushSettings brushSettings => _paintTool.brushSettings;
+        public bool overwriteParentingSettings
+        {
+            get => _paintTool.overwriteParentingSettings;
+            set => _paintTool.overwriteParentingSettings = value;
+        }
+
+        #endregion
+        public void DataChanged()
+        {
+            PWBCore.SetSavePending();
+        }
+        public virtual void Copy(IToolSettings other)
+        {
+            var otherModularToolSettings = other as ModularToolBase;
+            if (otherModularToolSettings == null) return;
+            _paintTool.Copy(otherModularToolSettings._paintTool);
+            _moduleSizeType = otherModularToolSettings._moduleSizeType;
+            _moduleSize = otherModularToolSettings._moduleSize;
+            _spacing = otherModularToolSettings._spacing;
+            _upwardAxis = otherModularToolSettings._upwardAxis;
+        }
+    }
+    #endregion
     #endregion
     #region DATA
     [System.Serializable]
@@ -1119,15 +1506,40 @@ namespace PluginMaster
         }
     }
 
-
+    #region PERSISTENT DATA
     public interface IToolName { string value { get; } }
+
+    public interface IPersistentData
+    {
+        long id { get; }
+        string name { get; set; }
+        void Rename(string newName, bool renameParentObject);
+        public enum Visibility
+        {
+            SHOW_ALL,
+            SHOW_OBJECTS,
+            HIDE_ALL,
+        }
+        Visibility visibility { get; set; }
+        void ToggleVisibility();
+        GameObject[] objects { get; }
+        bool isSelected { get; set; }
+        void ToggleSelection();
+        void ClearSelection();
+        void SelectAll();
+        bool AllPointsAreSelected();
+        Bounds GetBounds(float sizeMultiplier);
+        GameObject GetParent();
+        bool ControlPointIsSelected(int idx);
+        string toolName { get; }
+    }
     [System.Serializable]
-    public class PersistentData<TOOL_NAME, TOOL_SETTINGS, CONTROL_POINT> : ISerializationCallbackReceiver
+    public class PersistentData<TOOL_NAME, TOOL_SETTINGS, CONTROL_POINT> : IPersistentData, ISerializationCallbackReceiver
         where TOOL_NAME : IToolName, new()
-        where TOOL_SETTINGS : ICloneableToolSettings, new()
+        where TOOL_SETTINGS : IToolSettings, new()
         where CONTROL_POINT : ControlPoint, new()
     {
-        #region ID
+        #region ID & NAME
         private static long _nextId = System.DateTime.Now.Ticks;
         [SerializeField] protected long _id = _nextId;
         public static long nextId => _nextId;
@@ -1136,7 +1548,72 @@ namespace PluginMaster
         public static void SetNextId() => _nextId = System.DateTime.Now.Ticks;
         public long id => _id;
         public string hexId => HexId(id);
+
+        [SerializeField] private string _name = string.Empty;
+        public string name
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_name)) _name = hexId;
+                return _name;
+            }
+            set
+            {
+                if (_name == value) return;
+                _name = value;
+                PWBCore.SetSavePending();
+            }
+        }
+
+        public void Rename(string newName, bool renameParentObject)
+        {
+            var oldName = name;
+            if (oldName == newName) return;
+            name = newName;
+            if (!renameParentObject) return;
+            var parent = GetParent().transform;
+            if (parent == null) return;
+            do
+            {
+                if (parent.name == oldName)
+                {
+                    parent.name = newName;
+                    return;
+                }
+                parent = parent.transform.parent;
+            }
+            while (parent != null);
+        }
         #endregion
+        #region VISIBILITY
+        [SerializeField] private IPersistentData.Visibility _visibility = IPersistentData.Visibility.SHOW_ALL;
+        public IPersistentData.Visibility visibility
+        {
+            get => _visibility;
+            set
+            {
+                if (_visibility == value) return;
+                _visibility = value;
+                PWBCore.SetSavePending();
+            }
+        }
+        public void ToggleVisibility()
+        {
+            switch (visibility)
+            {
+                case IPersistentData.Visibility.SHOW_ALL: _visibility = IPersistentData.Visibility.SHOW_OBJECTS; break;
+                case IPersistentData.Visibility.SHOW_OBJECTS: _visibility = IPersistentData.Visibility.HIDE_ALL; break;
+                case IPersistentData.Visibility.HIDE_ALL: _visibility = IPersistentData.Visibility.SHOW_ALL; break;
+            }
+            PWBCore.SetSavePending();
+        }
+        #endregion
+
+        #region SELECTION
+        public bool isSelected { get; set; }
+        public virtual void ToggleSelection() => isSelected = !isSelected;
+        #endregion
+
         #region OBJECT POSES
         [SerializeField]
         private System.Collections.Generic.List<ObjectPose> _poses = new System.Collections.Generic.List<ObjectPose>();
@@ -1273,7 +1750,7 @@ namespace PluginMaster
             }
             if (targetIdx == -1) return false;
             InsertPose(targetIdx, new ObjectPose(obj.transform.position, obj.transform.localRotation,
-                obj.transform.localScale), new ObjectId(obj), false);
+                obj.transform.localScale), new ObjectId(obj), updateObjectArray: true);
             RemovePose(targetIdx + 1);
             return true;
         }
@@ -1396,7 +1873,8 @@ namespace PluginMaster
             return _pointPositions[idx];
         }
         public Vector3 selectedPoint => _pointPositions[_selectedPointIdx];
-        public bool IsSelected(int idx) => _selection.Contains(idx);
+        public bool ControlPointIsSelected(int idx) => _selection.Contains(idx);
+        public CONTROL_POINT[] controlPoints => _controlPoints.ToArray();
         public int selectionCount => _selection.Count;
         public virtual bool SetPoint(int idx, Vector3 value, bool registerUndo, bool selectAll, bool moveSelection = true)
         {
@@ -1443,9 +1921,31 @@ namespace PluginMaster
 
         public void RemoveSelectedPoints()
         {
+            if (_selectedPointIdx == -1)
+            {
+                _selection.Clear();
+                return;
+            }
+            RemovePoints(_selection.ToArray());
+        }
+
+        public void RemovePoint(int idx)
+        {
             ToolProperties.RegisterUndo(COMMAND_NAME);
-            var toRemove = new System.Collections.Generic.List<int>(_selection);
-            if (!toRemove.Contains(_selectedPointIdx)) toRemove.Add(_selectedPointIdx);
+            if (_controlPoints.Count <= 2)
+            {
+                Initialize();
+                return;
+            }
+            _controlPoints.RemoveAt(idx);
+            if (_selectedPointIdx == idx) _selectedPointIdx = -1;
+            RemoveFromSelection(idx);
+            UpdatePoints();
+        }
+        public void RemovePoints(int[] indexes)
+        {
+            ToolProperties.RegisterUndo(COMMAND_NAME);
+            var toRemove = new System.Collections.Generic.List<int>(indexes);
             toRemove.Sort();
             if (toRemove.Count >= _pointPositions.Length - 1)
             {
@@ -1488,7 +1988,11 @@ namespace PluginMaster
         protected CONTROL_POINT[] PointsGetRange(int index, int count) => _controlPoints.GetRange(index, count).ToArray();
         public int selectedPointIdx
         {
-            get => _selectedPointIdx;
+            get
+            {
+                if (_selectedPointIdx >= _pointPositions.Length) ClearSelection();
+                return _selectedPointIdx;
+            }
             set
             {
                 if (_selectedPointIdx == value) return;
@@ -1505,12 +2009,34 @@ namespace PluginMaster
             for (int i = 0; i < pointsCount; ++i) _selection.Add(i);
             if (_selectedPointIdx < 0) _selectedPointIdx = 0;
         }
+
+        public bool AllPointsAreSelected() => _selection.Count == pointsCount;
         public void RemoveFromSelection(int idx)
         {
             if (_selection.Contains(idx)) _selection.Remove(idx);
         }
-        public void ClearSelection() => _selection.Clear();
+        public void ClearSelection()
+        {
+            _selectedPointIdx = -1;
+            _selection.Clear();
+            isSelected = false;
+        }
         public void Reset() => Initialize();
+
+        public Bounds GetBounds(float sizeMultiplier)
+        {
+            var max = BoundsUtils.MIN_VECTOR3;
+            var min = BoundsUtils.MAX_VECTOR3;
+            foreach (var point in _controlPoints)
+            {
+                max = Vector3.Max(max, point);
+                min = Vector3.Min(min, point);
+            }
+            var size = (max - min);
+            var center = size / 2 + min;
+            size *= sizeMultiplier;
+            return new Bounds(center, size);
+        }
         #endregion
         #region SETTINGS
         [SerializeField] protected TOOL_SETTINGS _settings = new TOOL_SETTINGS();
@@ -1530,6 +2056,7 @@ namespace PluginMaster
         }
         #endregion
         #region COMMON
+        public string toolName => (new TOOL_NAME()).value;
         protected virtual void Initialize()
         {
             _selectedPointIdx = -1;
@@ -1546,8 +2073,9 @@ namespace PluginMaster
             PersistentData<TOOL_NAME, TOOL_SETTINGS, CONTROL_POINT> data)
         {
             Copy(data);
+            _name = data.name;
             _settings = new TOOL_SETTINGS();
-            data._settings.Clone(_settings);
+            _settings.Copy(data._settings);
             _id = nextId;
             SetNextId();
             _initialBrushId = initialBrushId;
@@ -1580,8 +2108,7 @@ namespace PluginMaster
             clone._objectIds = _objectIds.ToList();
             clone._objects = _objects.ToList();
             clone._initialBrushId = _initialBrushId;
-            _settings.Clone(clone._settings);
-
+            clone.settings.Copy(_settings);
             clone._selectedPointIdx = -1;
             clone._selection.Clear();
         }
@@ -1605,6 +2132,64 @@ namespace PluginMaster
             _initialBrushId = other._initialBrushId;
         }
 
+        public virtual void Duplicate(PersistentData<TOOL_NAME, TOOL_SETTINGS, CONTROL_POINT> other)
+        {
+            _controlPoints.Clear();
+            foreach (var point in other._controlPoints)
+            {
+                var pointClone = new CONTROL_POINT();
+                pointClone.Copy(point);
+                _controlPoints.Add(pointClone);
+            }
+            _selectedPointIdx = other._selectedPointIdx;
+            _selection = other._selection.ToList();
+            _pointPositions = other._pointPositions == null ? null : other._pointPositions.ToArray();
+
+            _settings = other._settings;
+            _initialBrushId = other._initialBrushId;
+
+            foreach (var obj in other._objects)
+            {
+                GameObject clone = null;
+                var prefabName = obj.name;
+                var prefab = UnityEditor.PrefabUtility.GetCorrespondingObjectFromSource(obj);
+                if (prefab == null)
+                {
+                    clone = GameObject.Instantiate(obj);
+                    prefabName = obj.name;
+                }
+                else
+                {
+                    clone = (GameObject)UnityEditor.PrefabUtility.InstantiatePrefab(prefab);
+                    prefabName = prefab.name;
+                }
+                clone.transform.position = obj.transform.position;
+                clone.transform.rotation = obj.transform.rotation;
+                clone.transform.localScale = obj.transform.lossyScale;
+                clone.name = prefabName;
+
+                Transform surface = obj.transform.parent;
+                while (surface != null)
+                {
+                    var compCount = surface.gameObject.GetComponents<Component>().Length;
+                    if (compCount == 1) surface = surface.parent;
+                    else break;
+                }
+
+                var settings = other.settings as IPaintToolSettings;
+                var parent = PWBIO.GetParent(settings, prefabName,
+                    create: true, surface, hexId);
+
+                var commandName = "Duplicate item";
+                UnityEditor.Undo.RegisterCreatedObjectUndo(obj, commandName);
+                UnityEditor.Undo.SetTransformParent(clone.transform, parent, commandName);
+
+
+                AddPose(new ObjectId(clone), new ObjectPose(clone));
+                PWBIO.AddPaintedObject(clone);
+            }
+        }
+
         private bool _deserializing = false;
         protected bool deserializing { get => _deserializing; set => _deserializing = value; }
         public void OnBeforeSerialize() { }
@@ -1621,7 +2206,7 @@ namespace PluginMaster
     [System.Serializable]
     public class SceneData<TOOL_NAME, TOOL_SETTINGS, CONTROL_POINT, TOOL_DATA>
         where TOOL_NAME : IToolName, new()
-        where TOOL_SETTINGS : ICloneableToolSettings, new()
+        where TOOL_SETTINGS : IToolSettings, new()
         where CONTROL_POINT : ControlPoint, new()
         where TOOL_DATA : PersistentData<TOOL_NAME, TOOL_SETTINGS, CONTROL_POINT>, new()
     {
@@ -1680,5 +2265,6 @@ namespace PluginMaster
             return parents.ToArray();
         }
     }
+    #endregion
     #endregion
 }

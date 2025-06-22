@@ -20,7 +20,7 @@ public class CharacterDialogue : MonoBehaviour
     string GetRandomDialogueNode()
     {
         int index = Random.Range(1, maxVariants + 1);
-        return $"dialogue_{actor.actorName}_{index}";
+        return $"dialogue_{actor.actorName.ToLower()}_{index}";
 
         //return $"dialogue_{actor.actorName}_{location}_{situation}_{index}";
     }

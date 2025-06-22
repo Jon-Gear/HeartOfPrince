@@ -48,13 +48,13 @@ namespace PluginMaster
 
         #region GENERAL SETTINGS
         private bool _dataGroupOpen = true;
-        private bool _autoSaveGroupOpen = true;
+        //private bool _autoSaveGroupOpen = true;
         private bool _unsavedChangesGroupOpen = true;
         private bool _gizmosGroupOpen = true;
         private bool _toolbarGroupOpen = true;
         private bool _pinToolGroupOpen = true;
         private bool _gravityToolGroupOpen = true;
-        private bool _thumbnailsGroupOpen = true;
+        private bool _BrushesGroupOpen = true;
         private bool _tempCollidersGroupOpen = true;
         private bool _palettesGroupOpen = true;
         private bool _editModeGroupOpen = true;
@@ -66,10 +66,11 @@ namespace PluginMaster
             if (_dataGroupOpen) DataGroup();
             UnityEditor.EditorGUILayout.EndFoldoutHeaderGroup();
 
-            _autoSaveGroupOpen
+            /*_autoSaveGroupOpen
                 = UnityEditor.EditorGUILayout.BeginFoldoutHeaderGroup(_autoSaveGroupOpen, "Auto-Save Settings");
             if (_autoSaveGroupOpen) AutoSaveGroup();
             UnityEditor.EditorGUILayout.EndFoldoutHeaderGroup();
+            */
 
             _unsavedChangesGroupOpen = UnityEditor.EditorGUILayout.BeginFoldoutHeaderGroup(_unsavedChangesGroupOpen,
                 "Unsaved Changes");
@@ -101,8 +102,8 @@ namespace PluginMaster
             if (_editModeGroupOpen) EditModeGroup();
             UnityEditor.EditorGUILayout.EndFoldoutHeaderGroup();
 
-            _thumbnailsGroupOpen = UnityEditor.EditorGUILayout.BeginFoldoutHeaderGroup(_thumbnailsGroupOpen, "Thumnails");
-            if (_thumbnailsGroupOpen) ThumbnailsGroup();
+            _BrushesGroupOpen = UnityEditor.EditorGUILayout.BeginFoldoutHeaderGroup(_BrushesGroupOpen, "Brushes");
+            if (_BrushesGroupOpen) BrushesGroup();
             UnityEditor.EditorGUILayout.EndFoldoutHeaderGroup();
 
             _palettesGroupOpen = UnityEditor.EditorGUILayout.BeginFoldoutHeaderGroup(_palettesGroupOpen, "Palettes");
@@ -115,7 +116,7 @@ namespace PluginMaster
             using (new GUILayout.HorizontalScope(UnityEditor.EditorStyles.helpBox))
             {
                 UnityEditor.EditorGUIUtility.labelWidth = 90;
-                UnityEditor.EditorGUILayout.LabelField("Data directory:"
+                UnityEditor.EditorGUILayout.LabelField("Data directory"
                     , PWBSettings.fullDataDir, UnityEditor.EditorStyles.textField);
                 if (GUILayout.Button("...", GUILayout.Width(29), GUILayout.Height(20)))
                 {
@@ -126,17 +127,19 @@ namespace PluginMaster
             }
         }
 
+        /*
         private void AutoSaveGroup()
         {
             using (new GUILayout.HorizontalScope(UnityEditor.EditorStyles.helpBox))
             {
-                GUILayout.Label("Auto-Save Every:");
+                GUILayout.Label("Auto-Save Every");
                 PWBCore.staticData.autoSavePeriodMinutes
                     = UnityEditor.EditorGUILayout.IntSlider(PWBCore.staticData.autoSavePeriodMinutes, 1, 10);
                 GUILayout.Label("minutes");
                 GUILayout.FlexibleSpace();
             }
         }
+        */
 
         private static readonly string[] _unsavedChangesActionNames = { "Ask if want to save", "Save", "Discard" };
         private void UnsavedChangesGroup()
@@ -145,7 +148,7 @@ namespace PluginMaster
             {
                 UnityEditor.EditorGUIUtility.labelWidth = 45;
                 PWBCore.staticData.unsavedChangesAction = (PWBData.UnsavedChangesAction)
-                    UnityEditor.EditorGUILayout.Popup("Action:",
+                    UnityEditor.EditorGUILayout.Popup("Action",
                     (int)PWBCore.staticData.unsavedChangesAction, _unsavedChangesActionNames);
             }
         }
@@ -154,18 +157,26 @@ namespace PluginMaster
         {
             using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
             {
-                UnityEditor.EditorGUIUtility.labelWidth = 110;
-                PWBCore.staticData.controPointSize = UnityEditor.EditorGUILayout.IntSlider("Control point size:",
-                    PWBCore.staticData.controPointSize, 1, 3);
-                using (new GUILayout.HorizontalScope())
+                using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
                 {
-                    GUILayout.Label("Selected control point:", GUILayout.Width(150));
-                    UnityEditor.EditorGUIUtility.labelWidth = 40;
-                    PWBCore.staticData.selectedContolPointColor = UnityEditor.EditorGUILayout.ColorField(
-                    "color:", PWBCore.staticData.selectedContolPointColor);
-                    GUILayout.Space(20);
-                    PWBCore.staticData.selectedControlPointBlink = UnityEditor.EditorGUILayout.ToggleLeft(
-                        "Blink on mouse move", PWBCore.staticData.selectedControlPointBlink);
+                    UnityEditor.EditorGUIUtility.labelWidth = 110;
+                    PWBCore.staticData.controPointSize = UnityEditor.EditorGUILayout.IntSlider("Control point size",
+                        PWBCore.staticData.controPointSize, 1, 3);
+                    using (new GUILayout.HorizontalScope())
+                    {
+                        GUILayout.Label("Selected control point", GUILayout.Width(150));
+                        UnityEditor.EditorGUIUtility.labelWidth = 40;
+                        PWBCore.staticData.selectedContolPointColor = UnityEditor.EditorGUILayout.ColorField(
+                        "Color", PWBCore.staticData.selectedContolPointColor);
+                        GUILayout.Space(20);
+                        PWBCore.staticData.selectedControlPointBlink = UnityEditor.EditorGUILayout.ToggleLeft(
+                            "Blink on mouse move", PWBCore.staticData.selectedControlPointBlink);
+                    }
+                }
+                using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
+                {
+                    PWBCore.staticData.showInfoText
+                    = UnityEditor.EditorGUILayout.ToggleLeft("Show info text", PWBCore.staticData.showInfoText);
                 }
             }
         }
@@ -175,8 +186,11 @@ namespace PluginMaster
             using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
             {
                 PWBCore.staticData.closeAllWindowsWhenClosingTheToolbar
-                        = UnityEditor.EditorGUILayout.ToggleLeft("Close all windows when closing the toolbar",
-                        PWBCore.staticData.closeAllWindowsWhenClosingTheToolbar);
+                    = UnityEditor.EditorGUILayout.ToggleLeft("Close all windows when closing the toolbar",
+                    PWBCore.staticData.closeAllWindowsWhenClosingTheToolbar);
+                PWBCore.staticData.openToolPropertiesWhenAToolIsSelected
+                    = UnityEditor.EditorGUILayout.ToggleLeft("Open tool properties when a tool is selected",
+                    PWBCore.staticData.openToolPropertiesWhenAToolIsSelected);
             }
         }
 
@@ -185,7 +199,7 @@ namespace PluginMaster
             using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
             {
                 UnityEditor.EditorGUIUtility.labelWidth = 155;
-                PinManager.rotationSnapValue = UnityEditor.EditorGUILayout.Slider("Rotation snap value (Deg):",
+                PinManager.rotationSnapValue = UnityEditor.EditorGUILayout.Slider("Rotation snap value (Deg)",
                     PinManager.rotationSnapValue, 0f, 360f);
             }
         }
@@ -196,17 +210,23 @@ namespace PluginMaster
             {
                 UnityEditor.EditorGUIUtility.labelWidth = 182;
                 GravityToolManager.surfaceDistanceSensitivity
-                    = UnityEditor.EditorGUILayout.Slider("Distance to surface sensitivity:",
+                    = UnityEditor.EditorGUILayout.Slider("Distance to surface sensitivity",
                      GravityToolManager.surfaceDistanceSensitivity, 0f, 1f);
             }
         }
-        private void ThumbnailsGroup()
+        private void BrushesGroup()
         {
             using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
             {
                 UnityEditor.EditorGUIUtility.labelWidth = 110;
-                PWBCore.staticData.thumbnailLayer = UnityEditor.EditorGUILayout.IntField("Thumbnail Layer:",
+                PWBCore.staticData.openBrushPropertiesWhenABrushIsSelected
+                    = UnityEditor.EditorGUILayout.ToggleLeft("Open brush properties when a brush is selected",
+                    PWBCore.staticData.openBrushPropertiesWhenABrushIsSelected);
+                PWBCore.staticData.thumbnailLayer = UnityEditor.EditorGUILayout.IntField("Thumbnail Layer",
                     PWBCore.staticData.thumbnailLayer);
+                PWBCore.staticData.createThumbnailsFolder
+                    = UnityEditor.EditorGUILayout.ToggleLeft("Group all thumbnails folders into a single folder",
+                    PWBCore.staticData.createThumbnailsFolder);
             }
         }
         private void PalettesGroup()
@@ -227,7 +247,7 @@ namespace PluginMaster
             {
                 UnityEditor.EditorGUIUtility.labelWidth = 45;
                 PWBCore.staticData.tempCollidersAction = (PWBData.TempCollidersAction)
-                    UnityEditor.EditorGUILayout.Popup("Action:",
+                    UnityEditor.EditorGUILayout.Popup("Action",
                     (int)PWBCore.staticData.tempCollidersAction, _tempCollidersActionNames);
             }
         }
@@ -237,7 +257,7 @@ namespace PluginMaster
             {
                 UnityEditor.EditorGUIUtility.labelWidth = 120;
                 PWBCore.staticData.maxPreviewCountInEditMode
-                    = UnityEditor.EditorGUILayout.IntField(new GUIContent("Max Preview Count:",
+                    = UnityEditor.EditorGUILayout.IntField(new GUIContent("Max Preview Count",
                     "Defines the maximum number of pre-existing objects displayed as preview in Edit Mode." +
                     "This setting can optimize performance, especially for scenes with numerous objects"),
                     PWBCore.staticData.maxPreviewCountInEditMode);
@@ -246,6 +266,8 @@ namespace PluginMaster
         #endregion
 
         #region SHORTCUTS
+        private bool _floorCategory = false;
+        private bool _wallCategory = false;
         private bool _pinCategory = false;
         private bool _brushCategory = false;
         private bool _gravityCategory = false;
@@ -257,7 +279,9 @@ namespace PluginMaster
         private bool _selectionCategory = false;
         private bool _circleSelectCategory = false;
         private bool _gridCategory = false;
+        private bool _snapCategory = false;
         private bool _paletteCategory = false;
+        private bool _gizmosCategory = false;
         private bool _toolbarCategory = true;
 
         private PWBKeyShortcut _selectedShortcut = null;
@@ -353,6 +377,7 @@ namespace PluginMaster
         private void SelectCategory(ref bool category)
         {
             _gridCategory = false;
+            _snapCategory = false;
             _pinCategory = false;
             _brushCategory = false;
             _gravityCategory = false;
@@ -365,6 +390,9 @@ namespace PluginMaster
             _circleSelectCategory = false;
             _paletteCategory = false;
             _toolbarCategory = false;
+            _floorCategory = false;
+            _wallCategory = false;
+            _gizmosCategory = false;
             category = true;
         }
         public static void SelectToolCategory(ToolManager.PaintTool tool)
@@ -426,7 +454,7 @@ namespace PluginMaster
 
             using (new GUILayout.HorizontalScope(UnityEditor.EditorStyles.helpBox))
             {
-                GUILayout.Label("Profile:");
+                GUILayout.Label("Profile");
                 if (GUILayout.Button(PWBSettings.shortcuts.profileName,
                     UnityEditor.EditorStyles.popup, GUILayout.MinWidth(100)))
                 {
@@ -449,6 +477,7 @@ namespace PluginMaster
                 using (new GUILayout.VerticalScope(GUILayout.Width(categoryColumnW)))
                 {
                     if (GUILayout.Toggle(_toolbarCategory, "Toolbar", categoryButton)) SelectCategory(ref _toolbarCategory);
+                    if (GUILayout.Toggle(_gizmosCategory, "Gizmos", categoryButton)) SelectCategory(ref _gizmosCategory);
                     if (GUILayout.Toggle(_pinCategory, "Pin", categoryButton)) SelectCategory(ref _pinCategory);
                     if (GUILayout.Toggle(_brushCategory, "Brush", categoryButton)) SelectCategory(ref _brushCategory);
                     if (GUILayout.Toggle(_gravityCategory, "Gravity", categoryButton)) SelectCategory(ref _gravityCategory);
@@ -457,13 +486,19 @@ namespace PluginMaster
                     if (GUILayout.Toggle(_tilingCategory, "Tiling", categoryButton)) SelectCategory(ref _tilingCategory);
                     if (GUILayout.Toggle(_eraserCategory, "Eraser", categoryButton)) SelectCategory(ref _eraserCategory);
                     if (GUILayout.Toggle(_replacerCategory, "Replacer", categoryButton)) SelectCategory(ref _replacerCategory);
+                    
+                    if (GUILayout.Toggle(_floorCategory, "Floor", categoryButton)) SelectCategory(ref _floorCategory);
+                    if (GUILayout.Toggle(_wallCategory, "Wall", categoryButton)) SelectCategory(ref _wallCategory);
+                    
                     if (GUILayout.Toggle(_selectionCategory, "Selection", categoryButton))
                         SelectCategory(ref _selectionCategory);
                     if (GUILayout.Toggle(_circleSelectCategory, "Circle Select", categoryButton))
                         SelectCategory(ref _circleSelectCategory);
+                    
                     if (GUILayout.Toggle(_gridCategory, "Grid", categoryButton)) SelectCategory(ref _gridCategory);
+                    if (GUILayout.Toggle(_snapCategory, "Snap", categoryButton)) SelectCategory(ref _snapCategory);
                     if (GUILayout.Toggle(_paletteCategory, "Palette", categoryButton)) SelectCategory(ref _paletteCategory);
-
+                    
                     using (new UnityEditor.EditorGUI.DisabledGroupScope(true))
                         GUILayout.Box(new GUIContent(), new GUIStyle(categoryButton) { fixedHeight = 427 });
                 }
@@ -515,6 +550,8 @@ namespace PluginMaster
 
                         var cellRect = _multiColumnHeader.GetCellRect(0, columnRect);
                         cellRect.x += minX;
+
+
                         UnityEditor.EditorGUI.LabelField(cellRect, new GUIContent(shortcut.name));
 
                         ////////////////
@@ -522,9 +559,36 @@ namespace PluginMaster
                         columnRect.y = rowRect.y;
 
                         cellRect = _multiColumnHeader.GetCellRect(1, columnRect);
-                        cellRect.x += minX;
-                        cellRect.width -= 20;
-                        UnityEditor.EditorGUI.LabelField(cellRect, new GUIContent(shortcutString(shortcut)),
+                        var cellW = cellRect.width;
+                        var shortcutText = shortcutString(shortcut);
+                        if (shortcut is PWBTwoStepKeyShortcut)
+                        {
+                            cellRect.x += minX;
+                            cellRect.width = 20;
+                            var twoStepShortcut = shortcut as PWBTwoStepKeyShortcut;
+                            using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                            {
+                                var firstStepEnabled = UnityEditor.EditorGUI.Toggle(cellRect,
+                                twoStepShortcut.firstStepEnabled);
+                                if (check.changed)
+                                {
+                                    twoStepShortcut.firstStepEnabled = firstStepEnabled;
+                                    PWBSettings.UpdateShrotcutsConflictsAndSaveFile();
+                                }
+                            }
+                            cellRect.x += 20;
+                            cellRect.width = cellW - 40;
+                            if (twoStepShortcut.firstStepEnabled)
+                                shortcutText = PWBSettings.shortcuts.gridEnableShortcuts.combination.ToString() + ", "
+                                    + shortcutText;
+                        }
+                        else
+                        {
+                            cellRect.x += minX;
+                            cellRect.width = cellW - 20;
+                        }
+
+                        UnityEditor.EditorGUI.LabelField(cellRect, new GUIContent(shortcutText),
                             shortcutStyle(shortcut));
 
                         if (cellRect.Contains(Event.current.mousePosition)
@@ -547,9 +611,51 @@ namespace PluginMaster
                         }
 
                         if (!shortcut.conflicted) return;
-                        cellRect.x += cellRect.width;
+                        cellRect.x += cellW - 20;
+                        if (shortcut is PWBTwoStepKeyShortcut) cellRect.x -= 20;
                         cellRect.width = 20;
-                        UnityEditor.EditorGUI.LabelField(cellRect, new GUIContent(warningTexture));
+
+                        string conflictGroup = string.Empty;
+                        PWBKeyShortcut conflictedShortcut;
+                        if (PWBSettings.GetShortcutConflict(shortcut, out conflictedShortcut))
+                        {
+                            if ((conflictedShortcut.group & PWBShortcut.Group.GRID) != 0)
+                                conflictGroup = "Grid - ";
+                            else if ((conflictedShortcut.group & PWBShortcut.Group.PIN) != 0)
+                                conflictGroup = "Pin - ";
+                            else if ((conflictedShortcut.group & PWBShortcut.Group.BRUSH) != 0)
+                                conflictGroup = "Brush - ";
+                            else if ((conflictedShortcut.group & PWBShortcut.Group.GRAVITY) != 0)
+                                conflictGroup = "Gravity - ";
+                            else if ((conflictedShortcut.group & PWBShortcut.Group.LINE) != 0)
+                                conflictGroup = "Line - ";
+                            else if ((conflictedShortcut.group & PWBShortcut.Group.SHAPE) != 0)
+                                conflictGroup = "Shape - ";
+                            else if ((conflictedShortcut.group & PWBShortcut.Group.TILING) != 0)
+                                conflictGroup = "Tiling - ";
+                            else if ((conflictedShortcut.group & PWBShortcut.Group.ERASER) != 0)
+                                conflictGroup = "Eraser - ";
+                            else if ((conflictedShortcut.group & PWBShortcut.Group.REPLACER) != 0)
+                                conflictGroup = "Replacer - ";
+                            else if ((conflictedShortcut.group & PWBShortcut.Group.SELECTION) != 0)
+                                conflictGroup = "Selection - ";
+                            else if ((conflictedShortcut.group & PWBShortcut.Group.PALETTE) != 0)
+                                conflictGroup = "Palette - ";
+                            else if ((conflictedShortcut.group & PWBShortcut.Group.CIRCLE_SELECT) != 0)
+                                conflictGroup = "Circle Select - ";
+                            else if ((conflictedShortcut.group & PWBShortcut.Group.EXTRUDE) != 0)
+                                conflictGroup = "Extrude - ";
+                            else if ((conflictedShortcut.group & PWBShortcut.Group.MIRROR) != 0)
+                                conflictGroup = "Mirror - ";
+                            else if ((conflictedShortcut.group & PWBShortcut.Group.FLOOR) != 0)
+                                conflictGroup = "Floor - ";
+                            else if ((conflictedShortcut.group & PWBShortcut.Group.WALL) != 0)
+                                conflictGroup = "Wall - ";
+                        }
+                        var conflictText = $"Conflict with {conflictGroup}{conflictedShortcut.name}";
+                        UnityEditor.EditorGUI.LabelField(cellRect, new GUIContent(warningTexture, conflictText));
+                        if (cellRect.Contains(Event.current.mousePosition) && Event.current.type == EventType.MouseDown)
+                            UnityEditor.EditorUtility.DisplayDialog("Shortcut Conflict", conflictText, "OK");
                     }
 
                     void MouseShortcutRow(PWBMouseShortcut shortcut, bool scrollWheelOnly = false)
@@ -649,15 +755,17 @@ namespace PluginMaster
                         ShortcutRow(PWBSettings.shortcuts.editModeDeleteItemAndItsChildren);
                         ShortcutRow(PWBSettings.shortcuts.editModeDeleteItemButNotItsChildren);
                         ShortcutRow(PWBSettings.shortcuts.editModeSelectParent);
+                        ShortcutRow(PWBSettings.shortcuts.editModeDuplicate);
                     }
                     void SelectionRows()
                     {
-                        ShortcutRow(PWBSettings.shortcuts.selectionRotate90XCW);
-                        ShortcutRow(PWBSettings.shortcuts.selectionRotate90XCCW);
                         ShortcutRow(PWBSettings.shortcuts.selectionRotate90YCW);
                         ShortcutRow(PWBSettings.shortcuts.selectionRotate90YCCW);
+                        ShortcutRow(PWBSettings.shortcuts.selectionRotate90XCW);
+                        ShortcutRow(PWBSettings.shortcuts.selectionRotate90XCCW);
                         ShortcutRow(PWBSettings.shortcuts.selectionRotate90ZCW);
                         ShortcutRow(PWBSettings.shortcuts.selectionRotate90ZCCW);
+                        ShortcutRow(PWBSettings.shortcuts.selectionToggleSpace);
                     }
                     if (_toolbarCategory)
                     {
@@ -672,6 +780,12 @@ namespace PluginMaster
                         ShortcutRow(PWBSettings.shortcuts.toolbarSelectionToggle);
                         ShortcutRow(PWBSettings.shortcuts.toolbarExtrudeToggle);
                         ShortcutRow(PWBSettings.shortcuts.toolbarMirrorToggle);
+                        ShortcutRow(PWBSettings.shortcuts.toolbarFloorToggle);
+                        ShortcutRow(PWBSettings.shortcuts.toolbarWallToggle);
+                    }
+                    else if (_gizmosCategory)
+                    {
+                        ShortcutRow(PWBSettings.shortcuts.gizmosToggleInfotext);
                     }
                     else if (_pinCategory)
                     {
@@ -786,6 +900,14 @@ namespace PluginMaster
                         ShortcutRow(PWBSettings.shortcuts.selectionEditCustomHandle);
                         SelectionRows();
                     }
+                    else if (_floorCategory)
+                    {
+                        ShortcutRow(PWBSettings.shortcuts.floorRotate90YCW);
+                    }
+                    else if (_wallCategory)
+                    {
+                        ShortcutRow(PWBSettings.shortcuts.wallHalfTurn);
+                    }
                     else if (_circleSelectCategory)
                     {
                         MouseShortcutRow(PWBSettings.shortcuts.brushRadius);
@@ -805,6 +927,11 @@ namespace PluginMaster
                         ShortcutRow(PWBSettings.shortcuts.gridToggleSpacingHandle);
                         ShortcutRow(PWBSettings.shortcuts.gridMoveOriginUp);
                         ShortcutRow(PWBSettings.shortcuts.gridMoveOriginDown);
+                        ShortcutRow(PWBSettings.shortcuts.gridNextOrigin);
+                    }
+                    else if (_snapCategory)
+                    {
+                        ShortcutRow(PWBSettings.shortcuts.snapToggleBoundsSnapping);
                     }
                     else if (_paletteCategory)
                     {
@@ -814,6 +941,7 @@ namespace PluginMaster
                         ShortcutRow(PWBSettings.shortcuts.palettePreviousPalette);
                         ShortcutRow(PWBSettings.shortcuts.paletteNextPalette);
                         ShortcutRow(PWBSettings.shortcuts.palettePickBrush);
+                        ShortcutRow(PWBSettings.shortcuts.paletteReplaceSceneSelection);
                         MouseShortcutRow(PWBSettings.shortcuts.paletteNextBrushScroll, true);
                         MouseShortcutRow(PWBSettings.shortcuts.paletteNextPaletteScroll, true);
                     }
@@ -825,7 +953,8 @@ namespace PluginMaster
                         + PWBSettings.shortcuts.gridEnableShortcuts.combination
                         + ".\nFor example to toggle the grid you have to press "
                         + PWBSettings.shortcuts.gridEnableShortcuts.combination + " and then "
-                        + PWBSettings.shortcuts.gridToggle.combination + ".",
+                        + PWBSettings.shortcuts.gridToggle.combination + "."
+                        + "\nUnchecking disables the first step.",
                        UnityEditor.MessageType.Info);
                     }
                 }
@@ -851,7 +980,7 @@ namespace PluginMaster
             }
             if (Event.current.keyCode < KeyCode.Space || Event.current.keyCode > KeyCode.F15) return;
             var combi = new PWBKeyCombination(Event.current.keyCode, Event.current.modifiers);
-
+            Event.current.Use();
             void SetCombination()
             {
                 _selectedShortcut.combination.Set(Event.current.keyCode, Event.current.modifiers);

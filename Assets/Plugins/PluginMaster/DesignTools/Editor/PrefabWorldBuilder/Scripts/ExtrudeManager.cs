@@ -18,7 +18,7 @@ namespace PluginMaster
 {
     #region DATA & SETTINGS
     [System.Serializable]
-    public class ExtrudeSettings : SelectionToolBaseBasic, IToolSettings, IPaintToolSettings
+    public class ExtrudeSettings : SelectionToolBaseBasic, IToolSettings, IPaintToolSettings, IToolParentingSettings
     {
         [SerializeField] private Space _space = Space.World;
         [SerializeField] private Vector3 _spacing = Vector3.zero;
@@ -210,6 +210,11 @@ namespace PluginMaster
         public bool overwriteBrushProperties
         { get => _paintTool.overwriteBrushProperties; set => _paintTool.overwriteBrushProperties = value; }
         public BrushSettings brushSettings => _paintTool.brushSettings;
+        public bool overwriteParentingSettings
+        {
+            get => _paintTool.overwriteParentingSettings;
+            set => _paintTool.overwriteParentingSettings = value;
+        }
         #endregion
     }
 

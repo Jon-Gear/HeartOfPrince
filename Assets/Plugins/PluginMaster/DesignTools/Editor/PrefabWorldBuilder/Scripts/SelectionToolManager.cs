@@ -349,8 +349,7 @@ namespace PluginMaster
                 RotateSelection90Deg(Vector3.back, points);
             else if (PWBSettings.shortcuts.selectionRotate90ZCW.Check())
                 RotateSelection90Deg(Vector3.forward, points);
-            else if (Event.current.keyCode == KeyCode.X && Event.current.type == EventType.KeyDown
-                && Event.current.control && Event.current.shift)
+            else if (PWBSettings.shortcuts.selectionToggleSpace.Check())
             {
                 SelectionToolManager.settings.handleSpace = SelectionToolManager.settings.handleSpace == Space.Self
                     ? Space.World : Space.Self;
@@ -469,8 +468,10 @@ namespace PluginMaster
             var prevPosition = points[_selectedBoxPointIdx];
             SetSetectedPoint(UnityEditor.Handles.PositionHandle(points[_selectedBoxPointIdx], rotation));
             if (prevPosition == points[_selectedBoxPointIdx]) return;
-            SetSetectedPoint(SnapAndUpdateGridOrigin(points[_selectedBoxPointIdx],
-                SnapManager.settings.snappingEnabled, true, true, true, Vector3.down));
+            var snappedPoint = SnapToBounds(points[_selectedBoxPointIdx]);
+            snappedPoint = SnapAndUpdateGridOrigin(snappedPoint,
+                SnapManager.settings.snappingEnabled, true, true, true, Vector3.down);
+            SetSetectedPoint(snappedPoint);
             if (_snappedPointIsSelected) _snappedPoint = points[_selectedBoxPointIdx];
 
             if (prevPosition == points[_selectedBoxPointIdx]) return;
@@ -481,9 +482,13 @@ namespace PluginMaster
                     out RaycastHit closestVertexInfo, sceneView.in2DMode, null))
                     SetSetectedPoint(closestVertexInfo.point);
             }
-            else points[_selectedBoxPointIdx] = SnapAndUpdateGridOrigin(points[_selectedBoxPointIdx],
+            else
+            {
+                points[_selectedBoxPointIdx] = SnapToBounds(points[_selectedBoxPointIdx]);
+                points[_selectedBoxPointIdx] = SnapAndUpdateGridOrigin(points[_selectedBoxPointIdx],
                     SnapManager.settings.snappingEnabled, true, true,
                     !SelectionToolManager.settings.embedInSurface, Vector3.down);
+            }
 
             if (prevPosition == points[_selectedBoxPointIdx]) return;
             var delta = points[_selectedBoxPointIdx] - prevPosition;

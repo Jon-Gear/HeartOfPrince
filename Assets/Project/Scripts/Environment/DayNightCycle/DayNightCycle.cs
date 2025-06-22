@@ -6,6 +6,7 @@ using UnityEngine;
 [ExecuteAlways] public class DayNightCycle : Singleton<DayNightCycle>
 {   
     [Header("Sun Light")]
+    [SerializeField] private bool enableSun = true;
     [SerializeField] private Light sun;
     [SerializeField] private float sunBaseIntensity = 1f;
     [SerializeField] private float sunIntensityVariation = 1.5f;
@@ -23,7 +24,10 @@ using UnityEngine;
 
     private void Start()
     {
-
+        if(!enableSun)
+        {
+            sun.enabled = false;
+        }
     }
 
     // Update is called once per frame

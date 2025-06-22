@@ -239,11 +239,12 @@ namespace PluginMaster
             bool result = false;
             var noColliderDistance = float.MaxValue;
             if (MouseRaycast(ray, out RaycastHit hitInfo, out GameObject collider, maxDistance,
-                layerMask, settings.paintOnPalettePrefabs, settings.paintOnMeshesWithoutCollider, settings.tagFilter.ToArray(), terrainLayers))
+                layerMask, settings.paintOnPalettePrefabs, settings.paintOnMeshesWithoutCollider,
+                settings.tagFilter.ToArray(), terrainLayers))
             {
                 var nearestRoot = UnityEditor.PrefabUtility.GetNearestPrefabInstanceRoot(collider);
                 bool isAPaintedObject = false;
-                
+
                 while (nearestRoot != null)
                 {
                     isAPaintedObject = isAPaintedObject || _paintedObjects.Contains(nearestRoot);
@@ -251,18 +252,18 @@ namespace PluginMaster
                         : nearestRoot.transform.parent.gameObject;
                     nearestRoot = parent == null ? null : UnityEditor.PrefabUtility.GetNearestPrefabInstanceRoot(parent);
                 }
-                
+
                 bool selectedOnlyFilter = !settings.paintOnSelectedOnly
                     || SelectionManager.selection.Contains(collider)
                     || PWBCore.CollidersContains(SelectionManager.selection, collider.name);
-                
+
                 bool paletteFilter = !isAPaintedObject || settings.paintOnPalettePrefabs;
                 var filterResult = selectedOnlyFilter && paletteFilter;
 
                 result = filterResult;
                 if (filterResult && (hitInfo.distance < noColliderDistance))
                     hit = hitInfo;
-                
+
             }
             return result;
         }
@@ -290,14 +291,14 @@ namespace PluginMaster
                     hit.point = new Vector3(mouseRay.origin.x, mouseRay.origin.y, 0f);
                     hit.normal = Vector3.back;
                 }
-                DrawBrush(sceneView, hit, BrushManager.settings.showPreview);
+                DrawBrush(sceneView, ref hit, BrushManager.settings.showPreview);
             }
             else _paintStroke.Clear();
 
             if (Event.current.button == 0 && !Event.current.alt
                 && (Event.current.type == EventType.MouseDown || Event.current.type == EventType.MouseDrag))
             {
-                if (!BrushManager.settings.showPreview) DrawBrush(sceneView, hit, true);
+                if (!BrushManager.settings.showPreview) DrawBrush(sceneView, ref hit, true);
                 Paint(BrushManager.settings);
                 Event.current.Use();
             }
@@ -312,15 +313,15 @@ namespace PluginMaster
             return tangent;
         }
 
-        private static void DrawBrush(UnityEditor.SceneView sceneView, RaycastHit hit, bool preview)
+        private static void DrawBrush(UnityEditor.SceneView sceneView, ref RaycastHit hit, bool preview)
         {
             var settings = BrushManager.settings;
             UpdateStrokeDirection(hit.point);
             if (PaletteManager.selectedBrush == null) return;
             PWBCore.UpdateTempCollidersIfHierarchyChanged();
+            hit.point = SnapToBounds(hit.point);
             hit.point = SnapAndUpdateGridOrigin(hit.point, SnapManager.settings.snappingEnabled,
                 settings.paintOnPalettePrefabs, settings.paintOnMeshesWithoutCollider, false, Vector3.down);
-
             var tangent = GetTangent(hit.normal);
             var bitangent = Vector3.Cross(hit.normal, tangent);
 
@@ -357,7 +358,18 @@ namespace PluginMaster
             var camera = sceneView.camera;
             var settings = BrushManager.settings;
             _paintStroke.Clear();
+
+            BrushToolSettings.AvoidOverlappingType avoidMode = settings.avoidOverlapping;
+            float densitySpacing = 0f;
+            if (avoidMode != BrushToolSettings.AvoidOverlappingType.DISABLED)
+            {
+                float minSpacing = settings.minSpacing;
+                float densityFactor = settings.density * 0.01f;
+                densitySpacing = Mathf.Sqrt((minSpacing * minSpacing) / densityFactor) * 0.99999f;
+            }
+
             var nearbyObjectsAtDensitySpacing = new System.Collections.Generic.List<GameObject>();
+
             foreach (var strokeItem in BrushstrokeManager.brushstroke)
             {
                 var worldPos = hitPoint + TangentSpaceToWorld(tangent, bitangent,
@@ -366,7 +378,7 @@ namespace PluginMaster
                     ? settings.maxHeightFromCenter : settings.radius;
                 var ray = new Ray(worldPos + normal * height, -normal);
                 var in2DMode = strokeItem.settings.isAsset2D && sceneView.in2DMode;
-               
+
                 if (BrushRaycast(ray, out RaycastHit itemHit, height * 2f, settings.layerFilter,
                     settings, settings.terrainLayerFilter) || in2DMode)
                 {
@@ -398,34 +410,28 @@ namespace PluginMaster
                     }
                     else itemPosition += normal * brushSettings.surfaceDistance;
 
-                    if (settings.avoidOverlapping != BrushToolSettings.AvoidOverlappingType.DISABLED
-                        && settings.avoidOverlapping != BrushToolSettings.AvoidOverlappingType.WITH_ALL_OBJECTS)
+                    if (avoidMode != BrushToolSettings.AvoidOverlappingType.DISABLED)
                     {
-                        var rSqr = settings.minSpacing * settings.minSpacing;
-                        var d = settings.density / 100f;
-                        var densitySpacing = Mathf.Sqrt(rSqr / d) * 0.99999f;
                         octree.GetNearbyNonAlloc(itemPosition, densitySpacing, nearbyObjectsAtDensitySpacing);
                         if (nearbyObjectsAtDensitySpacing.Count > 0)
                         {
+                            if (avoidMode == BrushToolSettings.AvoidOverlappingType.WITH_ALL_OBJECTS) continue;
                             var brushObjectsNearby = false;
                             foreach (var obj in nearbyObjectsAtDensitySpacing)
                             {
-                                if (settings.avoidOverlapping
-                                    == BrushToolSettings.AvoidOverlappingType.WITH_BRUSH_PREFABS
+                                if (avoidMode == BrushToolSettings.AvoidOverlappingType.WITH_BRUSH_PREFABS
                                     && PaletteManager.selectedBrush.ContainsSceneObject(obj))
                                 {
                                     brushObjectsNearby = true;
                                     break;
                                 }
-                                else if (settings.avoidOverlapping
-                                    == BrushToolSettings.AvoidOverlappingType.WITH_PALETTE_PREFABS
+                                else if (avoidMode == BrushToolSettings.AvoidOverlappingType.WITH_PALETTE_PREFABS
                                     && PaletteManager.selectedPalette.ContainsSceneObject(obj))
                                 {
                                     brushObjectsNearby = true;
                                     break;
                                 }
-                                else if (settings.avoidOverlapping
-                                        == BrushToolSettings.AvoidOverlappingType.WITH_SAME_PREFABS)
+                                else if (avoidMode == BrushToolSettings.AvoidOverlappingType.WITH_SAME_PREFABS)
                                 {
                                     var outermostPrefab = UnityEditor.PrefabUtility.GetOutermostPrefabInstanceRoot(obj);
                                     if (outermostPrefab == null) continue;
@@ -510,6 +516,6 @@ namespace PluginMaster
                 }
             }
         }
+        #endregion
     }
-    #endregion
 }

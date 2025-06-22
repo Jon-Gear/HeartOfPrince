@@ -19,7 +19,8 @@ namespace PluginMaster
 {
     #region DATA & SETTINGS
     [System.Serializable]
-    public class ReplacerSettings : CircleToolBase, ISelectionBrushTool, IModifierTool, IPaintToolSettings
+    public class ReplacerSettings : CircleToolBase, ISelectionBrushTool, IModifierTool,
+        IPaintToolSettings, IToolParentingSettings
     {
         [SerializeField] private bool _keepTargetSize = false;
         [SerializeField] private bool _maintainProportions = false;
@@ -129,6 +130,11 @@ namespace PluginMaster
             set => _paintTool.overwriteBrushProperties = value;
         }
         public BrushSettings brushSettings => _paintTool.brushSettings;
+        public bool overwriteParentingSettings
+        {
+            get => _paintTool.overwriteParentingSettings;
+            set => _paintTool.overwriteParentingSettings = value;
+        }
 
         #endregion
 
@@ -148,6 +154,7 @@ namespace PluginMaster
         public override void DataChanged()
         {
             base.DataChanged();
+            BrushstrokeManager.ClearReplacerDictionary();
             BrushstrokeManager.UpdateBrushstroke();
         }
     }
@@ -159,8 +166,17 @@ namespace PluginMaster
     #region PWBIO
     public static partial class PWBIO
     {
-        private static System.Collections.Generic.List<GameObject> _toReplace
-            = new System.Collections.Generic.List<GameObject>();
+        private class ReplacerPaintStrokeItem : PaintStrokeItem
+        {
+            public Transform target = null;
+
+            public ReplacerPaintStrokeItem(Transform target, GameObject prefab, Vector3 position, Quaternion rotation,
+                Vector3 scale, int layer, Transform parent, Transform surface, bool flipX, bool flipY,
+                int index = -1) : base(prefab, position, rotation, scale, layer, parent, surface, flipX, flipY, index)
+            {
+                this.target = target;
+            }
+        }
         private static System.Collections.Generic.List<Renderer> _replaceRenderers
             = new System.Collections.Generic.List<Renderer>();
         private static bool _replaceAllSelected = false;
@@ -190,13 +206,11 @@ namespace PluginMaster
             if (PaletteManager.selectedBrushIdx < 0) return;
             if (_replaceAllSelected)
             {
-                BrushstrokeManager.UpdateBrushstroke();
+                var targets = SelectionManager.topLevelSelection;
+                BrushstrokeManager.UpdateReplacerBrushstroke(clearDictionary: true, targets);
                 _paintStroke.Clear();
-                _toReplace.Clear();
                 _replaceAllSelected = false;
-                _toReplace.AddRange(SelectionManager.topLevelSelection);
-                foreach (var selected in _toReplace)
-                    ReplacePreview(sceneView.camera, selected.transform);
+                ReplacePreview(sceneView.camera, ReplacerManager.settings, targets);
                 Replace();
                 return;
             }
@@ -215,7 +229,7 @@ namespace PluginMaster
                 PWBCore.UpdateTempCollidersIfHierarchyChanged();
             }
             DrawCircleTool(center, sceneView.camera, new Color(0f, 0f, 0, 1f), ReplacerManager.settings.radius);
-            GetReplacerTargetsAndDrawPreview(center, mouseRay, sceneView.camera);
+            DrawPreview(center, mouseRay, sceneView.camera);
         }
         public static void ResetReplacer()
         {
@@ -224,100 +238,54 @@ namespace PluginMaster
                 if (renderer == null) continue;
                 renderer.enabled = true;
             }
-            _toReplace.Clear();
             _replaceRenderers.Clear();
             _paintStroke.Clear();
+            BrushstrokeManager.ClearReplacerDictionary();
         }
 
         private static Transform _replaceSurface = null;
 
-
-        private static void ReplacePreview(Camera camera, Transform target)
+        private static void ReplacePreview(Camera camera, ReplacerSettings settings, GameObject[] targets)
         {
-            if (BrushstrokeManager.brushstroke.Length == 0) return;
-            var strokeItem = BrushstrokeManager.brushstroke[0];
-            var prefab = strokeItem.settings.prefab;
-            if (prefab == null) return;
-            var itemRotation = target.rotation;
-            var targetBounds = BoundsUtils.GetBoundsRecursive(target, target.rotation);
-            var strokeRotation = Quaternion.Euler(strokeItem.additionalAngle);
-            var scaleMult = strokeItem.scaleMultiplier;
-            var settings = ReplacerManager.settings;
-            if (settings.overwriteBrushProperties)
+            BrushstrokeManager.UpdateReplacerBrushstroke(false, targets);
+            var brushstroke = BrushstrokeManager.brushstroke;
+            foreach (var strokeItem in brushstroke)
             {
-                var brushSettings = settings.brushSettings;
-                var additonalAngle = brushSettings.addRandomRotation
-                    ? brushSettings.randomEulerOffset.randomVector : brushSettings.eulerOffset;
-                strokeRotation *= Quaternion.Euler(additonalAngle);
-                scaleMult = brushSettings.randomScaleMultiplier
-                    ? brushSettings.randomScaleMultiplierRange.randomVector : brushSettings.scaleMultiplier;
+                var target =  BrushstrokeManager.GetReplacerTargetFromStrokeItem(strokeItem);
+                if (target == null) continue;
+                var prefab = strokeItem.settings.prefab;
+                var itemPosition = strokeItem.tangentPosition;
+                var itemRotation = Quaternion.Euler(strokeItem.additionalAngle);
+                var scaleMult = strokeItem.scaleMultiplier;
+                var itemScale = Vector3.Scale(prefab.transform.localScale, scaleMult);
+                
+                var layer = settings.overwritePrefabLayer ? settings.layer : target.gameObject.layer;
+                Transform parentTransform = target.parent;
+
+                if (!settings.sameParentAsTarget)
+                    parentTransform = GetParent(settings, prefab.name, create: false, _replaceSurface);
+
+                _paintStroke.Add(new ReplacerPaintStrokeItem(target, prefab, itemPosition,
+                    itemRotation * prefab.transform.rotation,
+                    itemScale, layer, parentTransform, null, false, false));
+                var rootToWorld = Matrix4x4.TRS(itemPosition, itemRotation, scaleMult)
+                    * Matrix4x4.Translate(-prefab.transform.position);
+                PreviewBrushItem(prefab, rootToWorld, layer, camera, false, false, strokeItem.flipX, strokeItem.flipY);
             }
-            var inverseStrokeRotation = Quaternion.Inverse(strokeRotation);
-            itemRotation *= strokeRotation;
-            var itemBounds = BoundsUtils.GetBoundsRecursive(prefab.transform, prefab.transform.rotation * strokeRotation);
-
-            if (settings.keepTargetSize)
-            {
-                var targetSize = targetBounds.size;
-                var itemSize = itemBounds.size;
-
-                if (settings.maintainProportions)
-                {
-                    var targetMagnitude = Mathf.Max(targetSize.x, targetSize.y, targetSize.z);
-                    var itemMagnitude = Mathf.Max(itemSize.x, itemSize.y, itemSize.z);
-                    scaleMult = inverseStrokeRotation * (Vector3.one * (targetMagnitude / itemMagnitude));
-                }
-                else scaleMult = inverseStrokeRotation
-                        * new Vector3(targetSize.x / itemSize.x, targetSize.y / itemSize.y, targetSize.z / itemSize.z);
-                scaleMult = new Vector3(Mathf.Abs(scaleMult.x), Mathf.Abs(scaleMult.y), Mathf.Abs(scaleMult.z));
-            }
-            var itemScale = Vector3.Scale(prefab.transform.localScale, scaleMult);
-            var itemPosition = targetBounds.center;
-            _replaceSurface = null;
-            if (settings.positionMode == ReplacerSettings.PositionMode.ON_SURFACE)
-            {
-                var TRS = Matrix4x4.TRS(itemPosition, itemRotation, itemScale);
-                var bottomDistanceToSurfce = GetBottomDistanceToSurface(strokeItem.settings.bottomVertices,
-                    TRS, Mathf.Abs(strokeItem.settings.bottomMagnitude), paintOnPalettePrefabs: true,
-                    castOnMeshesWithoutCollider: true, out _replaceSurface,
-                    new System.Collections.Generic.HashSet<GameObject> { target.gameObject });
-                itemPosition += itemRotation * new Vector3(0f, -bottomDistanceToSurfce, 0f);
-            }
-            else
-            {
-                if (settings.positionMode == ReplacerSettings.PositionMode.PIVOT)
-                    itemPosition = target.position;
-                itemPosition -= itemRotation * Vector3.Scale(itemBounds.center - prefab.transform.position, scaleMult);
-            }
-
-            var layer = settings.overwritePrefabLayer ? settings.layer : target.gameObject.layer;
-            Transform parentTransform = target.parent;
-
-            if (!settings.sameParentAsTarget)
-                parentTransform = GetParent(settings, prefab.name, create: false, _replaceSurface);
-
-            _paintStroke.Add(new PaintStrokeItem(prefab, itemPosition,
-                itemRotation * prefab.transform.rotation,
-                itemScale, layer, parentTransform, null, false, false));
-            var rootToWorld = Matrix4x4.TRS(itemPosition, itemRotation, scaleMult)
-                * Matrix4x4.Translate(-prefab.transform.position);
-            PreviewBrushItem(prefab, rootToWorld, layer, camera, false, false, strokeItem.flipX, strokeItem.flipY);
         }
 
-        private static void Replace()
+        private static GameObject[] Replace()
         {
-            if (_toReplace.Count == 0) return;
-            if (_paintStroke.Count != _toReplace.Count) return;
             const string COMMAND_NAME = "Replace";
             foreach (var renderer in _replaceRenderers) renderer.enabled = true;
             _replaceRenderers.Clear();
             var settings = ReplacerManager.settings;
-            for (int i = 0; i < _toReplace.Count; ++i)
+            var newObjects = new System.Collections.Generic.HashSet<GameObject>();
+            foreach (ReplacerPaintStrokeItem item in _paintStroke)
             {
-                var target = _toReplace[i];
-                if (target == null) continue;
-                var item = _paintStroke[i];
                 if (item.prefab == null) continue;
+                var target = item.target.gameObject;
+                if (target == null) continue;
                 if (settings.outermostPrefabFilter)
                 {
                     var nearestRoot = UnityEditor.PrefabUtility.GetNearestPrefabInstanceRoot(target);
@@ -350,12 +318,11 @@ namespace PluginMaster
                 var root = UnityEditor.PrefabUtility.GetOutermostPrefabInstanceRoot(obj);
                 PWBCore.AddTempCollider(obj);
                 AddPaintedObject(obj);
-
+                newObjects.Add(obj);
                 if (!LineManager.instance.ReplaceObject(target, obj))
                     if (!ShapeManager.instance.ReplaceObject(target, obj))
                         TilingManager.instance.ReplaceObject(target, obj);
 
-                BrushstrokeManager.UpdateBrushstroke();
                 var tempColliders = PWBCore.GetTempColliders(target);
                 if (tempColliders != null)
                     foreach (var tempCollider in tempColliders) UnityEditor.Undo.DestroyObjectImmediate(tempCollider);
@@ -374,25 +341,19 @@ namespace PluginMaster
                 }
             }
             _paintStroke.Clear();
-            _toReplace.Clear();
+            BrushstrokeManager.ClearReplacerDictionary();
+            return newObjects.ToArray();
         }
 
         public static void ReplaceAllSelected() => _replaceAllSelected = true;
 
-        private static void GetReplacerTargetsAndDrawPreview(Vector3 center, Ray mouseRay, Camera camera)
+        private static GameObject[] GetReplacerTargets(Vector3 center, Ray mouseRay, Camera camera)
         {
-            var targetsSet = new System.Collections.Generic.HashSet<GameObject>(); 
+            var targetsSet = new System.Collections.Generic.HashSet<GameObject>();
             GetCircleToolTargets(mouseRay, camera, ReplacerManager.settings, ReplacerManager.settings.radius, targetsSet);
             var toReplace = targetsSet.ToArray();
-            _toReplace.Clear();
             _paintStroke.Clear();
-
-            foreach (var renderer in _replaceRenderers)
-            {
-                if (renderer == null) continue;
-                renderer.enabled = true;
-            }
-            _replaceRenderers.Clear();
+            var result = new System.Collections.Generic.HashSet<GameObject>();
             for (int i = 0; i < toReplace.Length; ++i)
             {
                 var obj = toReplace[i];
@@ -406,14 +367,26 @@ namespace PluginMaster
                     }
                 }
                 if (isChild) continue;
-                _toReplace.Add(obj);
-                _replaceRenderers.AddRange(obj.GetComponentsInChildren<Renderer>().Where(r => r.enabled == true));
-                ReplacePreview(camera, obj.transform);
-                foreach (var renderer in _replaceRenderers) renderer.enabled = false;
-                BrushstrokeManager.UpdateBrushstroke();
+                result.Add(obj);
             }
+            return result.ToArray();
+        }
+
+        private static void DrawPreview(Vector3 center, Ray mouseRay, Camera camera)
+        {
+            foreach (var renderer in _replaceRenderers)
+            {
+                if (renderer == null) continue;
+                renderer.enabled = true;
+            }
+            
+            var targets = GetReplacerTargets(center, mouseRay, camera);
+            _replaceRenderers.Clear();
+            foreach ( var obj in targets)
+                _replaceRenderers.AddRange(obj.GetComponentsInChildren<Renderer>().Where(r => r.enabled == true));
+            ReplacePreview(camera, ReplacerManager.settings, targets);
+            foreach (var renderer in _replaceRenderers) renderer.enabled = false;
         }
     }
-
     #endregion
 }

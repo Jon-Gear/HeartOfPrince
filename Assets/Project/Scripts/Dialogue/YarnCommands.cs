@@ -13,6 +13,24 @@ public class YarnCommands : MonoBehaviour
     Other ideas:
     - Background dialogue between other characters (like in NITW)
     */
+    // Background Dialogue (Thought Management)
+    [YarnCommand("addThought")]
+    public static void AddThought(string actorName, string thoughtName, int maxVariants)
+    {
+        // Find the actor by name
+        Actor actor = ActorRegistry.Instance.GetActorByName(actorName);
+        if (actor == null)
+        {
+            Debug.LogWarningFormat("Cannot find actor named {0}!", actorName);
+            return;
+        }
+
+        actor.AddThought(thoughtName, maxVariants);
+    }
+
+
+
+
     // Camera Control
 
     [YarnCommand("setLongShot")]

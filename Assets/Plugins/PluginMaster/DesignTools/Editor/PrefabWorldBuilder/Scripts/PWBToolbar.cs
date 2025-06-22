@@ -32,15 +32,12 @@ namespace PluginMaster
         private const int WIDTH = 556;
         private const int HEIGHT = 520;
 
-        private Object _documentationPdf = null;
-
         [UnityEditor.MenuItem("Tools/Plugin Master/Prefab World Builder/Toolbar...", false, 1100)]
         public static void ShowWindow()
         {
 #if UNITY_2021_2_OR_NEWER
             if (!UnityEditor.EditorUtility.DisplayDialog("Toolbar Overlays",
-                "PWB tools are available as overlay panels in the scene view window (in Unity 2021.2 or higher). " +
-                "\nClick anywhere in the Scene view and press the Spacebar to open the overlays menu.",
+                "PWB tools are available as overlay panels in the scene view window (in Unity 2021.2 or higher). ",
                 "Open toolbar anyway", "cancel")) return;
 #endif
             var isANewInstance = _instance == null;
@@ -63,11 +60,7 @@ namespace PluginMaster
         {
             _instance = this;
             _skin = Resources.Load<GUISkin>("PWBSkin");
-            if (_skin == null)
-            {
-                Close();
-                return;
-            }
+            if (_skin == null) return;
             UnityEngine.Assertions.Assert.IsNotNull(_skin);
             _btnStyle = _skin.GetStyle("ToggleButton");
             _foldoutButtonStyle = new GUIStyle(_btnStyle);
@@ -90,7 +83,6 @@ namespace PluginMaster
             PWBIO.controlId = GUIUtility.GetControlID(GetHashCode(), FocusType.Passive);
             PWBIO.UpdateOctree();
 
-            _documentationPdf = UnityEditor.AssetDatabase.LoadMainAssetAtPath(PWBCore.staticData.documentationPath);
             ToolManager.OnToolChange += OnToolChange;
             SnapManager.settings.OnDataChanged += Repaint;
         }
@@ -133,15 +125,7 @@ namespace PluginMaster
                     GUILayout.Space(5);
                     SnapGUI();
                     GUILayout.Space(5);
-                    if (GUILayout.Button(_helpIcon, _btnStyle))
-                    {
-                        if (_documentationPdf == null)
-                            _documentationPdf = UnityEditor.AssetDatabase
-                                .LoadMainAssetAtPath(PWBCore.staticData.documentationPath);
-                        if (_documentationPdf == null)
-                            Debug.LogWarning("Missing Documentation File");
-                        else UnityEditor.AssetDatabase.OpenAsset(_documentationPdf);
-                    }
+                    if (GUILayout.Button(_helpIcon, _btnStyle)) PWBCore.OpenDocFile();
                     GUILayout.FlexibleSpace();
                 }
             }
@@ -190,6 +174,8 @@ namespace PluginMaster
             {
                 if (keyCombination != string.Empty) button.tooltip = tooltip + " ... " + keyCombination;
             }
+            UpdateTooltipShortcut(_floorIcon, "Floor", PWBSettings.shortcuts.toolbarFloorToggle.combination.ToString());
+            UpdateTooltipShortcut(_wallIcon, "Wall", PWBSettings.shortcuts.toolbarWallToggle.combination.ToString());
             UpdateTooltipShortcut(_pinIcon, "Pin", PWBSettings.shortcuts.toolbarPinToggle.combination.ToString());
             UpdateTooltipShortcut(_brushIcon, "Brush", PWBSettings.shortcuts.toolbarBrushToggle.combination.ToString());
             UpdateTooltipShortcut(_eraserIcon, "Eraser", PWBSettings.shortcuts.toolbarEraserToggle.combination.ToString());
@@ -213,6 +199,9 @@ namespace PluginMaster
         #endregion
 
         #region TOOLS
+        private GUIContent _floorIcon = null;
+        private GUIContent _wallIcon = null;
+
         private GUIContent _pinIcon = null;
         private GUIContent _brushIcon = null;
         private GUIContent _eraserIcon = null;
@@ -226,6 +215,7 @@ namespace PluginMaster
         private GUIContent _mirrorIcon = null;
         private GUIContent _replaceIcon = null;
         private GUIContent _helpIcon = null;
+        private GUIContent _propertiesIcon = null;
 
         private bool _toolChanged = false;
         private void OnToolChange(ToolManager.PaintTool prevTool)
@@ -236,6 +226,9 @@ namespace PluginMaster
 
         private void LoadToolIcons()
         {
+            _floorIcon = new GUIContent(Resources.Load<Texture2D>("Sprites/Floors"), "Floor");
+            _wallIcon = new GUIContent(Resources.Load<Texture2D>("Sprites/Walls"), "Wall");
+
             _pinIcon = new GUIContent(Resources.Load<Texture2D>("Sprites/Pin"), "Pin");
             _brushIcon = new GUIContent(Resources.Load<Texture2D>("Sprites/Brush"), "Brush");
             _eraserIcon = new GUIContent(Resources.Load<Texture2D>("Sprites/Eraser"), "Eraser");
@@ -249,6 +242,7 @@ namespace PluginMaster
             _mirrorIcon = new GUIContent(Resources.Load<Texture2D>("Sprites/Mirror"), "Mirror");
             _replaceIcon = new GUIContent(Resources.Load<Texture2D>("Sprites/Replace"), "Replacer");
             _helpIcon = new GUIContent(Resources.Load<Texture2D>("Sprites/Help"), "Documentation");
+            _propertiesIcon = new GUIContent(Resources.Load<Texture2D>("Sprites/ToolProperties"), "Tool Properties");
         }
 
         private void ToolsGUI()
@@ -256,6 +250,16 @@ namespace PluginMaster
             using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
             {
                 var newtool = ToolManager.tool;
+
+                var floorSelected = newtool == ToolManager.PaintTool.FLOOR;
+                newtool = (GUILayout.Toggle(floorSelected, _floorIcon, _btnStyle)
+                ? ToolManager.PaintTool.FLOOR : (floorSelected ? ToolManager.PaintTool.NONE : newtool));
+
+                var wallSelected = newtool == ToolManager.PaintTool.WALL;
+                newtool = (GUILayout.Toggle(wallSelected, _wallIcon, _btnStyle)
+                ? ToolManager.PaintTool.WALL : (wallSelected ? ToolManager.PaintTool.NONE : newtool));
+
+                GUILayout.Space(5);
 
                 var pinSelected = newtool == ToolManager.PaintTool.PIN;
                 newtool = (GUILayout.Toggle(pinSelected, _pinIcon, _btnStyle)
@@ -288,7 +292,9 @@ namespace PluginMaster
                 var eraserSelected = newtool == ToolManager.PaintTool.ERASER;
                 newtool = (GUILayout.Toggle(eraserSelected, _eraserIcon, _btnStyle)
                 ? ToolManager.PaintTool.ERASER : (eraserSelected ? ToolManager.PaintTool.NONE : newtool));
-
+                
+                GUILayout.Space(5);
+                if (GUILayout.Button(_propertiesIcon, _btnStyle)) ToolProperties.ShowWindow();
                 GUILayout.Space(5);
 
                 var selectionSelected = newtool == ToolManager.PaintTool.SELECTION;
@@ -375,6 +381,7 @@ namespace PluginMaster
         private GUIContent _showGridToolsHIcon = null;
         private GUIContent _hideGridToolsHIcon = null;
         private GUIStyle _foldoutButtonStyle = null;
+        private GUIContent _boundsSnappingIcon = null;
         private void LoadSnapIcons()
         {
             _showGridIcon = new GUIContent(Resources.Load<Texture2D>("Sprites/ShowGrid"), "Show grid");
@@ -395,6 +402,8 @@ namespace PluginMaster
             _hideGridToolsIcon = new GUIContent(Resources.Load<Texture2D>("Sprites/HideGridTools"));
             _showGridToolsHIcon = new GUIContent(Resources.Load<Texture2D>("Sprites/ShowGridToolsH"));
             _hideGridToolsHIcon = new GUIContent(Resources.Load<Texture2D>("Sprites/HideGridToolsH"));
+            _boundsSnappingIcon = new GUIContent(Resources.Load<Texture2D>("Sprites/BoundsSnapping"),
+                "Enable bounds snapping");
         }
 
         private void SnapGUI()
@@ -468,7 +477,7 @@ namespace PluginMaster
                     settings.lockedGrid ? _lockGridIcon : _unlockGridIcon, _btnStyle);
                 if (check.changed) SnapSettingsWindow.RepaintWindow();
             }
-
+            settings.boundsSnapping = GUILayout.Toggle(settings.boundsSnapping, _boundsSnappingIcon, _btnStyle);
             if (GUILayout.Button(_snapSettingsIcon, _btnStyle)) SnapSettingsWindow.ShowWindow();
             if (GUILayout.Button(foldoutIcon, _foldoutButtonStyle)) _showGridTools = false;
         }

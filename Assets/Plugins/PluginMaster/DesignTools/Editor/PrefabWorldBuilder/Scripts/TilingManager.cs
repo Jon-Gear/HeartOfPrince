@@ -22,20 +22,12 @@ namespace PluginMaster
     {
         #region TILING SETTINGS
 
-        public enum CellSizeType
-        {
-            SMALLEST_OBJECT,
-            BIGGEST_OBJECT,
-            CUSTOM
-        }
-
-        [SerializeField] private CellSizeType _cellSizeType = CellSizeType.SMALLEST_OBJECT;
+        [SerializeField] private TilesUtils.SizeType _cellSizeType = TilesUtils.SizeType.SMALLEST_OBJECT;
         [SerializeField] private Vector2 _cellSize = Vector2.one;
         [SerializeField] private Quaternion _rotation = Quaternion.identity;
         [SerializeField] private Vector2 _spacing = Vector2.zero;
         [SerializeField] private AxesUtils.SignedAxis _axisAlignedWithNormal = AxesUtils.SignedAxis.UP;
         [SerializeField] private bool _showPreview = true;
-        public System.Action<float, Vector3> OnRotationChanged;
         public Quaternion rotation
         {
             get => _rotation;
@@ -45,17 +37,10 @@ namespace PluginMaster
                 var prevRotation = _rotation;
                 _rotation = value;
                 OnDataChanged();
-                if (OnRotationChanged != null)
-                {
-                    var angle = Quaternion.Angle(prevRotation, _rotation);
-                    var axis = Vector3.Cross(prevRotation * Vector3.forward, _rotation * Vector3.forward);
-                    if (axis == Vector3.zero) axis = Vector3.Cross(prevRotation * Vector3.up, _rotation * Vector3.up);
-                    axis.Normalize();
-                    OnRotationChanged(angle, axis);
-                }
             }
         }
-        public CellSizeType cellSizeType
+
+        public TilesUtils.SizeType cellSizeType
         {
             get => _cellSizeType;
             set
@@ -110,69 +95,21 @@ namespace PluginMaster
         {
             if (ToolManager.tool != ToolManager.PaintTool.TILING) return;
 
-            if (_cellSizeType != CellSizeType.CUSTOM)
+            if (_cellSizeType != TilesUtils.SizeType.CUSTOM)
             {
                 var toolSettings = TilingManager.settings;
                 BrushSettings brush = PaletteManager.selectedBrush;
                 if (ToolManager.editMode && brush == null) brush = brushSettings;
                 else if (toolSettings.overwriteBrushProperties) brush = toolSettings.brushSettings;
-                if (brush == null)return;
-
-                var cellSize = Vector3.one * (_cellSizeType == CellSizeType.SMALLEST_OBJECT
-                        ? float.MaxValue : float.MinValue);
-                if (ToolManager.editMode && PWBIO.selectedPersistentTilingData != null)
-                {
-                    var prefabs = new System.Collections.Generic.HashSet<GameObject>();
-                    var objSet = PWBIO.selectedPersistentTilingData.objectSet;
-                    var scaleMultiplier = _cellSizeType == CellSizeType.SMALLEST_OBJECT
-                            ? brush.minScaleMultiplier : brush.maxScaleMultiplier;
-                    foreach (var obj in objSet)
-                    {
-                        if (obj == null) continue;
-                        var objSize = BoundsUtils.GetBoundsRecursive(obj.transform,
-                            obj.transform.rotation * Quaternion.Euler(brush.eulerOffset)).size;
-                        cellSize = _cellSizeType == CellSizeType.SMALLEST_OBJECT
-                            ? Vector3.Min(cellSize, objSize) : Vector3.Max(cellSize, objSize);
-                        var prefab = UnityEditor.PrefabUtility.GetCorrespondingObjectFromSource(obj);
-                        if (prefab == null) continue;
-                        if(prefabs.Contains(prefab)) continue;
-                        prefabs.Add(prefab);
-                        var prefabSize = Vector3.Scale(BoundsUtils.GetBoundsRecursive(prefab.transform,
-                           prefab.transform.rotation * Quaternion.Euler(brush.eulerOffset)).size, scaleMultiplier);
-                        cellSize = _cellSizeType == CellSizeType.SMALLEST_OBJECT
-                            ? Vector3.Min(cellSize, prefabSize) : Vector3.Max(cellSize, prefabSize);
-                    }
-                }
-                if (brush is MultibrushSettings)
-                {
-                    var multibrush = brush as MultibrushSettings;
-                    foreach (var item in multibrush.items)
-                    {
-                        var prefab = item.prefab;
-                        if (prefab == null) continue;
-                        var scaleMultiplier = _cellSizeType == CellSizeType.SMALLEST_OBJECT
-                            ? item.minScaleMultiplier : item.maxScaleMultiplier;
-                        var itemSize = Vector3.Scale(BoundsUtils.GetBoundsRecursive(prefab.transform,
-                            prefab.transform.rotation * Quaternion.Euler(brush.eulerOffset), ignoreDissabled : true,
-                            BoundsUtils.ObjectProperty.BOUNDING_BOX, recursive: true, useDictionary: false).size,
-                            scaleMultiplier);
-                        cellSize = _cellSizeType == CellSizeType.SMALLEST_OBJECT
-                            ? Vector3.Min(cellSize, itemSize) : Vector3.Max(cellSize, itemSize);
-                    }
-                }
-
-                if (cellSize == Vector3.one * float.MaxValue || cellSize == Vector3.one * float.MinValue) return;
-                if (_axisAlignedWithNormal.axis == AxesUtils.Axis.Y) cellSize.y = cellSize.z;
-                else if (_axisAlignedWithNormal.axis == AxesUtils.Axis.X)
-                {
-                    cellSize.x = cellSize.y;
-                    cellSize.y = cellSize.z;
-                }
-
-                if (cellSize.x == 0) cellSize.x = 0.5f;
-                if (cellSize.y == 0) cellSize.y = 0.5f;
-                if (cellSize.z == 0) cellSize.z = 0.5f;
-                _cellSize = cellSize;
+                if (brush == null) return;
+                AxesUtils.SignedAxis forwardAxis = AxesUtils.SignedAxis.FORWARD;
+                if (_axisAlignedWithNormal == AxesUtils.SignedAxis.DOWN) forwardAxis = AxesUtils.SignedAxis.BACK;
+                else if (_axisAlignedWithNormal == AxesUtils.SignedAxis.RIGHT) forwardAxis = AxesUtils.SignedAxis.UP;
+                else if (_axisAlignedWithNormal == AxesUtils.SignedAxis.LEFT) forwardAxis = AxesUtils.SignedAxis.DOWN;
+                else if (_axisAlignedWithNormal == AxesUtils.SignedAxis.FORWARD) forwardAxis = AxesUtils.SignedAxis.RIGHT;
+                else if (_axisAlignedWithNormal == AxesUtils.SignedAxis.BACK) forwardAxis = AxesUtils.SignedAxis.LEFT;
+                _cellSize = TilesUtils.GetCellSize(_cellSizeType, brush, _axisAlignedWithNormal,
+                    forwardAxis, _cellSize, tangentSpace: true, quarterTurns: 0, subtractBrushOffset: false);
                 ToolProperties.RepainWindow();
                 UnityEditor.SceneView.RepaintAll();
             }
@@ -235,6 +172,11 @@ namespace PluginMaster
             }
         }
         public BrushSettings brushSettings => _paintTool.brushSettings;
+        public bool overwriteParentingSettings
+        {
+            get => _paintTool.overwriteParentingSettings;
+            set => _paintTool.overwriteParentingSettings = value;
+        }
         #endregion
 
         public override void Copy(IToolSettings other)
@@ -322,7 +264,7 @@ namespace PluginMaster
         private static void TilingInitializeOnLoad()
         {
             TilingManager.settings.OnDataChanged += OnTilingSettingsChanged;
-            TilingManager.settings.OnRotationChanged += OnTilingRotationChanged;
+            BrushSettings.OnBrushSettingsChanged += PreviewSelectedPersistentTilings;
         }
         private static void OnUndoTiling() => ClearTilingStroke();
         private static void OnTilingToolModeChanged()
@@ -348,15 +290,6 @@ namespace PluginMaster
             if (_selectedPersistentTilingData == null) return;
             _selectedPersistentTilingData.settings.Copy(TilingManager.settings);
             PreviewPersistentTiling(_selectedPersistentTilingData);
-        }
-        private static void OnTilingRotationChanged(float angle, Vector3 axis)
-        {
-            if (!ToolManager.editMode) return;
-            if (_selectedPersistentTilingData == null) return;
-            RotateTiling(_selectedPersistentTilingData, angle, axis, false);
-            DrawCells(_selectedPersistentTilingData);
-            PreviewPersistentTiling(_selectedPersistentTilingData);
-            repaint = true;
         }
         #endregion
 
@@ -390,16 +323,17 @@ namespace PluginMaster
             if (MouseDot(out Vector3 point, out Vector3 normal, TilingManager.settings.mode, in2DMode,
                 TilingManager.settings.paintOnPalettePrefabs, TilingManager.settings.paintOnMeshesWithoutCollider, false))
             {
+                point = SnapToBounds(point);
                 point = SnapAndUpdateGridOrigin(point, SnapManager.settings.snappingEnabled,
-                   TilingManager.settings.paintOnPalettePrefabs, TilingManager.settings.paintOnMeshesWithoutCollider
-                   , false, Vector3.down);
+                   TilingManager.settings.paintOnPalettePrefabs, TilingManager.settings.paintOnMeshesWithoutCollider,
+                   false, TilingManager.settings.rotation * Vector3.down);
                 _tilingData.SetPoint(2, point, registerUndo: false, selectAll: false);
                 _tilingData.SetPoint(0, point, registerUndo: false, selectAll: false);
             }
             if (_tilingData.pointsCount > 0) DrawDotHandleCap(_tilingData.GetPoint(0));
         }
 
-        private static void TilingStateRectangle(bool in2DMode)
+        private static void TilingStateRectangle(UnityEditor.SceneView sceneView)
         {
             var settings = TilingManager.settings;
             if (Event.current.button == 0 && Event.current.type == EventType.MouseDown && !Event.current.alt)
@@ -415,6 +349,10 @@ namespace PluginMaster
             if (plane.Raycast(mouseRay, out float distance))
             {
                 var point = mouseRay.GetPoint(distance);
+                point = SnapToBounds(point);
+                point = SnapAndUpdateGridOrigin(point, SnapManager.settings.snappingEnabled,
+                   TilingManager.settings.paintOnPalettePrefabs, TilingManager.settings.paintOnMeshesWithoutCollider,
+                   false, TilingManager.settings.rotation * Vector3.down);
                 _tilingData.SetPoint(2, point, registerUndo: false, selectAll: false);
                 var diagonal = point - _tilingData.GetPoint(0);
                 var tangent = Vector3.Project(diagonal, settings.rotation * Vector3.right);
@@ -422,15 +360,31 @@ namespace PluginMaster
                 _tilingData.SetPoint(1, _tilingData.GetPoint(0) + tangent, registerUndo: false, selectAll: false);
                 _tilingData.SetPoint(3, _tilingData.GetPoint(0) + bitangent, registerUndo: false, selectAll: false);
                 DrawTilingGrid(_tilingData);
+                TilingInfoText(sceneView);
                 for (int i = 0; i < 4; ++i) DrawDotHandleCap(_tilingData.GetPoint(i));
                 return;
             }
             DrawDotHandleCap(_tilingData.GetPoint(0));
+
+        }
+        private static void TilingInfoText(UnityEditor.SceneView sceneView)
+        {
+            if (!PWBCore.staticData.showInfoText) return;
+            if (_tilingSize == Vector2Int.zero) return;
+            var labelTexts = new string[]
+            { $"{_tilingSize.x} x {_tilingSize.y}" };
+            InfoText.Draw(sceneView, labelTexts);
         }
         private static void TilingStateEdit(Camera camera)
         {
             bool mouseDown = Event.current.button == 0 && Event.current.type == EventType.MouseDown;
             TilingShortcuts(_tilingData);
+            if (_rotateTiling90)
+            {
+                var rotation = _tilingData.settings.rotation * Quaternion.AngleAxis(90, _rotateTilingAxis);
+                SetTilingRotation(_tilingData, rotation);
+                _rotateTiling90 = false;
+            }
             var forceStrokeUpdate = updateStroke;
             if (updateStroke)
             {
@@ -452,14 +406,14 @@ namespace PluginMaster
         {
             var nextTilingId = TilingData.nextHexId;
             var objDic = Paint(TilingManager.settings, PAINT_CMD, true, false, nextTilingId);
-            if (objDic.Count != 1)
-                return;
+            if (objDic.Count != 1) return;
             var scenePath = UnityEngine.SceneManagement.SceneManager.GetActiveScene().path;
             var sceneGUID = UnityEditor.AssetDatabase.AssetPathToGUID(scenePath);
             var initialBrushId = PaletteManager.selectedBrush != null ? PaletteManager.selectedBrush.id : -1;
             var objs = objDic[nextTilingId].ToArray();
             var persistentData = new TilingData(objs, initialBrushId, _tilingData);
             TilingManager.instance.AddPersistentItem(sceneGUID, persistentData);
+            PWBItemsWindow.RepainWindow();
         }
         private static void TilingStrokePreview(Camera camera, string hexId, bool forceUpdate)
         {
@@ -606,11 +560,18 @@ namespace PluginMaster
         {
             _paintStroke.Clear();
             BrushstrokeManager.ClearBrushstroke();
-            if (ToolManager.editMode && _editingPersistentLine)
+            updateStroke = true;
+            if (ToolManager.editMode)
             {
+                if (!_editingPersistentLine) return;
                 _selectedPersistentTilingData.UpdatePoses();
                 PreviewPersistentTiling(_selectedPersistentTilingData);
                 UnityEditor.SceneView.RepaintAll();
+            }
+            else
+            {
+                UpdateCellCenters(_tilingData, false);
+                TilingStrokePreview(UnityEditor.SceneView.lastActiveSceneView.camera, TilingData.nextHexId, true);
             }
         }
         private static void TilingDuringSceneGUI(UnityEditor.SceneView sceneView)
@@ -632,7 +593,7 @@ namespace PluginMaster
                     TilingStateNone(sceneView.in2DMode);
                     break;
                 case ToolManager.ToolState.PREVIEW:
-                    TilingStateRectangle(sceneView.in2DMode);
+                    TilingStateRectangle(sceneView);
                     break;
                 case ToolManager.ToolState.EDIT:
                     TilingStateEdit(sceneView.camera);
@@ -674,7 +635,8 @@ namespace PluginMaster
             if (data.selectedPointIdx < 0) return false;
             _handlePosition = position;
             var prevPosition = data.selectedPoint;
-            var snappedPoint = SnapAndUpdateGridOrigin(_handlePosition, SnapManager.settings.snappingEnabled,
+            var snappedPoint = SnapToBounds(_handlePosition);
+            snappedPoint = SnapAndUpdateGridOrigin(snappedPoint, SnapManager.settings.snappingEnabled,
                data.settings.paintOnPalettePrefabs, data.settings.paintOnMeshesWithoutCollider,
                false, Vector3.down);
             data.SetPoint(data.selectedPointIdx, snappedPoint, registerUndo: true, selectAll: false);
@@ -723,13 +685,16 @@ namespace PluginMaster
             data.settings.rotation = rotation;
             if (data.settings.rotation == prevRotation) return false;
 
-            var angle = Quaternion.Angle(prevRotation, data.settings.rotation);
-            var axis = Vector3.Cross(prevRotation * Vector3.forward,
-                data.settings.rotation * Vector3.forward);
-            if (axis == Vector3.zero) axis = Vector3.Cross(prevRotation * Vector3.up,
-                data.settings.rotation * Vector3.up);
-            axis.Normalize();
-            RotateTiling(data, angle, axis, false);
+            ToolProperties.RegisterUndo(TilingData.COMMAND_NAME);
+            updateStroke = true;
+            var delta = rotation * Quaternion.Inverse(prevRotation);
+            for (int i = 0; i < 8; ++i)
+            {
+                var centerToPoint = data.GetPoint(i) - data.GetPoint(8);
+                var rotatedPos = (delta * centerToPoint) + data.GetPoint(8);
+                data.SetPoint(i, rotatedPos, registerUndo: false, selectAll: false);
+            }
+            DrawCells(data);
             ToolProperties.RepainWindow();
             UpdateCellCenters(data, false);
             return true;
@@ -745,8 +710,10 @@ namespace PluginMaster
             _tilingData.settings.UpdateCellSize();
             UpdateCellCenters(_tilingData, true);
         }
+        private static Vector2Int _tilingSize = Vector2Int.zero;
         private static void UpdateCellCenters(TilingData data, bool DrawCells)
         {
+            if (!ToolManager.editMode && data.state == ToolManager.ToolState.NONE) return;
             data.tilingCenters.Clear();
             var settings = data.settings;
             var tangentDir = data.GetPoint(1) - data.GetPoint(0);
@@ -767,27 +734,70 @@ namespace PluginMaster
                 data.tilingCenters.Add(cellCenter);
                 if (!DrawCells) return;
                 UnityEditor.Handles.color = new Color(0f, 0f, 0f, 0.3f);
+
                 UnityEditor.Handles.DrawAAPolyLine(6, linePoints);
                 UnityEditor.Handles.color = new Color(1f, 1f, 1f, 0.3f);
                 UnityEditor.Handles.DrawAAPolyLine(2, linePoints);
+
             }
             var minCellSize = settings.cellSize + settings.spacing;
             minCellSize = Vector2.Max(minCellSize, Vector2.one * 0.001f);
             var cellSize = minCellSize - settings.spacing;
             float tangentOffset = 0;
-            while (Mathf.Abs(tangentOffset) + Mathf.Abs(cellSize.x) < tangentSize)
+            _tilingSize = Vector2Int.zero;
+            while (Mathf.Abs(tangentOffset) + Mathf.Abs(cellSize.x) <= tangentSize)
             {
                 float bitangentOffset = 0;
-                while (Mathf.Abs(bitangentOffset) + Mathf.Abs(cellSize.y) < bitangentSize)
+                ++_tilingSize.x;
+                var sizeY = 0;
+                while (Mathf.Abs(bitangentOffset) + Mathf.Abs(cellSize.y) <= bitangentSize)
                 {
                     SetTileCenter();
                     bitangentOffset += minCellSize.y;
                     offset = data.GetPoint(0) + tangentDir * Mathf.Abs(tangentOffset)
                         + bitangentDir * Mathf.Abs(bitangentOffset);
+                    ++sizeY;
                 }
+                _tilingSize.y = Mathf.Max(_tilingSize.y, sizeY);
                 tangentOffset += minCellSize.x;
                 offset = data.GetPoint(0) + tangentDir * Mathf.Abs(tangentOffset);
             }
+        }
+
+        private static Vector3 _rotateTilingAxis = Vector3.zero;
+
+        private static bool _rotateTiling90 = false;
+        public static void ShowTilingContextMenu(TilingData data, Vector2 mousePosition)
+        {
+            if (!ToolManager.editMode) return;
+            void Rotate90(Vector3 axis)
+            {
+                if (ToolManager.editMode) SelectTiling(data);
+                _rotateTiling90 = true;
+                _rotateTilingAxis = axis;
+            }
+            var menu = new UnityEditor.GenericMenu();
+            menu.AddItem(new GUIContent("Rotate 90º around Y ... "
+                + PWBSettings.shortcuts.selectionRotate90YCW.combination.ToString()), on: false,
+                () => Rotate90(Vector3.down));
+            menu.AddItem(new GUIContent("Rotate -90º around Y ... "
+                + PWBSettings.shortcuts.selectionRotate90YCCW.combination.ToString()), on: false,
+                () => Rotate90(Vector3.up));
+            menu.AddItem(new GUIContent("Rotate 90º around X ... "
+                + PWBSettings.shortcuts.selectionRotate90XCW.combination.ToString()), on: false,
+                () => Rotate90(Vector3.left));
+            menu.AddItem(new GUIContent("Rotate -90º around X ... "
+                + PWBSettings.shortcuts.selectionRotate90XCCW.combination.ToString()), on: false,
+                () => Rotate90(Vector3.right));
+            menu.AddItem(new GUIContent("Rotate 90º around Z ... "
+                + PWBSettings.shortcuts.selectionRotate90ZCW.combination.ToString()), on: false,
+                () => Rotate90(Vector3.back));
+            menu.AddItem(new GUIContent("Rotate -90º around Z ... "
+                + PWBSettings.shortcuts.selectionRotate90ZCCW.combination.ToString()), on: false,
+                () => Rotate90(Vector3.forward));
+            menu.AddSeparator(string.Empty);
+            PersistentItemContextMenu(menu, data, mousePosition);
+            menu.ShowAsContext();
         }
         private static bool DrawTilingControlPoints(TilingData data,
             out bool clickOnPoint, out bool wasEdited, out Vector3 delta)
@@ -809,6 +819,14 @@ namespace PluginMaster
                     {
                         data.selectedPointIdx = i;
                         clickOnPoint = true;
+                        Event.current.Use();
+                    }
+                    if (Event.current.button == 1 && Event.current.type == EventType.MouseDown
+                      && !Event.current.control && !Event.current.shift && !Event.current.alt
+                          && UnityEditor.HandleUtility.nearestControl == controlId)
+                    {
+                        ShowTilingContextMenu(data,
+                            UnityEditor.EditorGUIUtility.GUIToScreenPoint(Event.current.mousePosition));
                         Event.current.Use();
                     }
                 }
@@ -856,50 +874,42 @@ namespace PluginMaster
                 Event.current.Use();
                 return true;
             }
+            void Rotate90(Vector3 axis)
+            {
+                _rotateTiling90 = true;
+                _rotateTilingAxis = axis;
+            }
             if (PWBSettings.shortcuts.selectionRotate90XCCW.Check())
             {
-                RotateTiling(data, 90, Vector3.right, true);
+                Rotate90(Vector3.right);
                 return true;
             }
             if (PWBSettings.shortcuts.selectionRotate90XCW.Check())
             {
-                RotateTiling(data, 90, Vector3.left, true);
+                Rotate90(Vector3.left);
                 return true;
             }
             if (PWBSettings.shortcuts.selectionRotate90YCCW.Check())
             {
-                RotateTiling(data, 90, Vector3.up, true);
+                Rotate90(Vector3.up);
                 return true;
             }
             if (PWBSettings.shortcuts.selectionRotate90YCW.Check())
             {
-                RotateTiling(data, 90, Vector3.down, true);
+                Rotate90(Vector3.down);
                 return true;
             }
             if (PWBSettings.shortcuts.selectionRotate90ZCCW.Check())
             {
-                RotateTiling(data, 90, Vector3.forward, true);
+                Rotate90(Vector3.forward);
                 return true;
             }
             if (PWBSettings.shortcuts.selectionRotate90ZCW.Check())
             {
-                RotateTiling(data, 90, Vector3.back, true);
+                Rotate90(Vector3.back);
                 return true;
             }
             return false;
-        }
-        private static void RotateTiling(TilingData data, float angle, Vector3 axis, bool updateDataRotation)
-        {
-            updateStroke = true;
-            var delta = Quaternion.AngleAxis(angle, axis);
-            for (int i = 0; i < 8; ++i)
-            {
-                var centerToPoint = data.GetPoint(i) - data.GetPoint(8);
-                var rotatedPos = (delta * centerToPoint) + data.GetPoint(8);
-                data.SetPoint(i, rotatedPos, registerUndo: false, selectAll: false);
-            }
-            if (updateDataRotation) data.settings.rotation *= delta;
-            DrawCells(data);
         }
         public static void UpdateTilingRotation(Quaternion rotation)
         {
@@ -920,6 +930,18 @@ namespace PluginMaster
                 if (!_editingPersistentTiling) return null;
                 return _selectedPersistentTilingData;
             }
+        }
+
+        public static void SelectTiling(TilingData data)
+        {
+            ApplySelectedPersistentTiling(true);
+            _editingPersistentTiling = true;
+            data.ClearSelection();
+            data.selectedPointIdx = 8;
+            data.isSelected = true;
+            _selectedPersistentTilingData = data;
+            if (_initialPersistentTilingData == null) _initialPersistentTilingData = data.Clone();
+            TilingManager.instance.CopyToolSettings(data.settings);
         }
 
         private static void TilingToolEditMode(UnityEditor.SceneView sceneView)
@@ -947,7 +969,9 @@ namespace PluginMaster
                             if (selectedTilingId == -1)
                                 _createProfileName = TilingManager.instance.selectedProfileName;
                             TilingManager.instance.CopyToolSettings(itemData.settings);
+                            itemData.isSelected = true;
                             _selectedPersistentTilingData = itemData;
+
                             _editingPersistentTiling = true;
                             UpdateCellSize();
                         }
@@ -965,13 +989,7 @@ namespace PluginMaster
                 }
             }
             if (clickOnAnyPoint)
-            {
-                foreach (var itemData in deselectedItems)
-                {
-                    itemData.selectedPointIdx = -1;
-                    itemData.ClearSelection();
-                }
-            }
+                foreach (var itemData in deselectedItems) itemData.ClearSelection();
             if (!ToolManager.editMode) return;
             bool skipPreview = _selectedPersistentTilingData != null
                 && _selectedPersistentTilingData.objectCount > PWBCore.staticData.maxPreviewCountInEditMode;
@@ -1000,6 +1018,7 @@ namespace PluginMaster
                     PreviewPersistentTiling(_selectedPersistentTilingData);
                     TilingStrokePreview(sceneView.camera, _selectedPersistentTilingData.hexId, forceUpdate: true);
                 }
+                _persistentItemWasEdited = true;
                 ApplySelectedPersistentTiling(deselectPoint: true);
 
                 ToolProperties.RepainWindow();
@@ -1014,13 +1033,34 @@ namespace PluginMaster
                 TilingManager.instance.DeletePersistentItem(_selectedPersistentTilingData.id, false);
             else if (PWBSettings.shortcuts.editModeDeleteItemAndItsChildren.Check())
                 TilingManager.instance.DeletePersistentItem(_selectedPersistentTilingData.id, true);
+            else if (PWBSettings.shortcuts.editModeDuplicate.Check()) DuplicateItem(_selectedPersistentTilingData.id);
             if (TilingShortcuts(_selectedPersistentTilingData))
             {
                 DrawCells(_selectedPersistentTilingData);
                 PreviewPersistentTiling(_selectedPersistentTilingData);
                 repaint = true;
             }
+            if (_rotateTiling90)
+            {
+                var rotation = _selectedPersistentTilingData.settings.rotation * Quaternion.AngleAxis(90, _rotateTilingAxis);
+                SetTilingRotation(_selectedPersistentTilingData, rotation);
+                PreviewPersistentTiling(_selectedPersistentTilingData);
+                repaint = true;
+                _rotateTiling90 = false;
+            }
         }
+
+        public static void PreviewSelectedPersistentTilings()
+        {
+            if (ToolManager.tool != ToolManager.PaintTool.TILING) return;
+            var persistentTilings = TilingManager.instance.GetPersistentItems();
+            foreach (var tilingData in persistentTilings)
+            {
+                if (!tilingData.isSelected) continue;
+                PreviewPersistentTiling(tilingData);
+            }
+        }
+
         private static void PreviewPersistentTiling(TilingData data)
         {
             PWBCore.UpdateTempCollidersIfHierarchyChanged();
@@ -1060,13 +1100,6 @@ namespace PluginMaster
                 var height = size.x + size.y + size.z + maxSurfaceHeight
                     + Vector3.Distance(itemPosition, data.GetCenter()) + Vector3.Distance(data.GetPoint(0), data.GetPoint(2));
                 var normal = toolSettings.rotation * Vector3.up;
-
-                if (TilingManager.instance.applyBrushToExisting)
-                {
-                    if (toolSettings.overwriteBrushProperties) brushSettings = toolSettings.brushSettings;
-                    else if (PaletteManager.selectedBrush != null) brushSettings = PaletteManager.selectedBrush;
-                }
-                if (brushSettings == null) brushSettings = new BrushSettings();
 
                 var ray = new Ray(itemPosition + normal * height, -normal);
                 if (toolSettings.mode != PaintOnSurfaceToolSettingsBase.PaintMode.ON_SHAPE)
@@ -1163,8 +1196,14 @@ namespace PluginMaster
                     }
                 }
                 obj.transform.position = itemPosition;
+                
                 if (TilingManager.instance.applyBrushToExisting)
                 {
+                    brushSettings = TilingManager.instance.applyBrushToExisting
+                    ? (toolSettings.overwriteBrushProperties ? toolSettings.brushSettings : PaletteManager.selectedBrush)
+                    : PaletteManager.GetBrushById(data.initialBrushId);
+                    if (brushSettings == null) brushSettings = new BrushSettings();
+
                     obj.transform.localScale = Vector3.Scale(prefab.transform.localScale, scaleMult);
                     obj.transform.localRotation *= Quaternion.Euler(brushSettings.GetAdditionalAngle());
                     obj.transform.position += itemRotation * (axisDirection * brushSettings.GetSurfaceDistance());

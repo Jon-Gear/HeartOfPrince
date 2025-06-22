@@ -19,6 +19,18 @@ namespace PluginMaster
     public static partial class Shortcuts
     {
         #region TOGGLE TOOLS
+        public const string PWB_TOGGLE_FLOOR_SHORTCUT_ID = "Prefab World Builder/Tools - Toggle Floor Tool";
+        [UnityEditor.ShortcutManagement.Shortcut(PWB_TOGGLE_FLOOR_SHORTCUT_ID,
+            KeyCode.F, UnityEditor.ShortcutManagement.ShortcutModifiers.Shift
+            | UnityEditor.ShortcutManagement.ShortcutModifiers.Alt)]
+        private static void ToggleFloor() => PWBIO.ToogleTool(ToolManager.PaintTool.FLOOR);
+
+        public const string PWB_TOGGLE_WALL_SHORTCUT_ID = "Prefab World Builder/Tools - Toggle Wall Tool";
+        [UnityEditor.ShortcutManagement.Shortcut(PWB_TOGGLE_WALL_SHORTCUT_ID,
+            KeyCode.W, UnityEditor.ShortcutManagement.ShortcutModifiers.Shift
+            | UnityEditor.ShortcutManagement.ShortcutModifiers.Alt)]
+        private static void ToggleWall() => PWBIO.ToogleTool(ToolManager.PaintTool.WALL);
+
         public const string PWB_TOGGLE_PIN_SHORTCUT_ID = "Prefab World Builder/Tools - Toggle Pin Tool";
          [UnityEditor.ShortcutManagement.Shortcut(PWB_TOGGLE_PIN_SHORTCUT_ID,
              KeyCode.Alpha1, UnityEditor.ShortcutManagement.ShortcutModifiers.Shift

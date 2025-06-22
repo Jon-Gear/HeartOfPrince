@@ -49,9 +49,11 @@ namespace PluginMaster
         [SerializeField] private ThumbnailSettings _thumbnailSettings = new ThumbnailSettings();
         [field: System.NonSerialized] private Texture2D _thumbnail = null;
         public System.Action OnDataChangedAction;
+        public static System.Action OnBrushSettingsChanged;
         protected virtual void OnDataChanged()
         {
             if (OnDataChangedAction != null) OnDataChangedAction();
+            if (OnBrushSettingsChanged != null) OnBrushSettingsChanged();
         }
         public long id => _id;
         public virtual float surfaceDistance
@@ -117,6 +119,15 @@ namespace PluginMaster
                 _localPositionOffset = value;
                 OnDataChanged();
             }
+        }
+
+        public void SetLocalPositionOffset(float value, AxesUtils.Axis axis)
+        {
+            value = System.MathF.Round(value, digits: 5);
+            var currentValue = AxesUtils.GetAxisValue(_localPositionOffset, axis);
+            if (currentValue == value) return;
+            AxesUtils.SetAxisValue(ref _localPositionOffset, axis, value);
+            OnDataChanged();
         }
         public virtual bool rotateToTheSurface
         {
@@ -206,6 +217,8 @@ namespace PluginMaster
             get => _scaleMultiplier;
             set
             {
+                if (Mathf.Approximately(value.x, 0) && Mathf.Approximately(value.y, 0) && Mathf.Approximately(value.z, 0))
+                    return;
                 if (_scaleMultiplier == value) return;
                 _scaleMultiplier = value;
                 _randomScaleMultiplierRange.v1 = _randomScaleMultiplierRange.v2 = Vector3.one;
@@ -414,6 +427,33 @@ namespace PluginMaster
         public virtual void OnBeforeSerialize() { }
 
         public virtual void OnAfterDeserialize() { }
+
+        public override int GetHashCode()
+        {
+            int hashCode = 917907199;
+            hashCode = hashCode * -1521134295 + _id.GetHashCode();
+            hashCode = hashCode * -1521134295 + _surfaceDistance.GetHashCode();
+            hashCode = hashCode * -1521134295 + _randomSurfaceDistance.GetHashCode();
+            hashCode = hashCode * -1521134295 + _randomSurfaceDistanceRange.GetHashCode();
+            hashCode = hashCode * -1521134295 + _embedInSurface.GetHashCode();
+            hashCode = hashCode * -1521134295 + _embedAtPivotHeight.GetHashCode();
+            hashCode = hashCode * -1521134295 + _localPositionOffset.GetHashCode();
+            hashCode = hashCode * -1521134295 + _rotateToTheSurface.GetHashCode();
+            hashCode = hashCode * -1521134295 + _eulerOffset.GetHashCode();
+            hashCode = hashCode * -1521134295 + _addRandomRotation.GetHashCode();
+            hashCode = hashCode * -1521134295 + _rotationFactor.GetHashCode();
+            hashCode = hashCode * -1521134295 + _rotateInMultiples.GetHashCode();
+            hashCode = hashCode * -1521134295 + _randomEulerOffset.GetHashCode();
+            hashCode = hashCode * -1521134295 + _alwaysOrientUp.GetHashCode();
+            hashCode = hashCode * -1521134295 + _separateScaleAxes.GetHashCode();
+            hashCode = hashCode * -1521134295 + _scaleMultiplier.GetHashCode();
+            hashCode = hashCode * -1521134295 + _randomScaleMultiplier.GetHashCode();
+            hashCode = hashCode * -1521134295 + _randomScaleMultiplier.GetHashCode();
+            hashCode = hashCode * -1521134295 + _flipX.GetHashCode();
+            hashCode = hashCode * -1521134295 + _flipY.GetHashCode();
+            hashCode = hashCode * -1521134295 + _thumbnailSettings.GetHashCode();
+            return hashCode;
+        }
     }
 
     public static class SelectionUtils
@@ -467,6 +507,19 @@ namespace PluginMaster
         public Vector2 targetOffset { get => _targetOffset; set => _targetOffset = value; }
         public bool useCustomImage { get => _useCustomImage; set => _useCustomImage = value; }
         public ThumbnailSettings() { }
+
+        private static ThumbnailSettings _defaultTAsset2DThumbnailSettings = null;
+        public static ThumbnailSettings GetDefaultTAsset2DThumbnailSettings()
+        {
+            if (_defaultTAsset2DThumbnailSettings == null)
+            {
+                _defaultTAsset2DThumbnailSettings = new ThumbnailSettings();
+                _defaultTAsset2DThumbnailSettings.targetEuler = new Vector3(17.5f, 0f, 0f);
+                _defaultTAsset2DThumbnailSettings.zoom = 1.47f;
+                _defaultTAsset2DThumbnailSettings.targetOffset = new Vector2(0f, -0.06f);
+            }
+            return _defaultTAsset2DThumbnailSettings;
+        }
         public ThumbnailSettings(Color backgroudColor, Vector3 lightEuler, Color lightColor, float lightIntensity,
             float zoom, Vector3 targetEuler, Vector2 targetOffset, bool useCustomImage)
         {
@@ -498,6 +551,20 @@ namespace PluginMaster
             var clone = new ThumbnailSettings();
             clone.Copy(this);
             return clone;
+        }
+
+        public override int GetHashCode()
+        {
+            int hashCode = 917907199;
+            hashCode = hashCode * -1521134295 + _backgroudColor.GetHashCode();
+            hashCode = hashCode * -1521134295 + _lightEuler.GetHashCode();
+            hashCode = hashCode * -1521134295 + _lightColor.GetHashCode();
+            hashCode = hashCode * -1521134295 + _lightIntensity.GetHashCode();
+            hashCode = hashCode * -1521134295 + _zoom.GetHashCode();
+            hashCode = hashCode * -1521134295 + _targetEuler.GetHashCode();
+            hashCode = hashCode * -1521134295 + _targetOffset.GetHashCode();
+            hashCode = hashCode * -1521134295 + _useCustomImage.GetHashCode();
+            return hashCode;
         }
     }
 
@@ -567,7 +634,7 @@ namespace PluginMaster
             _size = BoundsUtils.GetBoundsRecursive(prefab.transform).size;
             _bottomMagnitude = BoundsUtils.GetBottomMagnitude(prefab.transform);
             UpdateAssetType();
-            if (isAsset2D) SetSpriteThumbnailSettings();
+            if (isAsset2D) thumbnailSettings.Copy(ThumbnailSettings.GetDefaultTAsset2DThumbnailSettings());
             UpdateThumbnail(updateItemThumbnails: false, savePng: true);
         }
 
@@ -576,13 +643,6 @@ namespace PluginMaster
             _parentId = parentSettings.id;
             _parentSettings = parentSettings;
             this.parentSettings.UpdateTotalFrequency();
-        }
-
-        public void SetSpriteThumbnailSettings()
-        {
-            thumbnailSettings.targetEuler = new Vector3(17.5f, 0f, 0f);
-            thumbnailSettings.zoom = 1.47f;
-            thumbnailSettings.targetOffset = new Vector2(0f, -0.06f);
         }
 
         public override string thumbnailPath
@@ -775,7 +835,11 @@ namespace PluginMaster
             return clone;
         }
 
-        public override void OnBeforeSerialize() => base.OnBeforeSerialize();
+        public override void OnBeforeSerialize()
+        {
+            base.OnBeforeSerialize();
+            _prefabPath = UnityEditor.AssetDatabase.GetAssetPath(_prefab);
+        }
 
         public override void OnAfterDeserialize()
         {
@@ -844,6 +908,21 @@ namespace PluginMaster
                 _directionList.RemoveAt(maxListCount);
             }
         }
+
+        public override int GetHashCode()
+        {
+            var hashCode = base.GetHashCode();
+            hashCode = hashCode * -1521134295 + _overwriteSettings.GetHashCode();
+            hashCode = hashCode * -1521134295 + _guid.GetHashCode();
+            hashCode = hashCode * -1521134295 + _prefabPath.GetHashCode();
+            hashCode = hashCode * -1521134295 + _frequency.GetHashCode();
+            hashCode = hashCode * -1521134295 + _parentId.GetHashCode();
+            hashCode = hashCode * -1521134295 + _embedAtPivotHeight.GetHashCode();
+            hashCode = hashCode * -1521134295 + _overwriteThumbnailSettings.GetHashCode();
+            hashCode = hashCode * -1521134295 + _includeInThumbnail.GetHashCode();
+            hashCode = hashCode * -1521134295 + _isAsset2D.GetHashCode();
+            return hashCode;
+        }
     }
 
     [System.Serializable]
@@ -861,6 +940,7 @@ namespace PluginMaster
         [field: System.NonSerialized] private float _totalFrequency = -1;
         [field: System.NonSerialized] private PatternMachine _patternMachine = null;
         [field: System.NonSerialized] private PaletteData _palette = null;
+
 
         public string name
         {
@@ -961,11 +1041,13 @@ namespace PluginMaster
             _name = prefab.name;
             Copy(palette.brushCreationSettings.defaultBrushSettings);
             thumbnailSettings.Copy(palette.brushCreationSettings.defaultThumbnailSettings);
+            if (isAsset2D) thumbnailSettings.Copy(ThumbnailSettings.GetDefaultTAsset2DThumbnailSettings());
             UpdateThumbnail(updateItemThumbnails: false, savePng: true);
+
         }
 
         public override string thumbnailPath
-            => palette == null ? null : palette.thumbnailsPath + "/" + id.ToString("X") + ".png";
+            => palette == null ? null : palette.thumbnailsFolderPath + "/" + id.ToString("X") + ".png";
 
         public void AddItem(MultibrushItemSettings item)
         {
@@ -1065,32 +1147,72 @@ namespace PluginMaster
                 return _totalFrequency;
             }
         }
+        private int GetNextItemIndex()
+        {
+            if (frequencyMode == FrequencyMode.RANDOM)
+            {
+                if (_items.Count == 1) return 0;
+                var rand = UnityEngine.Random.Range(0f, totalFrequency);
+                float sum = 0;
+                for (int i = 0; i < _items.Count; ++i)
+                {
+                    sum += _items[i].frequency;
+                    if (rand <= sum) return i;
+                }
+                return -1;
+            }
+            if (_patternMachine == null)
+            {
+                if (PatternMachine.Validate(_pattern, _items.Count,
+                    out PatternMachine.Token[] tokens, out PatternMachine.Token[] endTokens)
+                    == PatternMachine.ValidationResult.VALID) _patternMachine = new PatternMachine(tokens, endTokens);
+            }
+            var result = _patternMachine == null ? -2 : _patternMachine.nextIndex - 1;
+            return result;
+        }
+        private int _currentItemIndex = 0;
         public int nextItemIndex
         {
             get
             {
-                if (frequencyMode == FrequencyMode.RANDOM)
-                {
-                    if (_items.Count == 1) return 0;
-                    var rand = UnityEngine.Random.Range(0f, totalFrequency);
-                    float sum = 0;
-                    for (int i = 0; i < _items.Count; ++i)
-                    {
-                        sum += _items[i].frequency;
-                        if (rand <= sum) return i;
-                    }
-                    return -1;
-                }
-                if (_patternMachine == null)
-                {
-                    if (PatternMachine.Validate(_pattern, _items.Count,
-                        out PatternMachine.Token[] tokens, out PatternMachine.Token[] endTokens)
-                        == PatternMachine.ValidationResult.VALID) _patternMachine = new PatternMachine(tokens, endTokens);
-                }
-                return _patternMachine == null ? -2 : _patternMachine.nextIndex - 1;
+                _currentItemIndex = GetNextItemIndex();
+                return _currentItemIndex;
             }
         }
-
+        public int currentItemIndex
+        {
+            get
+            {
+                return _currentItemIndex;
+            }
+        }
+        public void ResetCurrentItemIndex()
+        {
+            if (frequencyMode == FrequencyMode.RANDOM) return;
+            if (_patternMachine == null)
+            {
+                if (PatternMachine.Validate(_pattern, _items.Count,
+                    out PatternMachine.Token[] tokens, out PatternMachine.Token[] endTokens)
+                    == PatternMachine.ValidationResult.VALID) _patternMachine = new PatternMachine(tokens, endTokens);
+                return;
+            }
+            _patternMachine.Reset();
+            _currentItemIndex = _patternMachine.nextIndex - 1;
+        }
+        public void SetNextItemIndex()
+        {
+            _currentItemIndex = GetNextItemIndex();
+        }
+        public int GetPatternTokenIndex()
+        {
+            if (frequencyMode == FrequencyMode.RANDOM | _patternMachine == null) return 0;
+            return _patternMachine.tokenIndex;
+        }
+        public void SetPatternTokenIndex(int value)
+        {
+            if (frequencyMode == FrequencyMode.RANDOM | _patternMachine == null) return;
+            _patternMachine.SetTokenIndex(value);
+        }
         private void UpdatePatternMachine()
         {
             if (PatternMachine.Validate(_pattern, _items.Count,
@@ -1181,6 +1303,8 @@ namespace PluginMaster
                 if (_embedInSurface) UpdateBottomVertices();
             }
         }
+        public System.Collections.Generic.HashSet<GameObject> prefabs
+            => _items.Select(i => i.prefab).Where(p => p != null).ToHashSet();
         public bool ContainsPrefab(int prefabId)
             => _items.Exists(item => item.prefab != null && item.prefab.GetInstanceID() == prefabId);
 
@@ -1222,6 +1346,7 @@ namespace PluginMaster
                 var max = Vector3.one * float.MinValue;
                 foreach (var item in _items)
                     max = Vector3.Max(max, item.size);
+                max = Vector3.Scale(max, maxScaleMultiplier);
                 return max;
             }
         }
@@ -1243,6 +1368,18 @@ namespace PluginMaster
         public void Cleanup()
         {
             foreach (var item in items) if (item.prefab == null) RemoveItem(item);
+        }
+
+        public override int GetHashCode()
+        {
+            int hashCode = 917907199;
+            hashCode = hashCode * -1521134295 + _name.GetHashCode();
+            hashCode = hashCode * -1521134295 + _frequencyMode.GetHashCode();
+            hashCode = hashCode * -1521134295 + _pattern.GetHashCode();
+            hashCode = hashCode * -1521134295 + _restartPatternForEachStroke.GetHashCode();
+            foreach (var item in _items) hashCode = hashCode * -1521134295 + item.GetHashCode();
+            return hashCode;
+
         }
     }
 
@@ -1335,6 +1472,16 @@ namespace PluginMaster
             _defaultBrushSettings.Copy(other._defaultBrushSettings);
             _defaultThumbnailSettings.Copy(other._defaultThumbnailSettings);
         }
+
+        public override int GetHashCode()
+        {
+            int hashCode = 917907199;
+            hashCode = hashCode * -1521134295 + _includeSubfolders.GetHashCode();
+            hashCode = hashCode * -1521134295 + _addLabelsToDroppedPrefabs.GetHashCode();
+            hashCode = hashCode * -1521134295 + _defaultBrushSettings.GetHashCode();
+            hashCode = hashCode * -1521134295 + _defaultThumbnailSettings.GetHashCode();
+            return hashCode;
+        }
     }
     public class BrushInputData
     {
@@ -1356,8 +1503,10 @@ namespace PluginMaster
     }
 
     #endregion
+
+    #region PALETTE DATA & MANAGER
     [System.Serializable]
-    public class PaletteData
+    public class PaletteData : ISerializationCallbackReceiver
     {
         [SerializeField] private string _version = PWBData.VERSION;
         [SerializeField] private string _name = null;
@@ -1366,6 +1515,7 @@ namespace PluginMaster
         private System.Collections.Generic.List<MultibrushSettings> _brushes
             = new System.Collections.Generic.List<MultibrushSettings>();
         [SerializeField] BrushCreationSettings _brushCreationSettings = new BrushCreationSettings();
+        [SerializeField] private int _hashCode = 0;
         private string _filePath = null;
         private bool _saving = false;
         public PaletteData(string name, long id) => (_name, _id) = (name, id);
@@ -1392,18 +1542,20 @@ namespace PluginMaster
         {
             get
             {
-                void SetFilePath() => _filePath = PWBData.palettesDirectory + "/" + GetFileNameFromData(this);
+                void SetFilePath() => _filePath = PWBData.palettesDirectory + "/"
+                    + GetFileNameFromData(this, includeExtension: true);
                 if (_filePath == null) SetFilePath();
                 else if (!System.IO.File.Exists(_filePath)) SetFilePath();
                 return _filePath;
             }
             set => _filePath = value;
         }
-        public string thumbnailsPath
+        public string thumbnailsFolderPath
         {
             get
             {
-                var path = filePath.Substring(0, filePath.Length - 4);
+                var path = PWBData.palettesDirectory + (PWBCore.staticData.createThumbnailsFolder ? "/Thumbnails/" : "/")
+                    + GetFileNameFromData(this, includeExtension: false);
                 if (!System.IO.Directory.Exists(path)) System.IO.Directory.CreateDirectory(path);
                 return path;
             }
@@ -1412,7 +1564,9 @@ namespace PluginMaster
         public string version { get => _version; set => _version = value; }
         public bool saving => _saving;
         public void StopSaving() => _saving = false;
-        public static string GetFileNameFromData(PaletteData data) => "PWB_" + data._id.ToString("X") + ".txt";
+
+        public static string GetFileNameFromData(PaletteData data, bool includeExtension)
+            => "PWB_" + data._id.ToString("X") + (includeExtension ? ".txt" : "");
 
         public MultibrushSettings GetBrush(int idx)
         {
@@ -1482,25 +1636,26 @@ namespace PluginMaster
             PrefabPalette.OnChangeRepaint();
         }
 
-        public void DuplicateBrush(int index) => DuplicateBrushAt(index, index);
+        public void DuplicateBrush(int index, out MultibrushSettings duplicate)
+            => DuplicateBrushAt(index, index, out duplicate);
 
-        public void DuplicateBrushAt(int indexToDuplicate, int at)
+        public void DuplicateBrushAt(int indexToDuplicate, int at, out MultibrushSettings duplicate)
         {
             var original = _brushes[indexToDuplicate];
-            var clone = original.Clone();
+            duplicate = original.Clone() as MultibrushSettings;
 
-            if (clone.thumbnailSettings.useCustomImage)
+            if (duplicate.thumbnailSettings.useCustomImage)
             {
-                clone.thumbnailSettings.useCustomImage = false;
-                clone.UpdateThumbnail(updateItemThumbnails: true, savePng: true);
-                clone.thumbnailSettings.useCustomImage = true;
+                duplicate.thumbnailSettings.useCustomImage = false;
+                duplicate.UpdateThumbnail(updateItemThumbnails: true, savePng: true);
+                duplicate.thumbnailSettings.useCustomImage = true;
                 var thumbnailClone = new Texture2D(original.thumbnail.width, original.thumbnail.height);
                 thumbnailClone.SetPixels(original.thumbnail.GetPixels());
                 thumbnailClone.Apply();
-                clone.SetCustomThumbnailTexture(thumbnailClone, savePng: true);
+                duplicate.SetCustomThumbnailTexture(thumbnailClone, savePng: true);
             }
-            else clone.UpdateThumbnail(updateItemThumbnails: true, savePng: true);
-            _brushes.Insert(at, clone as MultibrushSettings);
+            else duplicate.UpdateThumbnail(updateItemThumbnails: true, savePng: true);
+            _brushes.Insert(at, duplicate);
             PWBCore.staticData.SaveAndUpdateVersion();
             Save();
         }
@@ -1551,6 +1706,7 @@ namespace PluginMaster
         public bool ContainsBrush(MultibrushSettings brush)
             => _brushes.Contains(brush) || _brushes.Exists(b => b.id == brush.id);
 
+        public static System.Action OnPaletteSaved;
         public string Save()
         {
             _saving = true;
@@ -1558,6 +1714,7 @@ namespace PluginMaster
             var fileExist = System.IO.File.Exists(filePath);
             System.IO.File.WriteAllText(filePath, jsonString);
             if (!fileExist) PWBCore.AssetDatabaseRefresh();
+            if (OnPaletteSaved != null) OnPaletteSaved();
             return filePath;
         }
 
@@ -1586,6 +1743,43 @@ namespace PluginMaster
             Save();
             ClearObjectQuery();
         }
+
+        public int hashCode => _hashCode;
+        public override int GetHashCode()
+        {
+            int hashCode = 917907199;
+            hashCode = hashCode * -1521134295 + _version.GetHashCode();
+            hashCode = hashCode * -1521134295 + _name.GetHashCode();
+            hashCode = hashCode * -1521134295 + _id.GetHashCode();
+            foreach (var brush in _brushes) hashCode = hashCode * -1521134295 + brush.GetHashCode();
+            hashCode = hashCode * -1521134295 + _brushCreationSettings.GetHashCode();
+            return hashCode;
+        }
+
+        public void ResetHashCode()
+        {
+            _hashCode = GetHashCode();
+        }
+
+        void ISerializationCallbackReceiver.OnBeforeSerialize()
+        {
+            _hashCode = GetHashCode();
+        }
+
+        void ISerializationCallbackReceiver.OnAfterDeserialize()
+        {
+        }
+    }
+
+    [System.Serializable]
+    public struct BasicPaletteData
+    {
+        [SerializeField] private int _hashCode;
+        [SerializeField] private string _name;
+        [SerializeField] private long _id;
+        public int hashCode => _hashCode;
+        public string name => _name;
+        public long id => _id;
     }
 
     [System.Serializable]
@@ -1604,10 +1798,9 @@ namespace PluginMaster
         [SerializeField] private bool _showTabsInMultipleRows = false;
         private System.Collections.Generic.HashSet<int> _idxSelection = new System.Collections.Generic.HashSet<int>();
 
-        public static System.Action OnBrushChanged;
+        public static System.Action OnBrushSelectionChanged;
         public static System.Action OnSelectionChanged;
         public static System.Action OnPaletteChanged;
-
         private bool _pickingBrushes = false;
 
         private int _movingBrushesFromIdx = -1;
@@ -1643,9 +1836,12 @@ namespace PluginMaster
                 return _instance;
             }
         }
-
+        private static bool _loadPaletteFilesPending = false;
+        public static void SetLoadPaletteFilesPending() => _loadPaletteFilesPending = true;
+        public static bool loadPaletteFilesPending => _loadPaletteFilesPending;
         public void LoadPaletteFiles(bool deleteUnusedThumbnails)
         {
+            _loadPaletteFilesPending = false;
             var txtPaths = System.IO.Directory.GetFiles(PWBData.palettesDirectory, "*.txt");
             if (txtPaths.Length == 0)
             {
@@ -1661,6 +1857,24 @@ namespace PluginMaster
                 if (string.IsNullOrEmpty(fileText)) continue;
                 try
                 {
+                    var basicPaletteDataFromFile = JsonUtility.FromJson<BasicPaletteData>(fileText);
+                    if (_paletteDataList.Count > 0)
+                    {
+                        var sameHash = _paletteDataList.Where(p => p.GetHashCode() == basicPaletteDataFromFile.hashCode);
+                        if (sameHash.Count() > 0)
+                        {
+                            clearList = false;
+                            continue;
+                        }
+                        var sameId = _paletteDataList.Where(p => p.id == basicPaletteDataFromFile.id);
+                        if (sameId.Count() > 0)
+                        {
+                            var currentData = sameId.First();
+                            currentData.Save();
+                            clearList = false;
+                            continue;
+                        }
+                    }
                     var paletteData = JsonUtility.FromJson<PaletteData>(fileText);
                     if (paletteData == null) continue;
                     if (clearList)
@@ -1675,7 +1889,6 @@ namespace PluginMaster
                 {
                     Debug.LogWarning("PWB found a corrupted palette file at: " + path);
                 }
-
             }
             if (deleteUnusedThumbnails) ThumbnailUtils.DeleteUnusedThumbnails();
         }
@@ -1729,7 +1942,8 @@ namespace PluginMaster
             instance._paletteDataList.Add(palette);
             if (save)
             {
-                palette.filePath = PWBData.palettesDirectory + "/" + PaletteData.GetFileNameFromData(palette);
+                palette.filePath = PWBData.palettesDirectory + "/"
+                    + PaletteData.GetFileNameFromData(palette, includeExtension: true);
                 palette.Save();
             }
         }
@@ -1748,7 +1962,7 @@ namespace PluginMaster
         public static void RemovePaletteAt(int paletteIdx)
         {
             var filePath = instance._paletteDataList[paletteIdx].filePath;
-            var thumbnailFolderPath = instance._paletteDataList[paletteIdx].thumbnailsPath;
+            var thumbnailFolderPath = instance._paletteDataList[paletteIdx].thumbnailsFolderPath;
             instance._paletteDataList.RemoveAt(paletteIdx);
             var metapath = filePath + ".meta";
             if (System.IO.File.Exists(metapath)) System.IO.File.Delete(metapath);
@@ -1873,9 +2087,15 @@ namespace PluginMaster
                     selectedBrush.UpdateAssetTypes();
                 }
                 else instance._selectedBrushIdx = -1;
+                if (PWBCore.staticData.openBrushPropertiesWhenABrushIsSelected && instance._selectedBrushIdx >= 0)
+                    BrushProperties.ShowWindow();
+                if (ToolManager.tool == ToolManager.PaintTool.PIN)
+                {
+                    BrushstrokeManager.UpdateBrushstroke(true);
+                    PWBIO.ResetPinValues();
+                }
+                if (OnBrushSelectionChanged != null) OnBrushSelectionChanged();
                 BrushstrokeManager.UpdateBrushstroke(true);
-                if (ToolManager.tool == ToolManager.PaintTool.PIN) PWBIO.ResetPinValues();
-                if (OnBrushChanged != null) OnBrushChanged();
             }
         }
 
@@ -1891,6 +2111,8 @@ namespace PluginMaster
                     PWBCore.UpdateTempColliders();
                     PWBIO.repaint = true;
                     UnityEditor.SceneView.RepaintAll();
+                    if (UnityEditor.SceneView.sceneViews.Count > 0)
+                        ((UnityEditor.SceneView)UnityEditor.SceneView.sceneViews[0]).Focus();
                 }
                 PrefabPalette.RepainWindow();
             }
@@ -2104,7 +2326,7 @@ namespace PluginMaster
         public static string[] GetPaletteThumbnailFolderPaths()
         {
             var paths = new string[instance.paletteDataList.Count];
-            for (int i = 0; i < paths.Length; ++i) paths[i] = instance.paletteDataList[i].thumbnailsPath;
+            for (int i = 0; i < paths.Length; ++i) paths[i] = instance.paletteDataList[i].thumbnailsFolderPath;
             return paths;
         }
         public static void Cleanup()
@@ -2170,4 +2392,5 @@ namespace PluginMaster
             if (repaintPalette) PrefabPalette.OnChangeRepaint();
         }
     }
+    #endregion
 }

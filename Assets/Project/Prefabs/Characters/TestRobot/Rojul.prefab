@@ -18,7 +18,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2465985659367620890
 Transform:
   m_ObjectHideFlags: 0
@@ -227,11 +227,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   actor: {fileID: 7206668920010851156}
-  maxVariants: 15
-  nodeTemplates:
-  - background_dialogue_{actor}_{time}_{index}
-  minInterval: 1
-  maxInterval: 2
+  defaultThoughts:
+  - thoughtName: background_dialogue_{actor}
+    maxVariants: 3
+    maxUseLimit: -1
+  - thoughtName: background_dialogue_{actor}_{time}
+    maxVariants: 3
+    maxUseLimit: -1
+  minInterval: 15
+  maxInterval: 30
 --- !u!1 &354891109219564534
 GameObject:
   m_ObjectHideFlags: 0
@@ -1549,19 +1553,19 @@ MonoBehaviour:
       rid: 3582672023768269325
   m_RuntimeData:
     m_Overrides:
-    - rid: 1724515181521797585
+    - rid: 1724515230915232187
   references:
     version: 2
     RefIds:
-    - rid: 1724515181521797585
+    - rid: 1724515230915232187
       type: {class: Parameter, ns: GameCreator.Runtime.Behavior, asm: GameCreator.Runtime.Behavior}
       data:
         m_Breakpoint: 0
         m_IsEnabled: 1
         m_Value:
-          rid: 1724515181521797586
+          rid: 1724515230915232188
         m_Name: Social
-    - rid: 1724515181521797586
+    - rid: 1724515230915232188
       type: {class: ValueStat, ns: GameCreator.Runtime.Stats, asm: GameCreator.Runtime.Stats}
       data:
         m_Breakpoint: 0
@@ -1618,6 +1622,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   actorName: Rojul
+  thoughts: []
   animationStates:
   - m_Name: FoldArmsCasual
     m_State:

@@ -269,6 +269,46 @@ namespace PluginMaster
             }
         }
 
+        public void GetColliding(Vector3 center, Vector3 localInnerRadius,
+            Quaternion gridRotation, Quaternion objectRotation, System.Collections.Generic.List<T> result)
+        {
+            var checkSize = localInnerRadius * 1.9999f;
+            var checkBounds = new Bounds(center, checkSize);
+            if (!bounds.Intersects(checkBounds))
+            {
+                return;
+            }
+            var nullObjectsIndexes = new System.Collections.Generic.List<int>();
+            // Check against any objects in this node
+            for (int i = 0; i < objects.Count; i++)
+            {
+                var octreeObj = objects[i];
+                if (octreeObj.Obj == null)
+                {
+                    nullObjectsIndexes.Insert(0, i);
+                    continue;
+                }
+                var objCenter = octreeObj.Bounds.center;
+
+                var fromTargetToObj = objCenter - center;
+                var rotatedCellCenter = center + Quaternion.Inverse(gridRotation) * fromTargetToObj;
+                var rotatedBounds = new Bounds(rotatedCellCenter, octreeObj.Bounds.size);
+
+                if (rotatedBounds.Intersects(checkBounds))
+                    result.Add(objects[i].Obj);
+            }
+            foreach (var i in nullObjectsIndexes) objects.RemoveAt(i);
+
+            // Check children
+            if (children != null)
+            {
+                for (int i = 0; i < 8; i++)
+                {
+                    children[i].GetColliding(center, localInnerRadius, gridRotation, objectRotation, result);
+                }
+            }
+        }
+
         /// <summary>
         /// Returns an array of objects that intersect with the specified ray, if any. Otherwise returns an empty array. See also: IsColliding.
         /// </summary>
@@ -304,6 +344,46 @@ namespace PluginMaster
             }
         }
 
+        private static bool IntersectsRay(Ray ray, Bounds bounds, float radius)
+        {
+            var boxCenterPlane = new Plane(-ray.direction, bounds.center);
+            var sphereCenter = boxCenterPlane.ClosestPointOnPlane(ray.origin);
+            var closestPoint = bounds.ClosestPoint(sphereCenter);
+            var distance = (closestPoint - sphereCenter).magnitude;
+            return distance <= radius;
+        }
+
+        public bool IsColliding(ref Ray checkRay, float radius, float maxDistance = float.PositiveInfinity)
+        {
+            if (!IntersectsRay(checkRay, bounds, radius)) return false;
+
+            for (int i = 0; i < objects.Count; i++)
+                if (IntersectsRay(checkRay, objects[i].Bounds, radius)) return true;
+
+            if (children == null) return false;
+            for (int i = 0; i < 8; i++)
+                if (children[i].IsColliding(ref checkRay, radius, maxDistance)) return true;
+            return false;
+        }
+
+        public void GetColliding(ref Ray checkRay, float radius, System.Collections.Generic.List<T> result, float maxDistance = float.PositiveInfinity)
+        {
+            if (!IntersectsRay(checkRay, bounds, radius)) return;
+
+            for (int i = 0; i < objects.Count; i++)
+                if (IntersectsRay(checkRay, objects[i].Bounds, radius)) result.Add(objects[i].Obj);
+
+            if (children == null) return;
+            for (int i = 0; i < 8; i++) children[i].GetColliding(ref checkRay, radius, result, maxDistance);
+        }
+
+        public T[] GetCollidingArray(ref Ray checkRay, float maxDistance = float.PositiveInfinity)
+        {
+            var result = new System.Collections.Generic.List<T>();
+            GetColliding(ref checkRay, result, maxDistance);
+            return result.ToArray();
+        }
+
         public void GetWithinFrustum(Plane[] planes, System.Collections.Generic.List<T> result)
         {
             // Is the input node inside the frustum?
@@ -329,6 +409,40 @@ namespace PluginMaster
                     children[i].GetWithinFrustum(planes, result);
                 }
             }
+        }
+
+        public void GetCollidingWithinFrustum(Plane[] planes, System.Collections.Generic.List<T> result,
+            Ray checkRay, float radius, Camera cam, float maxDistance = float.PositiveInfinity)
+        {
+            if (!GeometryUtility.TestPlanesAABB(planes, bounds)) return;
+
+            for (int i = 0; i < objects.Count; i++)
+            {
+                if (!GeometryUtility.TestPlanesAABB(planes, objects[i].Bounds)) continue;
+                if (IntersectsRay(checkRay, objects[i].Bounds, radius)) result.Add(objects[i].Obj);
+            }
+
+            if (children == null) return;
+            for (int i = 0; i < 8; i++)
+                children[i].GetCollidingWithinFrustum(planes, result, checkRay, radius, cam, maxDistance);
+
+        }
+
+        public void GetCollidingWithinFrustum(Plane[] planes, System.Collections.Generic.List<(T, Bounds)> result,
+            Ray checkRay, float radius, Camera cam, float maxDistance = float.PositiveInfinity)
+        {
+            if (!GeometryUtility.TestPlanesAABB(planes, bounds)) return;
+
+            for (int i = 0; i < objects.Count; i++)
+            {
+                if (!GeometryUtility.TestPlanesAABB(planes, objects[i].Bounds)) continue;
+                if (IntersectsRay(checkRay, objects[i].Bounds, radius)) result.Add((objects[i].Obj, objects[i].Bounds));
+            }
+
+            if (children == null) return;
+            for (int i = 0; i < 8; i++)
+                children[i].GetCollidingWithinFrustum(planes, result, checkRay, radius, cam, maxDistance);
+
         }
 
         /// <summary>
@@ -826,6 +940,12 @@ namespace PluginMaster
             rootNode.GetColliding(ref checkBounds, collidingWith);
         }
 
+
+        public void GetColliding(Vector3 center, Vector3 localInnerRadius, Quaternion gridRotation, Quaternion objectRotation,
+            System.Collections.Generic.List<T> result)
+        {
+            rootNode.GetColliding(center, localInnerRadius, gridRotation, objectRotation, result);
+        }
         /// <summary>
         /// Returns an array of objects that intersect with the specified ray, if any. Otherwise returns an empty array. See also: IsColliding.
         /// </summary>
@@ -838,6 +958,13 @@ namespace PluginMaster
             rootNode.GetColliding(ref checkRay, collidingWith, maxDistance);
         }
 
+        public T[] GetColliding(Ray checkRay, float maxDistance = float.PositiveInfinity)
+        {
+            var collidingWith = new System.Collections.Generic.List<T>();
+            rootNode.GetColliding(ref checkRay, collidingWith, maxDistance);
+            return collidingWith.ToArray();
+        }
+
         public System.Collections.Generic.List<T> GetWithinFrustum(Camera cam)
         {
             var planes = GeometryUtility.CalculateFrustumPlanes(cam);
@@ -845,6 +972,25 @@ namespace PluginMaster
             var list = new System.Collections.Generic.List<T>();
             rootNode.GetWithinFrustum(planes, list);
             return list;
+        }
+
+        public T[] GetCollidingtWithinFrustum(Ray checkRay, float radius,
+            Camera cam, float maxDistance = float.PositiveInfinity)
+        {
+            var planes = GeometryUtility.CalculateFrustumPlanes(cam);
+            var collidingWith = new System.Collections.Generic.List<T>();
+            rootNode.GetCollidingWithinFrustum(planes, collidingWith, checkRay, radius, cam, maxDistance);
+            return collidingWith.ToArray();
+        }
+
+        public bool GetCollidingtWithinFrustum(Ray checkRay, float radius,
+            Camera cam, out (T, Bounds)[] collidingWith, float maxDistance = float.PositiveInfinity)
+        {
+            var planes = GeometryUtility.CalculateFrustumPlanes(cam);
+            var result = new System.Collections.Generic.List<(T, Bounds)>();
+            rootNode.GetCollidingWithinFrustum(planes, result, checkRay, radius, cam, maxDistance);
+            collidingWith = result.ToArray();
+            return collidingWith.Length > 0;
         }
 
         public Bounds GetMaxBounds()

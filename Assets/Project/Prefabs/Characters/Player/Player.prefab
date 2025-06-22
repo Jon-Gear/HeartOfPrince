@@ -1046,7 +1046,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &8643185322586486927
 Transform:
   m_ObjectHideFlags: 0
@@ -1074,10 +1074,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb32cc0567b9d97488afda8e6f9e5736, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mood: neutral
-  location: alley
-  situation: idle
-  maxVariants: 3
+  actor: {fileID: 1665693158485693602}
   minInterval: 20
   maxInterval: 60
 --- !u!1 &4087725997866846209
@@ -1885,6 +1882,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   actorName: Prince
+  thoughts: []
   animationStates:
   - m_Name: FoldArmsCasual
     m_State:

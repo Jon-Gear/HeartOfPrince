@@ -70,7 +70,7 @@ namespace PluginMaster
     }
 
     [System.Serializable]
-    public class GravityToolManager : ToolManagerBase<GravityToolSettings> 
+    public class GravityToolManager : ToolManagerBase<GravityToolSettings>
     {
         private static float _surfaceDistanceSensitivityStatic = 1.0f;
         [SerializeField] private float _surfaceDistanceSensitivity = _surfaceDistanceSensitivityStatic;
@@ -107,6 +107,11 @@ namespace PluginMaster
         private static Material _gravityLinesMaterial = null;
         private static readonly int OPACITY_PROP_ID = Shader.PropertyToID("_opacity");
 
+        public static void InitializeGravityHeight()
+        {
+            if (PaletteManager.selectedBrush == null) return;
+            GravityToolManager.settings.height = PaletteManager.selectedBrush.maxBrushSize.y * 3;
+        }
         private static void GravityToolDuringSceneGUI(UnityEditor.SceneView sceneView)
         {
             if (GravityToolManager.settings.createTempColliders)
@@ -122,10 +127,11 @@ namespace PluginMaster
             if (_snapToVertex)
                 snappedToVertex = SnapToVertex(mouseRay, out closestVertexInfo, sceneView.in2DMode);
             if (snappedToVertex) mouseRay.origin = closestVertexInfo.point - mouseRay.direction;
-            if (MouseRaycast(mouseRay, out RaycastHit hit, out GameObject c, float.MaxValue, -1, paintOnPalettePrefabs: true, castOnMeshesWithoutCollider: true))
-                DrawGravityBrush(hit, sceneView.camera);
+            if (MouseRaycast(mouseRay, out RaycastHit hit, out GameObject c, float.MaxValue, -1,
+                paintOnPalettePrefabs: true, castOnMeshesWithoutCollider: true))
+                DrawGravityBrush(ref hit, sceneView.camera);
             else return;
-            
+
             void AddHeight(float value)
             {
                 GravityToolManager.settings.height += value;
@@ -141,7 +147,7 @@ namespace PluginMaster
 
                 var finalPoses = GravityUtils.SimulateGravity(paintedObjects, GravityToolManager.settings.simData, false);
 
-                for(int i = 0; i < paintedObjects.Length; ++i)
+                for (int i = 0; i < paintedObjects.Length; ++i)
                 {
                     var obj = paintedObjects[i];
                     var parent = obj.transform.parent;
@@ -186,13 +192,13 @@ namespace PluginMaster
                 }
             }
         }
-
-        private static void DrawGravityBrush(RaycastHit hit, Camera camera)
+        private static void DrawGravityBrush(ref RaycastHit hit, Camera camera)
         {
             var settings = GravityToolManager.settings;
 
             PWBCore.UpdateTempCollidersIfHierarchyChanged();
 
+            hit.point = SnapToBounds(hit.point);
             hit.point = SnapAndUpdateGridOrigin(hit.point, SnapManager.settings.snappingEnabled,
                 true, true, false, Vector3.down);
             var tangent = GetTangent(Vector3.up);
@@ -201,13 +207,13 @@ namespace PluginMaster
             if (settings.brushShape == BrushToolSettings.BrushShape.SQUARE)
             {
                 DrawSquareIndicator(hit.point, hit.normal, settings.radius,
-                    settings.height, tangent, bitangent, Vector3.up, true, true);
+                    settings.height, tangent, bitangent, Vector3.up, true, true, drawDropArea: true);
             }
             else
             {
                 DrawCricleIndicator(hit.point, hit.normal,
-                    settings.brushShape == BrushToolBase.BrushShape.POINT ? 0.1f : settings.radius,
-                    settings.height, tangent, bitangent, Vector3.up, true, true);
+                     settings.brushShape == BrushToolBase.BrushShape.POINT ? 0.1f : settings.radius,
+                     settings.height, tangent, bitangent, Vector3.up, true, true, drawDropArea: true);
             }
 
             if (_gravityLinesMesh == null)
@@ -236,7 +242,7 @@ namespace PluginMaster
             Graphics.DrawMesh(_gravityLinesMesh, gravityLinesMatrix, _gravityLinesMaterial, 0, camera);
 
             Transform surface = null;
-            if(hit.collider != null) surface = hit.collider.transform;
+            if (hit.collider != null) surface = hit.collider.transform;
 
             GravityStrokePreview(hit.point + new Vector3(0f, settings.height, 0f), tangent,
                 bitangent, camera, surface);
@@ -278,7 +284,7 @@ namespace PluginMaster
                 _paintStroke.Add(new PaintStrokeItem(prefab, itemPosition,
                     itemRotation * Quaternion.Euler(prefab.transform.eulerAngles),
                     itemScale, layer, parentTransform, surface, strokeItem.flipX, strokeItem.flipY));
-                PreviewBrushItem(prefab, rootToWorld, layer, camera,false, false, strokeItem.flipX, strokeItem.flipY);
+                PreviewBrushItem(prefab, rootToWorld, layer, camera, false, false, strokeItem.flipX, strokeItem.flipY);
             }
         }
 

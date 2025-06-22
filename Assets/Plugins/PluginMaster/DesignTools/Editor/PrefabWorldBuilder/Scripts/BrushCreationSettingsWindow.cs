@@ -62,7 +62,7 @@ namespace PluginMaster
                         using (new UnityEditor.EditorGUI.DisabledGroupScope(!settings.addLabelsToDroppedPrefabs))
                         {
                             UnityEditor.EditorGUIUtility.labelWidth = 40;
-                            settings.labelsCSV = UnityEditor.EditorGUILayout.TextField("Labels:", settings.labelsCSV);
+                            settings.labelsCSV = UnityEditor.EditorGUILayout.TextField("Labels", settings.labelsCSV);
                         }
                     }
 
@@ -79,7 +79,7 @@ namespace PluginMaster
                         using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
                         {
                             BrushProperties.BrushFields(settings.defaultBrushSettings, ref _brushPosGroupOpen,
-                                ref _brushRotGroupOpen, ref _brushScaleGroupOpen, ref _brushFlipGroupOpen, this, UNDO_MSG);
+                                ref _brushRotGroupOpen, ref _brushScaleGroupOpen, ref _brushFlipGroupOpen);
                             GUILayout.Space(10);
                             if (GUILayout.Button("Reset to factory settings"))
                             {

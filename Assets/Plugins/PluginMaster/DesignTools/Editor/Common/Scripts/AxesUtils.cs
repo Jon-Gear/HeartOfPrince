@@ -62,8 +62,25 @@ namespace PluginMaster
             }
             public static implicit operator SignedAxis(Vector3 value)
             {
+                value.x = Mathf.Clamp(Mathf.Round(value.x), -1f, 1f);
+                value.y = Mathf.Clamp(Mathf.Round(value.y), -1f, 1f);
+                value.z = Mathf.Clamp(Mathf.Round(value.z), -1f, 1f);
                 if (_dictionary.ContainsKey(value)) return _dictionary[value];
-                Debug.LogWarning("Rotated Axis");
+                if (Mathf.Approximately(value.x, 0f) && Mathf.Approximately(value.y, 1f) && Mathf.Approximately(value.z, 0f))
+                    return UP;
+                if (Mathf.Approximately(value.x, 0f) && Mathf.Approximately(value.y, -1f) && Mathf.Approximately(value.z, 0f))
+                    return DOWN;
+                if (Mathf.Approximately(value.x, 1f) && Mathf.Approximately(value.y, 0f) && Mathf.Approximately(value.z, 0f))
+                    return RIGHT;
+                if (Mathf.Approximately(value.x, -1f) && Mathf.Approximately(value.y, 0f) && Mathf.Approximately(value.z, 0f))
+                    return LEFT;
+                if (Mathf.Approximately(value.x, 0f) && Mathf.Approximately(value.y, 0f) && Mathf.Approximately(value.z, 1f))
+                    return FORWARD;
+                if (Mathf.Approximately(value.x, 0f) && Mathf.Approximately(value.y, 0f) && Mathf.Approximately(value.z, -1f))
+                    return BACK;
+                if (Mathf.Approximately(value.x, 0f) && Mathf.Approximately(value.y, 0f) && Mathf.Approximately(value.z, 0f))
+                    Debug.LogWarning($"Zero: ({value.x}, {value.y}, {value.z})");
+                else Debug.LogWarning($"Rotated Axis: ({value.x}, {value.y}, {value.z})");
                 return UP;
             }
             public override bool Equals(object obj) => Equals(obj as SignedAxis);
@@ -79,6 +96,59 @@ namespace PluginMaster
                 if (value == DOWN) return Vector3.down;
                 if (value == FORWARD) return Vector3.forward;
                 else return Vector3.back;
+            }
+
+            public static Vector3 GetEulerAnglesFromAxes(SignedAxis forwardAxis, SignedAxis upwardAxis)
+            {
+                var angle = Vector3.zero;
+                if (upwardAxis == UP)
+                {
+                    if (forwardAxis == RIGHT) angle.y = 270;
+                    else if (forwardAxis == LEFT) angle.y = 90;
+                    else if (forwardAxis == BACK) angle.y = 180;
+                    return angle;
+                }
+                if (upwardAxis == DOWN)
+                {
+                    angle.z = 180;
+                    if (forwardAxis == RIGHT) angle.y = 90;
+                    else if (forwardAxis == LEFT) angle.y = 270;
+                    else if (forwardAxis == BACK) angle.y = 180;
+                    return angle;
+                }
+                if (upwardAxis == FORWARD)
+                {
+                    angle.x = 270;
+                    if (forwardAxis == RIGHT) angle.y = 270;
+                    else if (forwardAxis == LEFT) angle.y = 90;
+                    else if (forwardAxis == UP) angle.y = 180;
+                    return angle;
+                }
+                if (upwardAxis == BACK)
+                {
+                    angle.x = 90;
+                    if (forwardAxis == RIGHT) angle.y = 270;
+                    else if (forwardAxis == LEFT) angle.y = 90;
+                    else if (forwardAxis == DOWN) angle.y = 180;
+                    return angle;
+                }
+                if (upwardAxis == RIGHT)
+                {
+                    angle.z = 90;
+                    if (forwardAxis == UP) angle.y = 90;
+                    else if (forwardAxis == DOWN) angle.y = 270;
+                    else if (forwardAxis == BACK) angle.y = 180;
+                    return angle;
+                }
+                if (upwardAxis == LEFT)
+                {
+                    angle.z = 270;
+                    if (forwardAxis == UP) angle.y = 270;
+                    else if (forwardAxis == DOWN) angle.y = 90;
+                    else if (forwardAxis == BACK) angle.y = 180;
+                    return angle;
+                }
+                return angle;
             }
         }
         public static float GetAxisValue(Vector3 v, Axis axis) => (axis == Axis.X ? v.x : axis == Axis.Y ? v.y : v.z);

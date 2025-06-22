@@ -30,6 +30,9 @@ namespace PluginMaster
             else ApplicationEventHandler.RefreshOnImportingCancelled();
             refreshDatabase = false;
         }
+
+        public static string iconPath => UnityEditor.EditorGUIUtility.isProSkin ? "Sprites/" : "Sprites/LightTheme/";
+
         #region DATA
         private static PWBData _staticData = null;
         public static bool staticDataWasInitialized => _staticData != null;
@@ -42,9 +45,21 @@ namespace PluginMaster
                 return _staticData;
             }
         }
+        public static void Initialize()
+        {
+            if (!_loadedFromFile) LoadFromFile();
+            PaletteManager.SetLoadPaletteFilesPending();
+        }
 
+        public static bool _loadedFromFile = false;
+        public static long _loadTimeSpan = 0;
+        public static System.Action OnLoadedFromFile;
         public static void LoadFromFile()
         {
+            var now = System.DateTime.Now.Ticks / System.TimeSpan.TicksPerMillisecond;
+            if (now - _loadTimeSpan < 1000) return;
+            _loadTimeSpan = now;
+            _loadedFromFile = true;
             var text = PWBData.ReadDataText();
             void CreateFile()
             {
@@ -72,6 +87,7 @@ namespace PluginMaster
                     foreach (var brush in palette.brushes)
                         foreach (var item in brush.items) item.InitializeParentSettings(brush);
             }
+            if (OnLoadedFromFile != null) OnLoadedFromFile();
         }
 
         public static void SetSavePending()
@@ -162,30 +178,33 @@ namespace PluginMaster
         }
 
         public static bool updatingTempColliders { get; set; }
-        public static void UpdateTempColliders()
+        public static void UpdateTempColliders(bool force = false)
         {
             updatingTempColliders = true;
             DestroyTempColliders();
             if (staticData.tempCollidersAction == PWBData.TempCollidersAction.NEVER_CREATE)
                 return;
-            if (ToolManager.tool == ToolManager.PaintTool.PIN && !PinManager.settings.paintOnMeshesWithoutCollider)
-                return;
-            if (ToolManager.tool == ToolManager.PaintTool.BRUSH && !BrushManager.settings.paintOnMeshesWithoutCollider)
-                return;
-            if (ToolManager.tool == ToolManager.PaintTool.GRAVITY && !GravityToolManager.settings.createTempColliders)
-                return;
-            if (ToolManager.tool == ToolManager.PaintTool.LINE && !LineManager.settings.paintOnMeshesWithoutCollider)
-                return;
-            if (ToolManager.tool == ToolManager.PaintTool.SHAPE && !ShapeManager.settings.paintOnMeshesWithoutCollider)
-                return;
-            if (ToolManager.tool == ToolManager.PaintTool.TILING && !TilingManager.settings.paintOnMeshesWithoutCollider)
-                return;
-            if (ToolManager.tool == ToolManager.PaintTool.SELECTION && !SelectionToolManager.settings.createTempColliders)
-                return;
-            if (ToolManager.tool == ToolManager.PaintTool.EXTRUDE && !ExtrudeManager.settings.createTempColliders)
-                return;
-            if (ToolManager.tool == ToolManager.PaintTool.MIRROR && !MirrorManager.settings.createTempColliders)
-                return;
+            if (force == false)
+            {
+                if (ToolManager.tool == ToolManager.PaintTool.PIN && !PinManager.settings.paintOnMeshesWithoutCollider)
+                    return;
+                if (ToolManager.tool == ToolManager.PaintTool.BRUSH && !BrushManager.settings.paintOnMeshesWithoutCollider)
+                    return;
+                if (ToolManager.tool == ToolManager.PaintTool.GRAVITY && !GravityToolManager.settings.createTempColliders)
+                    return;
+                if (ToolManager.tool == ToolManager.PaintTool.LINE && !LineManager.settings.paintOnMeshesWithoutCollider)
+                    return;
+                if (ToolManager.tool == ToolManager.PaintTool.SHAPE && !ShapeManager.settings.paintOnMeshesWithoutCollider)
+                    return;
+                if (ToolManager.tool == ToolManager.PaintTool.TILING && !TilingManager.settings.paintOnMeshesWithoutCollider)
+                    return;
+                if (ToolManager.tool == ToolManager.PaintTool.SELECTION && !SelectionToolManager.settings.createTempColliders)
+                    return;
+                if (ToolManager.tool == ToolManager.PaintTool.EXTRUDE && !ExtrudeManager.settings.createTempColliders)
+                    return;
+                if (ToolManager.tool == ToolManager.PaintTool.MIRROR && !MirrorManager.settings.createTempColliders)
+                    return;
+            }
             PWBIO.UpdateOctree();
             _meshFilterOctree = new BoundsOctree<MeshFilter>(10, Vector3.zero, 0.5f, 0.5f);
             var sceneCount = UnityEditor.SceneManagement.EditorSceneManager.sceneCount;
@@ -201,6 +220,7 @@ namespace PluginMaster
                 }
             }
         }
+
 
         public static void UpdateTempCollidersIfHierarchyChanged()
         {
@@ -536,6 +556,18 @@ namespace PluginMaster
             return tempColliders.ToArray();
         }
         #endregion
+
+        #region DOCUMENTATION
+        private static UnityEngine.Object _documentationPdf = null;
+        [UnityEditor.MenuItem("Tools/Plugin Master/Prefab World Builder/Documentation...", false, 1300)]
+        public static void OpenDocFile()
+        {
+            if (_documentationPdf == null)
+                _documentationPdf = UnityEditor.AssetDatabase.LoadMainAssetAtPath(PWBCore.staticData.documentationPath);
+            if (_documentationPdf == null) Debug.LogWarning("Missing Documentation File");
+            else UnityEditor.AssetDatabase.OpenAsset(_documentationPdf);
+        }
+        #endregion
     }
 
     [System.Serializable]
@@ -548,19 +580,23 @@ namespace PluginMaster
         public const string RELATIVE_RESOURCES_DIR = RELATIVE_TOOL_DIR + "/Resources";
         public const string RELATIVE_DATA_DIR = RELATIVE_RESOURCES_DIR + "/" + DATA_DIR;
         public const string PALETTES_DIR = "Palettes";
-        public const string VERSION = "4.3";
+        public const string VERSION = "4.7";
         [SerializeField] private string _version = VERSION;
         [SerializeField] private string _rootDirectory = null;
         [SerializeField] private int _autoSavePeriodMinutes = 1;
-        [SerializeField] private bool _undoBrushProperties = true;
         [SerializeField] private bool _undoPalette = true;
         [SerializeField] private int _controlPointSize = 2;
         [SerializeField] private Color _selectedContolPointColor = Color.cyan;
         [SerializeField] private bool _selectedControlPointBlink = false;
         [SerializeField] private bool _closeAllWindowsWhenClosingTheToolbar = false;
+        [SerializeField] private bool _openToolPropertiesWhenAToolIsSelected = false;
         [SerializeField] private bool _selectTheNextPaletteInAlphabeticalOrder = true;
         [SerializeField] private int _thumbnailLayer = 7;
+        [SerializeField] private bool _openBrushPropertiesWhenABrushIsSelected = false;
         [SerializeField] private int _maxPreviewCountInEditMode = 200;
+        [SerializeField] private bool _createThumbnailsFolder = false;
+        [SerializeField] private bool _renameItemParent = false;
+        [SerializeField] private bool _showInfoText = true;
 
         public enum UnsavedChangesAction { ASK, SAVE, DISCARD }
         [SerializeField] private UnsavedChangesAction _unsavedChangesAction = UnsavedChangesAction.ASK;
@@ -574,6 +610,9 @@ namespace PluginMaster
         [SerializeField] private TempCollidersAction _tempCollidersAction = TempCollidersAction.CREATE_ALL_AT_ONCE;
 
         [SerializeField] private PaletteManager _paletteManager = PaletteManager.instance;
+
+        [SerializeField] private FloorManager _floorManager = FloorManager.instance as FloorManager;
+        [SerializeField] private WallManager _wallManager = WallManager.instance as WallManager;
 
         [SerializeField] private PinManager _pinManager = PinManager.instance as PinManager;
         [SerializeField] private BrushManager _brushManager = BrushManager.instance as BrushManager;
@@ -592,6 +631,9 @@ namespace PluginMaster
         [SerializeField] private MirrorManager _mirrorManager = MirrorManager.instance as MirrorManager;
 
         [SerializeField] private SnapManager _snapManager = new SnapManager();
+
+        [SerializeField] private ToolParentingSettings _globalParentingSettings = new ToolParentingSettings();
+        public ToolParentingSettings globalParentingSettings => _globalParentingSettings;
         private bool _savePending = false;
         private bool _saving = false;
 
@@ -620,17 +662,6 @@ namespace PluginMaster
             }
         }
 
-        public bool undoBrushProperties
-        {
-            get => _undoBrushProperties;
-            set
-            {
-                if (_undoBrushProperties == value) return;
-                _undoBrushProperties = value;
-                SaveAndUpdateVersion();
-            }
-        }
-
         public bool undoPalette
         {
             get => _undoPalette;
@@ -638,6 +669,17 @@ namespace PluginMaster
             {
                 if (_undoPalette == value) return;
                 _undoPalette = value;
+                SaveAndUpdateVersion();
+            }
+        }
+
+        public bool ranameItemParent
+        {
+            get => _renameItemParent;
+            set
+            {
+                if (_renameItemParent == value) return;
+                _renameItemParent = value;
                 SaveAndUpdateVersion();
             }
         }
@@ -683,7 +725,16 @@ namespace PluginMaster
                 SaveAndUpdateVersion();
             }
         }
-
+        public bool openToolPropertiesWhenAToolIsSelected
+        {
+            get => _openToolPropertiesWhenAToolIsSelected;
+            set
+            {
+                if (_openToolPropertiesWhenAToolIsSelected == value) return;
+                _openToolPropertiesWhenAToolIsSelected = value;
+                SaveAndUpdateVersion();
+            }
+        }
         public bool selectTheNextPaletteInAlphabeticalOrder
         {
             get => _selectTheNextPaletteInAlphabeticalOrder;
@@ -707,6 +758,84 @@ namespace PluginMaster
             }
         }
 
+        public bool createThumbnailsFolder
+        {
+            get => _createThumbnailsFolder;
+            set
+            {
+                if (_createThumbnailsFolder == value) return;
+                _createThumbnailsFolder = value;
+                var thumbnailsFolderName = "Thumbnails";
+                if (palettesDirectory.Contains(Application.dataPath))
+                {
+                    var palettesFolder = palettesDirectory.Substring(Application.dataPath.Length - 6);
+                    var thumbnailsFolderPath = palettesFolder + "/" + thumbnailsFolderName;
+                    if (_createThumbnailsFolder)
+                    {
+                        if (!UnityEditor.AssetDatabase.IsValidFolder(thumbnailsFolderPath))
+                            UnityEditor.AssetDatabase.CreateFolder(palettesFolder, thumbnailsFolderName);
+                        var palettesFolders = UnityEditor.AssetDatabase.GetSubFolders(palettesFolder);
+                        foreach (var paletteFolder in palettesFolders)
+                        {
+                            var folderName = System.IO.Path.GetFileName(paletteFolder);
+                            if (folderName == thumbnailsFolderName) continue;
+                            var destinationPath = thumbnailsFolderPath + "/" + folderName;
+                            UnityEditor.AssetDatabase.MoveAsset(paletteFolder, destinationPath);
+                        }
+                    }
+                    else if (UnityEditor.AssetDatabase.IsValidFolder(thumbnailsFolderPath))
+                    {
+                        var thumbnailsFolders = UnityEditor.AssetDatabase.GetSubFolders(thumbnailsFolderPath);
+                        foreach (var thumbnailFolder in thumbnailsFolders)
+                        {
+                            var folderName = System.IO.Path.GetFileName(thumbnailFolder);
+                            var destinationPath = palettesFolder + "/" + folderName;
+                            UnityEditor.AssetDatabase.MoveAsset(thumbnailFolder, destinationPath);
+                        }
+                        UnityEditor.AssetDatabase.DeleteAsset(thumbnailsFolderPath);
+                    }
+                }
+                else
+                {
+                    var thumbnailsFolderPath = palettesDirectory + "/" + thumbnailsFolderName;
+                    if (_createThumbnailsFolder)
+                    {
+                        if (!System.IO.Directory.Exists(thumbnailsFolderPath))
+                            System.IO.Directory.CreateDirectory(thumbnailsFolderPath);
+                        var palettesFolders = System.IO.Directory.GetDirectories(palettesDirectory);
+                        foreach (var paletteFolder in palettesFolders)
+                        {
+                            var folderName = System.IO.Path.GetFileName(paletteFolder);
+                            if (folderName == thumbnailsFolderName) continue;
+                            var destinationPath = thumbnailsFolderPath + "/" + folderName;
+                            System.IO.Directory.Move(paletteFolder, destinationPath);
+                        }
+                    }
+                    else if (System.IO.Directory.Exists(thumbnailsFolderPath))
+                    {
+                        var thumbnailsFolders = System.IO.Directory.GetDirectories(thumbnailsFolderPath);
+                        foreach (var thumbnailFolder in thumbnailsFolders)
+                        {
+                            var folderName = System.IO.Path.GetFileName(thumbnailFolder);
+                            var destinationPath = palettesDirectory + "/" + folderName;
+                            System.IO.Directory.Move(thumbnailFolder, destinationPath);
+                        }
+                        System.IO.Directory.Delete(thumbnailsFolderPath);
+                    }
+                }
+                SaveAndUpdateVersion();
+            }
+        }
+        public bool openBrushPropertiesWhenABrushIsSelected
+        {
+            get => _openBrushPropertiesWhenABrushIsSelected;
+            set
+            {
+                if (_openBrushPropertiesWhenABrushIsSelected == value) return;
+                _openBrushPropertiesWhenABrushIsSelected = value;
+                SaveAndUpdateVersion();
+            }
+        }
         public int maxPreviewCountInEditMode
         {
             get => _maxPreviewCountInEditMode;
@@ -740,6 +869,19 @@ namespace PluginMaster
                 SaveAndUpdateVersion();
             }
         }
+
+        public bool showInfoText
+        {
+            get => _showInfoText;
+            set
+            {
+                if (_showInfoText == value) return;
+                _showInfoText = value;
+                SaveAndUpdateVersion();
+            }
+        }
+
+        public void ToggleInfoText() => showInfoText = !showInfoText;
         public void SetSavePending() => _savePending = true;
         public bool saving => _saving;
         public bool VersionUpdate()
@@ -846,7 +988,13 @@ namespace PluginMaster
                 PWBCore.staticData.Save(updateVersion: false);
                 updated = true;
             }
-            if (updated) PWBCore.AssetDatabaseRefresh();
+            if (dataVersion.IsOlderThan(VERSION)) updated = true;
+            if (updated)
+            {
+                PWBCore.AssetDatabaseRefresh();
+                PaletteManager.instance.LoadPaletteFiles(deleteUnusedThumbnails: true);
+            }
+
             return updated;
         }
 
@@ -886,6 +1034,8 @@ namespace PluginMaster
             _version = VERSION;
             var jsonString = JsonUtility.ToJson(this, true);
             var fileExist = System.IO.File.Exists(dataPath);
+            if (!System.IO.Directory.Exists(PWBSettings.fullDataDir))
+                System.IO.Directory.CreateDirectory(PWBSettings.fullDataDir);
             System.IO.File.WriteAllText(dataPath, jsonString);
             if (!fileExist) PWBCore.AssetDatabaseRefresh();
             _savePending = false;
@@ -959,6 +1109,15 @@ namespace PluginMaster
             return lhs.Equals(rhs);
         }
         public static bool operator !=(PWBShortcutCombination lhs, PWBShortcutCombination rhs) => !(lhs == rhs);
+        public override string ToString()
+        {
+            var result = string.Empty;
+            if (control) result = "Ctrl";
+            if (alt) result += (result == string.Empty ? "Alt" : "+Alt");
+            if (shift) result += (result == string.Empty ? "Shift" : "+Shift");
+            if (result != string.Empty) result += "+";
+            return result;
+        }
     }
     [System.Serializable]
     public class PWBKeyCombination : PWBShortcutCombination, System.IEquatable<PWBKeyCombination>
@@ -978,13 +1137,13 @@ namespace PluginMaster
         public bool Equals(PWBKeyCombination other)
         {
             if (other == null) return false;
-            return keyCode == other.keyCode && _modifiers == other._modifiers;
+            return ToString() == other.ToString();
         }
         public override bool Equals(object other)
         {
             if (other == null) return false;
             if (!(other is PWBKeyCombination otherCombination)) return false;
-            return Equals(otherCombination);
+            return ToString() == otherCombination.ToString();
         }
         public override int GetHashCode()
         {
@@ -997,7 +1156,7 @@ namespace PluginMaster
         {
             if ((object)lhs == null && (object)rhs == null) return true;
             if ((object)lhs == null || (object)rhs == null) return false;
-            return lhs.Equals(rhs);
+            return lhs.ToString() == rhs.ToString();
         }
         public static bool operator !=(PWBKeyCombination lhs, PWBKeyCombination rhs) => !(lhs == rhs);
 
@@ -1005,11 +1164,7 @@ namespace PluginMaster
         {
             var result = string.Empty;
             if (keyCode == KeyCode.None) return "Disabled";
-            if (control) result = "Ctrl";
-            if (alt) result += (result == string.Empty ? "Alt" : "+Alt");
-            if (shift) result += (result == string.Empty ? "Shift" : "+Shift");
-            if (result != string.Empty) result += "+";
-            result += keyCode;
+            result += base.ToString() + keyCode.ToString().Replace("Alpha", "");
             return result;
         }
 
@@ -1162,8 +1317,8 @@ namespace PluginMaster
         public bool isMouseDragEvent => mouseEvent == MouseEvents.DRAG_R_H || mouseEvent == MouseEvents.DRAG_R_V
                 || mouseEvent == MouseEvents.DRAG_M_H || mouseEvent == MouseEvents.DRAG_M_V;
         public bool isHorizontalDragEvent => mouseEvent == MouseEvents.DRAG_R_H || mouseEvent == MouseEvents.DRAG_M_H;
-        public float delta => (mouseEvent == MouseEvents.SCROLL_WHEEL ? Event.current.delta.y
-            : (isHorizontalDragEvent ? Event.current.delta.x : -Event.current.delta.y));
+        private float _delta = 0;
+        public float delta => _delta;
 
         public override bool Check(PWBShortcut.Group group = PWBShortcut.Group.NONE)
         {
@@ -1172,6 +1327,7 @@ namespace PluginMaster
             if (!base.Check()) return false;
             if (isMouseDragEvent)
             {
+                _delta = isHorizontalDragEvent ? Event.current.delta.x : -Event.current.delta.y;
                 if (Event.current.type != EventType.MouseDrag) return false;
                 if (isRDrag && Event.current.button != 1)
                     return false;
@@ -1193,12 +1349,42 @@ namespace PluginMaster
                     return false;
                 }
             }
-            if (mouseEvent == MouseEvents.SCROLL_WHEEL && !Event.current.isScrollWheel) return false;
+            if (mouseEvent == MouseEvents.SCROLL_WHEEL)
+            {
+                if (!Event.current.isScrollWheel) return false;
+                _delta = (Mathf.Abs(Event.current.delta.x) > Mathf.Abs(Event.current.delta.y))
+                    ? Event.current.delta.x : Event.current.delta.y;
+            }
             Event.current.Use();
             return true;
         }
 
-
+        public override string ToString()
+        {
+            var result = string.Empty;
+            if (mouseEvent == MouseEvents.NONE) return "Disabled";
+            var mouseEventString = string.Empty;
+            switch (mouseEvent)
+            {
+                case MouseEvents.SCROLL_WHEEL:
+                    mouseEventString = "Scroll wheel";
+                    break;
+                case MouseEvents.DRAG_R_H:
+                    mouseEventString = "Mouse R Btn H drag";
+                    break;
+                case MouseEvents.DRAG_R_V:
+                    mouseEventString = "Mouse R Btn V drag";
+                    break;
+                case MouseEvents.DRAG_M_H:
+                    mouseEventString = "Mouse Mid Btn H drag";
+                    break;
+                case MouseEvents.DRAG_M_V:
+                    mouseEventString = "Mouse Mid Btn V drag";
+                    break;
+            }
+            result += base.ToString() + mouseEventString;
+            return result;
+        }
     }
     #endregion
 
@@ -1220,7 +1406,12 @@ namespace PluginMaster
             ERASER = 256,
             REPLACER = 512,
             SELECTION = 1024,
-            PALETTE = 2048
+            PALETTE = 2048,
+            CIRCLE_SELECT = 4096,
+            EXTRUDE = 8192,
+            MIRROR = 16384,
+            FLOOR = 32768,
+            WALL = 65536
         }
         [SerializeField] private string _name = null;
         [SerializeField] private Group _group = Group.NONE;
@@ -1235,6 +1426,7 @@ namespace PluginMaster
         public string name => _name;
 
         public Group group => _group;
+        protected void SetGroup(Group value) => _group = value;
 
         public bool conflicted { get => _conflicted; set => _conflicted = value; }
     }
@@ -1282,6 +1474,27 @@ namespace PluginMaster
         public PWBHoldKeysAndClickCombination holdKeysAndClickCombination => _keyCombination as PWBHoldKeysAndClickCombination;
     }
 
+    [System.Serializable]
+    public class PWBTwoStepKeyShortcut : PWBKeyShortcut
+    {
+        [SerializeField] private bool _firstStepEnabled = true;
+
+        public PWBTwoStepKeyShortcut(string name, Group group,
+            KeyCode keyCode, EventModifiers modifiers = EventModifiers.None, bool firstStepEnabled = true)
+            : base(name, group, keyCode, modifiers) { }
+
+        public bool firstStepEnabled
+        {
+            get => _firstStepEnabled;
+            set
+            {
+                if (_firstStepEnabled == value) return;
+                _firstStepEnabled = value;
+                if (_firstStepEnabled) SetGroup(PWBShortcut.Group.GRID);
+                else SetGroup(PWBShortcut.Group.GLOBAL | PWBShortcut.Group.GRID);
+            }
+        }
+    }
     [System.Serializable]
     public class PWBMouseShortcut : PWBShortcut
     {
@@ -1363,66 +1576,189 @@ namespace PluginMaster
                 d2.brushRadius.combination.Set(EventModifiers.Shift, PWBMouseCombination.MouseEvents.DRAG_R_H);
                 return d2;
             }
+            else if (i == 2)
+            {
+                var d0 = new PWBShortcuts("Default 0");
+                //GRID
+                d0.gridEnableShortcuts.combination.Set(KeyCode.None);
+                d0.gridToggle.firstStepEnabled = false;
+                d0.gridToggleSnaping.firstStepEnabled = false;
+                d0.gridToggleLock.firstStepEnabled = false;
+                d0.gridSetOriginPosition.firstStepEnabled = false;
+                d0.gridSetOriginRotation.firstStepEnabled = false;
+                d0.gridSetSize.firstStepEnabled = false;
+                d0.gridFrameOrigin.firstStepEnabled = false;
+                d0.gridTogglePositionHandle.firstStepEnabled = false;
+                d0.gridToggleRotationHandle.firstStepEnabled = false;
+                d0.gridToggleSpacingHandle.firstStepEnabled = false;
+                d0.gridMoveOriginUp.firstStepEnabled = false;
+                d0.gridMoveOriginDown.firstStepEnabled = false;
+                d0.gridNextOrigin.firstStepEnabled = false;
+
+                //PIN
+                d0.pinMoveHandlesUp.combination.Set(KeyCode.U);
+                d0.pinMoveHandlesDown.combination.Set(KeyCode.J);
+                d0.pinSelectPrevHandle.combination.Set(KeyCode.I);
+                d0.pinSelectNextHandle.combination.Set(KeyCode.O);
+                d0.pinSelectPivotHandle.combination.Set(KeyCode.L);
+
+                d0.pinToggleRepeatItem.combination.Set(KeyCode.Alpha0);
+
+                d0.pinResetScale.combination.Set(KeyCode.Period);
+
+                d0.pinRotate90YCW.combination.Set(KeyCode.S);
+                d0.pinRotate90YCCW.combination.Set(KeyCode.S, EventModifiers.Control | EventModifiers.Alt);
+                d0.pinRotateAStepYCW.combination.Set(KeyCode.S, EventModifiers.Shift);
+                d0.pinRotateAStepYCCW.combination.Set(KeyCode.S,
+                    EventModifiers.Control | EventModifiers.Alt | EventModifiers.Shift);
+
+                d0.pinRotate90XCW.combination.Set(KeyCode.Q);
+                d0.pinRotate90XCCW.combination.Set(KeyCode.Q, EventModifiers.Control | EventModifiers.Alt);
+                d0.pinRotateAStepXCW.combination.Set(KeyCode.Q, EventModifiers.Shift);
+                d0.pinRotateAStepXCCW.combination.Set(KeyCode.Q,
+                    EventModifiers.Control | EventModifiers.Alt | EventModifiers.Shift);
+
+                d0.pinRotate90ZCW.combination.Set(KeyCode.B);
+                d0.pinRotate90ZCCW.combination.Set(KeyCode.B, EventModifiers.Control | EventModifiers.Alt);
+                d0.pinRotateAStepZCW.combination.Set(KeyCode.B, EventModifiers.Shift);
+                d0.pinRotateAStepZCCW.combination.Set(KeyCode.B,
+                    EventModifiers.Control | EventModifiers.Alt | EventModifiers.Shift);
+
+                d0.pinResetRotation.combination.Set(KeyCode.Comma);
+
+                d0.pinSnapRotationToGrid.combination.Set(KeyCode.G);
+
+                d0.pinAdd1UnitToSurfDist.combination.Set(KeyCode.H);
+                d0.pinSubtract1UnitFromSurfDist.combination.Set(KeyCode.N);
+                d0.pinAdd01UnitToSurfDist.combination.Set(KeyCode.H, EventModifiers.Shift);
+                d0.pinSubtract01UnitFromSurfDist.combination.Set(KeyCode.N, EventModifiers.Shift);
+
+                d0.pinResetSurfDist.combination.Set(KeyCode.M);
+
+                d0.pinSelectPreviousItem.combination.Set(KeyCode.A);
+                d0.pinSelectNextItem.combination.Set(KeyCode.D);
+
+                d0.pinFlipX.combination.Set(KeyCode.Minus);
+                //BRUSH & GRAVITY
+                d0.brushUpdatebrushstroke.combination.Set(KeyCode.U);
+                d0.brushResetRotation.combination.Set(KeyCode.Comma);
+
+                //GRAVITY
+                d0.gravityAdd1UnitToSurfDist.combination.Set(KeyCode.H);
+                d0.gravitySubtract1UnitFromSurfDist.combination.Set(KeyCode.N);
+                d0.gravityAdd01UnitToSurfDist.combination.Set(KeyCode.H, EventModifiers.Shift);
+                d0.gravitySubtract01UnitFromSurfDist.combination.Set(KeyCode.N, EventModifiers.Shift);
+
+                //EDIT MODE
+                d0.editModeSelectParent.combination.Set(KeyCode.T);
+                d0.editModeToggle.combination.Set(KeyCode.Period);
+                d0.editModeDuplicate.combination.Set(KeyCode.D);
+
+                //LINE
+                d0.lineSelectAllPoints.combination.Set(KeyCode.A);
+                d0.lineDeselectAllPoints.combination.Set(KeyCode.S);
+                d0.lineToggleCurve.combination.Set(KeyCode.U);
+                d0.lineToggleClosed.combination.Set(KeyCode.O);
+                d0.lineEditModeTypeToggle.combination.Set(KeyCode.Comma);
+
+                //TILING & SELECTION
+                d0.selectionRotate90YCW.combination.Set(KeyCode.S);
+                d0.selectionRotate90YCCW.combination.Set(KeyCode.S, EventModifiers.Control | EventModifiers.Alt);
+                d0.selectionRotate90XCW.combination.Set(KeyCode.C);
+                d0.selectionRotate90XCCW.combination.Set(KeyCode.C, EventModifiers.Control | EventModifiers.Alt);
+                d0.selectionRotate90ZCW.combination.Set(KeyCode.B);
+                d0.selectionRotate90ZCCW.combination.Set(KeyCode.B, EventModifiers.Control | EventModifiers.Alt);
+
+                //SELECTION
+                d0.selectionToggleSpace.combination.Set(KeyCode.A);
+
+                //FLOOR
+                d0.floorRotate90YCW.combination.Set(KeyCode.S);
+
+                //WALL
+                d0.wallHalfTurn.combination.Set(KeyCode.S);
+
+                return d0;
+            }
             return null;
         }
         #endregion
 
         #region KEY COMBINATIONS
+        #region GIZMOS
+        [SerializeField]
+        private PWBKeyShortcut _gizmosToggleInfotext = new PWBKeyShortcut("Toggle InfoText",
+          PWBShortcut.Group.GLOBAL, KeyCode.I, EventModifiers.Control | EventModifiers.Alt);
+        public PWBKeyShortcut gizmosToggleInfotext => _gizmosToggleInfotext;
+        #endregion
+
         #region GRID
         [SerializeField]
-        private PWBKeyShortcut _gridEnableShortcuts = new PWBKeyShortcut("Enable grid shorcuts",
+        private PWBKeyShortcut _gridEnableShortcuts = new PWBKeyShortcut("First step to enable grid shortcuts",
            PWBShortcut.Group.GLOBAL | PWBShortcut.Group.GRID, KeyCode.G, EventModifiers.Control);
         [SerializeField]
-        private PWBKeyShortcut _gridToggle = new PWBKeyShortcut("Toggle grid",
+        private PWBTwoStepKeyShortcut _gridToggle = new PWBTwoStepKeyShortcut("Toggle grid",
             PWBShortcut.Group.GRID, KeyCode.G, EventModifiers.Control);
         [SerializeField]
-        private PWBKeyShortcut _gridToggleSnapping = new PWBKeyShortcut("Toggle snapping",
+        private PWBTwoStepKeyShortcut _gridToggleSnapping = new PWBTwoStepKeyShortcut("Toggle snapping",
             PWBShortcut.Group.GRID, KeyCode.H, EventModifiers.Control);
         [SerializeField]
-        private PWBKeyShortcut _gridToggleLock = new PWBKeyShortcut("Toggle grid lock",
+        private PWBTwoStepKeyShortcut _gridToggleLock = new PWBTwoStepKeyShortcut("Toggle grid lock",
             PWBShortcut.Group.GRID, KeyCode.L, EventModifiers.Control);
         [SerializeField]
-        private PWBKeyShortcut _gridSetOriginPosition = new PWBKeyShortcut("Set the origin to the active gameobject position",
+        private PWBTwoStepKeyShortcut _gridSetOriginPosition
+            = new PWBTwoStepKeyShortcut("Set the origin to the active gameobject position",
             PWBShortcut.Group.GRID, KeyCode.W, EventModifiers.Control);
         [SerializeField]
-        private PWBKeyShortcut _gridSetOriginRotation
-            = new PWBKeyShortcut("Set the grid rotation to the active gameobject rotation",
+        private PWBTwoStepKeyShortcut _gridSetOriginRotation
+            = new PWBTwoStepKeyShortcut("Set the grid rotation to the active gameobject rotation",
             PWBShortcut.Group.GRID, KeyCode.E, EventModifiers.Control);
         [SerializeField]
-        private PWBKeyShortcut _gridSetSize = new PWBKeyShortcut("Set the snap value to the size of the active gameobject",
+        private PWBTwoStepKeyShortcut _gridSetSize
+            = new PWBTwoStepKeyShortcut("Set the snap value to the size of the active gameobject",
             PWBShortcut.Group.GRID, KeyCode.R, EventModifiers.Control);
         [SerializeField]
-        private PWBKeyShortcut _gridFrameOrigin = new PWBKeyShortcut("Frame grid origin",
+        private PWBTwoStepKeyShortcut _gridFrameOrigin = new PWBTwoStepKeyShortcut("Frame grid origin",
             PWBShortcut.Group.GRID, KeyCode.Q, EventModifiers.Control);
         [SerializeField]
-        private PWBKeyShortcut _gridTogglePositionHandle = new PWBKeyShortcut("Toggle Postion Handle",
+        private PWBTwoStepKeyShortcut _gridTogglePositionHandle = new PWBTwoStepKeyShortcut("Toggle Postion Handle",
             PWBShortcut.Group.GRID, KeyCode.W, EventModifiers.Control | EventModifiers.Alt);
         [SerializeField]
-        private PWBKeyShortcut _gridToggleRotationHandle = new PWBKeyShortcut("Toggle Rotation Handle",
+        private PWBTwoStepKeyShortcut _gridToggleRotationHandle = new PWBTwoStepKeyShortcut("Toggle Rotation Handle",
             PWBShortcut.Group.GRID, KeyCode.E, EventModifiers.Control | EventModifiers.Alt);
         [SerializeField]
-        private PWBKeyShortcut _gridToggleSpacingHandle = new PWBKeyShortcut("Toggle Spacing Handle",
+        private PWBTwoStepKeyShortcut _gridToggleSpacingHandle = new PWBTwoStepKeyShortcut("Toggle Spacing Handle",
             PWBShortcut.Group.GRID, KeyCode.R, EventModifiers.Control | EventModifiers.Alt);
         [SerializeField]
-        private PWBKeyShortcut _gridMoveOriginUp = new PWBKeyShortcut("Move the origin one step up",
+        private PWBTwoStepKeyShortcut _gridMoveOriginUp = new PWBTwoStepKeyShortcut("Move the origin one step up",
             PWBShortcut.Group.GRID, KeyCode.J, EventModifiers.Control | EventModifiers.Alt);
         [SerializeField]
-        private PWBKeyShortcut _gridMoveOriginDown = new PWBKeyShortcut("Move the origin one step down",
+        private PWBTwoStepKeyShortcut _gridMoveOriginDown = new PWBTwoStepKeyShortcut("Move the origin one step down",
            PWBShortcut.Group.GRID, KeyCode.M, EventModifiers.Control | EventModifiers.Alt);
-
+        [SerializeField]
+        private PWBTwoStepKeyShortcut _gridNextOrigin = new PWBTwoStepKeyShortcut("Set next origin",
+           PWBShortcut.Group.GRID, KeyCode.Alpha9, EventModifiers.Control | EventModifiers.Alt);
         public PWBKeyShortcut gridEnableShortcuts => _gridEnableShortcuts;
-        public PWBKeyShortcut gridToggle => _gridToggle;
-        public PWBKeyShortcut gridToggleSnaping => _gridToggleSnapping;
-        public PWBKeyShortcut gridToggleLock => _gridToggleLock;
-        public PWBKeyShortcut gridSetOriginPosition => _gridSetOriginPosition;
-        public PWBKeyShortcut gridSetOriginRotation => _gridSetOriginRotation;
-        public PWBKeyShortcut gridSetSize => _gridSetSize;
-        public PWBKeyShortcut gridFrameOrigin => _gridFrameOrigin;
-        public PWBKeyShortcut gridTogglePositionHandle => _gridTogglePositionHandle;
-        public PWBKeyShortcut gridToggleRotationHandle => _gridToggleRotationHandle;
-        public PWBKeyShortcut gridToggleSpacingHandle => _gridToggleSpacingHandle;
-        public PWBKeyShortcut gridMoveOriginUp => _gridMoveOriginUp;
-        public PWBKeyShortcut gridMoveOriginDown => _gridMoveOriginDown;
+        public PWBTwoStepKeyShortcut gridToggle => _gridToggle;
+        public PWBTwoStepKeyShortcut gridToggleSnaping => _gridToggleSnapping;
+        public PWBTwoStepKeyShortcut gridToggleLock => _gridToggleLock;
+        public PWBTwoStepKeyShortcut gridSetOriginPosition => _gridSetOriginPosition;
+        public PWBTwoStepKeyShortcut gridSetOriginRotation => _gridSetOriginRotation;
+        public PWBTwoStepKeyShortcut gridSetSize => _gridSetSize;
+        public PWBTwoStepKeyShortcut gridFrameOrigin => _gridFrameOrigin;
+        public PWBTwoStepKeyShortcut gridTogglePositionHandle => _gridTogglePositionHandle;
+        public PWBTwoStepKeyShortcut gridToggleRotationHandle => _gridToggleRotationHandle;
+        public PWBTwoStepKeyShortcut gridToggleSpacingHandle => _gridToggleSpacingHandle;
+        public PWBTwoStepKeyShortcut gridMoveOriginUp => _gridMoveOriginUp;
+        public PWBTwoStepKeyShortcut gridMoveOriginDown => _gridMoveOriginDown;
+        public PWBTwoStepKeyShortcut gridNextOrigin => _gridNextOrigin;
+        
+        #endregion
+        #region SNAP
+        [SerializeField]
+        private PWBKeyShortcut _snapToggleBoundsSnapping = new PWBKeyShortcut("Toggle bounds snapping",
+            PWBShortcut.Group.GLOBAL, KeyCode.K, EventModifiers.Control | EventModifiers.Shift);
+        public PWBKeyShortcut snapToggleBoundsSnapping => _snapToggleBoundsSnapping;
         #endregion
 
         #region PIN
@@ -1436,7 +1772,7 @@ namespace PluginMaster
         private PWBKeyShortcut _pinSelectNextHandle = new PWBKeyShortcut("Select the next handle as active",
            PWBShortcut.Group.PIN, KeyCode.Y, EventModifiers.Control | EventModifiers.Shift);
         [SerializeField]
-        private PWBKeyShortcut _pinSelectPrevHandle = new PWBKeyShortcut("Select the Previous handle as active",
+        private PWBKeyShortcut _pinSelectPrevHandle = new PWBKeyShortcut("Select the previous handle as active",
            PWBShortcut.Group.PIN, KeyCode.H, EventModifiers.Control | EventModifiers.Shift);
         [SerializeField]
         private PWBKeyShortcut _pinSelectPivotHandle = new PWBKeyShortcut("Set the pivot as the active handle",
@@ -1449,45 +1785,45 @@ namespace PluginMaster
           PWBShortcut.Group.PIN, KeyCode.Period, EventModifiers.Control | EventModifiers.Shift);
 
         [SerializeField]
-        private PWBKeyShortcut _pinRotate90YCW = new PWBKeyShortcut("Rotate 90º clockwise around Y axis",
+        private PWBKeyShortcut _pinRotate90YCW = new PWBKeyShortcut("Rotate 90º around Y",
           PWBShortcut.Group.PIN, KeyCode.Q, EventModifiers.Control);
         [SerializeField]
-        private PWBKeyShortcut _pinRotate90YCCW = new PWBKeyShortcut("Rotate 90º counterclockwise around Y axis",
+        private PWBKeyShortcut _pinRotate90YCCW = new PWBKeyShortcut("Rotate -90º around Y",
           PWBShortcut.Group.PIN, KeyCode.W, EventModifiers.Control);
         [SerializeField]
-        private PWBKeyShortcut _pinRotateAStepYCW = new PWBKeyShortcut("Rotate clockwise in small steps around the Y axis",
+        private PWBKeyShortcut _pinRotateAStepYCW = new PWBKeyShortcut("Rotate in steps around Y",
         PWBShortcut.Group.PIN, KeyCode.Q, EventModifiers.Control | EventModifiers.Shift);
         [SerializeField]
         private PWBKeyShortcut _pinRotateAStepYCCW
-            = new PWBKeyShortcut("Rotate counterclockwise in small steps around the Y axis",
+            = new PWBKeyShortcut("Rotate in negative steps around Y",
         PWBShortcut.Group.PIN, KeyCode.W, EventModifiers.Control | EventModifiers.Shift);
 
         [SerializeField]
-        private PWBKeyShortcut _pinRotate90XCW = new PWBKeyShortcut("Rotate 90º clockwise around X axis",
+        private PWBKeyShortcut _pinRotate90XCW = new PWBKeyShortcut("Rotate 90º around X",
           PWBShortcut.Group.PIN, KeyCode.K, EventModifiers.Control | EventModifiers.Alt);
         [SerializeField]
-        private PWBKeyShortcut _pinRotate90XCCW = new PWBKeyShortcut("Rotate 90º counterclockwise around X axis",
+        private PWBKeyShortcut _pinRotate90XCCW = new PWBKeyShortcut("Rotate -90º around X",
           PWBShortcut.Group.PIN, KeyCode.L, EventModifiers.Control | EventModifiers.Alt);
         [SerializeField]
-        private PWBKeyShortcut _pinRotateAStepXCW = new PWBKeyShortcut("Rotate clockwise in small steps around the X axis",
+        private PWBKeyShortcut _pinRotateAStepXCW = new PWBKeyShortcut("Rotate in steps around X",
         PWBShortcut.Group.PIN, KeyCode.K, EventModifiers.Control | EventModifiers.Alt | EventModifiers.Shift);
         [SerializeField]
         private PWBKeyShortcut _pinRotateAStepXCCW
-            = new PWBKeyShortcut("Rotate counterclockwise in small steps around the X axis",
+            = new PWBKeyShortcut("Rotate in negative steps around X",
         PWBShortcut.Group.PIN, KeyCode.L, EventModifiers.Control | EventModifiers.Alt | EventModifiers.Shift);
 
         [SerializeField]
-        private PWBKeyShortcut _pinRotate90ZCW = new PWBKeyShortcut("Rotate 90º clockwise around Z axis",
+        private PWBKeyShortcut _pinRotate90ZCW = new PWBKeyShortcut("Rotate 90º around Z",
           PWBShortcut.Group.PIN, KeyCode.Period, EventModifiers.Control | EventModifiers.Alt);
         [SerializeField]
-        private PWBKeyShortcut _pinRotate90ZCCW = new PWBKeyShortcut("Rotate 90º counterclockwise around Z axis",
+        private PWBKeyShortcut _pinRotate90ZCCW = new PWBKeyShortcut("Rotate -90º around Z",
           PWBShortcut.Group.PIN, KeyCode.Comma, EventModifiers.Control | EventModifiers.Alt);
         [SerializeField]
-        private PWBKeyShortcut _pinRotateAStepZCW = new PWBKeyShortcut("Rotate clockwise in small steps around the Z axis",
+        private PWBKeyShortcut _pinRotateAStepZCW = new PWBKeyShortcut("Rotate in steps around Z",
         PWBShortcut.Group.PIN, KeyCode.Period, EventModifiers.Control | EventModifiers.Alt | EventModifiers.Shift);
         [SerializeField]
         private PWBKeyShortcut _pinRotateAStepZCCW
-            = new PWBKeyShortcut("Rotate counterclockwise in small steps around the Z axis",
+            = new PWBKeyShortcut("Rotate in negative steps around Z",
         PWBShortcut.Group.PIN, KeyCode.Comma, EventModifiers.Control | EventModifiers.Alt | EventModifiers.Shift);
 
         [SerializeField]
@@ -1499,24 +1835,24 @@ namespace PluginMaster
 
 
         [SerializeField]
-        private PWBKeyShortcut _pinAdd1UnitToSurfDist = new PWBKeyShortcut("Increase the distance from the surface by 1 unit",
+        private PWBKeyShortcut _pinAdd1UnitToSurfDist = new PWBKeyShortcut("Surface distance +1",
           PWBShortcut.Group.PIN, KeyCode.U, EventModifiers.Control | EventModifiers.Alt);
         [SerializeField]
         private PWBKeyShortcut _pinSubtract1UnitFromSurfDist
-            = new PWBKeyShortcut("Decrease the distance from the surface by 1 unit",
+            = new PWBKeyShortcut("Surface distance -1",
           PWBShortcut.Group.PIN, KeyCode.J, EventModifiers.Control | EventModifiers.Alt);
         [SerializeField]
         private PWBKeyShortcut _pinAdd01UnitToSurfDist
-            = new PWBKeyShortcut("Increase the distance from the surface by 0.1 units",
+            = new PWBKeyShortcut("Surface distance +0.1",
          PWBShortcut.Group.PIN, KeyCode.U, EventModifiers.Control | EventModifiers.Alt | EventModifiers.Shift);
         [SerializeField]
         private PWBKeyShortcut _pinSubtract01UnitFromSurfDist
-            = new PWBKeyShortcut("Decrease the distance from the surface by 0.1 units",
+            = new PWBKeyShortcut("Surface distance -0.1",
           PWBShortcut.Group.PIN, KeyCode.J,
           EventModifiers.Control | EventModifiers.Alt | EventModifiers.Shift);
 
         [SerializeField]
-        private PWBKeyShortcut _pinResetSurfDist = new PWBKeyShortcut("Reset the distance from the surface to zero",
+        private PWBKeyShortcut _pinResetSurfDist = new PWBKeyShortcut("Surface distance = 0.0",
          PWBShortcut.Group.PIN, KeyCode.B, EventModifiers.Shift);
 
         [SerializeField]
@@ -1567,6 +1903,8 @@ namespace PluginMaster
         public PWBKeyShortcut pinSelectNextItem => _pinSelectNextItem;
 
         public PWBKeyShortcut pinFlipX => _pinFlipX;
+
+
         #endregion
 
         #region BRUSH & GRAVITY
@@ -1582,18 +1920,21 @@ namespace PluginMaster
 
         #region GRAVITY
         [SerializeField]
-        private PWBKeyShortcut _gravityAdd1UnitToSurfDist = new PWBKeyShortcut("Increase the distance from the surface by 1 unit",
+        private PWBKeyShortcut _gravityAdd1UnitToSurfDist
+            = new PWBKeyShortcut("Surface distance +1",
           PWBShortcut.Group.GRAVITY, KeyCode.U, EventModifiers.Control | EventModifiers.Alt);
         [SerializeField]
-        private PWBKeyShortcut _gravitySubtract1UnitFromSurfDist = new PWBKeyShortcut("Decrease the distance from the surface by 1 unit",
+        private PWBKeyShortcut _gravitySubtract1UnitFromSurfDist
+            = new PWBKeyShortcut("Surface distance -1",
           PWBShortcut.Group.GRAVITY, KeyCode.J, EventModifiers.Control | EventModifiers.Alt);
         [SerializeField]
-        private PWBKeyShortcut _gravityAdd01UnitToSurfDist = new PWBKeyShortcut("Increase the distance from the surface by 0.1 units",
+        private PWBKeyShortcut _gravityAdd01UnitToSurfDist
+            = new PWBKeyShortcut("Surface distance +0.1",
          PWBShortcut.Group.GRAVITY, KeyCode.U,
          EventModifiers.Control | EventModifiers.Alt | EventModifiers.Shift);
         [SerializeField]
         private PWBKeyShortcut _gravitySubtract01UnitFromSurfDist
-            = new PWBKeyShortcut("Decrease the distance from the surface by 0.1 units",
+            = new PWBKeyShortcut("Surface distance -0.1",
           PWBShortcut.Group.GRAVITY, KeyCode.J,
           EventModifiers.Control | EventModifiers.Alt | EventModifiers.Shift);
 
@@ -1606,12 +1947,12 @@ namespace PluginMaster
         #region EDIT MODE
         [SerializeField]
         private PWBKeyShortcut _editModeDeleteItemAndItsChildren
-            = new PWBKeyShortcut("Delete selected persistent item and its children",
+            = new PWBKeyShortcut("Delete selected item and its children",
            PWBShortcut.Group.LINE | PWBShortcut.Group.SHAPE | PWBShortcut.Group.TILING,
            KeyCode.Delete, EventModifiers.Alt);
         [SerializeField]
         private PWBKeyShortcut _editModeDeleteItemButNotItsChildren
-            = new PWBKeyShortcut("Delete selected persistent item but not its children",
+            = new PWBKeyShortcut("Delete selected item but not its children",
            PWBShortcut.Group.LINE | PWBShortcut.Group.SHAPE | PWBShortcut.Group.TILING,
            KeyCode.Delete, EventModifiers.Alt | EventModifiers.Shift);
         [SerializeField]
@@ -1622,10 +1963,15 @@ namespace PluginMaster
         private PWBKeyShortcut _editModeToggle = new PWBKeyShortcut("Toggle edit mode",
           PWBShortcut.Group.LINE | PWBShortcut.Group.SHAPE | PWBShortcut.Group.TILING,
           KeyCode.Period, EventModifiers.Alt | EventModifiers.Shift);
+        [SerializeField]
+        private PWBKeyShortcut _editModeDuplicate = new PWBKeyShortcut("Duplicate",
+          PWBShortcut.Group.LINE | PWBShortcut.Group.SHAPE | PWBShortcut.Group.TILING,
+          KeyCode.D, EventModifiers.Control | EventModifiers.Shift);
         public PWBKeyShortcut editModeDeleteItemAndItsChildren => _editModeDeleteItemAndItsChildren;
         public PWBKeyShortcut editModeDeleteItemButNotItsChildren => _editModeDeleteItemButNotItsChildren;
         public PWBKeyShortcut editModeSelectParent => _editModeSelectParent;
         public PWBKeyShortcut editModeToggle => _editModeToggle;
+        public PWBKeyShortcut editModeDuplicate => _editModeDuplicate;
         #endregion
 
         #region LINE
@@ -1636,7 +1982,7 @@ namespace PluginMaster
         private PWBKeyShortcut _lineDeselectAllPoints = new PWBKeyShortcut("Deselect all points",
           PWBShortcut.Group.LINE, KeyCode.D, EventModifiers.Control | EventModifiers.Shift);
         [SerializeField]
-        private PWBKeyShortcut _lineToggleCurve = new PWBKeyShortcut("Set the previous segment as a Curved or Straight Line",
+        private PWBKeyShortcut _lineToggleCurve = new PWBKeyShortcut("Set previous segment as Curved or Straight",
           PWBShortcut.Group.LINE, KeyCode.Y, EventModifiers.Control | EventModifiers.Shift);
         [SerializeField]
         private PWBKeyShortcut _lineToggleClosed = new PWBKeyShortcut("Close or open the line",
@@ -1654,22 +2000,22 @@ namespace PluginMaster
 
         #region TILING & SELECTION
         [SerializeField]
-        private PWBKeyShortcut _selectionRotate90XCW = new PWBKeyShortcut("Rotate 90º clockwise around X axis",
+        private PWBKeyShortcut _selectionRotate90XCW = new PWBKeyShortcut("Rotate 90º around X",
           PWBShortcut.Group.TILING | PWBShortcut.Group.SELECTION, KeyCode.U, EventModifiers.Control | EventModifiers.Shift);
         [SerializeField]
-        private PWBKeyShortcut _selectionRotate90XCCW = new PWBKeyShortcut("Rotate 90º counterclockwise around X axis",
+        private PWBKeyShortcut _selectionRotate90XCCW = new PWBKeyShortcut("Rotate -90º around X",
           PWBShortcut.Group.TILING | PWBShortcut.Group.SELECTION, KeyCode.J, EventModifiers.Control | EventModifiers.Shift);
         [SerializeField]
-        private PWBKeyShortcut _selectionRotate90YCW = new PWBKeyShortcut("Rotate 90º clockwise around Y axis",
+        private PWBKeyShortcut _selectionRotate90YCW = new PWBKeyShortcut("Rotate 90º around Y",
           PWBShortcut.Group.TILING | PWBShortcut.Group.SELECTION, KeyCode.K, EventModifiers.Control | EventModifiers.Alt);
         [SerializeField]
-        private PWBKeyShortcut _selectionRotate90YCCW = new PWBKeyShortcut("Rotate 90º counterclockwise around Y axis",
+        private PWBKeyShortcut _selectionRotate90YCCW = new PWBKeyShortcut("Rotate -90º around Y",
           PWBShortcut.Group.TILING | PWBShortcut.Group.SELECTION, KeyCode.L, EventModifiers.Control | EventModifiers.Alt);
         [SerializeField]
-        private PWBKeyShortcut _selectionRotate90ZCW = new PWBKeyShortcut("Rotate 90º clockwise around Z axis",
+        private PWBKeyShortcut _selectionRotate90ZCW = new PWBKeyShortcut("Rotate 90º around Z",
           PWBShortcut.Group.TILING | PWBShortcut.Group.SELECTION, KeyCode.U, EventModifiers.Control | EventModifiers.Alt);
         [SerializeField]
-        private PWBKeyShortcut _selectionRotate90ZCCW = new PWBKeyShortcut("Rotate 90º counterclockwise around Z axis",
+        private PWBKeyShortcut _selectionRotate90ZCCW = new PWBKeyShortcut("Rotate -90º around Z",
           PWBShortcut.Group.TILING | PWBShortcut.Group.SELECTION, KeyCode.J, EventModifiers.Control | EventModifiers.Alt);
         public PWBKeyShortcut selectionRotate90XCW => _selectionRotate90XCW;
         public PWBKeyShortcut selectionRotate90XCCW => _selectionRotate90XCCW;
@@ -1692,13 +2038,21 @@ namespace PluginMaster
         [SerializeField]
         private PWBKeyShortcut _selectionEditCustomHandle = new PWBKeyShortcut("Edit custom handle",
           PWBShortcut.Group.SELECTION, KeyCode.U);
+        [SerializeField]
+        private PWBKeyShortcut _selectionToggleSpace = new PWBKeyShortcut("Toggle Space Global/Local",
+          PWBShortcut.Group.SELECTION, KeyCode.X, EventModifiers.Shift);
         public PWBKeyShortcut selectionTogglePositionHandle => _selectionTogglePositionHandle;
         public PWBKeyShortcut selectionToggleRotationHandle => _selectionToggleRotationHandle;
         public PWBKeyShortcut selectionToggleScaleHandle => _selectionToggleScaleHandle;
         public PWBKeyShortcut selectionEditCustomHandle => _selectionEditCustomHandle;
+        public PWBKeyShortcut selectionToggleSpace => _selectionToggleSpace;
         #endregion
 
         #region TOOLBAR
+        private PWBKeyShortcut _toolbarFloorToggle = new PWBKeyShortcut("Toggle Floor Tool",
+            PWBShortcut.Group.GLOBAL, new PWBKeyCombinationUSM(Shortcuts.PWB_TOGGLE_FLOOR_SHORTCUT_ID));
+        private PWBKeyShortcut _toolbarWallToggle = new PWBKeyShortcut("Toggle Wall Tool",
+            PWBShortcut.Group.GLOBAL, new PWBKeyCombinationUSM(Shortcuts.PWB_TOGGLE_WALL_SHORTCUT_ID));
 
         private PWBKeyShortcut _toolbarPinToggle = new PWBKeyShortcut("Toggle Pin Tool",
             PWBShortcut.Group.GLOBAL, new PWBKeyCombinationUSM(Shortcuts.PWB_TOGGLE_PIN_SHORTCUT_ID));
@@ -1735,6 +2089,8 @@ namespace PluginMaster
 
         private PWBKeyShortcut _toolbarMirrorToggle = new PWBKeyShortcut("Toggle Mirror Tool",
             PWBShortcut.Group.GLOBAL, new PWBKeyCombinationUSM(Shortcuts.PWB_TOGGLE_MIRROR_SHORTCUT_ID));
+        public PWBKeyShortcut toolbarFloorToggle => _toolbarFloorToggle;
+        public PWBKeyShortcut toolbarWallToggle => _toolbarWallToggle;
         public PWBKeyShortcut toolbarPinToggle => _toolbarPinToggle;
         public PWBKeyShortcut toolbarBrushToggle => _toolbarBrushToggle;
         public PWBKeyShortcut toolbarGravityToggle => _toolbarGravityToggle;
@@ -1774,6 +2130,10 @@ namespace PluginMaster
         private PWBHoldKeysAndClickShortcut _palettePickBrush = new PWBHoldKeysAndClickShortcut("Pick or add a brush",
           PWBShortcut.Group.PALETTE | PWBShortcut.Group.GLOBAL,
           KeyCode.Alpha1, EventModifiers.Shift);
+        [SerializeField]
+        private PWBKeyShortcut _paletteReplaceSceneSelection = new PWBKeyShortcut("Replace selected objects in scene",
+          PWBShortcut.Group.PALETTE | PWBShortcut.Group.GLOBAL,
+          KeyCode.I, EventModifiers.Control | EventModifiers.Shift);
 
         public PWBKeyShortcut paletteDeleteBrush => _paletteDeleteBrush;
         public PWBKeyShortcut palettePreviousBrush => _palettePreviousBrush;
@@ -1781,6 +2141,21 @@ namespace PluginMaster
         public PWBKeyShortcut palettePreviousPalette => _palettePreviousPalette;
         public PWBKeyShortcut paletteNextPalette => _paletteNextPalette;
         public PWBHoldKeysAndClickShortcut palettePickBrush => _palettePickBrush;
+        public PWBKeyShortcut paletteReplaceSceneSelection => _paletteReplaceSceneSelection;
+        #endregion
+
+        #region FLOOR
+        [SerializeField]
+        private PWBKeyShortcut _floorRotate90YCW = new PWBKeyShortcut("Rotate 90º around Y",
+          PWBShortcut.Group.FLOOR, KeyCode.E, EventModifiers.Shift);
+        public PWBKeyShortcut floorRotate90YCW => _floorRotate90YCW;
+        #endregion
+
+        #region WALL
+        [SerializeField]
+        private PWBKeyShortcut _wallHalfTurn = new PWBKeyShortcut("Rotate 180º around Y",
+          PWBShortcut.Group.WALL, KeyCode.E, EventModifiers.Shift);
+        public PWBKeyShortcut wallHalfTurn => _wallHalfTurn;
         #endregion
 
         #region CONFLICTS
@@ -1792,6 +2167,8 @@ namespace PluginMaster
                 if (_keyShortcuts == null)
                     _keyShortcuts = new PWBKeyShortcut[]
                     {
+                        /*/// GIZMOS ///*/
+                        _gizmosToggleInfotext,
                         /*/// GRID ///*/
                         _gridEnableShortcuts,
                         _gridToggle,
@@ -1806,6 +2183,9 @@ namespace PluginMaster
                         _gridToggleSpacingHandle,
                         _gridMoveOriginUp,
                         _gridMoveOriginDown,
+                        _gridNextOrigin,
+                        /*/// SNAP ///*/
+                        _snapToggleBoundsSnapping,
                         /*/// PIN ///*/
                         _pinMoveHandlesUp,
                         _pinMoveHandlesDown,
@@ -1855,7 +2235,8 @@ namespace PluginMaster
                         _editModeDeleteItemAndItsChildren,
                         _editModeDeleteItemButNotItsChildren,
                         _editModeSelectParent,
-                        editModeToggle,
+                        _editModeToggle,
+                        _editModeDuplicate,
                         /*/// LINE ///*/
                         _lineSelectAllPoints,
                         _lineDeselectAllPoints,
@@ -1874,6 +2255,7 @@ namespace PluginMaster
                         _selectionToggleRotationHandle,
                         _selectionToggleScaleHandle,
                         _selectionEditCustomHandle,
+                        _selectionToggleSpace,
                         /*/// PALETTE ///*/
                         _paletteDeleteBrush,
                         _palettePreviousBrush,
@@ -1881,6 +2263,7 @@ namespace PluginMaster
                         _palettePreviousPalette,
                         _paletteNextPalette,
                         _palettePickBrush,
+                        _paletteReplaceSceneSelection,
                         /*/// TOOLBAR ///*/
                         _toolbarPinToggle,
                         _toolbarBrushToggle,
@@ -1892,14 +2275,20 @@ namespace PluginMaster
                         _toolbarEraserToggle,
                         _toolbarSelectionToggle,
                         _toolbarExtrudeToggle,
-                        _toolbarMirrorToggle
+                        _toolbarMirrorToggle,
+                        /*/// FLOOR ///*/
+                        _floorRotate90YCW,
+                        /*/// WALL ///*/
+                        _wallHalfTurn,
                     };
                 return _keyShortcuts;
             }
         }
-
+        private System.Collections.Generic.Dictionary<PWBKeyShortcut, PWBKeyShortcut> _keyConflicts
+            = new System.Collections.Generic.Dictionary<PWBKeyShortcut, PWBKeyShortcut>();
         public void UpdateConficts()
         {
+            _keyConflicts.Clear();
             foreach (var shortcut in keyShortcuts) shortcut.conflicted = false;
             for (int i = 0; i < keyShortcuts.Length; ++i)
             {
@@ -1911,17 +2300,31 @@ namespace PluginMaster
                     var shortcut2 = keyShortcuts[j];
                     if (shortcut2.conflicted) continue;
                     if (shortcut2.combination.keyCode == KeyCode.None) continue;
+
                     if ((shortcut1.group & shortcut2.group) == 0 && (shortcut1.group & PWBShortcut.Group.GLOBAL) == 0
-                        && (shortcut1.group & PWBShortcut.Group.GLOBAL) == 0) continue;
-                    if (shortcut1 == gridEnableShortcuts && (shortcut2.group & PWBShortcut.Group.GRID) != 0) continue;
+                       && (shortcut2.group & PWBShortcut.Group.GLOBAL) == 0) continue;
+                    if (shortcut1 == gridEnableShortcuts && (shortcut2.group & PWBShortcut.Group.GRID) != 0
+                        && (shortcut2.group & PWBShortcut.Group.GLOBAL) == 0)
+                        continue;
 
                     if (shortcut1.combination == shortcut2.combination)
                     {
                         shortcut1.conflicted = true;
                         shortcut2.conflicted = true;
+                        var combiString = shortcut1.combination.ToString();
+                        if (!_keyConflicts.ContainsKey(shortcut1)) _keyConflicts.Add(shortcut1, shortcut2);
+                        if (!_keyConflicts.ContainsKey(shortcut2)) _keyConflicts.Add(shortcut2, shortcut1);
                     }
                 }
             }
+        }
+        public bool GetConflictShortcuts(PWBKeyShortcut shortcut1, out PWBKeyShortcut shortcut2)
+        {
+            shortcut2 = null;
+            if (!_keyConflicts.ContainsKey(shortcut1)) UpdateConficts();
+            if (!_keyConflicts.ContainsKey(shortcut1)) return false;
+            shortcut2 = _keyConflicts[shortcut1];
+            return true;
         }
 
         public bool CheckConflicts(PWBKeyCombination combi, PWBKeyShortcut target, out string conflicts)
@@ -1953,32 +2356,32 @@ namespace PluginMaster
            PWBShortcut.Group.PIN, EventModifiers.Control, PWBMouseCombination.MouseEvents.SCROLL_WHEEL);
         [SerializeField]
         private PWBMouseShortcut _pinSelectNextItemScroll
-            = new PWBMouseShortcut("Select previous/next item in the multi-brush",
+            = new PWBMouseShortcut("Select prev/next item in the multi-brush",
                 PWBShortcut.Group.PIN, EventModifiers.Control | EventModifiers.Alt,
                 PWBMouseCombination.MouseEvents.SCROLL_WHEEL);
 
         [SerializeField]
-        private PWBMouseShortcut _pinRotateAroundY = new PWBMouseShortcut("Rotate freely around local Y axis",
+        private PWBMouseShortcut _pinRotateAroundY = new PWBMouseShortcut("Rotate freely around Y",
            PWBShortcut.Group.PIN, EventModifiers.Control, PWBMouseCombination.MouseEvents.DRAG_R_H);
         [SerializeField]
         private PWBMouseShortcut _pinRotateAroundYSnaped
-            = new PWBMouseShortcut("Rotate freely around the local Y axis in steps",
+            = new PWBMouseShortcut("Rotate freely around Y in steps",
                 PWBShortcut.Group.PIN, EventModifiers.Control | EventModifiers.Alt, PWBMouseCombination.MouseEvents.DRAG_R_H);
 
         [SerializeField]
-        private PWBMouseShortcut _pinRotateAroundX = new PWBMouseShortcut("Rotate freely around local X axis",
+        private PWBMouseShortcut _pinRotateAroundX = new PWBMouseShortcut("Rotate freely around X",
            PWBShortcut.Group.PIN, EventModifiers.Control, PWBMouseCombination.MouseEvents.DRAG_M_V);
         [SerializeField]
         private PWBMouseShortcut _pinRotateAroundXSnaped
-            = new PWBMouseShortcut("Rotate freely around the local X axis in steps",
+            = new PWBMouseShortcut("Rotate freely around X in steps",
                 PWBShortcut.Group.PIN, EventModifiers.Control | EventModifiers.Alt, PWBMouseCombination.MouseEvents.DRAG_M_V);
 
         [SerializeField]
-        private PWBMouseShortcut _pinRotateAroundZ = new PWBMouseShortcut("Rotate freely around local Z axis",
+        private PWBMouseShortcut _pinRotateAroundZ = new PWBMouseShortcut("Rotate freely around Z",
            PWBShortcut.Group.PIN, EventModifiers.Control | EventModifiers.Shift, PWBMouseCombination.MouseEvents.DRAG_M_V);
         [SerializeField]
         private PWBMouseShortcut _pinRotateAroundZSnaped
-            = new PWBMouseShortcut("Rotate freely around the local Z axis in steps", PWBShortcut.Group.PIN,
+            = new PWBMouseShortcut("Rotate freely around Z in steps", PWBShortcut.Group.PIN,
                 EventModifiers.Control | EventModifiers.Alt | EventModifiers.Shift, PWBMouseCombination.MouseEvents.DRAG_M_V);
 
         [SerializeField]
@@ -2002,7 +2405,8 @@ namespace PluginMaster
         #region RADIUS
         [SerializeField]
         private PWBMouseShortcut _brushRadius = new PWBMouseShortcut("Change radius",
-           PWBShortcut.Group.BRUSH | PWBShortcut.Group.GRAVITY | PWBShortcut.Group.ERASER | PWBShortcut.Group.REPLACER,
+           PWBShortcut.Group.BRUSH | PWBShortcut.Group.GRAVITY
+            | PWBShortcut.Group.ERASER | PWBShortcut.Group.REPLACER | PWBShortcut.Group.CIRCLE_SELECT,
            EventModifiers.Control, PWBMouseCombination.MouseEvents.SCROLL_WHEEL);
         public PWBMouseShortcut brushRadius => _brushRadius;
         #endregion
@@ -2050,11 +2454,11 @@ namespace PluginMaster
 
         #region PALETTE
         [SerializeField]
-        private PWBMouseShortcut _paletteNextBrushScroll = new PWBMouseShortcut("Select previous/next brush",
+        private PWBMouseShortcut _paletteNextBrushScroll = new PWBMouseShortcut("Select prev/next brush",
             PWBShortcut.Group.PALETTE | PWBShortcut.Group.GLOBAL,
            EventModifiers.Control | EventModifiers.Shift, PWBMouseCombination.MouseEvents.SCROLL_WHEEL);
         [SerializeField]
-        private PWBMouseShortcut _paletteNextPaletteScroll = new PWBMouseShortcut("Select previous/next palette",
+        private PWBMouseShortcut _paletteNextPaletteScroll = new PWBMouseShortcut("Select prev/next palette",
             PWBShortcut.Group.PALETTE | PWBShortcut.Group.GLOBAL,
            EventModifiers.Control | EventModifiers.Alt | EventModifiers.Shift, PWBMouseCombination.MouseEvents.SCROLL_WHEEL);
         public PWBMouseShortcut paletteNextBrushScroll => _paletteNextBrushScroll;
@@ -2159,6 +2563,48 @@ namespace PluginMaster
         }
         #endregion
         #endregion
+
+        public static (string Command, string Shortcut)[] GetShortcuts(PWBShortcut.Group group, EventModifiers modifiers)
+        {
+            var result = new System.Collections.Generic.List<(string Command, string Shortcut)>();
+            if (group == PWBShortcut.Group.NONE) return new (string Command, string Shortcut)[] { };
+            var defaultProfile = PWBSettings.selectedProfileIdx == 1 ? GetDefault(1) : GetDefault(0);
+            var keyShortcutsArray = new System.Collections.Generic.List<PWBKeyShortcut>(defaultProfile.keyShortcuts);
+            foreach (var shortcut in keyShortcutsArray)
+            {
+                if ((shortcut.group & group) != group) continue;
+                if (shortcut.combination.modifiers == modifiers) result.Add((shortcut.name, shortcut.combination.ToString()));
+            }
+            var mouseShortcutsArray = new System.Collections.Generic.List<PWBMouseShortcut>(defaultProfile.mouseShortcuts);
+            foreach (var shortcut in mouseShortcutsArray)
+            {
+                if ((shortcut.group & group) != group) continue;
+                if (shortcut.combination.modifiers == modifiers) result.Add((shortcut.name, shortcut.combination.ToString()));
+            }
+            return result.ToArray();
+        }
+
+        public static (string Command, string Shortcut)[] GetAllShortcuts(PWBShortcut.Group group, PWBShortcut.Group exclude)
+        {
+            var result = new System.Collections.Generic.List<(string Command, string Shortcut)>();
+            if (group == PWBShortcut.Group.NONE) return new (string Command, string Shortcut)[] { };
+            var defaultProfile = PWBSettings.selectedProfileIdx == 1 ? GetDefault(1) : GetDefault(0);
+            var keyShortcutsArray = new System.Collections.Generic.List<PWBKeyShortcut>(defaultProfile.keyShortcuts);
+            foreach (var shortcut in keyShortcutsArray)
+            {
+                if ((shortcut.group & group) != group) continue;
+                if (exclude != PWBShortcut.Group.NONE && (shortcut.group & exclude) == exclude) continue;
+                result.Add((shortcut.name, shortcut.combination.ToString()));
+            }
+            var mouseShortcutsArray = new System.Collections.Generic.List<PWBMouseShortcut>(defaultProfile.mouseShortcuts);
+            foreach (var shortcut in mouseShortcutsArray)
+            {
+                if ((shortcut.group & group) != group) continue;
+                if (exclude != PWBShortcut.Group.NONE && (shortcut.group & exclude) == exclude) continue;
+                result.Add((shortcut.name, shortcut.combination.ToString()));
+            }
+            return result.ToArray();
+        }
     }
     #endregion
 
@@ -2208,7 +2654,14 @@ namespace PluginMaster
                 var settings = JsonUtility.FromJson<PWBSettings>(System.IO.File.ReadAllText(settingsPath));
                 _dataDir = settings._dataDir;
                 if (PWBCore.IsFullPath(_dataDir)) _dataDir = PWBCore.GetRelativePath(_dataDir);
-                _shortcutProfiles = settings._shortcutProfiles;
+
+                foreach (var loadedProfile in settings._shortcutProfiles)
+                {
+                    var profiles = _shortcutProfiles.Where(p => p.profileName == loadedProfile.profileName);
+                    if (profiles.Count() <= 0) continue;
+                    var profile = profiles.First();
+                    profile = loadedProfile;
+                }
                 _selectedProfileIdx = settings._selectedProfileIdx;
             }
         }
@@ -2335,9 +2788,10 @@ namespace PluginMaster
            = new System.Collections.Generic.List<PWBShortcuts>()
            {
                 PWBShortcuts.GetDefault(0),
-                PWBShortcuts.GetDefault(1)
+                PWBShortcuts.GetDefault(1),
+                PWBShortcuts.GetDefault(2)
            };
-        [SerializeField] private int _selectedProfileIdx = 0;
+        [SerializeField] private int _selectedProfileIdx = 2;
         private PWBShortcuts selectedProfile
         {
             get
@@ -2387,18 +2841,17 @@ namespace PluginMaster
             instance.Save();
         }
 
-        public static void SetDefaultShortcut(int shortcutIdx, int defaultIdx)
+        public static bool GetShortcutConflict(PWBKeyShortcut shortcut1, out PWBKeyShortcut shortcut2)
         {
-            CheckDataDir();
-            if (shortcutIdx < 0 || shortcutIdx > instance._shortcutProfiles.Count) return;
-            instance._shortcutProfiles[shortcutIdx] = PWBShortcuts.GetDefault(defaultIdx);
+            return shortcuts.GetConflictShortcuts(shortcut1, out shortcut2);
         }
 
         public static void ResetSelectedProfile()
         {
             CheckDataDir();
-            if (selectedProfileIdx == 1) instance._shortcutProfiles[1] = PWBShortcuts.GetDefault(1);
-            else instance._shortcutProfiles[instance._selectedProfileIdx] = PWBShortcuts.GetDefault(0);
+            if (selectedProfileIdx == 0) instance._shortcutProfiles[1] = PWBShortcuts.GetDefault(0);
+            else if (selectedProfileIdx == 1) instance._shortcutProfiles[0] = PWBShortcuts.GetDefault(1);
+            else if (selectedProfileIdx == 2) instance._shortcutProfiles[2] = PWBShortcuts.GetDefault(2);
         }
 
         public static void ResetShortcutToDefault(PWBKeyShortcut shortcut)
@@ -2449,8 +2902,6 @@ namespace PluginMaster
         private static bool _sceneOpening = false;
         public static bool sceneOpening => _sceneOpening;
 
-
-        private static bool _hierarchyLoaded = false;
         private static bool _hierarchyChangedWhileUsingTools = false;
         public static bool hierarchyChangedWhileUsingTools
         { get => _hierarchyChangedWhileUsingTools; set => _hierarchyChangedWhileUsingTools = value; }
@@ -2465,8 +2916,7 @@ namespace PluginMaster
             UnityEditor.AssetDatabase.importPackageFailed += OnImportPackageFailed;
             UnityEditor.SceneManagement.EditorSceneManager.sceneOpening += OnSceneOpening;
             UnityEditor.SceneManagement.EditorSceneManager.sceneOpened += OnSceneOpened;
-            //UnityEditor.ObjectChangeEvents.changesPublished += ChangesPublished;
-
+            PWBCore.Initialize();
             const string firstInitSessionStateKey = "PWBFirstInitDone";
             if (!UnityEditor.SessionState.GetBool(firstInitSessionStateKey, false))
             {
@@ -2483,12 +2933,6 @@ namespace PluginMaster
 
         private static void OnHierarchyChanged()
         {
-            if (!_hierarchyLoaded)
-            {
-                _hierarchyLoaded = true;
-                if (!PWBCore.staticData.saving) PWBCore.LoadFromFile();
-                return;
-            }
             if (PWBCore.updatingTempColliders || PWBIO.painting)
             {
                 if (PWBCore.updatingTempColliders) PWBCore.updatingTempColliders = false;
@@ -2585,7 +3029,8 @@ namespace PluginMaster
         {
             await System.Threading.Tasks.Task.Delay(300);
             ++_quickSaveCount;
-            if (_quickSaveCount == 3 && PWBCore.staticDataWasInitialized) PWBCore.staticData.SaveAndUpdateVersion();
+            if (_quickSaveCount == 3 && PWBCore.staticDataWasInitialized)
+                PWBCore.staticData.SaveIfPending();
             PeriodicQuickSave();
         }
 

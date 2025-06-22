@@ -68,38 +68,31 @@ namespace PluginMaster
         #region RANGE FIELD
         public static RandomUtils.Range RangeField(string label, RandomUtils.Range value)
         {
+            var result = new RandomUtils.Range();
             using (new GUILayout.HorizontalScope())
             {
-                if (label != string.Empty)
-                {
-                    GUILayout.Label(label);
-                }
+                if (label != string.Empty) GUILayout.Label(label);
                 var prevLabelW = UnityEditor.EditorGUIUtility.labelWidth;
                 UnityEditor.EditorGUIUtility.labelWidth = 30;
-                GUILayout.Label("Between:");
-                value.v1 = UnityEditor.EditorGUILayout.FloatField(value.v1);
-                value.v2 = UnityEditor.EditorGUILayout.FloatField(value.v2);
+                GUILayout.Label("Between");
+                result.v1 = UnityEditor.EditorGUILayout.FloatField(value.v1);
+                result.v2 = UnityEditor.EditorGUILayout.FloatField(value.v2);
                 UnityEditor.EditorGUIUtility.labelWidth = prevLabelW;
             }
-            return value;
+            return result;
         }
 
         public static RandomUtils.Range3 Range3Field(string label, RandomUtils.Range3 value)
         {
+            var result = new RandomUtils.Range3(value);
             using (new GUILayout.VerticalScope())
             {
-                if (label != string.Empty)
-                {
-                    GUILayout.Label(label);
-                }
-
-                GUILayout.Label("Between:");
-                value.v1 = UnityEditor.EditorGUILayout.Vector3Field(string.Empty, value.v1);
-                value.v2 = UnityEditor.EditorGUILayout.Vector3Field(string.Empty, value.v2);
-
+                if (label != string.Empty) GUILayout.Label(label);
+                GUILayout.Label("Between");
+                result.v1 = UnityEditor.EditorGUILayout.Vector3Field(string.Empty, value.v1);
+                result.v2 = UnityEditor.EditorGUILayout.Vector3Field(string.Empty, value.v2);
             }
-
-            return value;
+            return result;
         }
         #endregion
 
@@ -199,7 +192,7 @@ namespace PluginMaster
                 using (new GUILayout.VerticalScope())
                 {
                     UnityEditor.EditorGUIUtility.labelWidth = 40;
-                    size = Mathf.Clamp(UnityEditor.EditorGUILayout.IntField("Size:", size), 0, 10);
+                    size = Mathf.Clamp(UnityEditor.EditorGUILayout.IntField("Size", size), 0, 10);
                     result = new OBJ_TYPE[size];
                     for (int i = 0; i < size; ++i)
                     {

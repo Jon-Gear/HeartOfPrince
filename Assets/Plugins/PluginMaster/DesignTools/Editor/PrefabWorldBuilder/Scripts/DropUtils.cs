@@ -83,7 +83,7 @@ namespace PluginMaster
         public static DroppedItem[] GetFolderItems()
         {
             DroppedItem[] items = null;
-            var folder = UnityEditor.EditorUtility.OpenFolderPanel("Add Prefabs in folder:", Application.dataPath, "Assets");
+            var folder = UnityEditor.EditorUtility.OpenFolderPanel("Add Prefabs in folder", Application.dataPath, "Assets");
             if (folder.Contains(Application.dataPath))
             {
                 folder = folder.Replace(Application.dataPath, "Assets");

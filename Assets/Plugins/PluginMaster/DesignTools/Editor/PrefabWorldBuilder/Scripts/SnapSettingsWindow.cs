@@ -43,12 +43,12 @@ namespace PluginMaster
                 {
                     if (SnapManager.settings.radialGridEnabled)
                     {
-                        SnapManager.settings.radialStep = UnityEditor.EditorGUILayout.FloatField("Radial Snap Value:",
+                        SnapManager.settings.radialStep = UnityEditor.EditorGUILayout.FloatField("Radial Snap Value",
                             SnapManager.settings.radialStep);
                     }
                     else
                     {
-                        SnapManager.settings.step = UnityEditor.EditorGUILayout.Vector3Field("Snap Value:",
+                        SnapManager.settings.step = UnityEditor.EditorGUILayout.Vector3Field("Snap Value",
                             SnapManager.settings.step);
                         SnapManager.settings.midpointSnapping = UnityEditor.EditorGUILayout.ToggleLeft("Midpoint snapping",
                             SnapManager.settings.midpointSnapping);
@@ -74,7 +74,7 @@ namespace PluginMaster
                 {
                     using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                     {
-                        SnapManager.settings.radialSectors = UnityEditor.EditorGUILayout.IntField("Radial Sectors:",
+                        SnapManager.settings.radialSectors = UnityEditor.EditorGUILayout.IntField("Radial Sectors",
                             SnapManager.settings.radialSectors);
                         if (check.changed) UnityEditor.SceneView.RepaintAll();
                     }
@@ -82,39 +82,74 @@ namespace PluginMaster
             }
             using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
             {
-                using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                using (new GUILayout.HorizontalScope(UnityEditor.EditorStyles.helpBox))
                 {
-                    SnapManager.settings.origin = UnityEditor.EditorGUILayout.Vector3Field("Grid Origin",
-                        SnapManager.settings.origin);
-                    if (check.changed) UnityEditor.SceneView.RepaintAll();
-                }
-                using (new UnityEditor.EditorGUI.DisabledGroupScope(_activeGameObject == null))
-                {
-                    if (GUILayout.Button("Set the origin to the active gameobject position"))
+                    int originIndex = 0;
+                    UnityEditor.EditorGUIUtility.labelWidth = 70;
+                    using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                     {
-                        SnapManager.settings.origin = _activeGameObject.transform.position;
-                        UnityEditor.SceneView.RepaintAll();
+                        originIndex = UnityEditor.EditorGUILayout.Popup("Grid origin",
+                            SnapManager.settings.GetIndexOfSelectedOrigin(), SnapManager.settings.GetOriginNames());
+                        if (check.changed)
+                        {
+                            SnapManager.settings.SelectOrigin(originIndex);
+                            UnityEditor.SceneView.RepaintAll();
+                        }
+                    }
+                    if (GUILayout.Button("Reset"))
+                    {
+                        SnapManager.settings.ResetOrigin();
+                    }
+                    if (GUILayout.Button("Save..."))
+                    {
+                        RenameWindow.ShowWindow(position.position + Event.current.mousePosition,
+                            SnapManager.settings.SaveGridOrigin, "Save Origin", SnapManager.settings.selectedOrigin);
+                    }
+                    using (new UnityEditor.EditorGUI.DisabledGroupScope(originIndex == 0))
+                    {
+                        if (GUILayout.Button("Delete"))
+                        {
+                            SnapManager.settings.DeleteSelectedOrigin();
+                        }
                     }
                 }
-            }
-            using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
-            {
-                using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
                 {
-                    var euler = SnapManager.settings.rotation.eulerAngles;
-                    euler = new Vector3(Mathf.RoundToInt(euler.x * 100000) / 100000f,
-                        Mathf.RoundToInt(euler.y * 100000) / 100000f,
-                        Mathf.RoundToInt(euler.z * 100000) / 100000f);
-                    SnapManager.settings.rotation
-                        = Quaternion.Euler(UnityEditor.EditorGUILayout.Vector3Field("Rotation", euler));
-                    if (check.changed) UnityEditor.SceneView.RepaintAll();
-                }
-                using (new UnityEditor.EditorGUI.DisabledGroupScope(_activeGameObject == null))
-                {
-                    if (GUILayout.Button("Set the rotation to the active gameobject rotation"))
+                    using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                     {
-                        SnapManager.settings.rotation = _activeGameObject.transform.rotation;
-                        UnityEditor.SceneView.RepaintAll();
+                        SnapManager.settings.origin = UnityEditor.EditorGUILayout.Vector3Field("Origin position",
+                            SnapManager.settings.origin);
+                        if (check.changed) UnityEditor.SceneView.RepaintAll();
+                    }
+
+                    using (new UnityEditor.EditorGUI.DisabledGroupScope(_activeGameObject == null))
+                    {
+                        if (GUILayout.Button("Set the origin to the active gameobject position"))
+                        {
+                            SnapManager.settings.origin = _activeGameObject.transform.position;
+                            UnityEditor.SceneView.RepaintAll();
+                        }
+                    }
+                }
+                using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
+                {
+                    using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                    {
+                        var euler = SnapManager.settings.rotation.eulerAngles;
+                        euler = new Vector3(Mathf.RoundToInt(euler.x * 100000) / 100000f,
+                            Mathf.RoundToInt(euler.y * 100000) / 100000f,
+                            Mathf.RoundToInt(euler.z * 100000) / 100000f);
+                        SnapManager.settings.rotation
+                            = Quaternion.Euler(UnityEditor.EditorGUILayout.Vector3Field("Rotation", euler));
+                        if (check.changed) UnityEditor.SceneView.RepaintAll();
+                    }
+                    using (new UnityEditor.EditorGUI.DisabledGroupScope(_activeGameObject == null))
+                    {
+                        if (GUILayout.Button("Set the rotation to the active gameobject rotation"))
+                        {
+                            SnapManager.settings.rotation = _activeGameObject.transform.rotation;
+                            UnityEditor.SceneView.RepaintAll();
+                        }
                     }
                 }
             }
@@ -125,7 +160,7 @@ namespace PluginMaster
                     using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                     {
                         SnapManager.settings.majorLinesGap
-                            = UnityEditor.EditorGUILayout.Vector3IntField("Major lines every Nth grid line:",
+                            = UnityEditor.EditorGUILayout.Vector3IntField("Major lines every Nth grid line",
                             SnapManager.settings.majorLinesGap);
                         if (check.changed) UnityEditor.SceneView.RepaintAll();
                     }
@@ -136,7 +171,7 @@ namespace PluginMaster
                 using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                 {
                     var idx = SnapManager.settings.radialGridEnabled ? 1 : 0;
-                    idx = UnityEditor.EditorGUILayout.Popup("Grid type:", idx, _gridTypeOptions);
+                    idx = UnityEditor.EditorGUILayout.Popup("Grid type", idx, _gridTypeOptions);
                     if (check.changed)
                     {
                         SnapManager.settings.radialGridEnabled = idx == 0 ? false : true;

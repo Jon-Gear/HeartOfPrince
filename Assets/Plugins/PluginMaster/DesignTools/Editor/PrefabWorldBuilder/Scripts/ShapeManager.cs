@@ -494,13 +494,6 @@ namespace PluginMaster
             _normal = otherShapeSettings._normal;
             _projectInNormalDir = otherShapeSettings._projectInNormalDir;
         }
-
-        public override void Clone(ICloneableToolSettings clone)
-        {
-            if (clone == null || !(clone is ShapeSettings)) clone = new ShapeSettings();
-            clone.Copy(this);
-        }
-
         public override void DataChanged()
         {
             base.DataChanged();
@@ -531,6 +524,7 @@ namespace PluginMaster
         private static void ShapeInitializeOnLoad()
         {
             ShapeManager.settings.OnDataChanged += OnShapeSettingsChanged;
+            BrushSettings.OnBrushSettingsChanged += PreviewSelectedPersistentShapes;
         }
         private static void OnShapeToolModeChanged()
         {
@@ -581,6 +575,7 @@ namespace PluginMaster
                 ShapeManager.settings.paintOnPalettePrefabs, ShapeManager.settings.paintOnMeshesWithoutCollider, false))
             {
                 if (ShapeManager.settings.projectInNormalDir) ShapeManager.settings.SetNormalAndDontTriggerChangeEvent(normal);
+                point = SnapToBounds(point);
                 point = SnapAndUpdateGridOrigin(point, SnapManager.settings.snappingEnabled,
                    ShapeManager.settings.paintOnPalettePrefabs, ShapeManager.settings.paintOnMeshesWithoutCollider,
                    false, Vector3.down);
@@ -606,6 +601,7 @@ namespace PluginMaster
             var radiusPoint = shapeData.center;
             if (shapeData.plane.Raycast(mouseRay, out float distance))
                 radiusPoint = mouseRay.GetPoint(distance);
+            radiusPoint = SnapToBounds(radiusPoint);
             radiusPoint = SnapAndUpdateGridOrigin(radiusPoint, SnapManager.settings.snappingEnabled,
                    shapeData.settings.paintOnPalettePrefabs, shapeData.settings.paintOnMeshesWithoutCollider,
                    false, Vector3.down);
@@ -683,6 +679,7 @@ namespace PluginMaster
                 }
                 var prevPosition = _shapeData.selectedPoint;
                 var snappedPoint = UnityEditor.Handles.PositionHandle(selectedPoint, _shapeData.planeRotation);
+                snappedPoint = SnapToBounds(snappedPoint);
                 snappedPoint = SnapAndUpdateGridOrigin(snappedPoint, SnapManager.settings.snappingEnabled,
                    ShapeManager.settings.paintOnPalettePrefabs, ShapeManager.settings.paintOnMeshesWithoutCollider,
                    false, Vector3.down);
@@ -723,6 +720,7 @@ namespace PluginMaster
             var initialBrushId = PaletteManager.selectedBrush != null ? PaletteManager.selectedBrush.id : -1;
             var persistentData = new ShapeData(objs, initialBrushId, _shapeData);
             ShapeManager.instance.AddPersistentItem(sceneGUID, persistentData);
+            PWBItemsWindow.RepainWindow();
         }
         private static void ShapeStrokePreview(UnityEditor.SceneView sceneView, string hexId,
             bool forceUpdate, ShapeData shapeData)
@@ -895,6 +893,14 @@ namespace PluginMaster
             var plane = new Plane(shapeData.planeRotation * Vector3.up, shapeData.center);
             return plane.ClosestPointOnPlane(point);
         }
+
+        public static void ShowShapeContextMenu(ShapeData data, Vector2 mousePosition)
+        {
+            if (!ToolManager.editMode) return;
+            var menu = new UnityEditor.GenericMenu();
+            PersistentItemContextMenu(menu, data, mousePosition);
+            menu.ShowAsContext();
+        }
         private static bool ShapeControlPoints(ShapeData shapeData, out bool clickOnPoint,
             out bool wasEdited, bool showHandles, out Vector3 delta)
         {
@@ -934,6 +940,14 @@ namespace PluginMaster
                         }
                     }
                 }
+                if (Event.current.button == 1 && Event.current.type == EventType.MouseDown
+                       && !Event.current.control && !Event.current.shift && !Event.current.alt
+                           && UnityEditor.HandleUtility.nearestControl == controlId)
+                {
+                    ShowShapeContextMenu(shapeData, 
+                        UnityEditor.EditorGUIUtility.GUIToScreenPoint(Event.current.mousePosition));
+                    Event.current.Use();
+                }
             }
             if (showHandles && shapeData.selectedPointIdx >= 0 && shapeData.selectedPointIdx < shapeData.pointsCount)
             {
@@ -945,6 +959,7 @@ namespace PluginMaster
                 }
                 var prevPosition = shapeData.selectedPoint;
                 var snappedPoint = UnityEditor.Handles.PositionHandle(selectedPoint, shapeData.planeRotation);
+                snappedPoint = SnapToBounds(snappedPoint);
                 snappedPoint = SnapAndUpdateGridOrigin(snappedPoint, SnapManager.settings.snappingEnabled,
                    shapeData.settings.paintOnPalettePrefabs, shapeData.settings.paintOnMeshesWithoutCollider,
                    false, Vector3.down);
@@ -1082,11 +1097,7 @@ namespace PluginMaster
         private static void DeselectPersistentShapes()
         {
             var persistentShapes = ShapeManager.instance.GetPersistentItems();
-            foreach (var s in persistentShapes)
-            {
-                s.selectedPointIdx = -1;
-                s.ClearSelection();
-            }
+            foreach (var s in persistentShapes) s.ClearSelection();
         }
 
         private static void ResetSelectedPersistentShape()
@@ -1096,8 +1107,18 @@ namespace PluginMaster
             var selectedShape = ShapeManager.instance.GetItem(_initialPersistentShapeData.id);
             if (selectedShape == null) return;
             selectedShape.ResetPoses(_initialPersistentShapeData);
-            selectedShape.selectedPointIdx = -1;
             selectedShape.ClearSelection();
+        }
+
+        public static void SelectShape(ShapeData data)
+        {
+            ApplySelectedPersistentShape(true);
+            _editingPersistentShape = true;
+            data.ClearSelection();
+            data.selectedPointIdx = 0;
+            _selectedPersistentShapeData = data;
+            if (_initialPersistentShapeData == null) _initialPersistentShapeData = data.Clone();
+            ShapeManager.instance.CopyToolSettings(data.settings);
         }
 
         private static void ShapeToolEditMode(UnityEditor.SceneView sceneView)
@@ -1171,6 +1192,7 @@ namespace PluginMaster
                         forceUpdate: true, _selectedPersistentShapeData);
                 }
                 DeleteDisabledObjects();
+                _persistentItemWasEdited = true;
                 ApplySelectedPersistentShape(true);
                 DeleteDisabledObjects();
                 ToolProperties.RepainWindow();
@@ -1184,7 +1206,21 @@ namespace PluginMaster
                 ShapeManager.instance.DeletePersistentItem(_selectedPersistentShapeData.id, false);
             else if (PWBSettings.shortcuts.editModeDeleteItemAndItsChildren.Check())
                 ShapeManager.instance.DeletePersistentItem(_selectedPersistentShapeData.id, true);
+            else if (PWBSettings.shortcuts.editModeDuplicate.Check()) DuplicateItem(_selectedPersistentShapeData.id);
 
+        }
+
+        public static void PreviewSelectedPersistentShapes()
+        {
+            if (ToolManager.tool != ToolManager.PaintTool.SHAPE) return;
+            if (_selectedPersistentShapeData != null) PreviewPersistentShape(_selectedPersistentShapeData);
+            var persistentShapes = ShapeManager.instance.GetPersistentItems();
+            foreach (var shapeData in persistentShapes)
+            {
+                if (!shapeData.isSelected) continue;
+                if (_shapeData == _selectedPersistentShapeData) continue;
+                PreviewPersistentShape(shapeData);
+            }
         }
 
         private static void PreviewPersistentShape(ShapeData shapeData)
@@ -1193,7 +1229,7 @@ namespace PluginMaster
 
             BrushstrokeObject[] objPoses = null;
             var objList = shapeData.objectList;
-            BrushstrokeManager.UpdatePersistentShapeBrushstroke(shapeData, objList, out objPoses);
+            BrushstrokeManager.UpdatePersistentShapeBrushstroke(shapeData, objList, out objPoses); 
             _disabledObjects = new System.Collections.Generic.HashSet<GameObject>(objList);
             var settings = shapeData.settings;
             BrushSettings brushSettings = ShapeManager.instance.applyBrushToExisting ?

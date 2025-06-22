@@ -27,9 +27,10 @@ namespace PluginMaster
         public readonly bool flipX;
         public readonly bool flipY;
         public readonly float surfaceDistance;
+        public readonly Vector3 brushstrokeDirection;
 
-        public BrushstrokeObject(int objIdx, Vector3 objPosition, Quaternion objRotation,
-            Vector3 additionalAngle, Vector3 objScale, bool flipX, bool flipY, float surfaceDistance)
+        public BrushstrokeObject(int objIdx, Vector3 objPosition, Quaternion objRotation, Vector3 additionalAngle,
+            Vector3 objScale, bool flipX, bool flipY, float surfaceDistance, Vector3 brushstrokeDirection)
         {
             this.objIdx = objIdx;
             this.objPosition = objPosition;
@@ -39,12 +40,13 @@ namespace PluginMaster
             this.flipX = flipX;
             this.flipY = flipY;
             this.surfaceDistance = surfaceDistance;
+            this.brushstrokeDirection = brushstrokeDirection;
         }
 
         public BrushstrokeObject Clone()
         {
             var clone = new BrushstrokeObject(objIdx, objPosition, objRotation, additionalAngle,
-                objScale, flipX, flipY, surfaceDistance);
+                objScale, flipX, flipY, surfaceDistance, brushstrokeDirection);
             return clone;
         }
 
@@ -52,7 +54,8 @@ namespace PluginMaster
         {
             return objPosition == other.objPosition && objRotation == other.objRotation
                 && additionalAngle == other.additionalAngle && objScale == other.objScale
-                && flipX == other.flipX && flipY == other.flipY && surfaceDistance == other.surfaceDistance;
+                && flipX == other.flipX && flipY == other.flipY && surfaceDistance == other.surfaceDistance
+                && brushstrokeDirection == other.brushstrokeDirection;
         }
         public static bool operator ==(BrushstrokeObject lhs, BrushstrokeObject rhs) => lhs.Equals(rhs);
         public static bool operator !=(BrushstrokeObject lhs, BrushstrokeObject rhs) => !lhs.Equals(rhs);
@@ -70,6 +73,7 @@ namespace PluginMaster
             hashCode = hashCode * -1521134295 + flipX.GetHashCode();
             hashCode = hashCode * -1521134295 + flipY.GetHashCode();
             hashCode = hashCode * -1521134295 + surfaceDistance.GetHashCode();
+            hashCode = hashCode * -1521134295 + brushstrokeDirection.GetHashCode();
             return hashCode;
         }
     }
@@ -84,9 +88,11 @@ namespace PluginMaster
         public readonly bool flipX;
         public readonly bool flipY;
         public readonly float surfaceDistance;
+        public readonly int index;
+        public readonly int tokenIndex;
 
-        public BrushstrokeItem(MultibrushItemSettings settings, Vector3 tangentPosition,
-            Vector3 additionalAngle, Vector3 scaleMultiplier, bool flipX, bool flipY, float surfaceDistance)
+        public BrushstrokeItem(int index, int tokenIndex, MultibrushItemSettings settings, Vector3 tangentPosition,
+            Vector3 additionalAngle,Vector3 scaleMultiplier, bool flipX, bool flipY, float surfaceDistance)
         {
             this.settings = settings;
             this.tangentPosition = tangentPosition;
@@ -96,11 +102,13 @@ namespace PluginMaster
             this.flipX = flipX;
             this.flipY = flipY;
             this.surfaceDistance = surfaceDistance;
+            this.index = index;
+            this.tokenIndex = tokenIndex;
         }
 
         public BrushstrokeItem Clone()
         {
-            var clone = new BrushstrokeItem(settings, tangentPosition, additionalAngle,
+            var clone = new BrushstrokeItem(index, tokenIndex, settings, tangentPosition, additionalAngle,
                 scaleMultiplier, flipX, flipY, surfaceDistance);
             clone.nextTangentPosition = nextTangentPosition;
             return clone;
@@ -160,21 +168,23 @@ namespace PluginMaster
                 if (lhs[i] != rhs[i]) return false;
             return true;
         }
-        private static void AddBrushstrokeItem(int index, Vector3 tangentPosition, Vector3 angle, Vector3 scale,
-            IPaintToolSettings paintToolSettings)
+        private static void AddBrushstrokeItem(int index, int tokenIndex, Vector3 tangentPosition, 
+            Vector3 angle, Vector3 scale, IPaintToolSettings paintToolSettings)
         {
             if (index < 0 || index >= PaletteManager.selectedBrush.itemCount) return;
 
-            BrushSettings brushSettings = PaletteManager.selectedBrush.items[index];
+            var multiBrushSettings = PaletteManager.selectedBrush;
+            BrushSettings brushSettings = multiBrushSettings.items[index];
             if (paintToolSettings != null && paintToolSettings.overwriteBrushProperties)
                 brushSettings = paintToolSettings.brushSettings;
 
-            var additonalAngle = angle + brushSettings.GetAdditionalAngle();
+            var additonalAngle = (Quaternion.Euler(angle) * Quaternion.Euler(brushSettings.GetAdditionalAngle())).eulerAngles;
             var flipX = brushSettings.GetFlipX();
             var flipY = brushSettings.GetFlipY();
             var surfaceDistance = brushSettings.GetSurfaceDistance();
-            var strokeItem = new BrushstrokeItem(PaletteManager.selectedBrush.items[index],
-                tangentPosition, additonalAngle, scale, flipX, flipY, surfaceDistance);
+            var strokeItem = new BrushstrokeItem(index, tokenIndex,
+                PaletteManager.selectedBrush.items[index], tangentPosition, additonalAngle,
+                scale, flipX, flipY, surfaceDistance);
             if (_brushstroke.Count > 0)
             {
                 var last = _brushstroke.Last();
@@ -187,7 +197,7 @@ namespace PluginMaster
         private static Vector3 ScaleMultiplier(int itemIdx, IPaintToolSettings settings)
         {
             if (settings.overwriteBrushProperties) return settings.brushSettings.GetScaleMultiplier();
-            if(PaletteManager.selectedBrush != null )
+            if (PaletteManager.selectedBrush != null)
             {
                 var nextItem = PaletteManager.selectedBrush.items[itemIdx];
                 return nextItem.GetScaleMultiplier();
@@ -210,9 +220,13 @@ namespace PluginMaster
             if (ToolManager.tool == ToolManager.PaintTool.BRUSH) UpdateBrushBaseStroke(BrushManager.settings);
             else if (ToolManager.tool == ToolManager.PaintTool.GRAVITY) UpdateBrushBaseStroke(GravityToolManager.settings);
             else if (ToolManager.tool == ToolManager.PaintTool.PIN) UpdateSingleBrushstroke(PinManager.settings);
-            else if (ToolManager.tool == ToolManager.PaintTool.REPLACER) UpdateSingleBrushstroke(ReplacerManager.settings);
+            else if (ToolManager.tool == ToolManager.PaintTool.REPLACER) _brushstroke.Clear();
+            else if (ToolManager.tool == ToolManager.PaintTool.FLOOR) UpdateFloorBrushstroke(setNextIdx: false);
+            else if (ToolManager.tool == ToolManager.PaintTool.WALL)
+                UpdateWallBrushstroke(WallManager.wallLenghtAxis, cellsCount: 1, setNextIdx: false, deleteMode: false);
         }
         #endregion
+        
         #region LINE
         public static float _minLineSpacing = float.MaxValue;
         public static float GetLineSpacing(int itemIdx, LineSettings settings, Vector3 scaleMult)
@@ -343,7 +357,8 @@ namespace PluginMaster
                 length += spacing;
 
                 if (length > lineLength) break;
-                AddBrushstrokeItem(nextIdx, position, angle: Vector3.zero, scale, settings);
+                AddBrushstrokeItem(nextIdx, PaletteManager.selectedBrush.GetPatternTokenIndex(), position,
+                    angle: Vector3.zero, scale, settings);
             } while (length < lineLength);
         }
         public static void UpdateLineBrushstroke(Vector3[] pathPoints)
@@ -353,7 +368,7 @@ namespace PluginMaster
             float spacing = settings.spacing;
             if (settings.spacingType == LineSettings.SpacingType.BOUNDS && transform != null)
             {
-                var bounds = BoundsUtils.GetBoundsRecursive(transform, transform.rotation, ignoreDissabled: true,
+                var bounds = BoundsUtils.GetBoundsRecursive(transform, transform.rotation, ignoreDissabled: false,
                      BoundsUtils.ObjectProperty.BOUNDING_BOX, recursive: true, useDictionary);
                 var size = Vector3.Scale(bounds.size, scale);
                 var axis = settings.axisOrientedAlongTheLine;
@@ -361,7 +376,6 @@ namespace PluginMaster
                     && UnityEditor.SceneView.currentDrawingSceneView.in2DMode && axis == AxesUtils.Axis.Z)
                     axis = AxesUtils.Axis.Y;
                 spacing = AxesUtils.GetAxisValue(size, axis);
-                if (spacing <= 0.0001) spacing = 0.5f;
             }
             spacing += settings.gapSize;
             _minLineSpacing = Mathf.Min(spacing, _minLineSpacing);
@@ -393,7 +407,6 @@ namespace PluginMaster
                 if (PaletteManager.selectedBrush.patternMachine != null)
                     PaletteManager.selectedBrush.patternMachine.Reset();
             int objIdx = 0;
-            const float THRESHOLD = 0.0001f;
             var prefabSpacingDictionary = new System.Collections.Generic.Dictionary<(int, Vector3), float>();
 
             var brush = PaletteManager.selectedBrush;
@@ -458,7 +471,7 @@ namespace PluginMaster
                 var segmentDirection = (pathPoints[segment + 1] - pathPoints[segment]).normalized;
                 var distance = length - lengthFromFirstPoint[segment];
 
-                var position = pathPoints[segment] + segmentDirection * distance;
+
                 var itemScaleMultiplier = ScaleMultiplier(nextIdx, LineManager.settings);
                 var itemSpacing = newItemSpacing(nextIdx, itemScaleMultiplier);
 
@@ -470,7 +483,7 @@ namespace PluginMaster
                 if (addExistingObject && lineObjects[objIdx] == null) addExistingObject = false;
                 float spacing = 0;
 
-                var objScale = Vector3.one; 
+                var objScale = Vector3.one;
                 if (addExistingObject)
                 {
                     var obj = lineObjects[objIdx];
@@ -490,23 +503,26 @@ namespace PluginMaster
                 else if (PaletteManager.selectedBrush != null) spacing = itemSpacing;
                 if (spacing == 0) break;
                 spacing = Mathf.Max(spacing, _minLineSpacing);
-                var centerPosition = position + segmentDirection * (spacing/2);
-
-
                 int nearestPathointIdx;
-                var intersection = LineData.NearestPathPoint(position, spacing, pathPoints, out nearestPathointIdx);
+                var position = pathPoints[segment] + segmentDirection * distance;
+                float distanceFromNearestPoint;
+                var intersection = LineData.NearestPathPoint(segment, position, spacing, pathPoints, out nearestPathointIdx,
+                    out distanceFromNearestPoint);
+
+                var startToEnd = intersection - position;
+                var centerPosition = startToEnd / 2 + position;
                 if (nearestPathointIdx > segment)
                     spacing = (pathPoints[nearestPathointIdx] - position).magnitude
                         + (intersection - pathPoints[nearestPathointIdx]).magnitude;
-                length += spacing;
-                if (lineLength - length < THRESHOLD) break;
+                length = Mathf.Max(length + spacing, lengthFromFirstPoint[nearestPathointIdx] + distanceFromNearestPoint);
+                if (lineLength < length) break;
                 if (addExistingObject)
                 {
                     var brushAdditionalAngle = Vector3.zero;
                     bool brushFlipX = false;
                     bool brushFlipY = false;
                     var brushSurfaceDistance = 0f;
-                    if(LineManager.instance.applyBrushToExisting)
+                    if (LineManager.instance.applyBrushToExisting)
                     {
                         if (PaletteManager.selectedBrush != null)
                         {
@@ -516,17 +532,20 @@ namespace PluginMaster
                             brushSurfaceDistance = brushSettings.GetSurfaceDistance();
                         }
                     }
+                    var brushstrokeDirection = toolSettings.objectsOrientedAlongTheLine ? startToEnd.normalized : Vector3.left;
                     objPositionsList.Add(new BrushstrokeObject(objIdx, centerPosition, objRotation: Quaternion.identity,
-                        brushAdditionalAngle, objScale, brushFlipX, brushFlipY, brushSurfaceDistance));
+                        brushAdditionalAngle, objScale, brushFlipX, brushFlipY, brushSurfaceDistance, brushstrokeDirection));
                     ++objIdx;
                     if (isAtTheEnd && objIdx >= lineObjects.Count) break;
                 }
                 else if (PaletteManager.selectedBrush == null) break;
                 else
                 {
-                    AddBrushstrokeItem(nextIdx, position, angle: Vector3.zero, itemScaleMultiplier, LineManager.settings);
+                    AddBrushstrokeItem(nextIdx, PaletteManager.selectedBrush == null ? 0
+                        : PaletteManager.selectedBrush.GetPatternTokenIndex(), position,
+                        angle: Vector3.zero, itemScaleMultiplier, LineManager.settings);
                     strokePositionsList.Add(position);
-                    if(!firstNewObjectAdded)
+                    if (!firstNewObjectAdded)
                     {
                         firstNewObjectAdded = true;
                         firstNewObjectIdx = itemCount;
@@ -534,11 +553,12 @@ namespace PluginMaster
                 }
                 ++itemCount;
 
-            } while (lineLength - length > THRESHOLD);
+            } while (lineLength > length);
             objPositions = objPositionsList.ToArray();
             strokePositions = strokePositionsList.ToArray();
         }
         #endregion
+        
         #region SHAPE
         public static void UpdateShapeBrushstroke()
         {
@@ -615,7 +635,8 @@ namespace PluginMaster
                     var brushItem = PaletteManager.selectedBrush.items[item.idx];
                     if (brushItem.prefab == null) continue;
                     var position = start + direction * (distance + item.size / 2);
-                    AddBrushstrokeItem(item.idx, position, angle, item.scaleMult, settings);
+                    AddBrushstrokeItem(item.idx, PaletteManager.selectedBrush.GetPatternTokenIndex(),
+                        position, angle, item.scaleMult, settings);
                     distance += item.size + spacing;
                 }
             }
@@ -685,7 +706,8 @@ namespace PluginMaster
                         Vector3.up);
                     var segmentRotation = Quaternion.LookRotation(itemDir, -settings.projectionDirection) * lookAt;
                     var angle = segmentRotation.eulerAngles;
-                    AddBrushstrokeItem(item.idx, position, angle, item.scaleMult, settings);
+                    AddBrushstrokeItem(item.idx, PaletteManager.selectedBrush.GetPatternTokenIndex(), 
+                        position, angle, item.scaleMult, settings);
                     var next_Item = items[(i + 1) % items.Count];
                     distance += item.size / 2 + next_Item.size / 2 + spacing;
                 }
@@ -716,7 +738,7 @@ namespace PluginMaster
             objPoses = objPosesList.ToArray();
 
             var toolSettings = ShapeManager.settings;
-           
+
             var brushSettings = toolSettings.overwriteBrushProperties ? toolSettings.brushSettings
                : PaletteManager.selectedBrush;
             Vector3 BrushScaleMultiplier() => (ShapeManager.instance.applyBrushToExisting
@@ -821,7 +843,7 @@ namespace PluginMaster
                         bool brushFlipX = false;
                         bool brushFlipY = false;
                         var brushSurfaceDistance = 0f;
-                        if (LineManager.instance.applyBrushToExisting)
+                        if (ShapeManager.instance.applyBrushToExisting)
                         {
                             if (PaletteManager.selectedBrush != null)
                             {
@@ -832,9 +854,10 @@ namespace PluginMaster
                             }
                         }
                         objPosesList.Add(new BrushstrokeObject(item.idx, position, segmentRotation,
-                            brushAdditionalAngle, item.objScale, brushFlipX, brushFlipY, brushSurfaceDistance));
+                            brushAdditionalAngle, item.objScale, brushFlipX, brushFlipY, brushSurfaceDistance,
+                            brushstrokeDirection: Vector3.zero));
                     }
-                    else AddBrushstrokeItem(item.idx, position, angle,
+                    else AddBrushstrokeItem(item.idx, PaletteManager.selectedBrush.GetPatternTokenIndex(), position, angle,
                         item.objScale, ShapeManager.settings);
                     var next_Item = items[(i + 1) % items.Count];
                     distance += item.size / 2 + next_Item.size / 2 + spacing;
@@ -953,7 +976,7 @@ namespace PluginMaster
                             bool brushFlipX = false;
                             bool brushFlipY = false;
                             var brushSurfaceDistance = 0f;
-                            if (LineManager.instance.applyBrushToExisting)
+                            if (ShapeManager.instance.applyBrushToExisting)
                             {
                                 if (PaletteManager.selectedBrush != null)
                                 {
@@ -964,9 +987,12 @@ namespace PluginMaster
                                 }
                             }
                             objPosesList.Add(new BrushstrokeObject(item.idx, position, segmentRotation,
-                                brushAdditionalAngle, item.objScale, brushFlipX, brushFlipY, brushSurfaceDistance));
+                                brushAdditionalAngle, item.objScale, brushFlipX, brushFlipY, brushSurfaceDistance,
+                            brushstrokeDirection: Vector3.zero));
                         }
-                        else AddBrushstrokeItem(item.idx, position, angle, item.objScale, settings);
+                        else AddBrushstrokeItem(item.idx,
+                            PaletteManager.selectedBrush == null ? 0 : PaletteManager.selectedBrush.GetPatternTokenIndex(),
+                            position, angle, item.objScale, settings);
                         distance += item.size + spacing;
                         ++firstObjInSegmentIdx;
                     }
@@ -982,6 +1008,7 @@ namespace PluginMaster
             objPoses = objPosesList.ToArray();
         }
         #endregion
+        
         #region TILING
         public static void UpdateTilingBrushstroke(Vector3[] cellCenters)
         {
@@ -990,8 +1017,9 @@ namespace PluginMaster
             for (int i = 0; i < cellCenters.Length; ++i)
             {
                 var nextIdx = PaletteManager.selectedBrush.nextItemIndex;
-                var item = PaletteManager.selectedBrush.items[nextIdx];
-                AddBrushstrokeItem(nextIdx, cellCenters[i], angle: Vector3.zero, scale: Vector3.one, TilingManager.settings);
+                AddBrushstrokeItem(nextIdx, PaletteManager.selectedBrush.GetPatternTokenIndex(),
+                    cellCenters[i], angle: Vector3.zero, scale: Vector3.one,
+                    TilingManager.settings);
             }
             ToolProperties.RepainWindow();
         }
@@ -1013,7 +1041,10 @@ namespace PluginMaster
                 {
                     if (PaletteManager.selectedBrush == null) break;
                     var nextIdx = PaletteManager.selectedBrush.nextItemIndex;
-                    AddBrushstrokeItem(nextIdx, position, angle: Vector3.zero, scale: Vector3.one, settings);
+                    AddBrushstrokeItem(nextIdx, PaletteManager.selectedBrush == null ? 0 
+                        : PaletteManager.selectedBrush.GetPatternTokenIndex(), position,
+                        angle: Vector3.zero, scale: Vector3.one,
+                        settings);
                     strokePositionsList.Add(position);
                 }
             }
@@ -1021,6 +1052,7 @@ namespace PluginMaster
             strokePositions = strokePositionsList.ToArray();
         }
         #endregion
+        
         #region PIN
         private static int _currentPinIdx = 0;
         public static void SetNextPinBrushstroke(int delta)
@@ -1029,10 +1061,12 @@ namespace PluginMaster
             var mod = _currentPinIdx % PaletteManager.selectedBrush.itemCount;
             _currentPinIdx = mod < 0 ? PaletteManager.selectedBrush.itemCount + mod : mod;
             _brushstroke.Clear();
-            AddBrushstrokeItem(_currentPinIdx, tangentPosition: Vector3.zero,
-                angle: Vector3.zero, ScaleMultiplier(_currentPinIdx, PinManager.settings), PinManager.settings);
+            AddBrushstrokeItem(_currentPinIdx, PaletteManager.selectedBrush.GetPatternTokenIndex(),
+                tangentPosition: Vector3.zero, angle: Vector3.zero,
+                ScaleMultiplier(_currentPinIdx, PinManager.settings), PinManager.settings);
         }
         #endregion
+        
         #region BRUSH
         private static void UpdateBrushBaseStroke(BrushToolBase brushSettings)
         {
@@ -1059,8 +1093,9 @@ namespace PluginMaster
                     && nextIdx == -2) return;
                 _brushstroke.Clear();
 
-                AddBrushstrokeItem(nextIdx, tangentPosition: Vector3.zero,
-                    angle: Vector3.zero, scale: ScaleMultiplier(nextIdx, brushSettings), brushSettings);
+                AddBrushstrokeItem(nextIdx, PaletteManager.selectedBrush.GetPatternTokenIndex(), 
+                    tangentPosition: Vector3.zero, angle: Vector3.zero,
+                    scale: ScaleMultiplier(nextIdx, brushSettings), brushSettings);
                 _currentPinIdx = Mathf.Clamp(nextIdx, 0, PaletteManager.selectedBrush.itemCount - 1);
             }
             else
@@ -1125,15 +1160,18 @@ namespace PluginMaster
                             || (PaletteManager.selectedBrush.frequencyMode
                             == PluginMaster.MultibrushSettings.FrequencyMode.PATTERN && nextItemIdx == -2)) continue;
                         var item = PaletteManager.selectedBrush.items[nextItemIdx];
-                        AddBrushstrokeItem(nextItemIdx, tangentPosition: position,
-                                angle: Vector3.zero, ScaleMultiplier(nextItemIdx, brushSettings), brushSettings);
+                        AddBrushstrokeItem(nextItemIdx, PaletteManager.selectedBrush.GetPatternTokenIndex(),
+                            tangentPosition: position, angle: Vector3.zero,
+                            ScaleMultiplier(nextItemIdx, brushSettings), brushSettings);
                     }
                 }
             }
         }
 
-        private static void UpdateSingleBrushstroke(IPaintToolSettings settings)
+        public static void UpdateSingleBrushstroke(IPaintToolSettings settings)
         {
+            _brushstroke.Clear();
+            if (PaletteManager.selectedBrush == null) return;
             var nextIdx = PaletteManager.selectedBrush.nextItemIndex;
             if (nextIdx == -1) return;
             if (PaletteManager.selectedBrush.frequencyMode == PluginMaster.MultibrushSettings.FrequencyMode.PATTERN
@@ -1144,7 +1182,8 @@ namespace PluginMaster
             }
 
 
-            AddBrushstrokeItem(nextIdx, tangentPosition: Vector3.zero, angle: Vector3.zero,
+            AddBrushstrokeItem(nextIdx, PaletteManager.selectedBrush.GetPatternTokenIndex(), 
+                tangentPosition: Vector3.zero, angle: Vector3.zero,
                 scale: ScaleMultiplier(nextIdx, settings), settings);
 
             const int maxTries = 10;
@@ -1154,13 +1193,367 @@ namespace PluginMaster
                 nextIdx = PaletteManager.selectedBrush.nextItemIndex;
                 if (nextIdx >= 0)
                 {
-                    AddBrushstrokeItem(nextIdx, tangentPosition: Vector3.zero, angle: Vector3.zero,
+                    AddBrushstrokeItem(nextIdx, PaletteManager.selectedBrush.GetPatternTokenIndex(), 
+                        tangentPosition: Vector3.zero, angle: Vector3.zero,
                         scale: ScaleMultiplier(nextIdx, settings), settings);
                     break;
                 }
             }
             _currentPinIdx = Mathf.Clamp(nextIdx, 0, PaletteManager.selectedBrush.itemCount - 1);
         }
+        #endregion
+
+        #region REPLACER
+        private static System.Collections.Generic.Dictionary<Transform, BrushstrokeItem> _replacerDictionary
+            = new System.Collections.Generic.Dictionary<Transform, BrushstrokeItem>();
+        private static System.Collections.Generic.Dictionary<BrushstrokeItem, Transform> _replacerDictionary2
+           = new System.Collections.Generic.Dictionary<BrushstrokeItem, Transform>();
+        public static void UpdateReplacerBrushstroke(bool clearDictionary, GameObject[] targets)
+        {
+            _brushstroke.Clear();
+            if (clearDictionary) ClearReplacerDictionary();
+            var toolSettings = ReplacerManager.settings;
+            bool GetStrokeItem(Transform target, int itemIdx, out BrushstrokeItem item)
+            {
+                item = new BrushstrokeItem();
+                if (itemIdx == -1) return false;
+                if (PaletteManager.selectedBrush.frequencyMode == PluginMaster.MultibrushSettings.FrequencyMode.PATTERN
+                    && itemIdx == -2)
+                {
+                    if (PaletteManager.selectedBrush.patternMachine != null)
+                        PaletteManager.selectedBrush.patternMachine.Reset();
+                    else return false;
+                }
+                var multiBrushSettings = PaletteManager.selectedBrush;
+                BrushSettings brushSettings = multiBrushSettings.items[itemIdx];
+                if (toolSettings.overwriteBrushProperties) brushSettings = toolSettings.brushSettings;
+                var flipX = brushSettings.GetFlipX();
+                var flipY = brushSettings.GetFlipY();
+
+                var multiBrushItemSettings = PaletteManager.selectedBrush.items[itemIdx];
+                var prefab = multiBrushItemSettings.prefab;
+                if (prefab == null) return false;
+                var itemRotation = target.rotation;
+                var targetBounds = BoundsUtils.GetBoundsRecursive(target, target.rotation);
+                var strokeRotation = Quaternion.identity;
+                var scaleMult = Vector3.one;
+
+                if (toolSettings.overwriteBrushProperties)
+                {
+                    var toolBrushSettings = toolSettings.brushSettings;
+                    var additonalAngle = toolBrushSettings.addRandomRotation
+                        ? toolBrushSettings.randomEulerOffset.randomVector : toolBrushSettings.eulerOffset;
+                    strokeRotation *= Quaternion.Euler(additonalAngle);
+                    scaleMult = toolBrushSettings.randomScaleMultiplier
+                        ? toolBrushSettings.randomScaleMultiplierRange.randomVector : toolBrushSettings.scaleMultiplier;
+                }
+                var inverseStrokeRotation = Quaternion.Inverse(strokeRotation);
+                itemRotation *= strokeRotation;
+                var itemBounds = BoundsUtils.GetBoundsRecursive(prefab.transform, prefab.transform.rotation * strokeRotation);
+
+                if (toolSettings.keepTargetSize)
+                {
+                    var targetSize = targetBounds.size;
+                    var itemSize = itemBounds.size;
+
+                    if (toolSettings.maintainProportions)
+                    {
+                        var targetMagnitude = Mathf.Max(targetSize.x, targetSize.y, targetSize.z);
+                        var itemMagnitude = Mathf.Max(itemSize.x, itemSize.y, itemSize.z);
+                        scaleMult = inverseStrokeRotation * (Vector3.one * (targetMagnitude / itemMagnitude));
+                    }
+                    else scaleMult = inverseStrokeRotation
+                            * new Vector3(targetSize.x / itemSize.x, targetSize.y / itemSize.y, targetSize.z / itemSize.z);
+                    scaleMult = new Vector3(Mathf.Abs(scaleMult.x), Mathf.Abs(scaleMult.y), Mathf.Abs(scaleMult.z));
+                }
+                var itemScale = Vector3.Scale(prefab.transform.localScale, scaleMult);
+                var itemPosition = targetBounds.center;
+
+                Transform replaceSurface = null;
+                if (toolSettings.positionMode == ReplacerSettings.PositionMode.ON_SURFACE)
+                {
+                    var TRS = Matrix4x4.TRS(itemPosition, itemRotation, itemScale);
+                    var bottomDistanceToSurfce = PWBIO.GetBottomDistanceToSurface(multiBrushItemSettings.bottomVertices,
+                        TRS, Mathf.Abs(multiBrushItemSettings.bottomMagnitude), paintOnPalettePrefabs: true,
+                        castOnMeshesWithoutCollider: true, out replaceSurface,
+                        new System.Collections.Generic.HashSet<GameObject> { target.gameObject });
+                    itemPosition += itemRotation * new Vector3(0f, -bottomDistanceToSurfce, 0f);
+                }
+                else
+                {
+                    if (toolSettings.positionMode == ReplacerSettings.PositionMode.PIVOT)
+                        itemPosition = target.position;
+                    itemPosition -= itemRotation * Vector3.Scale(itemBounds.center - prefab.transform.position, scaleMult);
+                }
+
+                item = new BrushstrokeItem(itemIdx, PaletteManager.selectedBrush.GetPatternTokenIndex(),
+                    multiBrushItemSettings, itemPosition, itemRotation.eulerAngles,
+                    scaleMult, flipX, flipY, surfaceDistance: 0);
+                return true;
+            }
+            void AddItem(Transform target)
+            {
+                var nextIdx = PaletteManager.selectedBrush.nextItemIndex;
+                if (GetStrokeItem(target, nextIdx, out BrushstrokeItem strokeItem))
+                {
+                    _brushstroke.Add(strokeItem);
+                    _replacerDictionary.Add(target, strokeItem);
+                    _replacerDictionary2.Add(strokeItem, target);
+                }
+            }
+            foreach(var sceneObj in targets)
+            {
+                var target = sceneObj.transform;
+                BrushstrokeItem item;
+                if (_replacerDictionary.ContainsKey(target))
+                {
+                    item = _replacerDictionary[target];
+                    if (GetStrokeItem(target, item.index, out BrushstrokeItem strokeItem))
+                    {
+                        if (item == strokeItem) _brushstroke.Add(item);
+                        else
+                        {
+                            _replacerDictionary.Remove(target);
+                            _replacerDictionary2.Remove(item);
+                            AddItem(target);
+                        }
+                    }
+                }
+                else AddItem(target);
+            }
+
+        }
+        public static void ClearReplacerDictionary()
+        {
+            _replacerDictionary.Clear();
+            _replacerDictionary2.Clear();
+        }
+        public static Transform GetReplacerTargetFromStrokeItem(BrushstrokeItem item) => _replacerDictionary2[item];
+        #endregion
+
+        #region MODULAR TOOLS
+        private static void UpdateFirstModularBrushstroke(ModularToolBase settings, bool setNextIdx)
+        {
+            if (PaletteManager.selectedBrush == null) return;
+            _brushstroke.Clear();
+            if (PaletteManager.selectedBrush.restartPatternForEachStroke)
+                PaletteManager.selectedBrush.ResetCurrentItemIndex();
+            else if (setNextIdx) PaletteManager.selectedBrush.SetNextItemIndex();
+            var nextIdx = PaletteManager.selectedBrush.currentItemIndex;
+            if (nextIdx == -1) return;
+            if (PaletteManager.selectedBrush.frequencyMode == MultibrushSettings.FrequencyMode.PATTERN
+                && nextIdx == -2)
+            {
+                if (PaletteManager.selectedBrush.patternMachine != null) PaletteManager.selectedBrush.patternMachine.Reset();
+                else return;
+            }
+
+            var forwardAxis = settings.forwardAxis;
+            if (settings is FloorSettings)
+            {
+                var floorSettings = (FloorSettings) settings;
+                var quarterTurns = FloorManager.quarterTurns;
+                if (floorSettings.swapXZ) ++quarterTurns;
+                forwardAxis = Quaternion.AngleAxis(-90 * quarterTurns, settings.upwardAxis) * forwardAxis;
+            }
+            else if (settings is WallSettings && WallManager.halfTurn)
+                forwardAxis = Quaternion.AngleAxis(180, settings.upwardAxis) * forwardAxis;
+            var angle = AxesUtils.SignedAxis.GetEulerAnglesFromAxes(forwardAxis, settings.upwardAxis);
+            angle = (Quaternion.Euler(angle) * SnapManager.settings.rotation).eulerAngles;
+            var scale = ScaleMultiplier(nextIdx, settings);
+            scale.x = Mathf.Abs(scale.x);
+            scale.y = Mathf.Abs(scale.y);
+            scale.z = Mathf.Abs(scale.z);
+            AddBrushstrokeItem(nextIdx, PaletteManager.selectedBrush.GetPatternTokenIndex(), 
+                tangentPosition: Vector3.zero, angle, scale, settings);
+
+            const int maxTries = 10;
+            int tryCount = 0;
+            while (_brushstroke.Count == 0 && ++tryCount < maxTries)
+            {
+                nextIdx = PaletteManager.selectedBrush.nextItemIndex;
+                if (nextIdx >= 0)
+                {
+                    AddBrushstrokeItem(nextIdx, PaletteManager.selectedBrush.GetPatternTokenIndex(),
+                        tangentPosition: Vector3.zero, angle, scale, settings);
+                    break;
+                }
+            }
+        }
+
+        #region FLOOR
+        private static int _cellsCountX = 0;
+        private static int _cellsCountZ = 0;
+        public static int cellsCountX => _cellsCountX;
+        public static int cellsCountZ => _cellsCountZ;
+        public static void ResetCellCount()
+        {
+            _cellsCountX = 1;
+            _cellsCountZ = 1;
+        }
+        public static void UpdateFloorBrushstroke(bool setNextIdx, bool deleteBox = false)
+        {
+            ResetCellCount();
+            if (FloorManager.state == FloorManager.ToolState.FIRST_CORNER)
+            {
+                UpdateFirstModularBrushstroke(FloorManager.settings, setNextIdx);
+                return;
+            }
+            var toolSettings = FloorManager.settings;
+            var diagonal = FloorManager.secondCorner - FloorManager.firstCorner;
+            var localDiagonal = Quaternion.Inverse(SnapManager.settings.rotation) * diagonal;
+
+            _cellsCountX = Mathf.RoundToInt(Mathf.Abs(localDiagonal.x / toolSettings.moduleSize.x)) + 1;
+            var signX = localDiagonal.x >= 0 ? 1 : -1;
+            var dirX = SnapManager.settings.rotation * (Vector3.right * signX);
+            var deltaX = dirX * toolSettings.moduleSize.x;
+
+            _cellsCountZ = Mathf.RoundToInt(Mathf.Abs(localDiagonal.z / toolSettings.moduleSize.z)) + 1;
+            var signZ = localDiagonal.z >= 0 ? 1 : -1;
+            var dirZ = SnapManager.settings.rotation * (Vector3.forward * signZ);
+            var deltaZ = dirZ * toolSettings.moduleSize.z;
+
+            var localRotation = Quaternion.FromToRotation(Vector3.up, toolSettings.upwardAxis);
+            var rotation = SnapManager.settings.rotation * localRotation;
+            var angle = rotation.eulerAngles;
+
+            var prevBrushstroke = _brushstroke.ToArray();
+            _brushstroke.Clear();
+
+            if (PaletteManager.selectedBrush.restartPatternForEachStroke)
+                PaletteManager.selectedBrush.ResetCurrentItemIndex();
+            var floorItemsCount = 0;
+            for (int xIdx = 0; xIdx < _cellsCountX; ++xIdx)
+            {
+                var tangent = deltaX * xIdx;
+                for (int zIdx = 0; zIdx < _cellsCountZ; ++zIdx)
+                {
+                    var bitangent = deltaZ * zIdx;
+                    var cellCenter = FloorManager.firstCorner + tangent + bitangent;
+                    var idx = PaletteManager.selectedBrush.currentItemIndex;
+                    BrushSettings brush = PaletteManager.selectedBrush.GetItemAt(idx);
+                    if (toolSettings.overwriteBrushProperties) brush = toolSettings.brushSettings;
+                    if(toolSettings.subtractBrushOffset)
+                    {
+                        var r = SnapManager.settings.rotation;
+                        if (FloorManager.quarterTurns > 0)
+                            r *= Quaternion.AngleAxis(FloorManager.quarterTurns * 90, toolSettings.upwardAxis);
+                        cellCenter += r * brush.localPositionOffset;
+                    }
+                    else cellCenter += rotation * brush.localPositionOffset;
+
+                    if (deleteBox)
+                    {
+                        var additionalAngle = (Quaternion.Euler(angle)
+                            * Quaternion.Euler(PaletteManager.selectedBrush.eulerOffset)).eulerAngles;
+                        var strokeItem = new BrushstrokeItem(index: 0, tokenIndex: 0, brush as MultibrushItemSettings,
+                            cellCenter, additionalAngle, scaleMultiplier: FloorManager.settings.moduleSize,
+                            flipX: false, flipY: false, surfaceDistance: 0);
+                        _brushstroke.Add(strokeItem);
+                    }
+                    else
+                    {
+                        var tokenIdx = PaletteManager.selectedBrush.GetPatternTokenIndex();
+                        if (!PaletteManager.selectedBrush.restartPatternForEachStroke
+                            && prevBrushstroke.Length > floorItemsCount)
+                        {
+                            idx = prevBrushstroke[floorItemsCount].index;
+                            tokenIdx = prevBrushstroke[floorItemsCount].tokenIndex;
+                            PaletteManager.selectedBrush.SetPatternTokenIndex(tokenIdx);
+                        }
+                        var scale = localRotation * ScaleMultiplier(idx, toolSettings);
+                        scale.x = Mathf.Abs(scale.x);
+                        scale.y = Mathf.Abs(scale.y);
+                        scale.z = Mathf.Abs(scale.z);
+                        AddBrushstrokeItem(idx, tokenIdx, cellCenter, angle, scale, toolSettings);
+                        if (setNextIdx) PaletteManager.selectedBrush.SetNextItemIndex();
+                    }
+                    ++floorItemsCount;
+                }
+            }
+        }
+        #endregion
+        #region WALL
+        public static void UpdateWallBrushstroke(AxesUtils.Axis segmentAxis, int cellsCount,
+            bool setNextIdx, bool deleteMode)
+        {
+            if (WallManager.state == WallManager.ToolState.FIRST_WALL_PREVIEW)
+            {
+                UpdateFirstModularBrushstroke(WallManager.settings, setNextIdx);
+                return;
+            }
+            var toolSettings = WallManager.settings;
+            var diagonal = WallManager.endPointSnapped - WallManager.startPointSnapped;
+            var localDiagonal = Quaternion.Inverse(SnapManager.settings.rotation) * diagonal;
+            Vector3 delta;
+            if (segmentAxis == AxesUtils.Axis.X)
+            {
+                var sign = localDiagonal.x >= 0 ? 1 : -1;
+                var dir = SnapManager.settings.rotation * (Vector3.right * sign);
+                delta = dir * SnapManager.settings.step.x;
+            }
+            else
+            {
+                var sign = localDiagonal.z >= 0 ? 1 : -1;
+                var dir = SnapManager.settings.rotation * (Vector3.forward * sign);
+                delta = dir * SnapManager.settings.step.z;
+            }
+            
+            var firstPoint = WallManager.endPointSnapped - (delta * (cellsCount - 1));
+            var localRotation = Quaternion.Euler(AxesUtils.SignedAxis.GetEulerAnglesFromAxes(toolSettings.forwardAxis,
+                toolSettings.upwardAxis));
+            var rotation = SnapManager.settings.rotation * localRotation;
+            var angle = rotation.eulerAngles;
+
+
+            var prevBrushstroke = _brushstroke.ToArray();
+            _brushstroke.Clear();
+            if (PaletteManager.selectedBrush.restartPatternForEachStroke)
+                PaletteManager.selectedBrush.ResetCurrentItemIndex();
+            var wallItemsCount = 0;
+            void AddItem(Vector3 position, AxesUtils.Axis segmentAxis)
+            {
+                int nextIdx = 0;
+                var brushItem = PaletteManager.selectedBrush.GetItemAt(PaletteManager.selectedBrush.currentItemIndex);
+                if (!deleteMode)
+                {
+                    nextIdx = PaletteManager.selectedBrush.currentItemIndex;
+                }
+                if (deleteMode)
+                {
+                    var additionalAngle = (Quaternion.Euler(angle)
+                            * Quaternion.Euler(PaletteManager.selectedBrush.eulerOffset)).eulerAngles;
+                    var strokeItem = new BrushstrokeItem(index: 0, tokenIndex: 0, brushItem,
+                        position, additionalAngle, scaleMultiplier: WallManager.settings.moduleSize,
+                        flipX: false, flipY: false, surfaceDistance: 0);
+                    _brushstroke.Add(strokeItem);
+                }
+                else
+                {
+                    var tokenIdx = PaletteManager.selectedBrush.GetPatternTokenIndex();
+                    if (!PaletteManager.selectedBrush.restartPatternForEachStroke && prevBrushstroke.Length > wallItemsCount)
+                    {
+                        nextIdx = prevBrushstroke[wallItemsCount].index;
+                        tokenIdx = prevBrushstroke[wallItemsCount].tokenIndex;
+                        PaletteManager.selectedBrush.SetPatternTokenIndex(tokenIdx);
+                    }
+                    var scale = localRotation * ScaleMultiplier(nextIdx, toolSettings);
+                    scale.x = Mathf.Abs(scale.x);
+                    scale.y = Mathf.Abs(scale.y);
+                    scale.z = Mathf.Abs(scale.z);
+                    AddBrushstrokeItem(nextIdx, tokenIdx, position, angle, scale, toolSettings);
+                    if (setNextIdx) PaletteManager.selectedBrush.SetNextItemIndex();
+                }
+                ++wallItemsCount;
+            }
+            for (int idx = 0; idx < cellsCount; ++idx)
+            {
+                var tangent = delta * idx;
+                var position = firstPoint + tangent;
+                AddItem(position, segmentAxis);
+            }
+        }
+        #endregion
         #endregion
     }
 }

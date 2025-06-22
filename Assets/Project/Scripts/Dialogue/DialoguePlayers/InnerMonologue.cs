@@ -1,3 +1,4 @@
+using GameCreator.Runtime.Characters;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,10 +7,7 @@ using Yarn.Unity;
 public class InnerMonologue : MonoBehaviour
 {
     [Header("Inner Monologue Settings")]
-    public string mood = "neutral";         // e.g. "angry", "tired"
-    public string location = "alley";       // e.g. "roof", "storefront"
-    public string situation = "idle";       // e.g. "resting", "watching"
-    public int maxVariants = 3;             // Number of monologue variants available per context
+    [SerializeField] private Actor actor;
 
     [Tooltip("Minimum time between monologues (seconds).")]
     public float minInterval = 10.0f;
@@ -35,16 +33,8 @@ public class InnerMonologue : MonoBehaviour
                 continue;
             }
 
-            string nodeName = GetRandomMonologueNode();
+            string nodeName = actor.GetRandomThought();
             DialogueManager.Instance.StartInnerMonologue(nodeName);
         }
-    }
-
-    string GetRandomMonologueNode()
-    {
-        int index = Random.Range(1, maxVariants + 1);
-        return $"monologue_test_{index}";
-
-        //return $"monologue_{mood}_{location}_{situation}_{index}";
     }
 }

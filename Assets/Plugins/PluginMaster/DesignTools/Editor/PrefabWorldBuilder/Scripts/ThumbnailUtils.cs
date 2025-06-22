@@ -41,7 +41,6 @@ namespace PluginMaster
                 UnityEditor.PlayerSettings.SetScriptingDefineSymbolsForGroup(buildTargetGroup, definesSCSV);
 #endif
             }
-
             var currentRenderPipeline = UnityEngine.Rendering.GraphicsSettings.currentRenderPipeline;
             if (currentRenderPipeline == null) SetDefineSymbol("PWB_BIRP");
             else if (currentRenderPipeline.GetType().ToString().Contains("HighDefinition")) SetDefineSymbol("PWB_HDRP");
@@ -121,6 +120,7 @@ namespace PluginMaster
         }
 
         private static Material _bgMaterial = null;
+        private static Cubemap _defaultCubemap = null;
         public static void UpdateThumbnail(ThumbnailSettings settings,
             Texture2D thumbnailTexture, GameObject prefab, string thumbnailPath, bool savePng)
         {
@@ -169,6 +169,75 @@ namespace PluginMaster
             thumbnailEditor.camera.cullingMask = layerMask;
             thumbnailEditor.renderTexture = new RenderTexture(SIZE, SIZE, 24);
             thumbnailEditor.camera.targetTexture = thumbnailEditor.renderTexture;
+
+            var originalAmbientMode = RenderSettings.ambientMode;
+            var originalAmbientLight = RenderSettings.ambientLight;
+            var originalAmbientEquatorColor = RenderSettings.ambientEquatorColor;
+            var originalAmbientGroundColor = RenderSettings.ambientGroundColor;
+            var originalAmbientSkyColor = RenderSettings.ambientSkyColor;
+            var originalAmbientIntensity = RenderSettings.ambientIntensity;
+            var originalAmbientProbe = RenderSettings.ambientProbe;
+            var originalReflectionMode = RenderSettings.defaultReflectionMode;
+            var originalSkybox = RenderSettings.skybox;
+            var originalFog = RenderSettings.fog;
+            var originalFogColor = RenderSettings.fogColor;
+            var originalFogStartDistance = RenderSettings.fogStartDistance;
+            var originalFogEndDistance = RenderSettings.fogEndDistance;
+            var originalFogDensity = RenderSettings.fogDensity;
+            var originalFogMode = RenderSettings.fogMode;
+            var originalHaloStrength = RenderSettings.haloStrength;
+            var originalFlareFadeSpeed = RenderSettings.flareFadeSpeed;
+            var originalFlareStrength = RenderSettings.flareStrength;
+            var originalReflectionIntensity = RenderSettings.reflectionIntensity;
+            var originalReflectionBounces = RenderSettings.reflectionBounces;
+            var originalDefaultReflectionResolution = RenderSettings.defaultReflectionResolution;
+            var originalSubtractiveShadowColor = RenderSettings.subtractiveShadowColor;
+            var originalSun = RenderSettings.sun;
+#if UNITY_2022_2_OR_NEWER
+            var originalReflectionTexture = RenderSettings.customReflectionTexture;
+#else
+            var originalReflectionTexture = RenderSettings.customReflection;
+#endif
+            float intensityMultiplier = 0.7f;
+            RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
+            RenderSettings.ambientLight = thumbnailEditor.settings.lightColor;
+            RenderSettings.ambientEquatorColor = thumbnailEditor.settings.backgroudColor;
+            RenderSettings.ambientGroundColor = thumbnailEditor.settings.backgroudColor;
+            RenderSettings.ambientSkyColor = thumbnailEditor.settings.backgroudColor;
+            RenderSettings.ambientIntensity = thumbnailEditor.settings.lightIntensity * intensityMultiplier;
+            RenderSettings.ambientProbe = new UnityEngine.Rendering.SphericalHarmonicsL2();
+            RenderSettings.defaultReflectionMode = UnityEngine.Rendering.DefaultReflectionMode.Custom;
+            RenderSettings.skybox = null;
+            RenderSettings.fog = false;
+            RenderSettings.fogColor = Color.clear;
+            RenderSettings.fogStartDistance = 0f;
+            RenderSettings.fogEndDistance = 1f;
+            RenderSettings.fogDensity = 0f;
+            RenderSettings.fogMode = FogMode.Linear;
+            RenderSettings.haloStrength = 0f;
+            RenderSettings.flareFadeSpeed = 1f;
+            RenderSettings.flareStrength = 0f;
+            RenderSettings.reflectionIntensity = thumbnailEditor.settings.lightIntensity * intensityMultiplier;
+            RenderSettings.reflectionBounces = 1;
+            RenderSettings.defaultReflectionResolution = 128;
+            RenderSettings.subtractiveShadowColor = Color.black;
+            RenderSettings.sun = null;
+            if (_defaultCubemap == null)
+            {
+                _defaultCubemap = new Cubemap(1, TextureFormat.RGB24, false);
+                Color[] colors = { Color.white };
+                for (int face = 0; face < 6; face++)
+                {
+                    _defaultCubemap.SetPixels(colors, (CubemapFace)face);
+                }
+                _defaultCubemap.Apply();
+            }
+#if UNITY_2022_2_OR_NEWER
+            RenderSettings.customReflectionTexture = _defaultCubemap;
+#else
+            RenderSettings.customReflection = _defaultCubemap;
+#endif
+
 
             var lightObj = new GameObject("PWBThumbnailEditorLight");
             thumbnailEditor.light = lightObj.AddComponent<Light>();
@@ -309,7 +378,7 @@ namespace PluginMaster
                 .ToDictionary(comp => comp, r => r.lightProbeUsage);
             foreach (var meshRenderer in meshRenderers.Keys)
                 meshRenderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
-            
+
             var skinnedMeshRenderers = thumbnailEditor.target.GetComponentsInChildren<SkinnedMeshRenderer>()
                  .ToDictionary(comp => comp, r => r.lightProbeUsage);
             foreach (var skinnedMeshRenderer in skinnedMeshRenderers.Keys)
@@ -356,10 +425,6 @@ namespace PluginMaster
                 child.gameObject.hideFlags = HideFlags.HideAndDontSave;
             }
 
-
-            var lightingDataAsset = UnityEditor.Lightmapping.lightingDataAsset;
-            UnityEditor.Lightmapping.lightingDataAsset = null;
-
             foreach (var light in sceneLights.Keys) light.cullingMask = light.cullingMask & ~layerMask;
 
             for (int i = 0; i < 9; ++i) thumbnailEditor.camera.Render();
@@ -368,13 +433,41 @@ namespace PluginMaster
 #if PWB_HDRP  || PWB_URP
             foreach (var vol in sceneVolumes) vol.Key.gameObject.SetActive(vol.Value);
             foreach (var meshRenderer in meshRenderers) meshRenderer.Key.lightProbeUsage = meshRenderer.Value;
-            foreach (var skinnedMeshRenderer in skinnedMeshRenderers) 
+            foreach (var skinnedMeshRenderer in skinnedMeshRenderers)
                 skinnedMeshRenderer.Key.lightProbeUsage = skinnedMeshRenderer.Value;
 #endif
-            UnityEditor.Lightmapping.lightingDataAsset = lightingDataAsset;
 
             RenderTextureToTexture2D(thumbnailEditor.camera.targetTexture, thumbnailTexture);
 
+           RenderSettings.ambientMode = originalAmbientMode;
+            RenderSettings.ambientLight = originalAmbientLight;
+            RenderSettings.ambientEquatorColor = originalAmbientEquatorColor;
+            RenderSettings.ambientGroundColor = originalAmbientGroundColor;
+            RenderSettings.ambientSkyColor = originalAmbientSkyColor;
+            RenderSettings.ambientIntensity = originalAmbientIntensity;
+            RenderSettings.ambientProbe = originalAmbientProbe;
+            RenderSettings.defaultReflectionMode = originalReflectionMode;
+            RenderSettings.skybox = originalSkybox;
+            RenderSettings.fog = originalFog;
+            RenderSettings.fogColor = originalFogColor;
+            RenderSettings.fogStartDistance = originalFogStartDistance;
+            RenderSettings.fogEndDistance = originalFogEndDistance;
+            RenderSettings.fogDensity = originalFogDensity;
+            RenderSettings.fogMode = originalFogMode;
+            RenderSettings.haloStrength = originalHaloStrength;
+            RenderSettings.flareFadeSpeed = originalFlareFadeSpeed;
+            RenderSettings.flareStrength = originalFlareStrength;
+            RenderSettings.reflectionIntensity = originalReflectionIntensity;
+            RenderSettings.reflectionBounces = originalReflectionBounces;
+            RenderSettings.defaultReflectionResolution = originalDefaultReflectionResolution;
+            RenderSettings.subtractiveShadowColor = originalSubtractiveShadowColor;
+            RenderSettings.sun = originalSun;
+
+#if UNITY_2022_2_OR_NEWER
+            RenderSettings.customReflectionTexture = originalReflectionTexture;
+#else
+            RenderSettings.customReflection = originalReflectionTexture;
+#endif
             Object.DestroyImmediate(thumbnailEditor.root);
             if (savePng) SavePngResource(thumbnailTexture, thumbnailPath);
         }
@@ -435,7 +528,7 @@ namespace PluginMaster
             if (brushItem.prefab == null) return;
             UpdateThumbnail(brushItem.thumbnailSettings, brushItem.thumbnailTexture,
                 brushItem.prefab, brushItem.thumbnailPath, savePng);
-            if(updateParent)
+            if (updateParent)
                 UpdateThumbnail(brushItem.parentSettings, updateItemThumbnails: false, savePng);
         }
 

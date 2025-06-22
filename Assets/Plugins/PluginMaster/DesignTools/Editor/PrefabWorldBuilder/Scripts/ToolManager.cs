@@ -32,7 +32,9 @@ namespace PluginMaster
             SELECTION,
             CIRCLE_SELECT,
             EXTRUDE,
-            MIRROR
+            MIRROR,
+            FLOOR,
+            WALL
         }
 
         private static PaintTool _tool = ToolManager.PaintTool.NONE;
@@ -45,7 +47,7 @@ namespace PluginMaster
         static ToolManager()
         {
             UnityEditor.EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
-            PaletteManager.OnBrushChanged += TilingManager.settings.UpdateCellSize;
+            PaletteManager.OnBrushSelectionChanged += TilingManager.settings.UpdateCellSize;
         }
 
         public static bool editMode
@@ -74,15 +76,22 @@ namespace PluginMaster
                     _triggerToolChangeEvent = true;
                     if (_tool != PaintTool.NONE) PWBCore.UpdateTempColliders();
                     PWBPreferences.SelectToolCategory(_tool);
+                    PWBItemsWindow.RepainWindow();
                 }
 
                 switch (_tool)
                 {
                     case PaintTool.PIN:
+                        PWBIO.SetOctreeUpdatePending();
                         PWBIO.ResetPinValues();
+                        break;
+                    case PaintTool.BRUSH:
+                        if(BrushManager.settings.avoidOverlapping != BrushToolSettings.AvoidOverlappingType.DISABLED)
+                            PWBCore.UpdateTempColliders(force: true);
                         break;
                     case PaintTool.GRAVITY:
                         PWBCore.DestroyTempColliders();
+                        PWBIO.InitializeGravityHeight();
                         break;
                     case PaintTool.REPLACER:
                         PWBIO.ResetReplacer();
@@ -93,13 +102,16 @@ namespace PluginMaster
                         PWBIO.ResetExtrudeState(false);
                         break;
                     case PaintTool.LINE:
+                        LineManager.instance.DeselectAllItems();
                         PWBIO.ResetLineState(false);
                         PWBCore.staticData.VersionUpdate();
                         break;
                     case PaintTool.SHAPE:
+                        ShapeManager.instance.DeselectAllItems();
                         PWBIO.ResetShapeState(false);
                         break;
                     case PaintTool.TILING:
+                        TilingManager.instance.DeselectAllItems();
                         PWBIO.ResetTilingState(false);
                         break;
                     case PaintTool.SELECTION:
@@ -110,6 +122,12 @@ namespace PluginMaster
                     case PaintTool.MIRROR:
                         SelectionManager.UpdateSelection();
                         PWBIO.InitializeMirrorPose();
+                        break;
+                    case PaintTool.FLOOR:
+                        PWBIO.OnFloorEnabled();
+                        break;
+                    case PaintTool.WALL:
+                        PWBIO.OnWallEnabled();
                         break;
                     case PaintTool.NONE:
                         PWBIO.ResetUnityCurrentTool();
@@ -123,22 +141,26 @@ namespace PluginMaster
                 if (_tool != PaintTool.NONE)
                 {
                     PWBIO.SaveUnityCurrentTool();
-                    ToolProperties.ShowWindow();
+                    if (PWBCore.staticData.openToolPropertiesWhenAToolIsSelected) ToolProperties.ShowWindow();
                     PaletteManager.pickingBrushes = false;
                 }
 
                 if (_tool == PaintTool.BRUSH || _tool == PaintTool.PIN || _tool == PaintTool.GRAVITY
                     || _tool == PaintTool.REPLACER || _tool == PaintTool.ERASER || _tool == PaintTool.LINE
-                    || _tool == PaintTool.SHAPE || _tool == PaintTool.TILING)
+                    || _tool == PaintTool.SHAPE || _tool == PaintTool.TILING || _tool == PaintTool.FLOOR
+                    || _tool == PaintTool.WALL)
                 {
                     PrefabPalette.ShowWindow();
-                    BrushProperties.ShowWindow();
                     SelectionManager.UpdateSelection();
-                    if (_tool == PaintTool.BRUSH || _tool == PaintTool.PIN
-                        || _tool == PaintTool.GRAVITY || _tool == PaintTool.REPLACER)
+                    if (_tool == PaintTool.BRUSH || _tool == PaintTool.PIN || _tool == PaintTool.GRAVITY
+                        || _tool == PaintTool.REPLACER || _tool == PaintTool.FLOOR || _tool == PaintTool.WALL)
                         BrushstrokeManager.UpdateBrushstroke();
                     PWBIO.ResetAutoParent();
                 }
+
+                if (_tool == PaintTool.LINE || _tool == PaintTool.SHAPE
+                    || _tool == PaintTool.TILING || _tool == PaintTool.NONE)
+                    PWBItemsWindow.RepainWindow();
 
                 ToolProperties.RepainWindow();
                 if (BrushProperties.instance != null) BrushProperties.instance.Repaint();
@@ -188,6 +210,26 @@ namespace PluginMaster
             if (settings is CircleSelectSettings) return PaintTool.CIRCLE_SELECT;
             if (settings is ExtrudeSettings) return PaintTool.EXTRUDE;
             if (settings is MirrorSettings) return PaintTool.MIRROR;
+            if (settings is FloorSettings) return PaintTool.FLOOR;
+            if (settings is WallSettings) return PaintTool.WALL;
+            return PaintTool.NONE;
+        }
+        public static PaintTool GetToolFromSettings(IPaintToolSettings settings)
+        {
+            if (settings is PinSettings) return PaintTool.PIN;
+            if (settings is GravityToolSettings) return PaintTool.GRAVITY;
+            if (settings is BrushToolSettings) return PaintTool.BRUSH;
+            if (settings is ShapeSettings) return PaintTool.SHAPE;
+            if (settings is LineSettings) return PaintTool.LINE;
+            if (settings is TilingSettings) return PaintTool.TILING;
+            if (settings is ReplacerSettings) return PaintTool.REPLACER;
+            if (settings is EraserSettings) return PaintTool.ERASER;
+            if (settings is SelectionToolSettings) return PaintTool.SELECTION;
+            if (settings is CircleSelectSettings) return PaintTool.CIRCLE_SELECT;
+            if (settings is ExtrudeSettings) return PaintTool.EXTRUDE;
+            if (settings is MirrorSettings) return PaintTool.MIRROR;
+            if (settings is FloorSettings) return PaintTool.FLOOR;
+            if (settings is WallSettings) return PaintTool.WALL;
             return PaintTool.NONE;
         }
 
@@ -207,8 +249,29 @@ namespace PluginMaster
                 case PaintTool.SELECTION: return SelectionToolManager.settings;
                 case PaintTool.CIRCLE_SELECT: return CircleSelectManager.settings;
                 case PaintTool.MIRROR: return MirrorManager.settings;
+                case PaintTool.FLOOR: return FloorManager.settings;
+                case PaintTool.WALL: return WallManager.settings;
                 default: return null;
             }
         }
+
+        public static IPersistentToolManager GetCurrentPersistentToolManager()
+        {
+            switch (tool)
+            {
+                case PaintTool.LINE: return LineManager.instance;
+                case PaintTool.SHAPE: return ShapeManager.instance;
+                case PaintTool.TILING: return TilingManager.instance;
+                default: return null;
+            }
+        }
+
+        public static IPersistentData[] GetCurrentPersistentToolData()
+        {
+            var manager = GetCurrentPersistentToolManager();
+            if (manager == null) return null;
+            return manager.GetItems();
+        }
+
     }
 }

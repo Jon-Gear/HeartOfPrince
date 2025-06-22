@@ -23,6 +23,8 @@ namespace PluginMaster
         private const string UNDO_MSG = "Tool properties";
         private Vector2 _mainScrollPosition = Vector2.zero;
         private GUIContent _updateButtonContent = null;
+        private GUISkin _skin = null;
+        private GUIStyle _reloadBtnStyle = null;
         private static ToolProperties _instance = null;
 
         [UnityEditor.MenuItem("Tools/Plugin Master/Prefab World Builder/Tool Properties...", false, 1130)]
@@ -43,6 +45,8 @@ namespace PluginMaster
             if (BrushManager.settings.paintOnMeshesWithoutCollider) PWBCore.UpdateTempColliders();
             _updateButtonContent
                 = new GUIContent(Resources.Load<Texture2D>("Sprites/Update"), "Update Temp Colliders");
+            _skin = Resources.Load<GUISkin>("PWBSkin");
+            _reloadBtnStyle = _skin.GetStyle("EyeButton");
             UnityEditor.Undo.undoRedoPerformed += Repaint;
         }
 
@@ -75,6 +79,8 @@ namespace PluginMaster
                 else if (ToolManager.tool == ToolManager.PaintTool.CIRCLE_SELECT) CircleSelectGroup();
                 else if (ToolManager.tool == ToolManager.PaintTool.MIRROR) MirrorGroup();
                 else if (ToolManager.tool == ToolManager.PaintTool.REPLACER) ReplacerGroup();
+                else if (ToolManager.tool == ToolManager.PaintTool.FLOOR) FloorGroup();
+                else if (ToolManager.tool == ToolManager.PaintTool.WALL) WallGroup();
             }
             if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
             {
@@ -116,7 +122,7 @@ namespace PluginMaster
             using (new GUILayout.HorizontalScope(UnityEditor.EditorStyles.helpBox))
             {
                 GUILayout.FlexibleSpace();
-                GUILayout.Label("Tool Profile:");
+                GUILayout.Label("Tool Profile");
                 if (GUILayout.Button(toolManager.selectedProfileName,
                     UnityEditor.EditorStyles.popup, GUILayout.MinWidth(100)))
                 {
@@ -277,7 +283,7 @@ namespace PluginMaster
                         }
                         using (new UnityEditor.EditorGUI.DisabledGroupScope
                             (!paintOnSurfaceSettings.paintOnMeshesWithoutCollider))
-                            if (GUILayout.Button(_updateButtonContent, GUILayout.Width(21), GUILayout.Height(21)))
+                            if (GUILayout.Button(_updateButtonContent, _reloadBtnStyle))
                                 PWBCore.UpdateTempColliders();
                     }
                 }
@@ -304,28 +310,41 @@ namespace PluginMaster
         {
             using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
             {
+                
+                using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                {
+                    var overwriteParentingSettings
+                        = UnityEditor.EditorGUILayout.ToggleLeft("Ovewrite parenting settings",
+                        paintSettings.overwriteParentingSettings);
+                    if (check.changed)
+                    {
+                        paintSettings.overwriteParentingSettings = overwriteParentingSettings;
+                    }
+                }
+                IToolParentingSettings parentingSettings = paintSettings as IToolParentingSettings;
+                if (!paintSettings.overwriteParentingSettings) parentingSettings = PWBCore.staticData.globalParentingSettings;
                 using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                 {
                     var autoCreateParent
-                        = UnityEditor.EditorGUILayout.ToggleLeft("Create parent", paintSettings.autoCreateParent);
+                        = UnityEditor.EditorGUILayout.ToggleLeft("Create parent", parentingSettings.autoCreateParent);
                     if (check.changed)
                     {
-                        paintSettings.autoCreateParent = autoCreateParent;
+                        parentingSettings.autoCreateParent = autoCreateParent;
                     }
                 }
-                if (!paintSettings.autoCreateParent)
+                if (!parentingSettings.autoCreateParent)
                 {
-                    paintSettings.setSurfaceAsParent = UnityEditor.EditorGUILayout.ToggleLeft("Set surface as parent",
-                        paintSettings.setSurfaceAsParent);
-                    if (!paintSettings.setSurfaceAsParent)
+                    parentingSettings.setSurfaceAsParent = UnityEditor.EditorGUILayout.ToggleLeft("Set surface as parent",
+                        parentingSettings.setSurfaceAsParent);
+                    if (!parentingSettings.setSurfaceAsParent)
                     {
                         using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                         {
-                            var parent = (Transform)UnityEditor.EditorGUILayout.ObjectField("Parent Transform:",
-                                paintSettings.parent, typeof(Transform), true);
+                            var parent = (Transform)UnityEditor.EditorGUILayout.ObjectField("Parent Transform",
+                                parentingSettings.parent, typeof(Transform), true);
                             if (check.changed)
                             {
-                                paintSettings.parent = parent;
+                                parentingSettings.parent = parent;
                             }
                         }
                     }
@@ -333,38 +352,38 @@ namespace PluginMaster
                 using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                 {
                     var createSubparent = UnityEditor.EditorGUILayout.ToggleLeft("Create sub-parents per palette",
-                   paintSettings.createSubparentPerPalette);
+                   parentingSettings.createSubparentPerPalette);
                     if (check.changed)
                     {
-                        paintSettings.createSubparentPerPalette = createSubparent;
+                        parentingSettings.createSubparentPerPalette = createSubparent;
                     }
                 }
                 using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                 {
                     var createSubparent = UnityEditor.EditorGUILayout.ToggleLeft("Create sub-parents per tool",
-                   paintSettings.createSubparentPerTool);
+                   parentingSettings.createSubparentPerTool);
                     if (check.changed)
                     {
-                        paintSettings.createSubparentPerTool = createSubparent;
+                        parentingSettings.createSubparentPerTool = createSubparent;
                     }
                 }
                 using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                 {
                     var createSubparent = UnityEditor.EditorGUILayout.ToggleLeft("Create sub-parents per brush",
-                   paintSettings.createSubparentPerBrush);
+                   parentingSettings.createSubparentPerBrush);
                     if (check.changed)
                     {
-                        paintSettings.createSubparentPerBrush = createSubparent;
+                        parentingSettings.createSubparentPerBrush = createSubparent;
                     }
                 }
                 using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                 {
                     var createSubparent = UnityEditor.EditorGUILayout.ToggleLeft("Create sub-parents per prefab",
-                   paintSettings.createSubparentPerPrefab);
+                   parentingSettings.createSubparentPerPrefab);
                     if (check.changed)
                     {
 
-                        paintSettings.createSubparentPerPrefab = createSubparent;
+                        parentingSettings.createSubparentPerPrefab = createSubparent;
                     }
                 }
 
@@ -380,7 +399,7 @@ namespace PluginMaster
                     var overwritePrefabLayer = UnityEditor.EditorGUILayout.ToggleLeft("Overwrite prefab layer",
                         paintSettings.overwritePrefabLayer);
                     int layer = paintSettings.layer;
-                    if (paintSettings.overwritePrefabLayer) layer = UnityEditor.EditorGUILayout.LayerField("Layer:",
+                    if (paintSettings.overwritePrefabLayer) layer = UnityEditor.EditorGUILayout.LayerField("Layer",
                         paintSettings.layer);
                     if (check.changed)
                     {
@@ -406,7 +425,7 @@ namespace PluginMaster
                     if (settings.radius > _maxRadius)
                         _maxRadius = Mathf.Max(Mathf.Floor(settings.radius / 10) * 20f, 10f);
                     UnityEditor.EditorGUIUtility.labelWidth = 60;
-                    var radius = UnityEditor.EditorGUILayout.Slider("Radius:", settings.radius, 0.05f, _maxRadius);
+                    var radius = UnityEditor.EditorGUILayout.Slider("Radius", settings.radius, 0.05f, _maxRadius);
                     if (check.changed)
                     {
                         settings.radius = radius;
@@ -425,7 +444,7 @@ namespace PluginMaster
                 UnityEditor.EditorGUIUtility.labelWidth = 60;
                 using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                 {
-                    var brushShape = (BrushToolSettings.BrushShape)UnityEditor.EditorGUILayout.Popup("Shape:",
+                    var brushShape = (BrushToolSettings.BrushShape)UnityEditor.EditorGUILayout.Popup("Shape",
                         (int)settings.brushShape, _brushShapeOptions);
                     if (check.changed)
                     {
@@ -450,7 +469,7 @@ namespace PluginMaster
                         using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                         {
                             UnityEditor.EditorGUIUtility.labelWidth = 80;
-                            var randomness = UnityEditor.EditorGUILayout.Slider("Randomness:", settings.randomness, 0f, 1f);
+                            var randomness = UnityEditor.EditorGUILayout.Slider("Randomness", settings.randomness, 0f, 1f);
                             if (check.changed)
                             {
                                 settings.randomness = randomness;
@@ -463,7 +482,7 @@ namespace PluginMaster
                 }
                 using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                 {
-                    var density = UnityEditor.EditorGUILayout.IntSlider("Density:", settings.density, 0, 100);
+                    var density = UnityEditor.EditorGUILayout.IntSlider("Density", settings.density, 0, 100);
                     if (check.changed)
                     {
                         settings.density = density;
@@ -475,12 +494,12 @@ namespace PluginMaster
                     using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
                     {
                         UnityEditor.EditorGUIUtility.labelWidth = 90;
-                        var spacingType = (BrushToolBase.SpacingType)UnityEditor.EditorGUILayout.Popup("Min Spacing:",
+                        var spacingType = (BrushToolBase.SpacingType)UnityEditor.EditorGUILayout.Popup("Min Spacing",
                             (int)settings.spacingType, _spacingOptions);
                         var spacing = settings.minSpacing;
                         using (new UnityEditor.EditorGUI.DisabledGroupScope(spacingType != BrushToolBase.SpacingType.CUSTOM))
                         {
-                            spacing = UnityEditor.EditorGUILayout.FloatField("Value:", settings.minSpacing);
+                            spacing = UnityEditor.EditorGUILayout.FloatField("Value", settings.minSpacing);
                         }
                         if (check.changed)
                         {
@@ -498,7 +517,7 @@ namespace PluginMaster
                             settings.orientAlongBrushstroke);
                         var additionalAngle = settings.additionalOrientationAngle;
                         if (orientAlongBrushstroke)
-                            additionalAngle = UnityEditor.EditorGUILayout.Vector3Field("Additonal angle:", additionalAngle);
+                            additionalAngle = UnityEditor.EditorGUILayout.Vector3Field("Additonal angle", additionalAngle);
                         if (check.changed)
                         {
                             settings.orientAlongBrushstroke = orientAlongBrushstroke;
@@ -532,7 +551,7 @@ namespace PluginMaster
                         }
 
                         using (new UnityEditor.EditorGUI.DisabledGroupScope(!settings.createTempColliders))
-                            if (GUILayout.Button(_updateButtonContent, GUILayout.Width(21), GUILayout.Height(21)))
+                            if (GUILayout.Button(_updateButtonContent, _reloadBtnStyle))
                                 PWBCore.UpdateTempColliders();
                     }
                 }
@@ -563,8 +582,7 @@ namespace PluginMaster
                     }
                     using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                     {
-                        UnityEditor.EditorGUIUtility.labelWidth = 110;
-                        var surfaceDistance = UnityEditor.EditorGUILayout.FloatField("Surface Distance:",
+                        var surfaceDistance = UnityEditor.EditorGUILayout.FloatField("Surface Distance",
                             settings.surfaceDistance);
                         if (check.changed)
                         {
@@ -623,7 +641,7 @@ namespace PluginMaster
                 if (settings.overwriteBrushProperties)
                     BrushProperties.BrushFields(settings.brushSettings,
                     ref state.brushPosGroupOpen, ref state.brushRotGroupOpen,
-                    ref state.brushScaleGroupOpen, ref state.brushFlipGroupOpen, this, UNDO_MSG);
+                    ref state.brushScaleGroupOpen, ref state.brushFlipGroupOpen);
             }
         }
 
@@ -643,6 +661,7 @@ namespace PluginMaster
                             PWBIO.ResetLineRotation();
                             PWBIO.repaint = true;
                             UnityEditor.SceneView.RepaintAll();
+                            PWBItemsWindow.RepainWindow();
                         }
                     }
                     if (persistentToolManager == LineManager.instance && ToolManager.editMode)
@@ -670,26 +689,21 @@ namespace PluginMaster
                         if (check.changed)
                         {
                             persistentToolManager.applyBrushToExisting = applyBrushToexisting;
+                            if (ToolManager.tool == ToolManager.PaintTool.LINE) PWBIO.PreviewSelectedPersistentLines();
+                            else if (ToolManager.tool == ToolManager.PaintTool.SHAPE) PWBIO.PreviewSelectedPersistentShapes();
+                            else if (ToolManager.tool == ToolManager.PaintTool.TILING)
+                                PWBIO.PreviewSelectedPersistentTilings();
                             PWBIO.repaint = true;
                             UnityEditor.SceneView.RepaintAll();
                         }
                     }
                 }
-                using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                if (ToolManager.editMode)
                 {
-                    var showPreexistingElements = UnityEditor.EditorGUILayout.ToggleLeft("Show Pre-existing elements",
-                        persistentToolManager.showPreexistingElements);
-                    if (check.changed)
-                    {
-                        persistentToolManager.showPreexistingElements = showPreexistingElements;
-                        PWBIO.repaint = true;
-                        UnityEditor.SceneView.RepaintAll();
-                    }
+                    if (GUILayout.Button("Open items window")) PWBItemsWindow.ShowWindow();
                 }
-                
             }
         }
-
         private void HandlePosition()
         {
             if (PWBIO.selectedPointIdx < 0) return;
@@ -697,7 +711,7 @@ namespace PluginMaster
             {
                 using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                 {
-                    PWBIO.handlePosition = UnityEditor.EditorGUILayout.Vector3Field("Handle position:", PWBIO.handlePosition);
+                    PWBIO.handlePosition = UnityEditor.EditorGUILayout.Vector3Field("Handle position", PWBIO.handlePosition);
                     if (check.changed) PWBIO.UpdateHandlePosition();
                 }
             }
@@ -711,7 +725,7 @@ namespace PluginMaster
                 using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                 {
                     var eulerAngles = PWBIO.handleRotation.eulerAngles;
-                    eulerAngles = UnityEditor.EditorGUILayout.Vector3Field("Handle rotation:", eulerAngles);
+                    eulerAngles = UnityEditor.EditorGUILayout.Vector3Field("Handle rotation", eulerAngles);
                     if (check.changed)
                     {
                         var newRotation = Quaternion.Euler(eulerAngles);
@@ -732,7 +746,7 @@ namespace PluginMaster
                 UnityEditor.EditorGUIUtility.labelWidth = 60;
                 using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                 {
-                    var command = (ModifierToolSettings.Command)UnityEditor.EditorGUILayout.Popup(actionLabel + ":",
+                    var command = (ModifierToolSettings.Command)UnityEditor.EditorGUILayout.Popup(actionLabel,
                         (int)settings.command, _modifierCommandOptions);
                     if (check.changed)
                     {
@@ -781,7 +795,7 @@ namespace PluginMaster
             {
                 using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                 {
-                    var mode = (PinSettings.PaintMode)UnityEditor.EditorGUILayout.Popup("Paint mode:",
+                    var mode = (PinSettings.PaintMode)UnityEditor.EditorGUILayout.Popup("Paint mode",
                         (int)PinManager.settings.mode, _pinModeNames);
                     if (check.changed)
                     {
@@ -836,7 +850,7 @@ namespace PluginMaster
                     var flatteningSettings = PinManager.settings.flatteningSettings;
                     using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                     {
-                        var hardness = UnityEditor.EditorGUILayout.Slider("Hardness:", flatteningSettings.hardness, 0, 1);
+                        var hardness = UnityEditor.EditorGUILayout.Slider("Hardness", flatteningSettings.hardness, 0, 1);
                         if (check.changed)
                         {
                             flatteningSettings.hardness = hardness;
@@ -844,7 +858,7 @@ namespace PluginMaster
                     }
                     using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                     {
-                        var padding = UnityEditor.EditorGUILayout.FloatField("Padding:", flatteningSettings.padding);
+                        var padding = UnityEditor.EditorGUILayout.FloatField("Padding", flatteningSettings.padding);
                         if (check.changed)
                         {
                             flatteningSettings.padding = padding;
@@ -889,7 +903,7 @@ namespace PluginMaster
                 if (BrushManager.settings.showPreview)
                     UnityEditor.EditorGUILayout.HelpBox("The brushstroke preview can cause slowdown issues.",
                         UnityEditor.MessageType.Info);
-                UnityEditor.EditorGUILayout.LabelField("Brushstroke object count:", BrushstrokeManager.itemCount.ToString());
+                UnityEditor.EditorGUILayout.LabelField("Brushstroke object count", BrushstrokeManager.itemCount.ToString());
             }
             using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
             {
@@ -898,11 +912,13 @@ namespace PluginMaster
                 using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                 {
                     var avoidOverlapping = (BrushToolSettings.AvoidOverlappingType)
-                        UnityEditor.EditorGUILayout.Popup("Avoid Overlapping:",
+                        UnityEditor.EditorGUILayout.Popup("Avoid Overlapping",
                         (int)BrushManager.settings.avoidOverlapping, _avoidOverlappingTypeNames);
                     if (check.changed)
                     {
                         BrushManager.settings.avoidOverlapping = avoidOverlapping;
+                        if (avoidOverlapping != BrushToolSettings.AvoidOverlappingType.DISABLED)
+                            PWBCore.UpdateTempColliders(force: true);
                     }
                 }
                 if (BrushManager.settings.brushShape != BrushToolBase.BrushShape.POINT)
@@ -912,7 +928,7 @@ namespace PluginMaster
                         using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                         {
                             var heightType = (BrushToolSettings.HeightType)
-                                UnityEditor.EditorGUILayout.Popup("Max Height From center:",
+                                UnityEditor.EditorGUILayout.Popup("Max Height From center",
                                 (int)BrushManager.settings.heightType, _heightTypeNames);
                             if (check.changed)
                             {
@@ -927,7 +943,7 @@ namespace PluginMaster
                         {
                             using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                             {
-                                var maxHeightFromCenter = Mathf.Abs(UnityEditor.EditorGUILayout.FloatField("Value:",
+                                var maxHeightFromCenter = Mathf.Abs(UnityEditor.EditorGUILayout.FloatField("Value",
                                     BrushManager.settings.maxHeightFromCenter));
                                 if (check.changed)
                                 {
@@ -950,7 +966,7 @@ namespace PluginMaster
                     {
                         var minSlope = BrushManager.settings.slopeFilter.min;
                         var maxSlope = BrushManager.settings.slopeFilter.max;
-                        UnityEditor.EditorGUILayout.MinMaxSlider("Slope Angle:", ref minSlope, ref maxSlope, 0, 90);
+                        UnityEditor.EditorGUILayout.MinMaxSlider("Slope Angle", ref minSlope, ref maxSlope, 0, 90);
                         minSlope = Mathf.Round(minSlope);
                         maxSlope = Mathf.Round(maxSlope);
                         GUILayout.Label("[" + minSlope.ToString("00") + "°," + maxSlope.ToString("00") + "°]");
@@ -965,7 +981,7 @@ namespace PluginMaster
 
                 using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                 {
-                    var mask = UnityEditor.EditorGUILayout.MaskField("Layers:",
+                    var mask = UnityEditor.EditorGUILayout.MaskField("Layers",
                         EditorGUIUtils.LayerMaskToField(BrushManager.settings.layerFilter),
                         UnityEditorInternal.InternalEditorUtility.layers);
                     if (check.changed)
@@ -976,11 +992,11 @@ namespace PluginMaster
                 }
 
                 UnityEditor.EditorGUIUtility.labelWidth = 108;
-                var field = EditorGUIUtils.MultiTagField.Instantiate("Tags:", BrushManager.settings.tagFilter, null);
+                var field = EditorGUIUtils.MultiTagField.Instantiate("Tags", BrushManager.settings.tagFilter, null);
                 field.OnChange += OnBrushTagFilterChanged;
 
                 bool terrainFilterChanged = false;
-                var terrainFilter = EditorGUIUtils.ObjectArrayFieldWithButtons("Terrain Layers:",
+                var terrainFilter = EditorGUIUtils.ObjectArrayFieldWithButtons("Terrain Layers",
                     BrushManager.settings.terrainLayerFilter, ref _terrainLayerFilterFoldout, out terrainFilterChanged);
                 if (terrainFilterChanged)
                 {
@@ -1043,13 +1059,13 @@ namespace PluginMaster
                 var data = settings.simData;
                 using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                 {
-                    settings.height = UnityEditor.EditorGUILayout.FloatField("Height:", settings.height);
-                    data.maxIterations = UnityEditor.EditorGUILayout.IntField("Max Iterations:", data.maxIterations);
-                    data.maxSpeed = UnityEditor.EditorGUILayout.FloatField("Max Speed:", data.maxSpeed);
-                    data.maxAngularSpeed = UnityEditor.EditorGUILayout.FloatField("Max Angular Speed:", data.maxAngularSpeed);
-                    data.mass = UnityEditor.EditorGUILayout.FloatField("Mass:", data.mass);
-                    data.drag = UnityEditor.EditorGUILayout.FloatField("Drag:", data.drag);
-                    data.angularDrag = UnityEditor.EditorGUILayout.FloatField("Angular Drag:", data.angularDrag);
+                    settings.height = UnityEditor.EditorGUILayout.FloatField("Height", settings.height);
+                    data.maxIterations = UnityEditor.EditorGUILayout.IntField("Max Iterations", data.maxIterations);
+                    data.maxSpeed = UnityEditor.EditorGUILayout.FloatField("Max Speed", data.maxSpeed);
+                    data.maxAngularSpeed = UnityEditor.EditorGUILayout.FloatField("Max Angular Speed", data.maxAngularSpeed);
+                    data.mass = UnityEditor.EditorGUILayout.FloatField("Mass", data.mass);
+                    data.drag = UnityEditor.EditorGUILayout.FloatField("Drag", data.drag);
+                    data.angularDrag = UnityEditor.EditorGUILayout.FloatField("Angular Drag", data.angularDrag);
                     if (check.changed)
                     {
                         GravityToolManager.settings.Copy(settings);
@@ -1074,7 +1090,7 @@ namespace PluginMaster
                         }
 
                         using (new UnityEditor.EditorGUI.DisabledGroupScope(!GravityToolManager.settings.createTempColliders))
-                            if (GUILayout.Button(_updateButtonContent, GUILayout.Width(21), GUILayout.Height(21)))
+                            if (GUILayout.Button(_updateButtonContent, _reloadBtnStyle))
                                 PWBCore.UpdateTempColliders();
 
                     }
@@ -1088,7 +1104,7 @@ namespace PluginMaster
                         data.changeLayer
                             = UnityEditor.EditorGUILayout.ToggleLeft("Change Layer Temporarily", data.changeLayer);
                         if (data.changeLayer)
-                            data.tempLayer = UnityEditor.EditorGUILayout.LayerField("Temp layer:", data.tempLayer);
+                            data.tempLayer = UnityEditor.EditorGUILayout.LayerField("Temp layer", data.tempLayer);
                     }
                     if (check.changed)
                     {
@@ -1122,7 +1138,7 @@ namespace PluginMaster
                 using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                 {
                     var mode = (PaintOnSurfaceToolSettingsBase.PaintMode)
-                    UnityEditor.EditorGUILayout.Popup("Paint Mode:", (int)lineSettings.mode, _lineModeNames);
+                    UnityEditor.EditorGUILayout.Popup("Paint Mode", (int)lineSettings.mode, _lineModeNames);
                     if (check.changed)
                     {
                         lineSettings.mode = mode;
@@ -1172,7 +1188,7 @@ namespace PluginMaster
 
                 using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                 {
-                    _lineProjDirIdx = UnityEditor.EditorGUILayout.Popup("Projection Direction:", _lineProjDirIdx, dirNames);
+                    _lineProjDirIdx = UnityEditor.EditorGUILayout.Popup("Projection Direction", _lineProjDirIdx, dirNames);
                     if (check.changed)
                     {
                         if (shapeSettings != null) shapeSettings.projectInNormalDir = _lineProjDirIdx == 6;
@@ -1200,7 +1216,7 @@ namespace PluginMaster
                     UnityEditor.EditorGUIUtility.labelWidth = 170;
                     using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                     {
-                        var axisOrientedAlongTheLine = UnityEditor.EditorGUILayout.Popup("Axis Oriented Along the Line:",
+                        var axisOrientedAlongTheLine = UnityEditor.EditorGUILayout.Popup("Axis Oriented Along the Line",
                         lineSettings.axisOrientedAlongTheLine == AxesUtils.Axis.X ? 0 : 1,
                         _lineAxesAlongTheLineNames) == 0 ? AxesUtils.Axis.X : AxesUtils.Axis.Z;
                         if (check.changed)
@@ -1217,7 +1233,7 @@ namespace PluginMaster
                 using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                 {
                     var spacingType = (LineSettings.SpacingType)
-                    UnityEditor.EditorGUILayout.Popup("Spacing:", (int)lineSettings.spacingType, _lineSpacingNames);
+                    UnityEditor.EditorGUILayout.Popup("Spacing", (int)lineSettings.spacingType, _lineSpacingNames);
                     if (check.changed)
                     {
                         lineSettings.spacingType = spacingType;
@@ -1228,7 +1244,7 @@ namespace PluginMaster
                 {
                     using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                     {
-                        var spacing = UnityEditor.EditorGUILayout.FloatField("Value:", lineSettings.spacing);
+                        var spacing = UnityEditor.EditorGUILayout.FloatField("Value", lineSettings.spacing);
                         if (check.changed)
                         {
                             lineSettings.spacing = spacing;
@@ -1238,7 +1254,7 @@ namespace PluginMaster
                 }
                 using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                 {
-                    var gapSize = UnityEditor.EditorGUILayout.FloatField("Gap Size:", lineSettings.gapSize);
+                    var gapSize = UnityEditor.EditorGUILayout.FloatField("Gap Size", lineSettings.gapSize);
                     if (check.changed)
                     {
                         if (PaletteManager.selectedBrushIdx >= 0 && PaletteManager.selectedBrush != null)
@@ -1262,6 +1278,20 @@ namespace PluginMaster
             HandlePosition();
             UnityEditor.EditorGUIUtility.labelWidth = 120;
             LineBaseGUI(LineManager.settings);
+            using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
+            {
+                using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                {
+                    var closed = UnityEditor.EditorGUILayout.ToggleLeft("Colsed Path", PWBIO.lineData.closed);
+                    if (check.changed)
+                    {
+                        PWBIO.lineData.closed = closed;
+                        PWBIO.UpdateStroke();
+                        UnityEditor.SceneView.RepaintAll();
+                        PWBIO.repaint = true;
+                    }
+                }
+            }
             PaintSettingsGUI(LineManager.settings, LineManager.settings);
             OverwriteBrushPropertiesGUI(LineManager.settings, ref _lineOverwriteGroupState);
         }
@@ -1282,7 +1312,7 @@ namespace PluginMaster
             {
                 using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                 {
-                    var shapeType = (ShapeSettings.ShapeType)UnityEditor.EditorGUILayout.Popup("Shape:",
+                    var shapeType = (ShapeSettings.ShapeType)UnityEditor.EditorGUILayout.Popup("Shape",
                         (int)ShapeManager.settings.shapeType, _shapeTypeNames);
                     if (check.changed)
                     {
@@ -1300,7 +1330,7 @@ namespace PluginMaster
                 {
                     using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                     {
-                        var sideCount = UnityEditor.EditorGUILayout.IntSlider("Number of sides:",
+                        var sideCount = UnityEditor.EditorGUILayout.IntSlider("Number of sides",
                             ShapeManager.settings.sidesCount, 3, 12);
                         if (check.changed)
                         {
@@ -1317,7 +1347,7 @@ namespace PluginMaster
                     var normalDirIdx = ShapeManager.settings.axisNormalToSurface
                         ? 6 : System.Array.IndexOf(_dir, ShapeManager.settings.normal);
                     UnityEditor.EditorGUIUtility.labelWidth = 120;
-                    normalDirIdx = UnityEditor.EditorGUILayout.Popup("Initial axis direction:", normalDirIdx, _shapeDirNames);
+                    normalDirIdx = UnityEditor.EditorGUILayout.Popup("Initial axis direction", normalDirIdx, _shapeDirNames);
                     var axisNormalToSurface = normalDirIdx == 6;
                     if (check.changed)
                     {
@@ -1337,7 +1367,7 @@ namespace PluginMaster
 
         #region TILING
         private static readonly string[] _tilingModeNames = { "Auto", "Paint on surface", "Paint on the plane" };
-        private static readonly string[] _tilingCellTypeNames = { "Smallest object", "Biggest object", "Custom" };
+        private static readonly string[] _cellTypeNames = { "Smallest object", "Biggest object", "Custom" };
         private static BrushPropertiesGroupState _tilingOverwriteGroupState;
         private void TilingGroup()
         {
@@ -1353,7 +1383,7 @@ namespace PluginMaster
                     if (TilingManager.settings.showPreview)
                         UnityEditor.EditorGUILayout.HelpBox("If you experience slowdown issues, disable preview.",
                             UnityEditor.MessageType.Info);
-                    UnityEditor.EditorGUILayout.LabelField("Object count:", BrushstrokeManager.itemCount.ToString());
+                    UnityEditor.EditorGUILayout.LabelField("Object count", BrushstrokeManager.itemCount.ToString());
                 }
             }
             UnityEditor.EditorGUIUtility.labelWidth = 180;
@@ -1362,12 +1392,12 @@ namespace PluginMaster
                 var settings = TilingManager.settings;
                 using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
                 {
-                    settings.mode = (TilingSettings.PaintMode)UnityEditor.EditorGUILayout.Popup("Paint mode:",
+                    settings.mode = (TilingSettings.PaintMode)UnityEditor.EditorGUILayout.Popup("Paint mode",
                     (int)settings.mode, _tilingModeNames);
                     using (var angleCheck = new UnityEditor.EditorGUI.ChangeCheckScope())
                     {
                         var eulerAngles = settings.rotation.eulerAngles;
-                        eulerAngles = UnityEditor.EditorGUILayout.Vector3Field("Plane Rotation:", eulerAngles);
+                        eulerAngles = UnityEditor.EditorGUILayout.Vector3Field("Plane Rotation", eulerAngles);
                         if (angleCheck.changed)
                         {
                             var newRotation = Quaternion.Euler(eulerAngles);
@@ -1382,10 +1412,10 @@ namespace PluginMaster
                 using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
                 {
                     UnityEditor.EditorGUIUtility.labelWidth = 76;
-                    settings.cellSizeType = (TilingSettings.CellSizeType)
-                        UnityEditor.EditorGUILayout.Popup("Cell size:", (int)settings.cellSizeType, _tilingCellTypeNames);
+                    settings.cellSizeType = (TilesUtils.SizeType)
+                        UnityEditor.EditorGUILayout.Popup("Cell size", (int)settings.cellSizeType, _cellTypeNames);
                     using (new UnityEditor.EditorGUI.DisabledGroupScope(
-                        settings.cellSizeType != TilingSettings.CellSizeType.CUSTOM))
+                        settings.cellSizeType != TilesUtils.SizeType.CUSTOM))
                     {
                         settings.cellSize = UnityEditor.EditorGUILayout.Vector2Field("", settings.cellSize);
                     }
@@ -1419,33 +1449,33 @@ namespace PluginMaster
                 var extrudeSettings = ExtrudeManager.settings.Clone();
                 using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
                 {
-                    extrudeSettings.space = (Space)(UnityEditor.EditorGUILayout.Popup("Space:",
+                    extrudeSettings.space = (Space)(UnityEditor.EditorGUILayout.Popup("Space",
                         (int)extrudeSettings.space, _spaceOptions));
                     if (extrudeSettings.space == Space.Self)
                     {
                         UnityEditor.EditorGUIUtility.labelWidth = 150;
                         extrudeSettings.rotationAccordingTo = (ExtrudeSettings.RotationAccordingTo)UnityEditor
-                            .EditorGUILayout.Popup("Set rotation according to:",
+                            .EditorGUILayout.Popup("Set rotation according to",
                             (int)extrudeSettings.rotationAccordingTo, _rotationOptions);
                     }
                 }
                 UnityEditor.EditorGUIUtility.labelWidth = 60;
                 using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
                 {
-                    extrudeSettings.spacingType = (ExtrudeSettings.SpacingType)UnityEditor.EditorGUILayout.Popup("Spacing:",
+                    extrudeSettings.spacingType = (ExtrudeSettings.SpacingType)UnityEditor.EditorGUILayout.Popup("Spacing",
                         (int)extrudeSettings.spacingType, _extrudeSpacingOptions);
                     if (extrudeSettings.spacingType == ExtrudeSettings.SpacingType.BOX_SIZE)
                         extrudeSettings.multiplier
-                            = UnityEditor.EditorGUILayout.Vector3Field("Multiplier:", extrudeSettings.multiplier);
+                            = UnityEditor.EditorGUILayout.Vector3Field("Multiplier", extrudeSettings.multiplier);
                     else extrudeSettings.spacing
-                            = UnityEditor.EditorGUILayout.Vector3Field("Value:", extrudeSettings.spacing);
+                            = UnityEditor.EditorGUILayout.Vector3Field("Value", extrudeSettings.spacing);
                 }
                 if (extrudeSettings.space == Space.World)
                 {
                     using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
                     {
                         UnityEditor.EditorGUIUtility.labelWidth = 80;
-                        extrudeSettings.addRandomRotation = UnityEditor.EditorGUILayout.Popup("Add Rotation:",
+                        extrudeSettings.addRandomRotation = UnityEditor.EditorGUILayout.Popup("Add Rotation",
                             extrudeSettings.addRandomRotation ? 1 : 0, _addRotationOptions) == 1;
                         if (extrudeSettings.addRandomRotation)
                         {
@@ -1454,7 +1484,7 @@ namespace PluginMaster
                             using (new GUILayout.HorizontalScope())
                             {
                                 extrudeSettings.rotateInMultiples = UnityEditor.EditorGUILayout.ToggleLeft
-                                    ("Only in multiples of:", extrudeSettings.rotateInMultiples);
+                                    ("Only in multiples of", extrudeSettings.rotateInMultiples);
                                 using (new UnityEditor.EditorGUI.DisabledGroupScope(!extrudeSettings.rotateInMultiples))
                                     extrudeSettings.rotationFactor
                                         = UnityEditor.EditorGUILayout.FloatField(extrudeSettings.rotationFactor);
@@ -1476,7 +1506,7 @@ namespace PluginMaster
                         if (extrudeSettings.autoCreateParent) extrudeSettings.createSubparentPerPrefab
                                 = UnityEditor.EditorGUILayout.ToggleLeft("Create sub-parent per prefab",
                                 extrudeSettings.createSubparentPerPrefab);
-                        else extrudeSettings.parent = (Transform)UnityEditor.EditorGUILayout.ObjectField("Parent Transform:",
+                        else extrudeSettings.parent = (Transform)UnityEditor.EditorGUILayout.ObjectField("Parent Transform",
                                 extrudeSettings.parent, typeof(Transform), true);
                     }
                 }
@@ -1486,7 +1516,7 @@ namespace PluginMaster
                         = UnityEditor.EditorGUILayout.ToggleLeft("Overwrite prefab layer",
                         extrudeSettings.overwritePrefabLayer);
                     if (extrudeSettings.overwritePrefabLayer)
-                        extrudeSettings.layer = UnityEditor.EditorGUILayout.LayerField("Layer:", extrudeSettings.layer);
+                        extrudeSettings.layer = UnityEditor.EditorGUILayout.LayerField("Layer", extrudeSettings.layer);
                 }
 
                 if (check.changed)
@@ -1509,13 +1539,13 @@ namespace PluginMaster
                 using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                 {
                     UnityEditor.EditorGUIUtility.labelWidth = 90;
-                    var handleSpace = (Space)(UnityEditor.EditorGUILayout.Popup("Handle Space:",
+                    var handleSpace = (Space)(UnityEditor.EditorGUILayout.Popup("Handle Space",
                         (int)SelectionToolManager.settings.handleSpace, _spaceOptions));
                     if (SelectionManager.topLevelSelection.Length > 1) SelectionToolManager.settings.boxSpace = Space.World;
                     var boxSpace = SelectionToolManager.settings.boxSpace;
                     using (new UnityEditor.EditorGUI.DisabledGroupScope(SelectionManager.topLevelSelection.Length > 1))
                     {
-                        boxSpace = (Space)(UnityEditor.EditorGUILayout.Popup("Box Space:",
+                        boxSpace = (Space)(UnityEditor.EditorGUILayout.Popup("Box Space",
                             (int)SelectionToolManager.settings.boxSpace, _spaceOptions));
                     }
                     if (check.changed)
@@ -1537,10 +1567,10 @@ namespace PluginMaster
                         SelectionToolManager.settings.paletteFilter);
                     var brushFilter = UnityEditor.EditorGUILayout.ToggleLeft("Prefabs from selected brush only",
                         SelectionToolManager.settings.brushFilter);
-                    var layerMask = UnityEditor.EditorGUILayout.MaskField("Layers:",
+                    var layerMask = UnityEditor.EditorGUILayout.MaskField("Layers",
                         EditorGUIUtils.LayerMaskToField(SelectionToolManager.settings.layerFilter),
                         UnityEditorInternal.InternalEditorUtility.layers);
-                    var tagField = EditorGUIUtils.MultiTagField.Instantiate("Tags:",
+                    var tagField = EditorGUIUtils.MultiTagField.Instantiate("Tags",
                         SelectionToolManager.settings.tagFilter, null);
                     tagField.OnChange += OnSelectionTagFilterChanged;
                     if (check.changed)
@@ -1597,15 +1627,15 @@ namespace PluginMaster
             using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
             {
                 var mirrorSettings = new MirrorSettings();
-                MirrorManager.settings.Clone(mirrorSettings);
+                mirrorSettings.Copy(MirrorManager.settings);
                 using (var mirrorCheck = new UnityEditor.EditorGUI.ChangeCheckScope())
                 {
                     using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
                     {
                         UnityEditor.EditorGUIUtility.labelWidth = 80;
-                        mirrorSettings.mirrorPosition = UnityEditor.EditorGUILayout.Vector3Field("Position:",
+                        mirrorSettings.mirrorPosition = UnityEditor.EditorGUILayout.Vector3Field("Position",
                             mirrorSettings.mirrorPosition);
-                        mirrorSettings.mirrorRotation = Quaternion.Euler(UnityEditor.EditorGUILayout.Vector3Field("Rotation:",
+                        mirrorSettings.mirrorRotation = Quaternion.Euler(UnityEditor.EditorGUILayout.Vector3Field("Rotation",
                             mirrorSettings.mirrorRotation.eulerAngles));
                     }
                     using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
@@ -1615,7 +1645,7 @@ namespace PluginMaster
                             = UnityEditor.EditorGUILayout.ToggleLeft("Invert scale", mirrorSettings.invertScale);
                         mirrorSettings.reflectRotation
                             = UnityEditor.EditorGUILayout.ToggleLeft("Reflect rotation", mirrorSettings.reflectRotation);
-                        mirrorSettings.action = (MirrorSettings.MirrorAction)UnityEditor.EditorGUILayout.Popup("Action:",
+                        mirrorSettings.action = (MirrorSettings.MirrorAction)UnityEditor.EditorGUILayout.Popup("Action",
                             (int)mirrorSettings.action, _mirrorActionNames);
                     }
                     if (mirrorCheck.changed) UnityEditor.SceneView.RepaintAll();
@@ -1636,7 +1666,7 @@ namespace PluginMaster
                                     = UnityEditor.EditorGUILayout.ToggleLeft("Create sub-parent per prefab",
                                     mirrorSettings.createSubparentPerPrefab);
                             else mirrorSettings.parent
-                                    = (Transform)UnityEditor.EditorGUILayout.ObjectField("Parent Transform:",
+                                    = (Transform)UnityEditor.EditorGUILayout.ObjectField("Parent Transform",
                                     mirrorSettings.parent, typeof(Transform), true);
                         }
                     }
@@ -1645,7 +1675,7 @@ namespace PluginMaster
                         mirrorSettings.overwritePrefabLayer = UnityEditor.EditorGUILayout.ToggleLeft("Overwrite prefab layer",
                             mirrorSettings.overwritePrefabLayer);
                         if (mirrorSettings.overwritePrefabLayer)
-                            mirrorSettings.layer = UnityEditor.EditorGUILayout.LayerField("Layer:", mirrorSettings.layer);
+                            mirrorSettings.layer = UnityEditor.EditorGUILayout.LayerField("Layer", mirrorSettings.layer);
                     }
                 }
                 if (check.changed)
@@ -1673,7 +1703,7 @@ namespace PluginMaster
             {
                 using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
                 {
-                    var positionMode = (ReplacerSettings.PositionMode)UnityEditor.EditorGUILayout.Popup("Position:",
+                    var positionMode = (ReplacerSettings.PositionMode)UnityEditor.EditorGUILayout.Popup("Position",
                         (int)settings.positionMode, _replacerModeOptions);
                     if (check.changed)
                     {
@@ -1733,6 +1763,371 @@ namespace PluginMaster
                 }
                 GUILayout.FlexibleSpace();
             }
+        }
+        #endregion
+
+        #region FLOOR
+        private static BrushPropertiesGroupState _floorOverwriteGroupState;
+        private void FloorGroup()
+        {
+            ToolProfileGUI(FloorManager.instance);
+
+            var settings = FloorManager.settings;
+            UnityEditor.EditorGUIUtility.labelWidth = 80;
+            using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
+            {
+                using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                {
+                    var axisIdx = UnityEditor.EditorGUILayout.Popup("Upward axis",
+                    settings.upwardAxis, _dirNames);
+                    if (check.changed)
+                    {
+                        settings.upwardAxis = axisIdx;
+                    }
+                }
+            }
+            using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
+            {
+                UnityEditor.EditorGUIUtility.labelWidth = 90;
+                using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                {
+                    var moduleSizeType = (TilesUtils.SizeType)
+                    UnityEditor.EditorGUILayout.Popup("Cell size type", (int)settings.moduleSizeType, _cellTypeNames);
+                    if (check.changed)
+                    {
+                        settings.moduleSizeType = moduleSizeType;
+                        if (settings.moduleSizeType == TilesUtils.SizeType.CUSTOM) FloorManager.settings.ResetSize();
+                    }
+                }
+
+                using (new GUILayout.HorizontalScope())
+                {
+                    GUILayout.FlexibleSpace();
+                    UnityEditor.EditorGUIUtility.labelWidth = 20;
+                    using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                    {
+                        using (new UnityEditor.EditorGUI.DisabledGroupScope(
+                            settings.moduleSizeType != TilesUtils.SizeType.CUSTOM))
+                        {
+                            var x = UnityEditor.EditorGUILayout.FloatField("X", settings.moduleSize.x);
+                            var z = UnityEditor.EditorGUILayout.FloatField("Z", settings.moduleSize.z);
+                            if (check.changed)
+                            {
+                                settings.moduleSize = new Vector3(x, 1, z);
+                            }
+                        }
+                    }
+                    if (GUILayout.Button("Swap"))
+                    {
+                        settings.SwapXZ();
+                        RepainWindow();
+                    }
+                }
+                if (settings.moduleSizeType == TilesUtils.SizeType.CUSTOM)
+                {
+                    int sizeIndex = 0;
+                    using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                    {
+                        UnityEditor.EditorGUIUtility.labelWidth = 70;
+                        sizeIndex = UnityEditor.EditorGUILayout.Popup("Cell Size", settings.GetIndexOfSelectedSize(),
+                            settings.GetSizesNames());
+                        if (check.changed)
+                        {
+                            settings.SelectSize(sizeIndex);
+                        }
+                    }
+                    using (new GUILayout.HorizontalScope())
+                    {
+                        GUILayout.FlexibleSpace();
+                        if (GUILayout.Button("Reset")) FloorManager.settings.ResetSize();
+                        if (GUILayout.Button("Save..."))
+                        {
+                            RenameWindow.ShowWindow(position.position + Event.current.mousePosition,
+                                FloorManager.settings.SaveSize, "Save Size", settings.selectedSizeName);
+                        }
+                        using (new UnityEditor.EditorGUI.DisabledGroupScope(sizeIndex == 0))
+                        {
+                            if (GUILayout.Button("Delete"))
+                            {
+                                FloorManager.settings.DeleteSelectedSize();
+                            }
+                        }
+                    }
+                }
+                using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                {
+                    var subtractBrushOffset = UnityEditor.EditorGUILayout.ToggleLeft("Subtract brush local offset",
+                        settings.subtractBrushOffset);
+                    if (check.changed) settings.subtractBrushOffset = subtractBrushOffset;
+                }
+            }
+            UnityEditor.EditorGUIUtility.labelWidth = 70;
+            using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
+            {
+                using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                {
+                    var spacing = UnityEditor.EditorGUILayout.Vector3Field("Spacing", settings.spacing);
+                    if (check.changed)
+                    {
+                        settings.spacing = spacing;
+                        PWBIO.UpdateStroke();
+                        UnityEditor.SceneView.RepaintAll();
+                    }
+                }
+            }
+            using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
+            {
+                int originIndex = 0;
+                using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                {
+                    originIndex = UnityEditor.EditorGUILayout.Popup("Grid origin",
+                        SnapManager.settings.GetIndexOfSelectedOrigin(), SnapManager.settings.GetOriginNames());
+                    if (check.changed)
+                    {
+                        SnapManager.settings.SelectOrigin(originIndex);
+                        UnityEditor.SceneView.RepaintAll();
+                    }
+                }
+                using (new GUILayout.HorizontalScope())
+                {
+                    GUILayout.Label("Position");
+                    using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                    {
+                        var origin = UnityEditor.EditorGUILayout.Vector3Field(string.Empty,
+                            SnapManager.settings.origin);
+                        if (check.changed)
+                        {
+                            SnapManager.settings.origin = origin;
+                            UnityEditor.SceneView.RepaintAll();
+                        }
+                    }
+                }
+                using (new GUILayout.HorizontalScope())
+                {
+                    GUILayout.Label("Rotation");
+                    using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                    {
+                        var angle = UnityEditor.EditorGUILayout.Vector3Field(string.Empty,
+                            SnapManager.settings.rotation.eulerAngles);
+                        if (check.changed)
+                        {
+                            SnapManager.settings.rotation = Quaternion.Euler(angle);
+                            UnityEditor.SceneView.RepaintAll();
+                        }
+                    }
+                }
+                using (new GUILayout.HorizontalScope())
+                {
+                    GUILayout.FlexibleSpace();
+                    if (GUILayout.Button("Reset"))
+                    {
+                        SnapManager.settings.ResetOrigin();
+                    }
+                    if (GUILayout.Button("Save..."))
+                    {
+                        RenameWindow.ShowWindow(position.position + Event.current.mousePosition,
+                            SnapManager.settings.SaveGridOrigin, "Save Origin", SnapManager.settings.selectedOrigin);
+                    }
+                    using (new UnityEditor.EditorGUI.DisabledGroupScope(originIndex == 0))
+                    {
+                        if (GUILayout.Button("Delete"))
+                        {
+                            SnapManager.settings.DeleteSelectedOrigin();
+                        }
+                    }
+                }
+            }
+            PaintToolSettingsGUI(FloorManager.settings);
+            OverwriteBrushPropertiesGUI(FloorManager.settings, ref _floorOverwriteGroupState);
+        }
+        #endregion
+
+        #region WALL
+        private static BrushPropertiesGroupState _wallOverwriteGroupState;
+        private void WallGroup()
+        {
+            ToolProfileGUI(WallManager.instance);
+            var settings = WallManager.settings;
+            UnityEditor.EditorGUIUtility.labelWidth = 80;
+            using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
+            {
+                settings.autoCalculateAxes = UnityEditor.EditorGUILayout.ToggleLeft("Auto calculate axes",
+                    settings.autoCalculateAxes);
+                using (new UnityEditor.EditorGUI.DisabledGroupScope(settings.autoCalculateAxes))
+                {
+                    using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                    {
+                        var upAxisIdx = UnityEditor.EditorGUILayout.Popup("Upward axis",
+                         settings.upwardAxis, _dirNames);
+                        if (check.changed) settings.upwardAxis = upAxisIdx;
+                    }
+                    using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                    {
+                        var forwardAxisIdx = UnityEditor.EditorGUILayout.Popup("Forward axis",
+                         settings.forwardAxis, _dirNames);
+                        if (check.changed) settings.forwardAxis = forwardAxisIdx;
+                    }
+                }
+            }
+            using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
+            {
+                UnityEditor.EditorGUIUtility.labelWidth = 90;
+                using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                {
+                    var moduleSizeType = (TilesUtils.SizeType)
+                    UnityEditor.EditorGUILayout.Popup("Cell size type", (int)settings.moduleSizeType, _cellTypeNames);
+                    if (check.changed)
+                    {
+                        settings.moduleSizeType = moduleSizeType;
+                        if (settings.moduleSizeType == TilesUtils.SizeType.CUSTOM) WallManager.settings.ResetSize();
+                    }
+                }
+
+                using (new UnityEditor.EditorGUI.DisabledGroupScope(
+                    settings.moduleSizeType != TilesUtils.SizeType.CUSTOM))
+                {
+                    using (new GUILayout.HorizontalScope())
+                    {
+                        GUILayout.FlexibleSpace();
+                        using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                        {
+                            UnityEditor.EditorGUIUtility.labelWidth = 50;
+                            var size = UnityEditor.EditorGUILayout.FloatField("Length",
+                                AxesUtils.GetAxisValue(settings.moduleSize, WallManager.wallLenghtAxis));
+                            if (check.changed) settings.SetCustomLength(size);
+                        }
+                        GUILayout.Space(10);
+                        using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                        {
+                            UnityEditor.EditorGUIUtility.labelWidth = 70;
+                            var thickness = UnityEditor.EditorGUILayout.FloatField("Thickness", WallManager.wallThickness);
+                            if (check.changed) settings.SetThickness(thickness);
+                        }
+                    }
+                }
+                if (settings.moduleSizeType == TilesUtils.SizeType.CUSTOM)
+                {
+                    using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
+                    {
+                        int sizeIndex = 0;
+                        using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                        {
+                            UnityEditor.EditorGUIUtility.labelWidth = 80;
+                            sizeIndex = UnityEditor.EditorGUILayout.Popup("Wall Length", settings.GetIndexOfSelectedSize(),
+                                settings.GetSizesNames());
+                            if (check.changed)
+                            {
+                                settings.SelectSize(sizeIndex);
+                            }
+                        }
+                        using (new GUILayout.HorizontalScope())
+                        {
+                            GUILayout.FlexibleSpace();
+                            if (GUILayout.Button("Reset")) WallManager.settings.ResetSize();
+                            if (GUILayout.Button("Save..."))
+                            {
+                                RenameWindow.ShowWindow(position.position + Event.current.mousePosition,
+                                    WallManager.settings.SaveSize, "Save Size", settings.selectedSizeName);
+                            }
+                            using (new UnityEditor.EditorGUI.DisabledGroupScope(sizeIndex == 0))
+                            {
+                                if (GUILayout.Button("Delete"))
+                                {
+                                    WallManager.settings.DeleteSelectedSize();
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                    {
+                        var subtractBrushOffset = UnityEditor.EditorGUILayout.ToggleLeft("Subtract brush local offset",
+                            settings.subtractBrushOffset);
+                        if (check.changed) settings.subtractBrushOffset = subtractBrushOffset;
+                    }
+                }
+            }
+            using (new GUILayout.HorizontalScope(UnityEditor.EditorStyles.helpBox))
+            {
+                UnityEditor.EditorGUIUtility.labelWidth = 60;
+                using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                {
+                    var spacing = UnityEditor.EditorGUILayout.FloatField("Spacing", settings.spacing.x);
+                    if (check.changed)
+                    {
+                        settings.spacing = new Vector3(spacing, 0, spacing);
+                    }
+                }
+            }
+
+
+            using (new GUILayout.VerticalScope(UnityEditor.EditorStyles.helpBox))
+            {
+                int originIndex = 0;
+                using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                {
+                    UnityEditor.EditorGUIUtility.labelWidth = 70;
+                    originIndex = UnityEditor.EditorGUILayout.Popup("Grid origin",
+                        SnapManager.settings.GetIndexOfSelectedOrigin(), SnapManager.settings.GetOriginNames());
+                    if (check.changed)
+                    {
+                        SnapManager.settings.SelectOrigin(originIndex);
+                        UnityEditor.SceneView.RepaintAll();
+                    }
+                }
+                using (new GUILayout.HorizontalScope())
+                {
+                    GUILayout.Label("Position");
+                    using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                    {
+                        var origin = UnityEditor.EditorGUILayout.Vector3Field(string.Empty,
+                            SnapManager.settings.origin);
+                        if (check.changed)
+                        {
+                            SnapManager.settings.origin = origin;
+                            UnityEditor.SceneView.RepaintAll();
+                        }
+                    }
+                }
+                using (new GUILayout.HorizontalScope())
+                {
+                    GUILayout.Label("Rotation");
+                    using (var check = new UnityEditor.EditorGUI.ChangeCheckScope())
+                    {
+                        var angles = UnityEditor.EditorGUILayout.Vector3Field(string.Empty,
+                            SnapManager.settings.rotation.eulerAngles);
+                        if (check.changed)
+                        {
+                            SnapManager.settings.rotation = Quaternion.Euler(angles);
+                            UnityEditor.SceneView.RepaintAll();
+                        }
+                    }
+                }
+                using (new GUILayout.HorizontalScope())
+                {
+                    GUILayout.FlexibleSpace();
+                    if (GUILayout.Button("Reset"))
+                    {
+                        SnapManager.settings.ResetOrigin();
+                    }
+                    if (GUILayout.Button("Save..."))
+                    {
+                        RenameWindow.ShowWindow(position.position + Event.current.mousePosition,
+                            SnapManager.settings.SaveGridOrigin, "Save Origin", SnapManager.settings.selectedOrigin);
+                    }
+                    using (new UnityEditor.EditorGUI.DisabledGroupScope(originIndex == 0))
+                    {
+                        if (GUILayout.Button("Delete"))
+                        {
+                            SnapManager.settings.DeleteSelectedOrigin();
+                        }
+                    }
+                }
+            }
+            PaintToolSettingsGUI(FloorManager.settings);
+            OverwriteBrushPropertiesGUI(FloorManager.settings, ref _floorOverwriteGroupState);
         }
         #endregion
     }

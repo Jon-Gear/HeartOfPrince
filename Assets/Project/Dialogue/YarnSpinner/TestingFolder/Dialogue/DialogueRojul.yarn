@@ -1,4 +1,4 @@
-title: dialogue_Rojul_1
+title: dialogue_rojul_1
 tags:
 ---
 <<setCloseUpShot>>
@@ -77,6 +77,9 @@ Rojul: Assalamaleykum!
 <<enterState Prince WaveBig>>
 Prince: Walaikum as salaam!
 <<exitState Prince WaveBig>>
+
+<<addThought Prince prince_meeting_rojul_first_impression 3>>
+<<addThought Rojul rojul_meeting_prince_first_impression 3>>
 
 <<removeActorFromShot Rojul>>
 <<setLongShot>>
