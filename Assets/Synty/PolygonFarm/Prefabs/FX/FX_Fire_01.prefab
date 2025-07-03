@@ -127,7 +127,7 @@ ParticleSystem:
   moveWithTransform: 1
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
-  randomSeed: -1685335252
+  randomSeed: 455873307
   InitialModule:
     serializedVersion: 3
     enabled: 1
@@ -250,7 +250,7 @@ ParticleSystem:
       maxColor: {r: 1, g: 1, b: 1, a: 1}
     startSize:
       minMaxState: 3
-      scalar: 1
+      scalar: 0.15
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -268,7 +268,7 @@ ParticleSystem:
         m_Curve:
         - serializedVersion: 2
           time: 0
-          value: 0.5
+          value: 0.3333333
           inSlope: 0
           outSlope: 0
           tangentMode: 0
@@ -2957,7 +2957,7 @@ ParticleSystem:
   moveWithTransform: 1
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
-  randomSeed: -1685335252
+  randomSeed: 751835336
   InitialModule:
     serializedVersion: 3
     enabled: 1
@@ -5830,7 +5830,7 @@ ParticleSystemRenderer:
   m_Pivot: {x: 0, y: 0, z: 0}
   m_UseCustomVertexStreams: 0
   m_VertexStreams: 00010304
-  m_Mesh: {fileID: 4300000, guid: 219de587148d8bb41a8e255859dafe53, type: 3}
+  m_Mesh: {fileID: 4300000, guid: 0518a1b5b94b82a4c8680af309f6cc73, type: 3}
   m_Mesh1: {fileID: 0}
   m_Mesh2: {fileID: 0}
   m_Mesh3: {fileID: 0}
