@@ -13,6 +13,14 @@ public class YarnCommands : MonoBehaviour
     Other ideas:
     - Background dialogue between other characters (like in NITW)
     */
+
+    [YarnCommand("logDayEntry")]
+    public static void LogDayEntry(string entryMessage)
+    {
+        DayLogger.Instance.LogDayEntry(entryMessage);
+    }
+
+
     // Background Dialogue (Thought Management)
     [YarnCommand("addThought")]
     public static void AddThought(string actorName, string thoughtName, int maxVariants)

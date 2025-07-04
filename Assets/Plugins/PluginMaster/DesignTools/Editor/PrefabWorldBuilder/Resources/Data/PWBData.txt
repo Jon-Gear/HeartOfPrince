@@ -24,7 +24,7 @@
     "_tempCollidersAction": 1,
     "_paletteManager": {
         "_selectedPaletteIdx": 3,
-        "_selectedBrushIdx": -1,
+        "_selectedBrushIdx": 80,
         "_showBrushName": false,
         "_viewList": false,
         "_showTabsInMultipleRows": false,
@@ -194,9 +194,9 @@
         "_unsavedProfile": {
             "_moduleSizeType": 2,
             "_moduleSize": {
-                "x": 2.5,
+                "x": 5.0,
                 "y": 1.0,
-                "z": 2.5
+                "z": 5.0
             },
             "_subtractBrushOffset": true,
             "_spacing": {
@@ -332,7 +332,7 @@
                 },
                 "_overwriteParentingSettings": false
             },
-            "_swapXZ": true,
+            "_swapXZ": false,
             "_sizes": [
                 {
                     "_name": "Default",
@@ -341,9 +341,33 @@
                         "y": 1.0,
                         "z": 1.0
                     }
+                },
+                {
+                    "_name": "Street_5x5",
+                    "_size": {
+                        "x": 5.0,
+                        "y": 1.0,
+                        "z": 5.0
+                    }
+                },
+                {
+                    "_name": "Indoors_2.5x2.5",
+                    "_size": {
+                        "x": 2.5,
+                        "y": 1.0,
+                        "z": 2.5
+                    }
+                },
+                {
+                    "_name": "10x10",
+                    "_size": {
+                        "x": 10.0,
+                        "y": 1.0,
+                        "z": 10.0
+                    }
                 }
             ],
-            "_selectedSizeName": "Default"
+            "_selectedSizeName": "Street_5x5"
         }
     },
     "_wallManager": {
@@ -506,9 +530,9 @@
         "_unsavedProfile": {
             "_moduleSizeType": 1,
             "_moduleSize": {
-                "x": 1.9424926042556763,
-                "y": 0.944433867931366,
-                "z": 0.9248510599136353
+                "x": 5.0,
+                "y": 2.1404271125793459,
+                "z": 0.4445915222167969
             },
             "_subtractBrushOffset": false,
             "_spacing": {
@@ -802,7 +826,7 @@
             "_paintOnMeshesWithoutCollider": false,
             "_paintOnSelectedOnly": false,
             "_paintOnPalettePrefabs": false,
-            "_mode": 0,
+            "_mode": 2,
             "_paralellToTheSurface": true,
             "_repeat": false,
             "_flatteningSettings": {
@@ -813,7 +837,7 @@
             },
             "_flattenTerrain": false,
             "_avoidOverlapping": false,
-            "_snapRotationToGrid": true,
+            "_snapRotationToGrid": false,
             "_paintTool": {
                 "_parentGlobalId": "",
                 "_autoCreateParent": true,
@@ -1241,7 +1265,7 @@
                 "z": 0.0
             },
             "_spacingType": 0,
-            "_minSpacing": 0.6345849633216858,
+            "_minSpacing": 2.3983519077301027,
             "_randomizePositions": true,
             "_randomness": 1.0,
             "_paintOnSurfaceToolSettings": {
@@ -5286,7 +5310,7 @@
         ],
         "_selectedProfileName": "Default",
         "_unsavedProfile": {
-            "_radius": 1.0,
+            "_radius": 4.599999904632568,
             "_modifierTool": {
                 "_command": 1,
                 "_onlyTheClosest": true,
@@ -6040,9 +6064,9 @@
             "_lockedGrid": true,
             "_boundsSnapping": false,
             "_step": {
-                "x": 0.10000000149011612,
-                "y": 0.944433867931366,
-                "z": 0.10000000149011612
+                "x": 5.0,
+                "y": 1.0,
+                "z": 5.0
             },
             "_origin": {
                 "x": 0.0,

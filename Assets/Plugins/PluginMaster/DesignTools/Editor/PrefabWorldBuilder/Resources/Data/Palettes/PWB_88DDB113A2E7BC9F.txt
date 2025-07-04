@@ -18266,9 +18266,9 @@
                 "y": 0.0,
                 "z": 0.0
             },
-            "_addRandomRotation": false,
-            "_rotationFactor": 90.0,
-            "_rotateInMultiples": false,
+            "_addRandomRotation": true,
+            "_rotationFactor": 15.0,
+            "_rotateInMultiples": true,
             "_randomEulerOffset": {
                 "x": {
                     "_v1": 0.0,
@@ -18277,10 +18277,10 @@
                     "_max": 0.0
                 },
                 "y": {
-                    "_v1": 0.0,
-                    "_v2": 0.0,
-                    "_min": 0.0,
-                    "_max": 0.0
+                    "_v1": 90.0,
+                    "_v2": 180.0,
+                    "_min": 90.0,
+                    "_max": 180.0
                 },
                 "z": {
                     "_v1": 0.0,

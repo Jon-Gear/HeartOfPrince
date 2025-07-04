@@ -17,6 +17,8 @@ Prince: Walaikum as salaam.
 Rojul: I have this quest for you.
 <<activateQuest MyQuest>>
 <<trackQuest MyQuest>>
+<<logDayEntry "Rojul gave me a quest">>
+
 
 Rojul: Check your journal.
 
@@ -49,9 +51,14 @@ Rojul: Two
 Prince: Three!
 
 
+<<logDayEntry "Rojul and I counted to three together.">>
+
+
 Rojul: Check out this sick kick that I can do.
 
 <<gesture Rojul Kick>>
+
+<<logDayEntry "Rojul showed me a sick kick.">>
 
 Rojul: Hi-ya!
 
@@ -64,6 +71,7 @@ Rojul: Alright, I will see you later.
 
 -> Prince: Wait, I wanted to ask, what is your favorite color?
     Rojul: My favorite color is yellow.
+    <<logDayEntry "Rojul's favorite color is yellow.">>
     <<completeTask MyQuest "Ask Rojul what is his favorite color">>
     Prince: Ah, that is good to know.
     Rojul: Alright, I should go now.

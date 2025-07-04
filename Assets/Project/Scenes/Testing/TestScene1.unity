@@ -298,6 +298,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 213458801}
+  - component: {fileID: 213458802}
   m_Layer: 0
   m_Name: DayGameLoop
   m_TagString: Untagged
@@ -320,6 +321,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 235276779}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &213458802
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 213458800}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c86fbf2a43839eb49baf069af0468e49, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &215105303
 GameObject:
   m_ObjectHideFlags: 0
@@ -831,7 +844,9 @@ Transform:
   - {fileID: 234375058}
   - {fileID: 357954814}
   - {fileID: 1211053086}
+  - {fileID: 1025779405}
   - {fileID: 1951013032}
+  - {fileID: 695843442397421190}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &344079737
@@ -1162,6 +1177,51 @@ Transform:
   - {fileID: 1605345335}
   m_Father: {fileID: 344079738}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1025779404
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1025779405}
+  - component: {fileID: 1025779406}
+  m_Layer: 0
+  m_Name: DayLogger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1025779405
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1025779404}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 338828959}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1025779406
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1025779404}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd8d95e094f86c04e84c92c30d0e375f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dayLog: []
 --- !u!114 &1103712764 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3658025059952798564, guid: 53d18115fc9a09c44a4bab498f36549b, type: 3}
@@ -2867,7 +2927,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5008587440464157146}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -2875,7 +2935,7 @@ Transform:
   - {fileID: 5482259866011613474}
   - {fileID: 6627894539109600918}
   - {fileID: 1172405476}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 338828959}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &848446172563713974
 PrefabInstance:
@@ -3523,7 +3583,6 @@ SceneRoots:
   - {fileID: 2034096258}
   - {fileID: 116533539591057931}
   - {fileID: 6089667811100357310}
-  - {fileID: 695843442397421190}
   - {fileID: 1675813219}
   - {fileID: 481087556}
   - {fileID: 1179988808}
