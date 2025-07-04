@@ -23,8 +23,8 @@
     "_unsavedChangesAction": 0,
     "_tempCollidersAction": 1,
     "_paletteManager": {
-        "_selectedPaletteIdx": 3,
-        "_selectedBrushIdx": 80,
+        "_selectedPaletteIdx": 0,
+        "_selectedBrushIdx": -1,
         "_showBrushName": false,
         "_viewList": false,
         "_showTabsInMultipleRows": false,
@@ -530,9 +530,9 @@
         "_unsavedProfile": {
             "_moduleSizeType": 1,
             "_moduleSize": {
-                "x": 5.0,
-                "y": 2.1404271125793459,
-                "z": 0.4445915222167969
+                "x": 1.118917465209961,
+                "y": 2.2648472785949709,
+                "z": 0.21980895102024079
             },
             "_subtractBrushOffset": false,
             "_spacing": {
@@ -837,7 +837,7 @@
             },
             "_flattenTerrain": false,
             "_avoidOverlapping": false,
-            "_snapRotationToGrid": false,
+            "_snapRotationToGrid": true,
             "_paintTool": {
                 "_parentGlobalId": "",
                 "_autoCreateParent": true,
@@ -5310,7 +5310,7 @@
         ],
         "_selectedProfileName": "Default",
         "_unsavedProfile": {
-            "_radius": 4.599999904632568,
+            "_radius": 3.5,
             "_modifierTool": {
                 "_command": 1,
                 "_onlyTheClosest": true,
@@ -5359,16 +5359,16 @@
             "_surfaceDistance": 0.0,
             "_createTempColliders": true,
             "_rotateToTheSurface": false,
-            "_move": true,
-            "_rotate": false,
+            "_move": false,
+            "_rotate": true,
             "_scale": false,
             "_handleSpace": 1,
             "_boxSpace": 1,
-            "_paletteFilter": false,
+            "_paletteFilter": true,
             "_brushFilter": false,
             "_layerFilter": {
                 "serializedVersion": "2",
-                "m_Bits": 4294967295
+                "m_Bits": 55
             },
             "_tagFilter": [
                 "Untagged",
@@ -6064,9 +6064,9 @@
             "_lockedGrid": true,
             "_boundsSnapping": false,
             "_step": {
-                "x": 5.0,
+                "x": 1.0,
                 "y": 1.0,
-                "z": 5.0
+                "z": 1.0
             },
             "_origin": {
                 "x": 0.0,
