@@ -7108,6 +7108,62 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4170872224999596, guid: 63a656a2a2d1a2342bed22ca185e5c28, type: 3}
   m_PrefabInstance: {fileID: 1476949414}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &797886945
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 797886946}
+  - component: {fileID: 797886947}
+  m_Layer: 0
+  m_Name: Marker
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &797886946
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 797886945}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: -1, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 929594690}
+  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
+--- !u!114 &797886947
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 797886945}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b01c4c6ab8f24302816449b24f62efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_StopDistance: 0.01
+  m_MarkerType:
+    rid: 1724515395533799591
+  m_UniqueID:
+    m_SerializedID:
+      m_String: 41e4e958-d9e4-4b1e-9adf-81c0d8da0376
+  references:
+    version: 2
+    RefIds:
+    - rid: 1724515395533799591
+      type: {class: MarkerTypeDirection, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data: 
 --- !u!1001 &798545092
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8466,6 +8522,145 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4159889118618032, guid: 6242782b822ccb541be29698e302495f, type: 3}
   m_PrefabInstance: {fileID: 926370817}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &929594689
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 929594690}
+  - component: {fileID: 929594692}
+  - component: {fileID: 929594691}
+  m_Layer: 0
+  m_Name: DoorTo_MainStreet_R1_Back
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &929594690
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 929594689}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 2.53, y: 0.02983, z: -0.51}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 797886946}
+  m_Father: {fileID: 1744022940}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &929594691
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 929594689}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &929594692
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 929594689}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ecd922218e245e2b85d51f9f08338c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Instructions:
+    m_Instructions:
+    - rid: 1724515395533799627
+    - rid: 1724515395533799582
+  m_TriggerEvent:
+    rid: 1724515395533799580
+  references:
+    version: 2
+    RefIds:
+    - rid: 1724515395533799580
+      type: {class: EventTriggerEnter, ns: GameCreator.Runtime.VisualScripting, asm: GameCreator.Runtime.Core}
+      data:
+        m_Collider:
+          m_Option: 1
+          m_GameObject:
+            m_Property:
+              rid: 1724515395533799581
+    - rid: 1724515395533799581
+      type: {class: GetGameObjectPlayer, ns: GameCreator.Runtime.Characters, asm: GameCreator.Runtime.Core}
+      data: 
+    - rid: 1724515395533799582
+      type: {class: InstructionCommonSceneLoad, ns: GameCreator.Runtime.VisualScripting, asm: GameCreator.Runtime.Core}
+      data:
+        m_Breakpoint: 0
+        m_IsEnabled: 1
+        m_Scene:
+          m_Property:
+            rid: 1724515395533799584
+        m_Mode: 0
+        m_Async: 0
+        m_SceneEntries:
+          m_Entries:
+          - m_Target:
+              m_Property:
+                rid: 1724515395533799586
+            m_Location:
+              m_Property:
+                rid: 1724515395533799587
+    - rid: 1724515395533799584
+      type: {class: GetSceneName, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_SceneName:
+          m_Property:
+            rid: 1724515395533799585
+    - rid: 1724515395533799585
+      type: {class: GetStringString, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_Value: MainStreet_R1_Back
+    - rid: 1724515395533799586
+      type: {class: GetGameObjectPlayer, ns: GameCreator.Runtime.Characters, asm: GameCreator.Runtime.Core}
+      data: 
+    - rid: 1724515395533799587
+      type: {class: GetLocationNavigationMarker, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_Marker:
+          m_Property:
+            rid: 1724515395533799589
+    - rid: 1724515395533799589
+      type: {class: GetGameObjectNavigationMarkerID, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_ID:
+          m_Property:
+            rid: 1724515395533799590
+    - rid: 1724515395533799590
+      type: {class: GetStringString, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_Value: 6cdbb127-c8f0-4757-b176-083aa53e867b
+    - rid: 1724515395533799627
+      type: {class: StopDialogueYarn, ns: , asm: Assembly-CSharp}
+      data:
+        m_Breakpoint: 0
+        m_IsEnabled: 1
 --- !u!1 &931259456
 GameObject:
   m_ObjectHideFlags: 0
@@ -14119,7 +14314,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1793972296288166232, guid: 99855051b0e884f29b95ae90b1d1ccf5, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.51657677
+      value: -0.27
       objectReference: {fileID: 0}
     - target: {fileID: 1793972296288166232, guid: 99855051b0e884f29b95ae90b1d1ccf5, type: 3}
       propertyPath: m_LocalPosition.y
@@ -14127,7 +14322,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1793972296288166232, guid: 99855051b0e884f29b95ae90b1d1ccf5, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.084408045
+      value: 3.61
       objectReference: {fileID: 0}
     - target: {fileID: 1793972296288166232, guid: 99855051b0e884f29b95ae90b1d1ccf5, type: 3}
       propertyPath: m_LocalRotation.w
@@ -15735,6 +15930,38 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 63a656a2a2d1a2342bed22ca185e5c28, type: 3}
+--- !u!1 &1744022939
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1744022940}
+  m_Layer: 0
+  m_Name: Doors
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1744022940
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1744022939}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 6.96626, y: -0.02983, z: 4.15664}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 929594690}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1760979788
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -21639,3 +21866,4 @@ SceneRoots:
   - {fileID: 723526714}
   - {fileID: 55048526}
   - {fileID: 1508831019}
+  - {fileID: 1744022940}
