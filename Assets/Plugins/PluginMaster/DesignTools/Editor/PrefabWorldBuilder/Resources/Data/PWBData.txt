@@ -23,8 +23,8 @@
     "_unsavedChangesAction": 0,
     "_tempCollidersAction": 1,
     "_paletteManager": {
-        "_selectedPaletteIdx": 4,
-        "_selectedBrushIdx": -1,
+        "_selectedPaletteIdx": 0,
+        "_selectedBrushIdx": 0,
         "_showBrushName": false,
         "_viewList": false,
         "_showTabsInMultipleRows": false,
@@ -539,10 +539,10 @@
             "_moduleSizeType": 1,
             "_moduleSize": {
                 "x": 3.0,
-                "y": 3.0,
-                "z": 0.3899763226509094
+                "y": 0.10000000149011612,
+                "z": 1.5
             },
-            "_subtractBrushOffset": false,
+            "_subtractBrushOffset": true,
             "_spacing": {
                 "x": 0.0,
                 "y": 0.0,
@@ -834,7 +834,7 @@
             "_paintOnMeshesWithoutCollider": false,
             "_paintOnSelectedOnly": false,
             "_paintOnPalettePrefabs": false,
-            "_mode": 2,
+            "_mode": 1,
             "_paralellToTheSurface": true,
             "_repeat": false,
             "_flatteningSettings": {
@@ -5168,14 +5168,14 @@
         ],
         "_selectedProfileName": "Default",
         "_unsavedProfile": {
-            "_radius": 1.0,
+            "_radius": 1.2000000476837159,
             "_keepTargetSize": false,
             "_maintainProportions": false,
             "_positionMode": 0,
             "_sameParentasTarget": true,
             "_modifierTool": {
-                "_command": 0,
-                "_onlyTheClosest": false,
+                "_command": 1,
+                "_onlyTheClosest": true,
                 "_outermostPrefabFilter": true,
                 "_allButSelected": false
             },
@@ -6072,9 +6072,9 @@
             "_lockedGrid": true,
             "_boundsSnapping": false,
             "_step": {
-                "x": 3.0,
-                "y": 3.0,
-                "z": 3.0
+                "x": 0.10000000149011612,
+                "y": 1.0,
+                "z": 0.10000000149011612
             },
             "_origin": {
                 "x": 0.0,
