@@ -23,7 +23,7 @@
     "_unsavedChangesAction": 0,
     "_tempCollidersAction": 1,
     "_paletteManager": {
-        "_selectedPaletteIdx": 0,
+        "_selectedPaletteIdx": 1,
         "_selectedBrushIdx": -1,
         "_showBrushName": false,
         "_viewList": false,
@@ -831,10 +831,10 @@
         ],
         "_selectedProfileName": "Default",
         "_unsavedProfile": {
-            "_paintOnMeshesWithoutCollider": false,
+            "_paintOnMeshesWithoutCollider": true,
             "_paintOnSelectedOnly": false,
             "_paintOnPalettePrefabs": false,
-            "_mode": 1,
+            "_mode": 2,
             "_paralellToTheSurface": true,
             "_repeat": false,
             "_flatteningSettings": {
@@ -6078,7 +6078,7 @@
             },
             "_origin": {
                 "x": 0.0,
-                "y": 0.0,
+                "y": 0.8999999761581421,
                 "z": 0.0
             },
             "_rotation": {
