@@ -4,6 +4,9 @@ public enum DAYLOOPSTATE {  };
 
 public class DayGameLoop : Singleton<DayGameLoop>
 {
+
+
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -25,11 +28,11 @@ public class DayGameLoop : Singleton<DayGameLoop>
 
     void StartNewDay()
     {
-        TimeManager.Instance.SetTime(6, 0);
+        TimeManager.Instance.SetTime("06:00");
     }
 
     void EndDay()
     {
-
+        TimeManager.Instance.SetTime("18:00");
     }
 }

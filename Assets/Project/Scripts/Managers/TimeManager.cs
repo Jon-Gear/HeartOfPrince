@@ -22,6 +22,20 @@ public class TimeManager : EditorSingleton<TimeManager>
         isPaused = false;
     }
 
+    public void SetTime(string time)
+    {
+        // Expecting format "HH:mm"
+        if (string.IsNullOrEmpty(time)) return;
+
+        string[] parts = time.Split(':');
+        if (parts.Length != 2) return;
+
+        if (int.TryParse(parts[0], out int hours) && int.TryParse(parts[1], out int minutes))
+        {
+            SetTime(hours, minutes);
+        }
+    }
+
     public void SetTime(int _hours, int _minutes)
     {
         _hours = Mathf.Clamp(_hours, 0, 23);
