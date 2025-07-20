@@ -16,14 +16,14 @@ using Yarn.Unity;
 public class PlayDialogueYarn : Instruction
 {
     //[SerializeField] private PropertyGetGameObject m_Dialogue = GetGameObjectDialogue.Create();
-    [SerializeField] private CharacterDialogue characterDialogue;
+    [SerializeField] private TDialogue dialogue;
     
     public override string Title => string.Format(
             "Play Dialogue"
         );
     protected override Task Run(Args args)
     {
-        characterDialogue.Talk();
+        dialogue.Talk();
         return DefaultResult;
     }
 }

@@ -1,0 +1,47 @@
+title: task_munir_2_inactive
+---
+Munir: Assalamaleykum Prince!  
+Prince: Walaykum assalam, Munir.  
+Munir: We’re expecting a big turnout for Jumu’ah. I could use a bit of help with prep.  
+Prince: What do you need?  
+Munir: Three quick things. First, check if the donation box inside the mosque is locked.  
+Munir: Then, near the entrance — there's a stack of prayer mats. Bring them inside.  
+Munir: Finally, at the front gate — make sure the latch is working and the gate is closed. I don’t want kids running into the street.  
+Prince: Got it. I’ll handle it.  
+<<activateQuest "Munir/Tasks/2">>
+<<trackQuest "Munir/Tasks/2">>
+===
+
+
+title: task_munir_2_active
+---
+Munir: Have you checked everything yet, Prince?  
+Prince: Working on it. Got a few spots to hit.  
+Munir: Alright. Just make sure it’s all done before people start arriving.  
+===
+
+title: task_munir_2_completed
+---
+Munir: I checked everything. The box is locked, the mats are inside, and the gate's shut.  
+Prince: You can count on me.  
+Munir: Alhamdulillah. That kind of help means more than you know.  
+Prince: Anything for the masjid.  
+===
+
+
+title: task_munir_2_abandoned
+---
+Munir: Prince... none of the things were checked. I thought you said you’d help.  
+Prince: Something came up.  
+Munir: I understand. But follow-through is what makes a man dependable.  
+Prince: Yeah… I get it.   
+===
+
+title: task_munir_2_failed
+---
+Munir: The people are already here, and nothing was done.  
+Prince: I lost track of time.  
+Munir: Sometimes all it takes is one missed detail to create disorder.  
+Prince: That one’s on me. I’ll make it right next time.  
+===
+

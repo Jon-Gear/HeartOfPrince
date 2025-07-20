@@ -2,6 +2,7 @@
 using System.Drawing;
 using GameCreator.Runtime.Common;
 using GameCreator.Runtime.VisualScripting;
+using UnityEngine;
 
 /*
 List of Relevant Time Events:
@@ -15,20 +16,21 @@ List of Relevant Time Events:
 */
 
 
-[Title("On Update Clock")]
-[Description("This is an example event")]
+[Title("On Day Time Event")]
+[Description("Trigger when a certain day time is achieved")]
 [Image(typeof(IconClock), ColorTheme.Type.Yellow)]
-[Category("Koshaki/Time Events/On Update Clock")]
+[Category("Time Events/On Day Time Event")]
 [Serializable]
-public class TimeEvent : Event
+public class TimeEvent : GameCreator.Runtime.VisualScripting.Event
 {
+    [SerializeField] private DAYTIME DAYTIME = DAYTIME.Morning;
     protected override void OnUpdate(Trigger trigger)    
-    { 
-        (int hours, int minutes) = TimeManager.Instance.GetTime();
+    {
+        base.OnUpdate(trigger);
 
-        if(false)
+        if(TimeManager.Instance.GetDayTime() == DAYTIME)
         {
-            //_ = trigger.Execute(this.Self);
+            _ = trigger.Execute(this.Self);
         }
     }
 }

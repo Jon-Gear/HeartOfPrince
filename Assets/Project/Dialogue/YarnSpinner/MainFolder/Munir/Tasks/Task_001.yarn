@@ -1,0 +1,48 @@
+title: task_munir_1_inactive
+---
+Munir: Assalamaleykum Prince!  
+Prince: Walaykum assalam.  
+Munir: There’s a mess in front of the masjid near the dumpster. Garbage scattered everywhere.  
+Prince: You want me to clean it up?  
+Munir: Yes. It’s unsightly, and the kids keep playing near it. We should keep this place clean.  
+Prince: Alright. I’ll take care of it.  
+Munir: JazakAllah khair. It’s important to keep our surroundings tidy. 
+Munir: Let me know when you’re done. Before Maghrib would be best.
+Prince: Sure, I’ll make sure it’s done by then.
+<<activateQuest "Munir/Tasks/1">>
+<<trackQuest "Munir/Tasks/1">>
+===
+
+
+title: task_munir_1_active
+---
+Munir: Did you manage to clean the dumpster area?  
+Prince: Not yet. I’m working on it.  
+Munir: Alright. Just make sure it’s done before Maghrib.  
+===
+
+title: task_munir_1_completed
+---
+Munir: I checked the dumpster. It’s spotless now.  
+Prince: All cleaned up, like you asked.  
+Munir: JazakAllah khair, Prince. A clean space benefits everyone.  
+Prince: No problem. Glad to help.
+===
+
+
+title: task_munir_1_abandoned
+---
+Munir: The dumpster area is still a mess. I thought you agreed to clean it?  
+Prince: Something came up. I didn’t get to it.  
+Munir: I understand. But keeping your word matters more than the task itself.  
+Prince: You’re right. I’ll do better.   
+===
+
+title: task_munir_1_failed
+---
+Munir: I just saw the dumpster. The trash is still there, and Maghrib has passed.  
+Prince: I forgot.  
+Munir: Trust comes from small things like this. Think about that.  
+Prince: I will. Won’t happen again.  
+===
+

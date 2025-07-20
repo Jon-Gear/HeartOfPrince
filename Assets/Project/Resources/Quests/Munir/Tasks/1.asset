@@ -10,27 +10,27 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1c372b025c8c4d92bf11f951ee3d5042, type: 3}
-  m_Name: Test Quest
+  m_Name: 1
   m_EditorClassIdentifier: 
   m_Title:
     m_Property:
-      rid: 1724515053163511934
+      rid: 1724515069182870171
   m_Description:
     m_Property:
-      rid: 1724515053163511939
+      rid: 1724515069182870176
   m_Color:
     m_Property:
-      rid: 1724515053163511936
+      rid: 1724515069182870173
   m_Sprite:
     m_Property:
-      rid: 1724515053163511937
+      rid: 1724515069182870174
   m_Type: 0
   m_SortOrder: 0
   m_UniqueId:
     m_SerializedID:
-      m_String: 611271f2-3e09-4148-9c14-e837e8899061
+      m_String: 7d272be2-623f-4f28-b19a-eacb1dca42cd
   m_Tasks:
-    rid: 1724515053163511938
+    rid: 1724515069182870175
   m_OnActivate:
     m_Instructions:
       m_Instructions: []
@@ -39,7 +39,8 @@ MonoBehaviour:
       m_Instructions: []
   m_OnComplete:
     m_Instructions:
-      m_Instructions: []
+      m_Instructions:
+      - rid: 8339121058404893095
   m_OnAbandon:
     m_Instructions:
       m_Instructions: []
@@ -49,65 +50,66 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 1724515053163511934
+    - rid: 1724515069182870171
       type: {class: GetStringString, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
-        m_Value: Test Quest
-    - rid: 1724515053163511936
+        m_Value: Dirty Dumpster
+    - rid: 1724515069182870173
       type: {class: GetColorColorsWhite, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data: 
-    - rid: 1724515053163511937
+    - rid: 1724515069182870174
       type: {class: GetSpriteNone, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data: 
-    - rid: 1724515053163511938
+    - rid: 1724515069182870175
       type: {class: TasksTree, ns: GameCreator.Runtime.Quests, asm: GameCreator.Runtime.Quests}
       data:
-        m_Dirty: 41724
+        m_Dirty: 69383
         m_Data:
-          m_Keys: 41c2b369
+          m_Keys: fd4d75ec
           m_Values:
-          - m_Id: 1773388353
+          - m_Id: -327856643
             m_Value:
-              rid: 1724515053163511940
+              rid: 1724515069182870177
         m_Nodes:
-          m_Keys: 41c2b369
+          m_Keys: fd4d75ec
           m_Values:
-          - m_Id: 1773388353
+          - m_Id: -327856643
             m_Parent: -1
             m_Children: 
-        m_Roots: 41c2b369
-    - rid: 1724515053163511939
+        m_Roots: fd4d75ec
+    - rid: 1724515069182870176
       type: {class: GetStringTextArea, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
         m_Text:
-          m_Text: A test quest.
-    - rid: 1724515053163511940
+          m_Text: The dumpster in front of the masjid is a mess. Clean it up before
+            Maghrib so that you can earn trust from Munir.
+    - rid: 1724515069182870177
       type: {class: Task, ns: GameCreator.Runtime.Quests, asm: GameCreator.Runtime.Quests}
       data:
         m_Completion: 0
         m_IsHidden: 0
         m_Name:
           m_Property:
-            rid: 1724515053163511941
+            rid: 1724515069182870178
         m_Description:
           m_Property:
-            rid: 1724515053163511942
+            rid: 1724515069182870179
         m_Color:
           m_Property:
-            rid: 1724515053163511943
+            rid: 1724515069182870180
         m_Sprite:
           m_Property:
-            rid: 1724515053163511944
+            rid: 1724515069182870181
         m_UseCounter: 0
         m_CountTo:
           m_Property:
-            rid: 1724515053163511945
+            rid: 1724515069182870182
         m_ValueFrom:
           m_Property:
-            rid: 1724515053163511946
+            rid: 1724515069182870183
         m_CheckWhen:
           m_Event:
-            rid: 1724515053163511947
+            rid: 1724515069182870184
         m_OnActivate:
           m_Instructions:
             m_Instructions: []
@@ -123,26 +125,26 @@ MonoBehaviour:
         m_OnFail:
           m_Instructions:
             m_Instructions: []
-    - rid: 1724515053163511941
+    - rid: 1724515069182870178
       type: {class: GetStringString, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
-        m_Value: Task 1
-    - rid: 1724515053163511942
+        m_Value: Clean up the dumpster
+    - rid: 1724515069182870179
       type: {class: GetStringTextArea, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
         m_Text:
           m_Text: 
-    - rid: 1724515053163511943
+    - rid: 1724515069182870180
       type: {class: GetColorColorsWhite, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data: 
-    - rid: 1724515053163511944
+    - rid: 1724515069182870181
       type: {class: GetSpriteNone, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data: 
-    - rid: 1724515053163511945
+    - rid: 1724515069182870182
       type: {class: GetDecimalDecimal, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
         m_Value: 3
-    - rid: 1724515053163511946
+    - rid: 1724515069182870183
       type: {class: GetDecimalGlobalName, ns: GameCreator.Runtime.Variables, asm: GameCreator.Runtime.Core}
       data:
         m_Variable:
@@ -152,6 +154,29 @@ MonoBehaviour:
           m_Name:
             m_String: 
             m_ID: 0
-    - rid: 1724515053163511947
+    - rid: 1724515069182870184
       type: {class: EventOnLateUpdate, ns: GameCreator.Runtime.VisualScripting, asm: GameCreator.Runtime.Core}
       data: 
+    - rid: 8339121058404893095
+      type: {class: InstructionQuestTaskValue, ns: GameCreator.Runtime.Quests, asm: GameCreator.Runtime.Quests}
+      data:
+        m_Breakpoint: 0
+        m_IsEnabled: 1
+        m_Journal:
+          m_Property:
+            rid: 8339121058404893096
+        m_Task:
+          m_Quest: {fileID: 11400000, guid: 74614816200e47b4591310137b3cd610, type: 2}
+          m_TaskId: -1672045661
+        m_Value:
+          m_Operation: 1
+          m_Value:
+            m_Property:
+              rid: 8339121058404893097
+    - rid: 8339121058404893096
+      type: {class: GetGameObjectPlayer, ns: GameCreator.Runtime.Characters, asm: GameCreator.Runtime.Core}
+      data: 
+    - rid: 8339121058404893097
+      type: {class: GetDecimalDecimal, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_Value: 10

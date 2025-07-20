@@ -36,6 +36,43 @@ public class TimeManager : EditorSingleton<TimeManager>
         }
     }
 
+    public bool IsTimeWithin(string timeStart, string timeEnd)
+    {
+        // Expecting format "HH:mm"
+        if (string.IsNullOrEmpty(timeStart) || string.IsNullOrEmpty(timeEnd)) return false;
+
+        string[] parts_1 = timeStart.Split(':');
+        string[] parts_2 = timeEnd.Split(':');
+
+        if (parts_1.Length != 2 || parts_2.Length != 2) return false;
+
+        if (int.TryParse(parts_1[0], out int hours_1) && int.TryParse(parts_1[1], out int minutes_1) &&
+            int.TryParse(parts_2[0], out int hours_2) && int.TryParse(parts_2[1], out int minutes_2))
+        {
+            hours_1 = Mathf.Clamp(hours_1, 0, 23);
+            minutes_1 = Mathf.Clamp(minutes_1, 0, 59);
+            float start = (hours_1 + (minutes_1 / 60f)) / 24f;
+
+            hours_2 = Mathf.Clamp(hours_2, 0, 23);
+            minutes_2 = Mathf.Clamp(minutes_2, 0, 59);
+            float end = (hours_2 + (minutes_2 / 60f)) / 24f;
+
+            if(start < now && now < end)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+
     public void SetTime(int _hours, int _minutes)
     {
         _hours = Mathf.Clamp(_hours, 0, 23);

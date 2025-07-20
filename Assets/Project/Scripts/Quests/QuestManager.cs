@@ -1,4 +1,5 @@
 using GameCreator.Runtime.Common;
+using GameCreator.Runtime.Dialogue;
 using GameCreator.Runtime.Quests;
 using System.Collections.Generic;
 using UnityEngine;
@@ -49,6 +50,15 @@ public class QuestManager : Singleton<QuestManager>
         _ = journal.SetTaskValue(quest, taskId, newValue);
     }
 
+    public State GetQuestState(string questName)
+    {
+        if (journal == null) return State.Inactive;
+        Quest quest = Resources.Load<Quest>("Quests/" + questName);
+        if (quest == null) return State.Inactive;
+        
+        return journal.GetQuestState(quest);
+
+    }
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created

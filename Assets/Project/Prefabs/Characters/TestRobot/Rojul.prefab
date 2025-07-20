@@ -1553,28 +1553,28 @@ MonoBehaviour:
       rid: 3582672023768269325
   m_RuntimeData:
     m_Overrides:
-    - rid: 1724515230915232187
+    - rid: 8339121052726067569
   references:
     version: 2
     RefIds:
-    - rid: 1724515230915232187
+    - rid: 3582672023768269325
+      type: {class: GetDecimalDecimal, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_Value: 0.5
+    - rid: 8339121052726067569
       type: {class: Parameter, ns: GameCreator.Runtime.Behavior, asm: GameCreator.Runtime.Behavior}
       data:
         m_Breakpoint: 0
         m_IsEnabled: 1
         m_Value:
-          rid: 1724515230915232188
+          rid: 8339121052726067570
         m_Name: Social
-    - rid: 1724515230915232188
+    - rid: 8339121052726067570
       type: {class: ValueStat, ns: GameCreator.Runtime.Stats, asm: GameCreator.Runtime.Stats}
       data:
         m_Breakpoint: 0
         m_IsEnabled: 1
         m_Value: {fileID: 0}
-    - rid: 3582672023768269325
-      type: {class: GetDecimalDecimal, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
-      data:
-        m_Value: 0.5
 --- !u!114 &4365629744012632062
 MonoBehaviour:
   m_ObjectHideFlags: 0

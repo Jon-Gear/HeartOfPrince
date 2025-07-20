@@ -1,12 +1,12 @@
 using UnityEngine;
 
-public class CharacterDialogue : MonoBehaviour
+public class CharacterDialogue : TDialogue
 {
     [Header("Character Dialogue Settings")]
     [SerializeField] private Actor actor;
     public int maxVariants = 3;             // Number of monologue variants available per context
 
-    public void Talk()
+    public override void Talk()
     {
         if (DialogueManager.Instance.IsDialogueRunning())
         {
