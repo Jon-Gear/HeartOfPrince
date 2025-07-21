@@ -126,5 +126,6 @@ public class Actor : MonoBehaviour
 
     private void OnDestroy()
     {
+        ActorRegistry.Instance.UnregisterActor(this);
     }
 }

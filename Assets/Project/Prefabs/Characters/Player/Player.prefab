@@ -1659,8 +1659,6 @@ GameObject:
   - component: {fileID: 2596650277260859950}
   - component: {fileID: 8908693421579515348}
   - component: {fileID: 1665693158485693602}
-  - component: {fileID: 8703177865891526281}
-  - component: {fileID: 7051268489205438294}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -1937,69 +1935,6 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
---- !u!114 &8703177865891526281
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4715974037236951035}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2e913cd1061e436087d7629ff35a332c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_TrackMode: 0
-  m_Quests:
-    m_Quests:
-      m_Keys: []
-      m_Values: []
-  m_Tasks:
-    m_Tasks:
-      m_Keys: []
-      m_Values: []
---- !u!114 &7051268489205438294
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4715974037236951035}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0ecd922218e245e2b85d51f9f08338c2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Instructions:
-    m_Instructions:
-    - rid: 8339121058404893058
-  m_TriggerEvent:
-    rid: 8339121058404893041
-  references:
-    version: 2
-    RefIds:
-    - rid: 8339121058404893041
-      type: {class: EventOnStart, ns: GameCreator.Runtime.VisualScripting, asm: GameCreator.Runtime.Core}
-      data: 
-    - rid: 8339121058404893058
-      type: {class: InstructionQuestsActivate, ns: GameCreator.Runtime.Quests, asm: GameCreator.Runtime.Quests}
-      data:
-        m_Breakpoint: 0
-        m_IsEnabled: 1
-        m_Journal:
-          m_Property:
-            rid: 8339121058404893059
-        m_Quest:
-          m_Property:
-            rid: 8339121058404893060
-        m_WaitToComplete: 0
-    - rid: 8339121058404893059
-      type: {class: GetGameObjectPlayer, ns: GameCreator.Runtime.Characters, asm: GameCreator.Runtime.Core}
-      data: 
-    - rid: 8339121058404893060
-      type: {class: GetQuestInstance, ns: GameCreator.Runtime.Quests, asm: GameCreator.Runtime.Quests}
-      data:
-        m_Quest: {fileID: 11400000, guid: 74614816200e47b4591310137b3cd610, type: 2}
 --- !u!1 &4746549492132298227
 GameObject:
   m_ObjectHideFlags: 0

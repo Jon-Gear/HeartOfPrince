@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Yarn.Unity;
+using UnityEngine.SceneManagement;
 
 
 public class CharacterView : DialogueViewBase 
@@ -96,6 +97,11 @@ public class CharacterView : DialogueViewBase
 
         if (dialogueBubbleRect.gameObject.activeInHierarchy && DialogueManager.Instance.IsDialogueRunning())
         {
+            if(ActorRegistry.Instance.currentSpeaker == null)
+            {
+                Debug.LogWarning("Dialogue bubble position update failed: current speaker is null.");
+                return;
+            }
             dialogueBubbleRect.anchoredPosition = WorldToAnchoredPosition(dialogueBubbleRect, ActorRegistry.Instance.currentSpeaker.positionWithOffset, bubbleMargin);
         }
 

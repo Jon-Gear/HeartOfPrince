@@ -1,5 +1,6 @@
 using Unity.Cinemachine;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class CinemachineManager : Singleton<CinemachineManager>
 {
@@ -22,13 +23,25 @@ public class CinemachineManager : Singleton<CinemachineManager>
         closeUpShot.Priority = 1;
     }
 
-    private void Awake()
-    {   
-        brain = Camera.main.GetComponent<CinemachineBrain>();
+    public void UpdateCinemachineConfiner(BoxCollider newConfine)
+    {
+        longShot.GetComponent<CinemachineConfiner3D>().BoundingVolume = newConfine;
+        closeUpShot.GetComponent<CinemachineConfiner3D>().BoundingVolume = newConfine;
+    }
 
+    protected override void Awake()
+    {
+        base.Awake();
+        brain = Camera.main.GetComponent<CinemachineBrain>();
         longShot.Follow = cameraTarget.transform;
         closeUpShot.Follow = cameraTarget.transform;
-
+        
+    }
+    protected override void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        cameraTarget.ClearTargets();
+        Debug.Log($"New scene loaded: {scene.name}");
+        // Perform any logic you want when a new scene is entered
     }
 
 

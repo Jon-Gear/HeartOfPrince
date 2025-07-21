@@ -1,6 +1,7 @@
 using GameCreator.Runtime.Dialogue;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class ActorRegistry : Singleton<ActorRegistry>
 {
@@ -55,5 +56,12 @@ public class ActorRegistry : Singleton<ActorRegistry>
         {
             currentSpeaker = playerActor;
         }
+    }
+
+    protected override void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        playerActor = null;
+        currentSpeaker = null;
+        actors.Clear();
     }
 }

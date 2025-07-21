@@ -6,10 +6,15 @@ using UnityEngine;
 
 public class QuestManager : Singleton<QuestManager>
 {
-    [SerializeField] Journal journal;
-    private void Awake()
+    [SerializeField] public Journal journal;
+    protected override void Awake()
     {
-        journal = FindFirstObjectByType<Journal>();
+        base.Awake();
+        journal = GetComponent<Journal>();
+        if(journal == null)
+        {
+            Debug.LogError("Cannot find journal component on QuestManager. Please add a Journal component to this GameObject.");
+        }
     }
 
     public void ActivateQuest(string questName)
@@ -58,6 +63,14 @@ public class QuestManager : Singleton<QuestManager>
         
         return journal.GetQuestState(quest);
 
+    }
+
+    public State GetQuestState(Quest quest)
+    {
+        if (journal == null) return State.Inactive;
+        if (quest == null) return State.Inactive;
+        
+        return journal.GetQuestState(quest);
     }
 
 

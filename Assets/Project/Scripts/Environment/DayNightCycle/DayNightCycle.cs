@@ -2,8 +2,8 @@ using GameCreator.Runtime.Common;
 using Unity.Multiplayer.Center.Common;
 using UnityEngine;
 
-
-[ExecuteAlways] public class DayNightCycle : Singleton<DayNightCycle>
+// should not be singleton
+[ExecuteAlways] public class DayNightCycle : MonoBehaviour
 {   
     [Header("Sun Light")]
     [SerializeField] private bool enableSun = true;
@@ -16,11 +16,6 @@ using UnityEngine;
 
     [Header("Rotations")]
     [SerializeField] private Transform dailyRotation;
-
-    private void Awake()
-    {
-        
-    }
 
     private void Start()
     {

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
 {
@@ -30,24 +31,40 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
                     }
                 }
 
+
                 return _instance;
             }
+        }
+    }
+    protected virtual void Awake()
+    {
+        if (_instance == null)
+        {
+            _instance = this as T;
+            DontDestroyOnLoad(gameObject);
+            SceneManager.sceneLoaded += OnSceneLoaded;
+        }
+        else if (_instance != this)
+        {
+            Destroy(gameObject); // Kill the duplicate
         }
     }
 
     protected virtual void OnApplicationQuit()
     {
-        //_quitting = true;
+    
     }
 
     protected virtual void OnDestroy()
     {
-        /*
-        if (_instance == this)
+        if (Instance == this)
         {
-            _quitting = true;
+            SceneManager.sceneLoaded -= OnSceneLoaded;
         }
-        */
+    }
+
+    protected virtual void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
     }
 }
 

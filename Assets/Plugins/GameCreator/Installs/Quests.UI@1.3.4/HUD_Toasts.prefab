@@ -1513,19 +1513,19 @@ MonoBehaviour:
       data:
         m_Journal:
           m_Property:
-            rid: 4340017066418373015
+            rid: 8339121081156108476
         m_Quest:
           m_Option: 0
           m_Quest:
             m_Property:
               rid: 4340017066418373016
-    - rid: 4340017066418373015
-      type: {class: GetGameObjectPlayer, ns: GameCreator.Runtime.Characters, asm: GameCreator.Runtime.Core}
-      data: 
     - rid: 4340017066418373016
       type: {class: GetQuestInstance, ns: GameCreator.Runtime.Quests, asm: GameCreator.Runtime.Quests}
       data:
         m_Quest: {fileID: 0}
+    - rid: 8339121081156108476
+      type: {class: GetGameObjectPlayer, ns: GameCreator.Runtime.Characters, asm: GameCreator.Runtime.Core}
+      data: 
 --- !u!1 &3787437639277554698
 GameObject:
   m_ObjectHideFlags: 0
