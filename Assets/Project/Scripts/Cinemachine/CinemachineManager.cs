@@ -40,8 +40,6 @@ public class CinemachineManager : Singleton<CinemachineManager>
     protected override void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         cameraTarget.ClearTargets();
-        Debug.Log($"New scene loaded: {scene.name}");
-        // Perform any logic you want when a new scene is entered
     }
 
 

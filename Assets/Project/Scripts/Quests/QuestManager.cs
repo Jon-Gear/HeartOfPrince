@@ -11,10 +11,6 @@ public class QuestManager : Singleton<QuestManager>
     {
         base.Awake();
         journal = GetComponent<Journal>();
-        if(journal == null)
-        {
-            Debug.LogError("Cannot find journal component on QuestManager. Please add a Journal component to this GameObject.");
-        }
     }
 
     public void ActivateQuest(string questName)

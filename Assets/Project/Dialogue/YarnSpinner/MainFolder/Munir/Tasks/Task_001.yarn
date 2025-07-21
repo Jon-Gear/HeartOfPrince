@@ -1,19 +1,17 @@
 title: task_munir_1_inactive
 ---
-
-// Munir: Assalamaleykum Prince!  
-// Prince: Walaykum assalam.  
-// Munir: There’s a mess in front of the masjid near the dumpster. Garbage scattered everywhere.  
-// Prince: You want me to clean it up?  
-// Munir: Yes. It’s unsightly, and the kids keep playing near it. We should keep this place clean.  
-// Prince: Alright. I’ll take care of it.  
-// Munir: JazakAllah khair. It’s important to keep our surroundings tidy. 
-// Munir: Let me know when you’re done. Before Maghrib would be best.
-// Prince: Sure, I’ll make sure it’s done by then.
-Munir: Garbage
-Prince: I will clean it up.
-<<activateQuest "Munir/Tasks/1">>
-<<trackQuest "Munir/Tasks/1">>
+Munir: Assalamaleykum Prince!  
+Prince: Walaykum assalam.  
+Munir: There’s a mess in front of the masjid near the dumpster. Garbage scattered everywhere.  
+Prince: You want me to clean it up?  
+Munir: Yes. It’s unsightly, and the kids keep playing near it. We should keep this place clean.  
+Prince: Alright. I’ll take care of it.  
+Munir: Let me know when you’re done. Before Maghrib would be best.
+Prince: Sure, I’ll make sure it’s done by then.
+// Munir: Garbage
+// Prince: I will clean it up.
+<<activateQuest "Munir/Tasks/MunirTask1">>
+<<trackQuest "Munir/Tasks/MunirTask1">>
 ===
 
 

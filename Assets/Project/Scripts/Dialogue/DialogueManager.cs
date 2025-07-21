@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Yarn.Unity;
 
 // Wrapper class for DialogueRunner. Must be on the same GameObject as the DialogueRunner component.
@@ -62,5 +63,12 @@ public class DialogueManager : Singleton<DialogueManager>
     public void StopInnerMonologue()
     {
         innerMonologueRunner.Stop();
+    }
+
+    protected override void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        StopDialogue();
+        StopInnerMonologue();
+        StopBackgroundDialogue();
     }
 }

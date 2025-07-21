@@ -7,6 +7,10 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
     private static object _lock = new object();
     private static bool _quitting = false;
     
+    public static bool IsQuitting
+    {
+        get { return _quitting; }
+    }
     public static T Instance
     {
         get
@@ -25,9 +29,7 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
 
                     if (_instance == null)
                     {
-                        GameObject singletonObject = new GameObject(typeof(T).Name);
-                        _instance = singletonObject.AddComponent<T>();
-                        DontDestroyOnLoad(singletonObject);
+                        Debug.LogError($"[Singleton] Instance '{typeof(T)}' not found in the scene.");
                     }
                 }
 
@@ -52,7 +54,7 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
 
     protected virtual void OnApplicationQuit()
     {
-    
+        _quitting = true;
     }
 
     protected virtual void OnDestroy()

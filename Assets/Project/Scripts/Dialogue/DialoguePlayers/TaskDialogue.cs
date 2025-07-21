@@ -48,7 +48,7 @@ public class TaskDialogue : TDialogue
 
     string GetTaskPath()
     {
-        return $"{actor.actorName}/Tasks/{taskID}";
+        return $"{actor.actorName}/Tasks/{actor.actorName}Task{taskID}";
     }
 
 }
