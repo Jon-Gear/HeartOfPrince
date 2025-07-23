@@ -7,10 +7,13 @@ using UnityEngine;
 public class QuestManager : Singleton<QuestManager>
 {
     [SerializeField] public Journal journal;
+    [SerializeField] public GameObject deadlines;
     protected override void Awake()
     {
         base.Awake();
         journal = GetComponent<Journal>();
+
+        //ActivateQuest("MainQuest"); // Activate the main quest by default, delete later
     }
 
     public void ActivateQuest(string questName)
@@ -68,6 +71,12 @@ public class QuestManager : Singleton<QuestManager>
         
         return journal.GetQuestState(quest);
     }
+
+    public void AddTaskDeadline(PickTask m_Task, Deadline deadline)
+    {
+        deadlines.AddComponent<TaskDeadline>().Initialize(m_Task, deadline);
+    }
+
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created

@@ -71,11 +71,13 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
 }
 
 
-[ExecuteAlways] // Allows execution in edit mode
+
+[ExecuteAlways]
 public class EditorSingleton<T> : MonoBehaviour where T : MonoBehaviour
 {
     private static T _instance;
     private static object _lock = new object();
+    private static bool _subscribedToSceneLoad = false;
 
     public static T Instance
     {
@@ -91,7 +93,15 @@ public class EditorSingleton<T> : MonoBehaviour where T : MonoBehaviour
                     {
                         GameObject singletonObject = new GameObject(typeof(T).Name);
                         _instance = singletonObject.AddComponent<T>();
-                        DontDestroyOnLoad(singletonObject);
+
+                        if (Application.isPlaying)
+                            DontDestroyOnLoad(singletonObject);
+                    }
+
+                    if (Application.isPlaying && !_subscribedToSceneLoad)
+                    {
+                        SceneManager.sceneLoaded += OnSceneLoaded;
+                        _subscribedToSceneLoad = true;
                     }
                 }
 
@@ -100,4 +110,46 @@ public class EditorSingleton<T> : MonoBehaviour where T : MonoBehaviour
         }
     }
 
+    protected virtual void Awake()
+    {
+        if (_instance == null)
+        {
+            _instance = this as T;
+
+            if (Application.isPlaying)
+            {
+                DontDestroyOnLoad(gameObject);
+                if (!_subscribedToSceneLoad)
+                {
+                    SceneManager.sceneLoaded += OnSceneLoaded;
+                    _subscribedToSceneLoad = true;
+                }
+            }
+        }
+        else if (_instance != this)
+        {
+            if (Application.isPlaying)
+                Destroy(gameObject);
+            else
+                DestroyImmediate(gameObject);
+        }
+    }
+
+    protected virtual void OnDestroy()
+    {
+        if (_instance == this && Application.isPlaying)
+        {
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+            _subscribedToSceneLoad = false;
+        }
+    }
+
+    // Optional scene callback for runtime use
+    protected static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // Override in subclass if needed
+    }
+
+    // Optional helper to check runtime
+    public static bool IsRuntime => Application.isPlaying;
 }

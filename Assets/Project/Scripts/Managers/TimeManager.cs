@@ -143,6 +143,48 @@ public class TimeManager : EditorSingleton<TimeManager>
         return (hours, minutes);
     }
 
+    public string GetTimeString()
+    {
+        return $"{hours:D2}:{minutes:D2}";
+    }
+
+    public (int, int) GetTimeFromHoursAndMinutesFromNow(int hours, int minutes)
+    {
+        // Convert the current time to total minutes
+        float totalMinutes = now * 1440f; // 1440 minutes in a day
+        // Add the specified hours and minutes
+        totalMinutes += (hours * 60) + minutes;
+        // Normalize to a day
+        totalMinutes %= 1440f;
+        // Calculate new hours and minutes
+        int newHours = Mathf.FloorToInt(totalMinutes / 60);
+        int newMinutes = Mathf.FloorToInt(totalMinutes % 60);
+        return (newHours, newMinutes);
+    }
+
+    public string GetTimeFromHoursAndMinutesFromNowString(string time)
+    {
+        // Expecting format "HH:mm"
+        if (string.IsNullOrEmpty(time)) return "00:00";
+
+        string[] parts = time.Split(':');
+        if (parts.Length != 2) return "00:00";
+
+        if (int.TryParse(parts[0], out int hours) && int.TryParse(parts[1], out int minutes))
+        {
+            var t = GetTimeFromHoursAndMinutesFromNow(hours, minutes);
+            return $"{t.Item1:D2}:{t.Item2:D2}";
+        }
+        else
+        {
+            return "00:00"; // Default to midnight
+        }
+
+    }
+
+
+
+
     public float GetTimePercentage()
     {
         return now;

@@ -33,7 +33,8 @@ MonoBehaviour:
     rid: 8339121058404893011
   m_OnActivate:
     m_Instructions:
-      m_Instructions: []
+      m_Instructions:
+      - rid: 8339121124088480221
   m_OnDeactivate:
     m_Instructions:
       m_Instructions: []
@@ -396,3 +397,14 @@ MonoBehaviour:
     - rid: 8339121058404893244
       type: {class: EventOnLateUpdate, ns: GameCreator.Runtime.VisualScripting, asm: GameCreator.Runtime.Core}
       data: 
+    - rid: 8339121124088480221
+      type: {class: AddTaskDeadline, ns: , asm: Assembly-CSharp}
+      data:
+        m_Breakpoint: 0
+        m_IsEnabled: 1
+        m_Task:
+          m_Quest: {fileID: 11400000}
+          m_TaskId: 1341926685
+        m_Deadline:
+          Time: 18:00
+          WeekDay: 4
