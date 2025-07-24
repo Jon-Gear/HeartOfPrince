@@ -23,7 +23,7 @@
     "_unsavedChangesAction": 0,
     "_tempCollidersAction": 1,
     "_paletteManager": {
-        "_selectedPaletteIdx": 0,
+        "_selectedPaletteIdx": 1,
         "_selectedBrushIdx": -1,
         "_showBrushName": false,
         "_viewList": false,
@@ -194,9 +194,9 @@
         "_unsavedProfile": {
             "_moduleSizeType": 2,
             "_moduleSize": {
-                "x": 2.5,
+                "x": 5.0,
                 "y": 1.0,
-                "z": 2.5
+                "z": 5.0
             },
             "_subtractBrushOffset": true,
             "_spacing": {
@@ -375,7 +375,7 @@
                     }
                 }
             ],
-            "_selectedSizeName": "Indoors_2.5x2.5"
+            "_selectedSizeName": "Street_5x5"
         }
     },
     "_wallManager": {
@@ -845,7 +845,7 @@
             },
             "_flattenTerrain": false,
             "_avoidOverlapping": false,
-            "_snapRotationToGrid": false,
+            "_snapRotationToGrid": true,
             "_paintTool": {
                 "_parentGlobalId": "",
                 "_autoCreateParent": true,
@@ -5169,14 +5169,14 @@
         ],
         "_selectedProfileName": "Default",
         "_unsavedProfile": {
-            "_radius": 1.2000000476837159,
+            "_radius": 2.5,
             "_keepTargetSize": false,
             "_maintainProportions": false,
             "_positionMode": 0,
             "_sameParentasTarget": true,
             "_modifierTool": {
-                "_command": 1,
-                "_onlyTheClosest": true,
+                "_command": 0,
+                "_onlyTheClosest": false,
                 "_outermostPrefabFilter": true,
                 "_allButSelected": false
             },
@@ -6062,21 +6062,21 @@
             "_snappingEnabled": true,
             "_snappingOn": {
                 "x": true,
-                "y": true,
-                "z": false
-            },
-            "_visibleGrid": false,
-            "_gridOn": {
-                "x": false,
                 "y": false,
                 "z": true
+            },
+            "_visibleGrid": true,
+            "_gridOn": {
+                "x": false,
+                "y": true,
+                "z": false
             },
             "_lockedGrid": true,
             "_boundsSnapping": false,
             "_step": {
-                "x": 0.10000000149011612,
+                "x": 1.0,
                 "y": 2.996999979019165,
-                "z": 0.10000000149011612
+                "z": 1.0
             },
             "_origin": {
                 "x": 0.0,
