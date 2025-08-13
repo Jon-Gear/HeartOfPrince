@@ -91,11 +91,11 @@ public class EditorSingleton<T> : MonoBehaviour where T : MonoBehaviour
 
                     if (_instance == null)
                     {
-                        GameObject singletonObject = new GameObject(typeof(T).Name);
-                        _instance = singletonObject.AddComponent<T>();
+                        //GameObject singletonObject = new GameObject(typeof(T).Name);
+                        //_instance = singletonObject.AddComponent<T>();
 
-                        if (Application.isPlaying)
-                            DontDestroyOnLoad(singletonObject);
+                        //if (Application.isPlaying)
+                            //DontDestroyOnLoad(singletonObject);
                     }
 
                     if (Application.isPlaying && !_subscribedToSceneLoad)
