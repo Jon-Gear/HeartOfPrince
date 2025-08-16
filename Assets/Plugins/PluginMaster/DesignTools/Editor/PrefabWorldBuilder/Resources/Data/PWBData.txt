@@ -24,7 +24,7 @@
     "_tempCollidersAction": 1,
     "_paletteManager": {
         "_selectedPaletteIdx": 2,
-        "_selectedBrushIdx": 223,
+        "_selectedBrushIdx": -1,
         "_showBrushName": false,
         "_viewList": false,
         "_showTabsInMultipleRows": false,
@@ -845,7 +845,7 @@
             },
             "_flattenTerrain": false,
             "_avoidOverlapping": false,
-            "_snapRotationToGrid": true,
+            "_snapRotationToGrid": false,
             "_paintTool": {
                 "_parentGlobalId": "",
                 "_autoCreateParent": true,
@@ -6074,13 +6074,13 @@
             "_lockedGrid": true,
             "_boundsSnapping": false,
             "_step": {
-                "x": 0.10000000149011612,
+                "x": 1.0,
                 "y": 1.0,
-                "z": 0.10000000149011612
+                "z": 1.0
             },
             "_origin": {
                 "x": 0.0,
-                "y": 0.0,
+                "y": 6.0,
                 "z": 0.0
             },
             "_rotation": {
