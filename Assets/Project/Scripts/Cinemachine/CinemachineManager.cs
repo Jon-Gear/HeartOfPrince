@@ -9,7 +9,7 @@ public class CinemachineManager : Singleton<CinemachineManager>
     public CinemachineCamera longShot;
     public CinemachineCamera closeUpShot;
 
-    [SerializeField] public CameraTarget cameraTarget;
+    [SerializeField] public CinemachineTargetGroup targetGroup;
 
     public void SetLongShot()
     {
@@ -33,13 +33,12 @@ public class CinemachineManager : Singleton<CinemachineManager>
     {
         base.Awake();
         brain = Camera.main.GetComponent<CinemachineBrain>();
-        longShot.Follow = cameraTarget.transform;
-        closeUpShot.Follow = cameraTarget.transform;
+        //longShot.Follow = cameraTarget.transform;
+        //closeUpShot.Follow = cameraTarget.transform;
         
     }
     protected override void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        cameraTarget.ClearTargets();
     }
 
 

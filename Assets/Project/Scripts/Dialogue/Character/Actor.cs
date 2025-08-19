@@ -42,7 +42,7 @@ public class Actor : MonoBehaviour
             }
 
             ActorRegistry.Instance.playerActor = this;
-            CinemachineManager.Instance.cameraTarget.AddTarget(character.transform);
+            CinemachineManager.Instance.targetGroup.AddMember(character.transform, 1f, 0.5f) ;
         }
     }
 
@@ -127,7 +127,9 @@ public class Actor : MonoBehaviour
     private void OnDestroy()
     {
         if (ActorRegistry.IsQuitting) return;
-        
+
+        CinemachineManager.Instance.targetGroup.RemoveMember(character.transform);
+
         ActorRegistry.Instance.UnregisterActor(this);
     }
 }

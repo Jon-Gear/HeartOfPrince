@@ -65,7 +65,9 @@ public class YarnCommands : MonoBehaviour
         }
 
         // Add the target to the camera manager
-        CinemachineManager.Instance.cameraTarget.AddTarget(actor.transform);
+        CinemachineManager.Instance.targetGroup.AddMember(actor.transform, 1f, 0.5f);
+
+        //CinemachineManager.Instance.cameraTarget.AddTarget(actor.transform);
     }
 
     [YarnCommand("removeActorFromShot")]
@@ -79,8 +81,11 @@ public class YarnCommands : MonoBehaviour
             return;
         }
 
+        CinemachineManager.Instance.targetGroup.RemoveMember(actor.transform);
+
+
         // Add the target to the camera manager
-        CinemachineManager.Instance.cameraTarget.RemoveTarget(actor.transform);
+        //CinemachineManager.Instance.cameraTarget.RemoveTarget(actor.transform);
     }
 
 
