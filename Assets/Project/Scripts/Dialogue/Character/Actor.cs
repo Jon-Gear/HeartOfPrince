@@ -43,6 +43,7 @@ public class Actor : MonoBehaviour
 
             ActorRegistry.Instance.playerActor = this;
             CinemachineManager.Instance.targetGroup.AddMember(character.transform, 1f, 0.5f) ;
+            CinemachineManager.Instance.longShot.PreviousStateIsValid = false;
         }
     }
 

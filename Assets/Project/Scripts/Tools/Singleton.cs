@@ -6,7 +6,7 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
     private static T _instance;
     private static object _lock = new object();
     private static bool _quitting = false;
-    
+
     public static bool IsQuitting
     {
         get { return _quitting; }
@@ -45,6 +45,8 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
             _instance = this as T;
             DontDestroyOnLoad(gameObject);
             SceneManager.sceneLoaded += OnSceneLoaded;
+            SceneManager.sceneUnloaded += OnSceneUnloaded;
+            SceneManager.activeSceneChanged += OnActiveSceneChanged;
         }
         else if (_instance != this)
         {
@@ -62,14 +64,23 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
         if (Instance == this)
         {
             SceneManager.sceneLoaded -= OnSceneLoaded;
+            SceneManager.sceneUnloaded -= OnSceneUnloaded;
+            SceneManager.activeSceneChanged -= OnActiveSceneChanged;
         }
     }
 
     protected virtual void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
     }
-}
 
+    protected virtual void OnSceneUnloaded(Scene scene)
+    {
+    }
+
+    protected virtual void OnActiveSceneChanged(Scene oldScene, Scene newScene)
+    {
+    }
+}
 
 
 [ExecuteAlways]

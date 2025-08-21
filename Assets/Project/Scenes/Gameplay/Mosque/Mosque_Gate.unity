@@ -1110,6 +1110,63 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4381122271546710, guid: 952d10d9304504e43b389d1d7830e1f5, type: 3}
   m_PrefabInstance: {fileID: 2092423563}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &292508750
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1809260388992845294, guid: b7f76d0a74003aa439da60a7a55604ee, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 2.20402
+      objectReference: {fileID: 0}
+    - target: {fileID: 1809260388992845294, guid: b7f76d0a74003aa439da60a7a55604ee, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.02983
+      objectReference: {fileID: 0}
+    - target: {fileID: 1809260388992845294, guid: b7f76d0a74003aa439da60a7a55604ee, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 9.85771
+      objectReference: {fileID: 0}
+    - target: {fileID: 1809260388992845294, guid: b7f76d0a74003aa439da60a7a55604ee, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1809260388992845294, guid: b7f76d0a74003aa439da60a7a55604ee, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1809260388992845294, guid: b7f76d0a74003aa439da60a7a55604ee, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1809260388992845294, guid: b7f76d0a74003aa439da60a7a55604ee, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1809260388992845294, guid: b7f76d0a74003aa439da60a7a55604ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1809260388992845294, guid: b7f76d0a74003aa439da60a7a55604ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1809260388992845294, guid: b7f76d0a74003aa439da60a7a55604ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2001268631137963239, guid: b7f76d0a74003aa439da60a7a55604ee, type: 3}
+      propertyPath: m_Name
+      value: '[Manager] ScreenEffects'
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: b7f76d0a74003aa439da60a7a55604ee, type: 3}
 --- !u!1001 &297566759
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4975,6 +5032,42 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3847140615089728507, guid: 9f17569d8665e57498a5377ef9140396, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -3.96273
+      objectReference: {fileID: 0}
+    - target: {fileID: 3847140615089728507, guid: 9f17569d8665e57498a5377ef9140396, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3847140615089728507, guid: 9f17569d8665e57498a5377ef9140396, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -1.7264
+      objectReference: {fileID: 0}
+    - target: {fileID: 4029038317115549259, guid: 9f17569d8665e57498a5377ef9140396, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -3.96273
+      objectReference: {fileID: 0}
+    - target: {fileID: 4029038317115549259, guid: 9f17569d8665e57498a5377ef9140396, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 14.142136
+      objectReference: {fileID: 0}
+    - target: {fileID: 4029038317115549259, guid: 9f17569d8665e57498a5377ef9140396, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -15.868537
+      objectReference: {fileID: 0}
+    - target: {fileID: 4054252439962913997, guid: 9f17569d8665e57498a5377ef9140396, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -3.96273
+      objectReference: {fileID: 0}
+    - target: {fileID: 4054252439962913997, guid: 9f17569d8665e57498a5377ef9140396, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 14.142136
+      objectReference: {fileID: 0}
+    - target: {fileID: 4054252439962913997, guid: 9f17569d8665e57498a5377ef9140396, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -15.868537
+      objectReference: {fileID: 0}
     - target: {fileID: 6785456534905469715, guid: 9f17569d8665e57498a5377ef9140396, type: 3}
       propertyPath: m_Name
       value: '[Manager] Cinemachine'
@@ -8316,7 +8409,7 @@ Transform:
   m_GameObject: {fileID: 2111647732}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.95, y: -0.07001, z: 1.45}
+  m_LocalPosition: {x: 1.95, y: -0.07001, z: 0.19}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -8358,8 +8451,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Instructions:
     m_Instructions:
-    - rid: 1724515395533799627
-    - rid: 1724515395533799582
+    - rid: 1852311441191994200
   m_TriggerEvent:
     rid: 1724515395533799580
   references:
@@ -8376,58 +8468,54 @@ MonoBehaviour:
     - rid: 1724515395533799581
       type: {class: GetGameObjectPlayer, ns: GameCreator.Runtime.Characters, asm: GameCreator.Runtime.Core}
       data: 
-    - rid: 1724515395533799582
-      type: {class: InstructionCommonSceneLoad, ns: GameCreator.Runtime.VisualScripting, asm: GameCreator.Runtime.Core}
+    - rid: 1852311441191994200
+      type: {class: FadeSceneLoad, ns: , asm: Assembly-CSharp}
       data:
         m_Breakpoint: 0
         m_IsEnabled: 1
         m_Scene:
           m_Property:
-            rid: 1724515395533799584
+            rid: 1852311441191994202
         m_Mode: 0
-        m_Async: 0
+        m_Async: 1
         m_SceneEntries:
           m_Entries:
           - m_Target:
               m_Property:
-                rid: 1724515395533799586
+                rid: 1852311441191994204
             m_Location:
               m_Property:
-                rid: 1724515395533799587
-    - rid: 1724515395533799584
+                rid: 1852311441191994205
+        m_Duration: 0.5
+    - rid: 1852311441191994202
       type: {class: GetSceneName, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
         m_SceneName:
           m_Property:
-            rid: 1724515395533799585
-    - rid: 1724515395533799585
+            rid: 1852311441191994203
+    - rid: 1852311441191994203
       type: {class: GetStringString, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
         m_Value: Mosque_Entrance
-    - rid: 1724515395533799586
+    - rid: 1852311441191994204
       type: {class: GetGameObjectPlayer, ns: GameCreator.Runtime.Characters, asm: GameCreator.Runtime.Core}
       data: 
-    - rid: 1724515395533799587
+    - rid: 1852311441191994205
       type: {class: GetLocationNavigationMarker, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
         m_Marker:
           m_Property:
-            rid: 1724515395533799589
-    - rid: 1724515395533799589
+            rid: 1852311441191994207
+    - rid: 1852311441191994207
       type: {class: GetGameObjectNavigationMarkerID, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
         m_ID:
           m_Property:
-            rid: 1724515395533799590
-    - rid: 1724515395533799590
+            rid: 1852311441191994208
+    - rid: 1852311441191994208
       type: {class: GetStringString, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
         m_Value: 9d28884d-68b0-49ab-b5b8-edc8852220ae
-    - rid: 1724515395533799627
-      type: {class: StopDialogueYarn, ns: , asm: Assembly-CSharp}
-      data:
-        m_Breakpoint: 0
-        m_IsEnabled: 1
 --- !u!114 &133833288206465099
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9799,12 +9887,13 @@ SceneRoots:
   - {fileID: 1663364905}
   - {fileID: 765480440}
   - {fileID: 1578849450}
+  - {fileID: 292508750}
   - {fileID: 1537565700}
   - {fileID: 237284768}
   - {fileID: 2034096258}
   - {fileID: 871263527911632055}
   - {fileID: 481087556}
+  - {fileID: 380617767}
   - {fileID: 1179988808}
   - {fileID: 1548236072}
-  - {fileID: 380617767}
   - {fileID: 780532358}

@@ -388,6 +388,68 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2018994265}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &76875771
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 630202066}
+    m_Modifications:
+    - target: {fileID: 3255689577169802916, guid: ef6eb8019258fcf458e9c39ab1dd5e65, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3255689577169802916, guid: ef6eb8019258fcf458e9c39ab1dd5e65, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3255689577169802916, guid: ef6eb8019258fcf458e9c39ab1dd5e65, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3255689577169802916, guid: ef6eb8019258fcf458e9c39ab1dd5e65, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3255689577169802916, guid: ef6eb8019258fcf458e9c39ab1dd5e65, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3255689577169802916, guid: ef6eb8019258fcf458e9c39ab1dd5e65, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3255689577169802916, guid: ef6eb8019258fcf458e9c39ab1dd5e65, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3255689577169802916, guid: ef6eb8019258fcf458e9c39ab1dd5e65, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3255689577169802916, guid: ef6eb8019258fcf458e9c39ab1dd5e65, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3255689577169802916, guid: ef6eb8019258fcf458e9c39ab1dd5e65, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3696930411229923076, guid: ef6eb8019258fcf458e9c39ab1dd5e65, type: 3}
+      propertyPath: m_Name
+      value: CinemachineZone
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: ef6eb8019258fcf458e9c39ab1dd5e65, type: 3}
+--- !u!4 &76875772 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3255689577169802916, guid: ef6eb8019258fcf458e9c39ab1dd5e65, type: 3}
+  m_PrefabInstance: {fileID: 76875771}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &88678608
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2307,9 +2369,61 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3847140615089728507, guid: 9f17569d8665e57498a5377ef9140396, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -4.36182
+      objectReference: {fileID: 0}
+    - target: {fileID: 3847140615089728507, guid: 9f17569d8665e57498a5377ef9140396, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.88358
+      objectReference: {fileID: 0}
+    - target: {fileID: 3847140615089728507, guid: 9f17569d8665e57498a5377ef9140396, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.39896
+      objectReference: {fileID: 0}
+    - target: {fileID: 4029038317115549259, guid: 9f17569d8665e57498a5377ef9140396, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -4.36182
+      objectReference: {fileID: 0}
+    - target: {fileID: 4029038317115549259, guid: 9f17569d8665e57498a5377ef9140396, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 13.258555
+      objectReference: {fileID: 0}
+    - target: {fileID: 4029038317115549259, guid: 9f17569d8665e57498a5377ef9140396, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -14.541097
+      objectReference: {fileID: 0}
+    - target: {fileID: 4054252439962913997, guid: 9f17569d8665e57498a5377ef9140396, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -4.36182
+      objectReference: {fileID: 0}
+    - target: {fileID: 4054252439962913997, guid: 9f17569d8665e57498a5377ef9140396, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 13.258555
+      objectReference: {fileID: 0}
+    - target: {fileID: 4054252439962913997, guid: 9f17569d8665e57498a5377ef9140396, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -14.541097
+      objectReference: {fileID: 0}
+    - target: {fileID: 4054252439962913997, guid: 9f17569d8665e57498a5377ef9140396, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.92387956
+      objectReference: {fileID: 0}
+    - target: {fileID: 4054252439962913997, guid: 9f17569d8665e57498a5377ef9140396, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.38268343
+      objectReference: {fileID: 0}
     - target: {fileID: 6785456534905469715, guid: 9f17569d8665e57498a5377ef9140396, type: 3}
       propertyPath: m_Name
       value: '[Manager] Cinemachine'
+      objectReference: {fileID: 0}
+    - target: {fileID: 7944153906298857989, guid: 9f17569d8665e57498a5377ef9140396, type: 3}
+      propertyPath: orthographic
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7944153906298857989, guid: 9f17569d8665e57498a5377ef9140396, type: 3}
+      propertyPath: orthographic size
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3117,6 +3231,38 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4586278917610924, guid: e0eaa3a14d21aa54ca0d0c7a2f988305, type: 3}
   m_PrefabInstance: {fileID: 627320116}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &630202065
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 630202066}
+  m_Layer: 0
+  m_Name: CinemachineZones
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &630202066
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 630202065}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 76875772}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &631089419
 GameObject:
   m_ObjectHideFlags: 0
@@ -4707,7 +4853,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Instructions:
     m_Instructions:
-    - rid: 1724515395533799582
+    - rid: 1852311441191994169
   m_TriggerEvent:
     rid: 1724515395533799580
   references:
@@ -4724,50 +4870,51 @@ MonoBehaviour:
     - rid: 1724515395533799581
       type: {class: GetGameObjectPlayer, ns: GameCreator.Runtime.Characters, asm: GameCreator.Runtime.Core}
       data: 
-    - rid: 1724515395533799582
-      type: {class: InstructionCommonSceneLoad, ns: GameCreator.Runtime.VisualScripting, asm: GameCreator.Runtime.Core}
+    - rid: 1852311441191994169
+      type: {class: FadeSceneLoad, ns: , asm: Assembly-CSharp}
       data:
         m_Breakpoint: 0
         m_IsEnabled: 1
         m_Scene:
           m_Property:
-            rid: 1724515395533799584
+            rid: 1852311441191994171
         m_Mode: 0
-        m_Async: 0
+        m_Async: 1
         m_SceneEntries:
           m_Entries:
           - m_Target:
               m_Property:
-                rid: 1724515395533799586
+                rid: 1852311441191994173
             m_Location:
               m_Property:
-                rid: 1724515395533799587
-    - rid: 1724515395533799584
+                rid: 1852311441191994174
+        m_Duration: 0.5
+    - rid: 1852311441191994171
       type: {class: GetSceneName, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
         m_SceneName:
           m_Property:
-            rid: 1724515395533799585
-    - rid: 1724515395533799585
+            rid: 1852311441191994172
+    - rid: 1852311441191994172
       type: {class: GetStringString, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
         m_Value: Mosque_Gate
-    - rid: 1724515395533799586
+    - rid: 1852311441191994173
       type: {class: GetGameObjectPlayer, ns: GameCreator.Runtime.Characters, asm: GameCreator.Runtime.Core}
       data: 
-    - rid: 1724515395533799587
+    - rid: 1852311441191994174
       type: {class: GetLocationNavigationMarker, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
         m_Marker:
           m_Property:
-            rid: 1724515395533799589
-    - rid: 1724515395533799589
+            rid: 1852311441191994176
+    - rid: 1852311441191994176
       type: {class: GetGameObjectNavigationMarkerID, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
         m_ID:
           m_Property:
-            rid: 1724515395533799590
-    - rid: 1724515395533799590
+            rid: 1852311441191994177
+    - rid: 1852311441191994177
       type: {class: GetStringString, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
         m_Value: cedc4063-1b63-40b1-907d-6df52400554f
@@ -8977,7 +9124,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Instructions:
     m_Instructions:
-    - rid: 1724515395533799582
+    - rid: 1852311441191994158
   m_TriggerEvent:
     rid: 1724515395533799580
   references:
@@ -8994,50 +9141,51 @@ MonoBehaviour:
     - rid: 1724515395533799581
       type: {class: GetGameObjectPlayer, ns: GameCreator.Runtime.Characters, asm: GameCreator.Runtime.Core}
       data: 
-    - rid: 1724515395533799582
-      type: {class: InstructionCommonSceneLoad, ns: GameCreator.Runtime.VisualScripting, asm: GameCreator.Runtime.Core}
+    - rid: 1852311441191994158
+      type: {class: FadeSceneLoad, ns: , asm: Assembly-CSharp}
       data:
         m_Breakpoint: 0
         m_IsEnabled: 1
         m_Scene:
           m_Property:
-            rid: 1724515395533799584
+            rid: 1852311441191994160
         m_Mode: 0
-        m_Async: 0
+        m_Async: 1
         m_SceneEntries:
           m_Entries:
           - m_Target:
               m_Property:
-                rid: 1724515395533799586
+                rid: 1852311441191994162
             m_Location:
               m_Property:
-                rid: 1724515395533799587
-    - rid: 1724515395533799584
+                rid: 1852311441191994163
+        m_Duration: 0.5
+    - rid: 1852311441191994160
       type: {class: GetSceneName, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
         m_SceneName:
           m_Property:
-            rid: 1724515395533799585
-    - rid: 1724515395533799585
+            rid: 1852311441191994161
+    - rid: 1852311441191994161
       type: {class: GetStringString, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
         m_Value: Mosque_Main_Lobby
-    - rid: 1724515395533799586
+    - rid: 1852311441191994162
       type: {class: GetGameObjectPlayer, ns: GameCreator.Runtime.Characters, asm: GameCreator.Runtime.Core}
       data: 
-    - rid: 1724515395533799587
+    - rid: 1852311441191994163
       type: {class: GetLocationNavigationMarker, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
         m_Marker:
           m_Property:
-            rid: 1724515395533799589
-    - rid: 1724515395533799589
+            rid: 1852311441191994165
+    - rid: 1852311441191994165
       type: {class: GetGameObjectNavigationMarkerID, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
         m_ID:
           m_Property:
-            rid: 1724515395533799590
-    - rid: 1724515395533799590
+            rid: 1852311441191994166
+    - rid: 1852311441191994166
       type: {class: GetStringString, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
         m_Value: 884536e7-2f75-4758-b600-21c7dd503e24
@@ -11954,7 +12102,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1869977030}
   - component: {fileID: 1869977031}
-  - component: {fileID: 1869977032}
   m_Layer: 0
   m_Name: Point1
   m_TagString: Untagged
@@ -12001,23 +12148,6 @@ MonoBehaviour:
     - rid: 8339121052726067487
       type: {class: MarkerTypeDirection, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data: 
---- !u!114 &1869977032
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1869977029}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e5a0265923a760440b953cef813083d0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  spawnNPCEntries:
-  - actorName: Munir
-    timeStart: 09:00
-    timeEnd: 10:00
-    isSpawned: 0
 --- !u!1001 &1874182206
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14396,6 +14526,63 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!1001 &4509371177709782735
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1809260388992845294, guid: b7f76d0a74003aa439da60a7a55604ee, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1809260388992845294, guid: b7f76d0a74003aa439da60a7a55604ee, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1809260388992845294, guid: b7f76d0a74003aa439da60a7a55604ee, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1809260388992845294, guid: b7f76d0a74003aa439da60a7a55604ee, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1809260388992845294, guid: b7f76d0a74003aa439da60a7a55604ee, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1809260388992845294, guid: b7f76d0a74003aa439da60a7a55604ee, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1809260388992845294, guid: b7f76d0a74003aa439da60a7a55604ee, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1809260388992845294, guid: b7f76d0a74003aa439da60a7a55604ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1809260388992845294, guid: b7f76d0a74003aa439da60a7a55604ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1809260388992845294, guid: b7f76d0a74003aa439da60a7a55604ee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2001268631137963239, guid: b7f76d0a74003aa439da60a7a55604ee, type: 3}
+      propertyPath: m_Name
+      value: '[Manager] ScreenEffects'
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: b7f76d0a74003aa439da60a7a55604ee, type: 3}
 --- !u!224 &4612129704808769276
 RectTransform:
   m_ObjectHideFlags: 0
@@ -15114,18 +15301,20 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 2063024911}
-  - {fileID: 434352458}
   - {fileID: 1578006298}
   - {fileID: 974392013}
   - {fileID: 1677782767}
+  - {fileID: 434352458}
+  - {fileID: 4509371177709782735}
   - {fileID: 1951013032}
   - {fileID: 1186553375}
   - {fileID: 2034096258}
   - {fileID: 871263527911632055}
   - {fileID: 481087556}
+  - {fileID: 630202066}
+  - {fileID: 844656315}
   - {fileID: 1179988808}
   - {fileID: 1548236072}
   - {fileID: 881866659}
-  - {fileID: 844656315}
   - {fileID: 715933265}
   - {fileID: 1630593860}

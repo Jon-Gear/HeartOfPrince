@@ -10,7 +10,7 @@ public class CinemachineManager : Singleton<CinemachineManager>
     public CinemachineCamera closeUpShot;
 
     [SerializeField] public CinemachineTargetGroup targetGroup;
-
+    
     public void SetLongShot()
     {
         longShot.Priority = 1;
