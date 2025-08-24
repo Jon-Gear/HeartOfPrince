@@ -1,8 +1,65 @@
+using GameCreator.Runtime.Characters;
+using System.Security.Cryptography;
 using UnityEngine;
+using UnityEngine.Events;
 
 
 public enum DAYTIME { Morning, Sunrise, Noon, Afternoon, Evening, Night};
 public enum WEEKDAY { Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday};
+
+public class ClockChangedArgs
+{
+    public float Now { get; }
+    public int Hours { get; }
+    public int Minutes { get; }
+
+    public ClockChangedArgs(float now, int hours, int minutes)
+    {
+        Now = now;
+        Hours = hours;
+        Minutes = minutes;
+    }
+}
+
+public class DayPhaseChangedArgs
+{
+    public float TimeOfDay { get; }
+    public DAYTIME DayTime { get; }
+    public DayPhaseChangedArgs(float timeOfDay, DAYTIME dayTime)
+    {
+        TimeOfDay = timeOfDay;
+        DayTime = dayTime;
+    }
+    /*
+    public float SunAngle { get; }
+    public float NormalizedTime { get; }
+    public int DayNumber { get; }
+    public DayPhase Phase { get; }
+
+    
+    */
+}
+
+public class WeekDayPhaseChangedArgs
+{
+    public float DayNumber { get; }
+
+    public WEEKDAY WeekDay { get; }
+    public WeekDayPhaseChangedArgs(float dayNumber, WEEKDAY weekDay)
+    {
+        DayNumber = dayNumber;
+        WeekDay = weekDay;
+    }
+    /*
+    public float SunAngle { get; }
+    public float NormalizedTime { get; }
+    public int DayNumber { get; }
+    public DayPhase Phase { get; }
+
+    
+    */
+}
+
 
 public class TimeManager : EditorSingleton<TimeManager>
 {
@@ -200,6 +257,16 @@ public class TimeManager : EditorSingleton<TimeManager>
         return prayerTimes.GetSunAngle(now);
     }
 
+    public float GetSunIntensity()
+    {
+        if (prayerTimes == null)
+        {
+            Debug.LogWarning("Prayer times is not set.");
+            return 0.0f;
+        }
+        return Mathf.Clamp01(Mathf.Sin((GetSunAngle() - 90) * Mathf.Deg2Rad));
+    }
+
 
 
     [SerializeField] private int dayNumber = 0;
@@ -215,6 +282,154 @@ public class TimeManager : EditorSingleton<TimeManager>
     private int minutes => Mathf.FloorToInt(((now * 24f) - hours) * 60f);
     private bool isPaused = false;
     private float timeScale => 24f / (targetDayLengthInMinutes / 60f);
+
+    public static event UnityAction<ClockChangedArgs> onClockUpdate;
+
+    public static event UnityAction<DayPhaseChangedArgs> onMorning;
+    public static event UnityAction<DayPhaseChangedArgs> onSunrise;
+    public static event UnityAction<DayPhaseChangedArgs> onNoon;
+    public static event UnityAction<DayPhaseChangedArgs> onAfternoon;
+    public static event UnityAction<DayPhaseChangedArgs> onEvening;
+    public static event UnityAction<DayPhaseChangedArgs> onNight;
+    public static event UnityAction<DayPhaseChangedArgs> onDayTimeChanged;
+
+
+    private DAYTIME currentDayTime;
+
+    public static event UnityAction<WeekDayPhaseChangedArgs> onMonday;
+    public static event UnityAction<WeekDayPhaseChangedArgs> onTuesday;
+    public static event UnityAction<WeekDayPhaseChangedArgs> onWednesday;
+    public static event UnityAction<WeekDayPhaseChangedArgs> onThursday;
+    public static event UnityAction<WeekDayPhaseChangedArgs> onFriday;
+    public static event UnityAction<WeekDayPhaseChangedArgs> onSaturday;
+    public static event UnityAction<WeekDayPhaseChangedArgs> onSunday;
+    public static event UnityAction<WeekDayPhaseChangedArgs> onWeekDayChanged;
+
+    private WEEKDAY currentWeekDay;
+
+
+    private void TriggerClockUpdate()
+    {
+        var args = new ClockChangedArgs(now, hours, minutes);
+        onClockUpdate?.Invoke(args);
+    }
+
+    private void TriggerMorning()
+    {
+        var args = new DayPhaseChangedArgs(now, currentDayTime);
+        onMorning?.Invoke(args);
+    }
+
+    private void TriggerSunrise()
+    {
+        var args = new DayPhaseChangedArgs(now, currentDayTime);
+        onSunrise?.Invoke(args);
+    }
+    private void TriggerNoon()
+    {
+        var args = new DayPhaseChangedArgs(now, currentDayTime);
+        onNoon?.Invoke(args);
+    }
+    private void TriggerAfternoon()
+    {
+        var args = new DayPhaseChangedArgs(now, currentDayTime);
+        onAfternoon?.Invoke(args);
+    }
+    private void TriggerEvening()
+    {
+        var args = new DayPhaseChangedArgs(now, currentDayTime);
+        onEvening?.Invoke(args);
+    }
+    private void TriggerNight()
+    {
+        var args = new DayPhaseChangedArgs(now, currentDayTime);
+        onNight?.Invoke(args);
+    }
+
+
+    private void TriggerDayTimeChanged()
+    {        
+        currentDayTime = GetDayTime();
+
+        switch (currentDayTime)
+        {
+            case DAYTIME.Morning: TriggerMorning(); break;
+            case DAYTIME.Sunrise: TriggerSunrise(); break;
+            case DAYTIME.Noon: TriggerNoon(); break;
+            case DAYTIME.Afternoon: TriggerAfternoon(); break;
+            case DAYTIME.Evening: TriggerEvening(); break;
+            case DAYTIME.Night: TriggerNight(); break;
+        }
+
+        var args = new DayPhaseChangedArgs(now, currentDayTime);
+        onDayTimeChanged?.Invoke(args);
+    }
+
+    private void TriggerMonday()
+    {
+        var args = new WeekDayPhaseChangedArgs(dayNumber, currentWeekDay);
+        onMonday?.Invoke(args);
+    }
+
+    private void TriggerTuesday()
+    {
+        var args = new WeekDayPhaseChangedArgs(dayNumber, currentWeekDay);
+        onTuesday?.Invoke(args);
+    }
+
+    private void TriggerWednesday()
+    {
+        var args = new WeekDayPhaseChangedArgs(dayNumber, currentWeekDay);
+        onWednesday?.Invoke(args);
+    }
+
+    private void TriggerThursday()
+    {
+        var args = new WeekDayPhaseChangedArgs(dayNumber, currentWeekDay);
+        onThursday?.Invoke(args);
+    }
+
+    private void TriggerFriday()
+    {
+        var args = new WeekDayPhaseChangedArgs(dayNumber, currentWeekDay);
+        onFriday?.Invoke(args);
+    }
+
+    private void TriggerSaturday()
+    {
+        var args = new WeekDayPhaseChangedArgs(dayNumber, currentWeekDay);
+        onSaturday?.Invoke(args);
+    }
+
+    private void TriggerSunday()
+    {
+        var args = new WeekDayPhaseChangedArgs(dayNumber, currentWeekDay);
+        onSunday?.Invoke(args);
+    }
+
+
+    private void TriggerWeekDayChanged()
+    {
+        dayNumber += 1;
+        currentWeekDay = GetWeekDay();
+
+
+        switch (currentWeekDay)
+        {
+            case WEEKDAY.Monday: TriggerMonday(); break;
+            case WEEKDAY.Tuesday: TriggerTuesday(); break;
+            case WEEKDAY.Wednesday: TriggerWednesday(); break;
+            case WEEKDAY.Thursday: TriggerThursday(); break;
+            case WEEKDAY.Friday: TriggerFriday(); break;
+            case WEEKDAY.Saturday: TriggerSaturday(); break;
+            case WEEKDAY.Sunday: TriggerSunday(); break;
+        }
+
+        var args = new WeekDayPhaseChangedArgs(dayNumber, currentWeekDay);
+        onWeekDayChanged?.Invoke(args);
+    }
+
+
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private void Start()
@@ -233,10 +448,19 @@ public class TimeManager : EditorSingleton<TimeManager>
         if (Application.isPlaying)
         {
             now += Time.deltaTime * timeScale / 864000f;
-            if(now > 1)
+            TriggerClockUpdate();
+
+            if (now > 1)
             {
                 now -= 1;
+                TriggerWeekDayChanged();
             }
+
+            if(currentDayTime != GetDayTime())
+            {
+                TriggerDayTimeChanged();
+            }
+
         }
     }
 }

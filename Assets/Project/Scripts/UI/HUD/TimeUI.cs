@@ -19,44 +19,121 @@ public class TimeUI : MonoBehaviour
     [SerializeField] Sprite nightIcon;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    void Awake()
     {
+        // DayTime
+        TimeManager.onMorning += OnMorning;
+        TimeManager.onSunrise += OnSunrise;
+        TimeManager.onNoon += OnNoon;   
+        TimeManager.onAfternoon += OnAfternoon;
+        TimeManager.onEvening += OnEvening;
+        TimeManager.onNight += OnNight;
+
+        // Weekday
+        TimeManager.onClockUpdate += OnClockUpdate;
+        TimeManager.onDayTimeChanged += OnDayTimeChanged;
+        TimeManager.onWeekDayChanged += OnWeekDayChanged;
 
     }
 
-    // Update is called once per frame
-    void Update()
+    private void OnDestroy()
     {
-        UpdateClock();
-        UpdateWeekDay();
-        UpdateDayTime();
-        UpdateIcon();
+        // DayTime
+        TimeManager.onMorning -= OnMorning;
+        TimeManager.onSunrise -= OnSunrise;
+        TimeManager.onNoon -= OnNoon;   
+        TimeManager.onAfternoon -= OnAfternoon;
+        TimeManager.onEvening -= OnEvening;
+        TimeManager.onNight -= OnNight;
+        // Weekday
+        TimeManager.onClockUpdate -= OnClockUpdate;
+        TimeManager.onDayTimeChanged -= OnDayTimeChanged;
+        TimeManager.onWeekDayChanged -= OnWeekDayChanged;
     }
 
-    void UpdateClock()
+    private void OnEnable()
     {
-        var (hours, minutes) = TimeManager.Instance.GetTime();
-        clockText.text = $"{hours:D2}:{minutes:D2}";
+        // DayTime
+        TimeManager.onMorning += OnMorning;
+        TimeManager.onSunrise += OnSunrise;
+        TimeManager.onNoon += OnNoon;
+        TimeManager.onAfternoon += OnAfternoon;
+        TimeManager.onEvening += OnEvening;
+        TimeManager.onNight += OnNight;
+
+        // Weekday
+        TimeManager.onClockUpdate += OnClockUpdate;
+        TimeManager.onDayTimeChanged += OnDayTimeChanged;
+        TimeManager.onWeekDayChanged += OnWeekDayChanged;
     }
 
-    void UpdateDayTime()
+    private void OnDisable()
     {
-        dayTimeText.text = TimeManager.Instance.ToString(TimeManager.Instance.GetDayTime());
+        // DayTime
+        TimeManager.onMorning -= OnMorning;
+        TimeManager.onSunrise -= OnSunrise;
+        TimeManager.onNoon -= OnNoon;   
+        TimeManager.onAfternoon -= OnAfternoon;
+        TimeManager.onEvening -= OnEvening;
+        TimeManager.onNight -= OnNight;
+        // Weekday
+        TimeManager.onClockUpdate -= OnClockUpdate;
+        TimeManager.onDayTimeChanged -= OnDayTimeChanged;
+        TimeManager.onWeekDayChanged -= OnWeekDayChanged;
     }
 
-    void UpdateWeekDay()
+    void OnClockUpdate(ClockChangedArgs args)
     {
-        weekDayText.text = TimeManager.Instance.ToString(TimeManager.Instance.GetWeekDay());
+        clockText.text = $"{args.Hours:D2}:{args.Minutes:D2}";
     }
 
+    void OnWeekDayChanged(WeekDayPhaseChangedArgs args)
+    {
+        weekDayText.text = TimeManager.Instance.ToString(args.WeekDay);
+    }
+
+    void OnDayTimeChanged(DayPhaseChangedArgs args)
+    {
+        dayTimeText.text = TimeManager.Instance.ToString(args.DayTime);
+    }
+
+    void OnMorning(DayPhaseChangedArgs args)
+    {
+        DayIcon.sprite = morningIcon;
+    }
+
+    void OnSunrise(DayPhaseChangedArgs args)
+    {
+        DayIcon.sprite = sunriseIcon;
+    }
+
+    void OnNoon(DayPhaseChangedArgs args)
+    {
+        DayIcon.sprite = noonIcon;
+    }
+
+    void OnAfternoon(DayPhaseChangedArgs args)
+    {
+        DayIcon.sprite = afternoonIcon;
+    }
+
+    void OnEvening(DayPhaseChangedArgs args)
+    {
+        DayIcon.sprite = eveningIcon;
+    }
+
+    void OnNight(DayPhaseChangedArgs args)
+    {
+        DayIcon.sprite = nightIcon;
+    }
+
+    /*
     void UpdateIcon()
     {
         var dayTime = TimeManager.Instance.GetDayTime();
-        /**/
         switch (dayTime)
         {
             case DAYTIME.Morning:
-                DayIcon.sprite = morningIcon;
                 break;
             case DAYTIME.Sunrise:
                 DayIcon.sprite = sunriseIcon;
@@ -74,6 +151,6 @@ public class TimeUI : MonoBehaviour
                 DayIcon.sprite = nightIcon;
                 break;
         }
-        /**/
     }
+    */
 }
