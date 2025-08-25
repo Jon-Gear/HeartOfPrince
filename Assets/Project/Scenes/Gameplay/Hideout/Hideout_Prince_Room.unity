@@ -1963,6 +1963,7 @@ MonoBehaviour:
   m_Instructions:
     m_Instructions:
     - rid: 1724515395533799582
+    - rid: 1852311509635432914
   m_TriggerEvent:
     rid: 1724515395533799580
   references:
@@ -1983,7 +1984,7 @@ MonoBehaviour:
       type: {class: InstructionCommonSceneLoad, ns: GameCreator.Runtime.VisualScripting, asm: GameCreator.Runtime.Core}
       data:
         m_Breakpoint: 0
-        m_IsEnabled: 1
+        m_IsEnabled: 0
         m_Scene:
           m_Property:
             rid: 1724515395533799584
@@ -2023,6 +2024,54 @@ MonoBehaviour:
           m_Property:
             rid: 1724515395533799590
     - rid: 1724515395533799590
+      type: {class: GetStringString, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_Value: 2f1d9100-75de-4a0e-b43f-9180ef86dd1c
+    - rid: 1852311509635432914
+      type: {class: FadeSceneLoad, ns: , asm: Assembly-CSharp}
+      data:
+        m_Breakpoint: 0
+        m_IsEnabled: 1
+        m_Scene:
+          m_Property:
+            rid: 1852311509635432916
+        m_Mode: 0
+        m_Async: 1
+        m_SceneEntries:
+          m_Entries:
+          - m_Target:
+              m_Property:
+                rid: 1852311509635432918
+            m_Location:
+              m_Property:
+                rid: 1852311509635432919
+        m_Duration: 0.5
+    - rid: 1852311509635432916
+      type: {class: GetSceneName, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_SceneName:
+          m_Property:
+            rid: 1852311509635432917
+    - rid: 1852311509635432917
+      type: {class: GetStringString, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_Value: Hideout_Hub
+    - rid: 1852311509635432918
+      type: {class: GetGameObjectPlayer, ns: GameCreator.Runtime.Characters, asm: GameCreator.Runtime.Core}
+      data: 
+    - rid: 1852311509635432919
+      type: {class: GetLocationNavigationMarker, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_Marker:
+          m_Property:
+            rid: 1852311509635432921
+    - rid: 1852311509635432921
+      type: {class: GetGameObjectNavigationMarkerID, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_ID:
+          m_Property:
+            rid: 1852311509635432922
+    - rid: 1852311509635432922
       type: {class: GetStringString, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
         m_Value: 2f1d9100-75de-4a0e-b43f-9180ef86dd1c

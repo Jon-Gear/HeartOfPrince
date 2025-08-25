@@ -1330,7 +1330,6 @@ MonoBehaviour:
   m_Instructions:
     m_Instructions:
     - rid: 1852311424040698844
-    - rid: 1852311425172635702
   m_TriggerEvent:
     rid: 1852311424040698867
   references:
@@ -1367,18 +1366,6 @@ MonoBehaviour:
       type: {class: InputButtonKeyboardPress, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
         m_Key: 2
-    - rid: 1852311425172635702
-      type: {class: InstructionCommonDebugText, ns: GameCreator.Runtime.VisualScripting, asm: GameCreator.Runtime.Core}
-      data:
-        m_Breakpoint: 0
-        m_IsEnabled: 1
-        m_Message:
-          m_Property:
-            rid: 1852311425172635703
-    - rid: 1852311425172635703
-      type: {class: GetStringString, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
-      data:
-        m_Value: My message
 --- !u!1 &4715974037236951035
 GameObject:
   m_ObjectHideFlags: 0
