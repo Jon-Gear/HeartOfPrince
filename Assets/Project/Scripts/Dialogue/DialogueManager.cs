@@ -65,7 +65,7 @@ public class DialogueManager : Singleton<DialogueManager>
         innerMonologueRunner.Stop();
     }
 
-    protected override void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    protected override void OnActiveSceneChanged(Scene oldScene, Scene newScene)
     {
         StopDialogue();
         StopInnerMonologue();

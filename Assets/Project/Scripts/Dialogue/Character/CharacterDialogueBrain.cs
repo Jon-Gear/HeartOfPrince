@@ -127,11 +127,27 @@ public class CharacterDialogueBrain : MonoBehaviour
             return;
         }
 
+        if (dialogueTopics.Count == 0)
+        {
+            return;
+        }
+
         DialogueManager.Instance.StartDialogue(ChooseDialogueNode());
     }
 
     public void StartBackgroundDialogueLoop()
     {
+        if (DialogueManager.Instance.IsDialogueRunning() ||
+            DialogueManager.Instance.IsInnerMonologueRunning() ||
+            DialogueManager.Instance.IsBackgroundDialogueRunning())
+        {
+            return;
+        }
+        if (backgroundDialogueTopics.Count == 0)
+        {
+            return;
+        }
+
         backgroundDialogueLoop = StartCoroutine(BackgroundDialogueLoop());
     }
 
@@ -151,23 +167,45 @@ public class CharacterDialogueBrain : MonoBehaviour
                 continue;
             }
 
+            if(backgroundDialogueTopics.Count == 0)
+            {
+                continue;
+            }
+
             DialogueManager.Instance.StartBackgroundDialogue(ChooseBackgroundDialogueNode());
         }
     }
 
     public void StopBackgroundDialogueLoop()
     {
-        Debug.Log("Stopping background dialogue loop for " + characterName);
         if (backgroundDialogueLoop != null)
-        { 
+        {
+            Debug.Log($"Stopping background dialogue loop for {characterName}.");
             StopCoroutine(backgroundDialogueLoop);
         }
     }
 
+    
+    public void AddBackgroundDialogueTopic(BackgroundDialogueTopic topic)
+    {
+        if (!backgroundDialogueTopics.Contains(topic))
+        {
+            backgroundDialogueTopics.Add(topic);
+        }
+    }
+
+    public void RemoveBackgroundDialogueTopic(BackgroundDialogueTopic topic)
+    {
+        if (backgroundDialogueTopics.Contains(topic))
+        {
+            backgroundDialogueTopics.Remove(topic);
+        }
+    }
 
 
     private string ChooseDialogueNode()
     {
+        
         string nodeName = dialogueTopics[Random.Range(0, dialogueTopics.Count)].GetTopicNodeName().Replace("{actor}", characterName.ToLower());
         return nodeName;
     }
@@ -184,3 +222,69 @@ public class CharacterDialogueBrain : MonoBehaviour
         StopBackgroundDialogueLoop();
     }
 }
+
+/*
+
+1. Contextual Factors
+
+These determine when a line is appropriate.
+
+Time of Day -> morning greetings vs tired night talk.
+
+Weather -> hot, rainy, cold comments.
+
+Location -> inside hideout vs on the street vs mosque.
+
+Current Activity -> scavenging, eating, resting.
+
+Who’s Nearby -> group chatter vs private whispers.
+
+Player Progress -> what missions/quests Prince has done.
+
+2. Relational Factors
+
+How Nacho (or any kid) feels about Prince / others.
+
+Trust Level -> “Boss, I’ll do it right away” vs “I dunno about this, man…”
+
+Mood / Emotion -> bored, cheerful, tired, scared.
+
+History -> references past events the player has done.
+
+3. Variation & Naturalism
+
+Avoid repetition fatigue.
+
+Variant Lines (you already have maxVariants).
+
+Probability Weighting (rare “golden” lines).
+
+Cooldowns (don’t let same topic repeat too soon).
+
+Chained Dialogue -> background mutter -> Prince can comment -> leads into real conversation.
+
+4. Types of Dialogue
+
+To mix things up:
+
+Foreground (active) -> player talks to Nacho.
+
+Background (passive) -> Nacho mutters to himself, sings, jokes with another kid.
+
+Reactive Comments -> player actions trigger remarks (“Whoa, boss stole that smooth!”).
+
+Ambient Flavor -> jokes, stories, kids teasing each other.
+
+Philosophical / Reflective -> Nacho thinking about life, streets, or Prince’s health.
+
+5. Design Patterns for Dialogue
+
+Topic Pools (like “food,” “weather,” “plans,” “other gang kids”).
+
+State-Based Nodes -> e.g., nacho_dialogue_trust_high_1.
+
+Dynamic Insertions -> e.g., {playerName} or {currentWeather}.
+
+Escalation Over Time -> as trust/community grows, dialogue tone shifts.
+
+*/

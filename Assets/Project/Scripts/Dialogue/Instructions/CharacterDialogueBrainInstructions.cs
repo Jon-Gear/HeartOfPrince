@@ -3,6 +3,7 @@ using GameCreator.Runtime.Dialogue;
 using GameCreator.Runtime.VisualScripting;
 using System;
 using System.Threading.Tasks;
+using UnityEngine;
 
 
 [Title("Talk To Character")]
@@ -65,3 +66,64 @@ public class InstructionStopBackgroundDialogue : Instruction
         return DefaultResult;
     }
 }
+
+[Title("Add Background Dialogue Topic")]
+[Description("This will add a background dialogue topic to the CharacterDialogueBrain")]
+[Image(typeof(IconPlus), ColorTheme.Type.Green)]
+[Category("YarnSpinner/Misc/Add Background Dialogue Topic")]
+[Serializable]
+public class InstructionAddBackgroundDialogueTopic : Instruction
+{
+    [SerializeField] private PropertyGetGameObject target;
+    [SerializeField] private BackgroundDialogueTopic topic = null;
+    public override string Title => $"Add a background dialogue topic to nearby character";
+
+    protected override Task Run(Args args)
+    {
+        GameObject gameObject = this.target.Get(args);
+
+        if(gameObject == null) return DefaultResult;
+
+        Actor actor = gameObject.GetComponent<Actor>();
+        if(actor == null) return DefaultResult;
+
+        CharacterDialogueBrain character = CharacterManager.Instance.GetCharacter(actor.actorName);
+
+        if (character == null) return DefaultResult;
+
+        character.AddBackgroundDialogueTopic(topic);
+
+        return DefaultResult;
+    }
+}
+
+[Title("Remove Background Dialogue Topic")]
+[Description("This will remove a background dialogue topic to the CharacterDialogueBrain")]
+[Image(typeof(IconMinus), ColorTheme.Type.Red)]
+[Category("YarnSpinner/Misc/Remove Background Dialogue Topic")]
+[Serializable]
+public class InstructionRemoveBackgroundDialogueTopic : Instruction
+{
+    [SerializeField] private PropertyGetGameObject target;
+    [SerializeField] private BackgroundDialogueTopic topic = null;
+    public override string Title => $"Add a background dialogue topic to nearby character";
+
+    protected override Task Run(Args args)
+    {
+        GameObject gameObject = this.target.Get(args);
+
+        if (gameObject == null) return DefaultResult;
+
+        Actor actor = gameObject.GetComponent<Actor>();
+        if (actor == null) return DefaultResult;
+
+        CharacterDialogueBrain character = CharacterManager.Instance.GetCharacter(actor.actorName);
+
+        if (character == null) return DefaultResult;
+
+        character.RemoveBackgroundDialogueTopic(topic);
+
+        return DefaultResult;
+    }
+}
+
