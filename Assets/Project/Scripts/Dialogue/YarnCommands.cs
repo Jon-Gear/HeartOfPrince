@@ -33,7 +33,7 @@ public class YarnCommands : MonoBehaviour
             return;
         }
 
-        actor.AddThought(thoughtName, maxVariants);
+        //actor.AddThought(thoughtName, maxVariants);
     }
 
 

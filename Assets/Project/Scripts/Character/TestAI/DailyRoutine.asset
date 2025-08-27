@@ -1,0 +1,377 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50dbca47426e4169b2c7ee6a34a43d3a, type: 3}
+  m_Name: DailyRoutine
+  m_EditorClassIdentifier: 
+  m_Nodes:
+  - rid: 1852311509635433337
+  - rid: 1852311509635433338
+  - rid: 1852311509635433342
+  - rid: 1852311509635433350
+  - rid: 1852311509635433379
+  - rid: 1852311509635433383
+  - rid: 1852311509635433387
+  m_Data:
+    m_List:
+    - rid: 1852311555628072965
+  m_Thoughts:
+    m_List: []
+  references:
+    version: 2
+    RefIds:
+    - rid: 1852311509635433337
+      type: {class: NodeActionPlanRoot, ns: GameCreator.Runtime.Behavior, asm: GameCreator.Runtime.Behavior}
+      data:
+        m_Id:
+          m_String: fb053551-122e-45c6-8be2-b76b915c5ec4
+        m_Position: {x: 0, y: 50}
+        m_Ports:
+          m_Inputs: []
+          m_Outputs: []
+    - rid: 1852311509635433338
+      type: {class: NodeActionPlanTaskInstructions, ns: GameCreator.Runtime.Behavior, asm: GameCreator.Runtime.Behavior}
+      data:
+        m_Id:
+          m_String: 9ca208f4-f60a-4982-a065-f81fdd6f105f
+        m_Position: {x: 1.5333405, y: -50.766655}
+        m_Ports:
+          m_Inputs: []
+          m_Outputs:
+          - rid: 1852311509635433339
+          - rid: 1852311509635433340
+        m_Cost:
+          m_Property:
+            rid: 1852311509635433341
+        m_Conditions:
+          m_Conditions:
+            m_Conditions: []
+        m_Name: MoveToPointA
+        m_Instructions:
+          m_Instructions:
+            m_Instructions:
+            - rid: 1852311509635433352
+    - rid: 1852311509635433339
+      type: {class: OutputPortActionPlanPreConditions, ns: GameCreator.Runtime.Behavior, asm: GameCreator.Runtime.Behavior}
+      data:
+        m_Id:
+          m_Value: d66cef2f-fc81-4395-8d78-e70815ed14f7
+        m_Connections:
+        - m_Value: 6744a564-1712-44e8-807f-ae2973a1d72e
+    - rid: 1852311509635433340
+      type: {class: OutputPortActionPlanPostConditions, ns: GameCreator.Runtime.Behavior, asm: GameCreator.Runtime.Behavior}
+      data:
+        m_Id:
+          m_Value: acacec36-c099-47c5-b102-87bdbb6dc106
+        m_Connections:
+        - m_Value: 419a7737-f7da-4237-9fcf-ccba2a9148e9
+    - rid: 1852311509635433341
+      type: {class: GetDecimalDecimal, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_Value: 1
+    - rid: 1852311509635433342
+      type: {class: NodeActionPlanTaskInstructions, ns: GameCreator.Runtime.Behavior, asm: GameCreator.Runtime.Behavior}
+      data:
+        m_Id:
+          m_String: 89beb3d2-c3fa-4342-b42c-ff22bd9a3811
+        m_Position: {x: 4.299965, y: 74}
+        m_Ports:
+          m_Inputs: []
+          m_Outputs:
+          - rid: 1852311509635433343
+          - rid: 1852311509635433344
+        m_Cost:
+          m_Property:
+            rid: 1852311509635433345
+        m_Conditions:
+          m_Conditions:
+            m_Conditions: []
+        m_Name: MoveToPointB
+        m_Instructions:
+          m_Instructions:
+            m_Instructions:
+            - rid: 1852311509635433392
+    - rid: 1852311509635433343
+      type: {class: OutputPortActionPlanPreConditions, ns: GameCreator.Runtime.Behavior, asm: GameCreator.Runtime.Behavior}
+      data:
+        m_Id:
+          m_Value: 299b9472-9d57-42fd-b186-2079028430e5
+        m_Connections:
+        - m_Value: 21d14dbe-03bd-4d37-96f9-78e2f2985fe2
+    - rid: 1852311509635433344
+      type: {class: OutputPortActionPlanPostConditions, ns: GameCreator.Runtime.Behavior, asm: GameCreator.Runtime.Behavior}
+      data:
+        m_Id:
+          m_Value: 4281bddf-ac77-4afe-a55f-41ccf1708969
+        m_Connections:
+        - m_Value: 16c19f09-b320-4edf-9f6f-0dcb3f2c9e8c
+    - rid: 1852311509635433345
+      type: {class: GetDecimalDecimal, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_Value: 2
+    - rid: 1852311509635433350
+      type: {class: NodeActionPlanPostConditions, ns: GameCreator.Runtime.Behavior, asm: GameCreator.Runtime.Behavior}
+      data:
+        m_Id:
+          m_String: 6837199f-d22b-4445-b8d0-6852a7bd64b9
+        m_Position: {x: 410.16656, y: -53.666664}
+        m_Ports:
+          m_Inputs:
+          - rid: 1852311509635433351
+          m_Outputs: []
+        m_Beliefs:
+          m_List:
+          - rid: 1852311509635433377
+          - rid: 1852311509635433378
+    - rid: 1852311509635433351
+      type: {class: InputPortActionPlanPostConditions, ns: GameCreator.Runtime.Behavior, asm: GameCreator.Runtime.Behavior}
+      data:
+        m_Id:
+          m_Value: 419a7737-f7da-4237-9fcf-ccba2a9148e9
+    - rid: 1852311509635433352
+      type: {class: InstructionCharacterNavigationMoveTo, ns: GameCreator.Runtime.VisualScripting, asm: GameCreator.Runtime.Core}
+      data:
+        m_Breakpoint: 0
+        m_IsEnabled: 1
+        m_Character:
+          m_Property:
+            rid: 1852311509635433441
+        m_Location:
+          m_Property:
+            rid: 1852311509635433354
+        m_StopDistance:
+          m_Property:
+            rid: 1852311509635433355
+        m_Options:
+          m_WaitToArrive: 1
+          m_CancelOnFail: 1
+          m_OnFail:
+            m_Instructions:
+            - rid: 1852311509635433445
+    - rid: 1852311509635433354
+      type: {class: GetLocationNavigationMarker, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_Marker:
+          m_Property:
+            rid: 1852311509635433443
+    - rid: 1852311509635433355
+      type: {class: GetDecimalConstantZero, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data: 
+    - rid: 1852311509635433377
+      type: {class: Belief, ns: GameCreator.Runtime.Behavior, asm: GameCreator.Runtime.Behavior}
+      data:
+        m_Breakpoint: 0
+        m_IsEnabled: 1
+        m_Name:
+          m_String: AtPointA
+        m_Value: 1
+    - rid: 1852311509635433378
+      type: {class: Belief, ns: GameCreator.Runtime.Behavior, asm: GameCreator.Runtime.Behavior}
+      data:
+        m_Breakpoint: 0
+        m_IsEnabled: 1
+        m_Name:
+          m_String: AtPointB
+        m_Value: 0
+    - rid: 1852311509635433379
+      type: {class: NodeActionPlanPreConditions, ns: GameCreator.Runtime.Behavior, asm: GameCreator.Runtime.Behavior}
+      data:
+        m_Id:
+          m_String: 46dfa197-028d-4735-9f05-5f246f56eab4
+        m_Position: {x: -321.23334, y: -52.133358}
+        m_Ports:
+          m_Inputs:
+          - rid: 1852311509635433380
+          m_Outputs: []
+        m_Beliefs:
+          m_List:
+          - rid: 1852311509635433381
+    - rid: 1852311509635433380
+      type: {class: InputPortActionPlanPreConditions, ns: GameCreator.Runtime.Behavior, asm: GameCreator.Runtime.Behavior}
+      data:
+        m_Id:
+          m_Value: 6744a564-1712-44e8-807f-ae2973a1d72e
+    - rid: 1852311509635433381
+      type: {class: Belief, ns: GameCreator.Runtime.Behavior, asm: GameCreator.Runtime.Behavior}
+      data:
+        m_Breakpoint: 0
+        m_IsEnabled: 1
+        m_Name:
+          m_String: AtPointA
+        m_Value: 0
+    - rid: 1852311509635433383
+      type: {class: NodeActionPlanPreConditions, ns: GameCreator.Runtime.Behavior, asm: GameCreator.Runtime.Behavior}
+      data:
+        m_Id:
+          m_String: 3526bb92-3ee1-4a39-ad66-63088310befe
+        m_Position: {x: -308.1999, y: 73.600006}
+        m_Ports:
+          m_Inputs:
+          - rid: 1852311509635433384
+          m_Outputs: []
+        m_Beliefs:
+          m_List:
+          - rid: 1852311509635433389
+    - rid: 1852311509635433384
+      type: {class: InputPortActionPlanPreConditions, ns: GameCreator.Runtime.Behavior, asm: GameCreator.Runtime.Behavior}
+      data:
+        m_Id:
+          m_Value: 21d14dbe-03bd-4d37-96f9-78e2f2985fe2
+    - rid: 1852311509635433387
+      type: {class: NodeActionPlanPostConditions, ns: GameCreator.Runtime.Behavior, asm: GameCreator.Runtime.Behavior}
+      data:
+        m_Id:
+          m_String: c5aa06d4-5ac8-4547-a779-fc358db5a9eb
+        m_Position: {x: 365.69998, y: 65.933365}
+        m_Ports:
+          m_Inputs:
+          - rid: 1852311509635433388
+          m_Outputs: []
+        m_Beliefs:
+          m_List:
+          - rid: 1852311509635433390
+          - rid: 1852311509635433391
+    - rid: 1852311509635433388
+      type: {class: InputPortActionPlanPostConditions, ns: GameCreator.Runtime.Behavior, asm: GameCreator.Runtime.Behavior}
+      data:
+        m_Id:
+          m_Value: 16c19f09-b320-4edf-9f6f-0dcb3f2c9e8c
+    - rid: 1852311509635433389
+      type: {class: Belief, ns: GameCreator.Runtime.Behavior, asm: GameCreator.Runtime.Behavior}
+      data:
+        m_Breakpoint: 0
+        m_IsEnabled: 1
+        m_Name:
+          m_String: AtPointB
+        m_Value: 0
+    - rid: 1852311509635433390
+      type: {class: Belief, ns: GameCreator.Runtime.Behavior, asm: GameCreator.Runtime.Behavior}
+      data:
+        m_Breakpoint: 0
+        m_IsEnabled: 1
+        m_Name:
+          m_String: AtPointA
+        m_Value: 1
+    - rid: 1852311509635433391
+      type: {class: Belief, ns: GameCreator.Runtime.Behavior, asm: GameCreator.Runtime.Behavior}
+      data:
+        m_Breakpoint: 0
+        m_IsEnabled: 1
+        m_Name:
+          m_String: AtPointB
+        m_Value: 0
+    - rid: 1852311509635433392
+      type: {class: InstructionCharacterNavigationMoveTo, ns: GameCreator.Runtime.VisualScripting, asm: GameCreator.Runtime.Core}
+      data:
+        m_Breakpoint: 0
+        m_IsEnabled: 1
+        m_Character:
+          m_Property:
+            rid: 1852311509635433403
+        m_Location:
+          m_Property:
+            rid: 1852311509635433394
+        m_StopDistance:
+          m_Property:
+            rid: 1852311509635433395
+        m_Options:
+          m_WaitToArrive: 1
+          m_CancelOnFail: 1
+          m_OnFail:
+            m_Instructions:
+            - rid: 1852311509635433399
+    - rid: 1852311509635433394
+      type: {class: GetLocationNavigationMarker, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_Marker:
+          m_Property:
+            rid: 1852311509635433397
+    - rid: 1852311509635433395
+      type: {class: GetDecimalConstantZero, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data: 
+    - rid: 1852311509635433397
+      type: {class: GetGameObjectByName, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_Name:
+          m_Property:
+            rid: 1852311509635433398
+    - rid: 1852311509635433398
+      type: {class: GetStringString, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_Value: PointB
+    - rid: 1852311509635433399
+      type: {class: InstructionCommonDebugText, ns: GameCreator.Runtime.VisualScripting, asm: GameCreator.Runtime.Core}
+      data:
+        m_Breakpoint: 0
+        m_IsEnabled: 1
+        m_Message:
+          m_Property:
+            rid: 1852311509635433400
+    - rid: 1852311509635433400
+      type: {class: GetStringString, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_Value: Failed to reach point B
+    - rid: 1852311509635433403
+      type: {class: GetGameObjectByName, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_Name:
+          m_Property:
+            rid: 1852311509635433404
+    - rid: 1852311509635433404
+      type: {class: GetStringString, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_Value: Nacho
+    - rid: 1852311509635433441
+      type: {class: GetGameObjectByName, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_Name:
+          m_Property:
+            rid: 1852311509635433442
+    - rid: 1852311509635433442
+      type: {class: GetStringString, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_Value: Nacho
+    - rid: 1852311509635433443
+      type: {class: GetGameObjectByName, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_Name:
+          m_Property:
+            rid: 1852311509635433444
+    - rid: 1852311509635433444
+      type: {class: GetStringString, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_Value: PointA
+    - rid: 1852311509635433445
+      type: {class: InstructionCommonDebugText, ns: GameCreator.Runtime.VisualScripting, asm: GameCreator.Runtime.Core}
+      data:
+        m_Breakpoint: 0
+        m_IsEnabled: 1
+        m_Message:
+          m_Property:
+            rid: 1852311509635433446
+    - rid: 1852311509635433446
+      type: {class: GetStringString, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_Value: Failed to reach point A
+    - rid: 1852311555628072965
+      type: {class: Parameter, ns: GameCreator.Runtime.Behavior, asm: GameCreator.Runtime.Behavior}
+      data:
+        m_Breakpoint: 0
+        m_IsEnabled: 1
+        m_Value:
+          rid: 1852311555628072971
+        m_Name: Bye
+    - rid: 1852311555628072971
+      type: {class: ValueBool, ns: GameCreator.Runtime.Variables, asm: GameCreator.Runtime.Core}
+      data:
+        m_Breakpoint: 0
+        m_IsEnabled: 1
+        m_Value: 0

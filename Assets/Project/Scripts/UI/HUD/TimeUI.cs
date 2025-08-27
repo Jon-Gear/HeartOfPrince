@@ -89,12 +89,12 @@ public class TimeUI : MonoBehaviour
 
     void OnWeekDayChanged(WeekDayPhaseChangedArgs args)
     {
-        weekDayText.text = TimeManager.Instance.ToString(args.WeekDay);
+        weekDayText.text = TimeUtils.WeekDayToString(args.WeekDay);
     }
 
     void OnDayTimeChanged(DayPhaseChangedArgs args)
     {
-        dayTimeText.text = TimeManager.Instance.ToString(args.DayTime);
+        dayTimeText.text = TimeUtils.DayTimeToString(args.DayTime);
     }
 
     void OnMorning(DayPhaseChangedArgs args)

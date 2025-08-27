@@ -10,3 +10,4 @@ public class CharacterEntry
     [SerializeField] public Marker CurrentPosition;
     [SerializeField] public string DespawnTime;
 }
+

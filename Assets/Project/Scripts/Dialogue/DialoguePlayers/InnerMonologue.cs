@@ -33,8 +33,8 @@ public class InnerMonologue : MonoBehaviour
                 continue;
             }
 
-            string nodeName = actor.GetRandomThought();
-            DialogueManager.Instance.StartInnerMonologue(nodeName);
+            //string nodeName = actor.GetRandomThought();
+            //DialogueManager.Instance.StartInnerMonologue(nodeName);
         }
     }
 }

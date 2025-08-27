@@ -1,7 +1,11 @@
 using UnityEngine;
 
+
+
 public class CharacterBrain : MonoBehaviour
 {
+
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -15,4 +19,13 @@ public class CharacterBrain : MonoBehaviour
     }
 
 
+    void Roam()
+    {
+
+    }
+
+    void Talk()
+    {
+
+    }
 }

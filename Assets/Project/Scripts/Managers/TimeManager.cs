@@ -21,6 +21,8 @@ public class ClockChangedArgs
     }
 }
 
+
+
 public class DayPhaseChangedArgs
 {
     public float TimeOfDay { get; }
@@ -137,36 +139,7 @@ public class TimeManager : EditorSingleton<TimeManager>
         now =  (_hours + (_minutes / 60f)) / 24f;
     }
 
-    public string ToString(WEEKDAY input)
-    {
-        switch(input)
-        {
-            case WEEKDAY.Monday: return "Monday";
-            case WEEKDAY.Tuesday: return "Tuesday";
-            case WEEKDAY.Wednesday: return "Wednesday";
-            case WEEKDAY.Thursday: return "Thursday";
-            case WEEKDAY.Friday: return "Friday";
-            case WEEKDAY.Saturday: return "Saturday";
-            case WEEKDAY.Sunday: return "Sunday";
-            default: return "Unknown";
-        }
-    }
-
-
-
-    public string ToString(DAYTIME input)
-    {
-        switch(input)
-        {
-            case DAYTIME.Morning: return "Morning";
-            case DAYTIME.Sunrise: return "Sunrise";
-            case DAYTIME.Noon: return "Noon";
-            case DAYTIME.Afternoon: return "Afternoon";
-            case DAYTIME.Evening: return "Evening";
-            case DAYTIME.Night: return "Night";
-            default: return "Unknown";
-        }
-    }
+    
 
 
     public DAYTIME GetDayTime()
@@ -461,6 +434,37 @@ public class TimeManager : EditorSingleton<TimeManager>
                 TriggerDayTimeChanged();
             }
 
+        }
+    }
+}
+public static class TimeUtils
+{
+    public static string WeekDayToString(WEEKDAY input)
+    {
+        switch (input)
+        {
+            case WEEKDAY.Monday: return "Monday";
+            case WEEKDAY.Tuesday: return "Tuesday";
+            case WEEKDAY.Wednesday: return "Wednesday";
+            case WEEKDAY.Thursday: return "Thursday";
+            case WEEKDAY.Friday: return "Friday";
+            case WEEKDAY.Saturday: return "Saturday";
+            case WEEKDAY.Sunday: return "Sunday";
+            default: return "Unknown";
+        }
+    }
+
+    public static string DayTimeToString(DAYTIME input)
+    {
+        switch (input)
+        {
+            case DAYTIME.Morning: return "Morning";
+            case DAYTIME.Sunrise: return "Sunrise";
+            case DAYTIME.Noon: return "Noon";
+            case DAYTIME.Afternoon: return "Afternoon";
+            case DAYTIME.Evening: return "Evening";
+            case DAYTIME.Night: return "Night";
+            default: return "Unknown";
         }
     }
 }

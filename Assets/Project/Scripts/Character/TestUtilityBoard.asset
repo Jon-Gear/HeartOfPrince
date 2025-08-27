@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Nodes:
   - rid: 1852311509635433310
+  - rid: 1852311509635433315
   m_Data:
     m_List: []
   m_Minimum:
@@ -82,5 +83,63 @@ MonoBehaviour:
         m_Name:
           m_String: 
     - rid: 1852311509635433314
+      type: {class: GetGameObjectSelf, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data: 
+    - rid: 1852311509635433315
+      type: {class: NodeUtilityBoardTask, ns: GameCreator.Runtime.Behavior, asm: GameCreator.Runtime.Behavior}
+      data:
+        m_Id:
+          m_String: f0a846e7-e760-439d-bbef-7216fb5984a9
+        m_Position: {x: -80.66666, y: -132.00002}
+        m_Ports:
+          m_Inputs: []
+          m_Outputs: []
+        m_Score:
+          m_Value:
+            m_Property:
+              rid: 1852311509635433316
+          m_Curve:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2.5
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0.1
+            - serializedVersion: 3
+              time: 1
+              value: 0.1
+              inSlope: -0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0.5
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+        m_Conditions:
+          m_Conditions:
+            m_Conditions: []
+        m_Name: My Task
+        m_OnExit:
+          m_Instructions:
+            m_Instructions: []
+        m_Instructions:
+          m_Instructions:
+            m_Instructions: []
+    - rid: 1852311509635433316
+      type: {class: GetDecimalParameter, ns: GameCreator.Runtime.Behavior, asm: GameCreator.Runtime.Behavior}
+      data:
+        m_Processor:
+          m_Property:
+            rid: 1852311509635433319
+        m_Name:
+          m_String: 
+    - rid: 1852311509635433319
       type: {class: GetGameObjectSelf, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data: 

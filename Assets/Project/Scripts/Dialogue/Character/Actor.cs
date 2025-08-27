@@ -10,7 +10,7 @@ public class Actor : MonoBehaviour
 {
     [SerializeField] public string actorName = "Actor";
 
-    [SerializeField] private List<ThoughtData> thoughts = new List<ThoughtData>();
+    //[SerializeField] private List<ThoughtData> thoughts = new List<ThoughtData>();
 
     [SerializeField] private List<AnimationStateEntry> animationStates = new List<AnimationStateEntry>();
     [SerializeField] private List<GestureEntry> gestures = new List<GestureEntry>();
@@ -47,6 +47,7 @@ public class Actor : MonoBehaviour
         }
     }
 
+    /*
     public void AddThought(string thoughtName, int maxVariants = 3)
     {
         ThoughtData thought = thoughts.FirstOrDefault(t => t.thoughtName == thoughtName);
@@ -80,7 +81,7 @@ public class Actor : MonoBehaviour
 
         return thoughtNodeName;
     }
-
+    */
 
 
     public void Gesture(string gestureName)

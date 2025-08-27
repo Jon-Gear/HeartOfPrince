@@ -16,7 +16,7 @@ public class CharacterView : DialogueViewBase
     public CanvasScaler canvasScaler;
 
     [Tooltip("for best results, set the rectTransform anchors to middle-center, and make sure the rectTransform's pivot Y is set to 0")]
-    public RectTransform dialogueBubbleRect, optionsBubbleRect, backgroundDialogueBubbleRect, innerMonologueBubbleRect;
+    public RectTransform dialogueBubbleRect, dialogueOptionsBubbleRect, backgroundDialogueBubbleRect, innerMonologueBubbleRect;
 
     [Tooltip("margin is 0-1.0 (0.1 means 10% of screen space)... -1 lets dialogue bubbles appear offscreen or get cutoff")]
     public float bubbleMargin = 0.1f;
@@ -105,9 +105,9 @@ public class CharacterView : DialogueViewBase
             dialogueBubbleRect.anchoredPosition = WorldToAnchoredPosition(dialogueBubbleRect, ActorRegistry.Instance.currentSpeaker.positionWithOffset, bubbleMargin);
         }
 
-        if (optionsBubbleRect.gameObject.activeInHierarchy && DialogueManager.Instance.IsDialogueRunning())
+        if (dialogueOptionsBubbleRect.gameObject.activeInHierarchy && (DialogueManager.Instance.IsDialogueRunning() || DialogueManager.Instance.IsBackgroundDialogueRunning()))
         {
-            optionsBubbleRect.anchoredPosition = WorldToAnchoredPosition(optionsBubbleRect, ActorRegistry.Instance.playerActor.positionWithOffset, bubbleMargin);
+            dialogueOptionsBubbleRect.anchoredPosition = WorldToAnchoredPosition(dialogueOptionsBubbleRect, ActorRegistry.Instance.playerActor.positionWithOffset, bubbleMargin);
         }
 
         if (innerMonologueBubbleRect.gameObject.activeInHierarchy && DialogueManager.Instance.IsInnerMonologueRunning())

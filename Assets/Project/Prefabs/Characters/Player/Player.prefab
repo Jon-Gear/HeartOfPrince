@@ -1070,7 +1070,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8643185322586486927
 Transform:
   m_ObjectHideFlags: 0
@@ -1602,7 +1602,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   actorName: Prince
-  thoughts: []
   animationStates:
   - m_Name: FoldArmsCasual
     m_State:
@@ -1650,7 +1649,7 @@ MonoBehaviour:
     m_Weight: 1
     m_Transition: 0.1
   gestures: []
-  messageBubbleOffset: {x: 0, y: 1, z: 0}
+  messageBubbleOffset: {x: 0, y: 1.2, z: 0}
   references:
     version: 2
     RefIds:

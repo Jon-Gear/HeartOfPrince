@@ -9,6 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3182753723883272907}
+  - component: {fileID: 6688653414734157622}
+  - component: {fileID: 831296107912017572}
   m_Layer: 0
   m_Name: Nacho
   m_TagString: Untagged
@@ -31,6 +33,165 @@ Transform:
   m_Children: []
   m_Father: {fileID: 6777921619610885219}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6688653414734157622
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 783943241080763222}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63345c3d361c65b4bbe921d037452e9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &831296107912017572
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 783943241080763222}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db50fabeac0a2d647b67dc48fc264e4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  characterName: Nacho
+  dialogueTopics:
+  - {fileID: 11400000, guid: 11bc3bbc2ee4f4d438ef4b6c92bd0b47, type: 2}
+  backgroundDialogueTopics:
+  - {fileID: 11400000, guid: a58d3123f30882a478c38b10c3ed4466, type: 2}
+  minInterval: 5
+  maxInterval: 6
+--- !u!1 &3245328338253044162
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8601187938402238372}
+  - component: {fileID: 214199998296485527}
+  - component: {fileID: 7091370823463166983}
+  m_Layer: 0
+  m_Name: Albeni
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8601187938402238372
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3245328338253044162}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6777921619610885219}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &214199998296485527
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3245328338253044162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63345c3d361c65b4bbe921d037452e9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &7091370823463166983
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3245328338253044162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db50fabeac0a2d647b67dc48fc264e4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  characterName: Albeni
+  dialogueTopics:
+  - {fileID: 11400000, guid: 11bc3bbc2ee4f4d438ef4b6c92bd0b47, type: 2}
+  backgroundDialogueTopics:
+  - {fileID: 11400000, guid: a58d3123f30882a478c38b10c3ed4466, type: 2}
+  minInterval: 1
+  maxInterval: 2
+--- !u!1 &3823396006111329071
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3924342024739096987}
+  - component: {fileID: 5153317414228896254}
+  - component: {fileID: 540543758622739989}
+  m_Layer: 0
+  m_Name: Sushi
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3924342024739096987
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3823396006111329071}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6777921619610885219}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5153317414228896254
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3823396006111329071}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63345c3d361c65b4bbe921d037452e9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &540543758622739989
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3823396006111329071}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db50fabeac0a2d647b67dc48fc264e4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  characterName: Sushi
+  dialogueTopics:
+  - {fileID: 11400000, guid: 11bc3bbc2ee4f4d438ef4b6c92bd0b47, type: 2}
+  backgroundDialogueTopics:
+  - {fileID: 11400000, guid: a58d3123f30882a478c38b10c3ed4466, type: 2}
+  minInterval: 5
+  maxInterval: 6
 --- !u!1 &4409061932063158097
 GameObject:
   m_ObjectHideFlags: 0
@@ -62,6 +223,8 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3182753723883272907}
+  - {fileID: 3924342024739096987}
+  - {fileID: 8601187938402238372}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7514096572543643067
@@ -76,4 +239,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b765fdffd94004782b44ce051ef505bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characterAssets: []

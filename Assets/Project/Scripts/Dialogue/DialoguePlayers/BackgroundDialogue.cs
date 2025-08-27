@@ -49,7 +49,7 @@ public class BackgroundDialogue: MonoBehaviour
 
     private string ChooseDialogueNode()
     {
-        string randomThought = actor.GetRandomThought();
+        string randomThought = "";//actor.GetRandomThought();
         if (!string.IsNullOrEmpty(randomThought))
         {
             return randomThought;
@@ -64,7 +64,7 @@ public class BackgroundDialogue: MonoBehaviour
         string nodeName = thoughtNodeName
             .Replace("{actor}", actor.actorName.ToLower())
             //.Replace("{location}", location.ToLower())
-            .Replace("{time}", TimeManager.Instance.ToString(TimeManager.Instance.GetDayTime()).ToLower());
+            .Replace("{time}", TimeUtils.DayTimeToString(TimeManager.Instance.GetDayTime()).ToLower());
         //.Replace("{mood}", mood.ToLower());
         return nodeName;
 
