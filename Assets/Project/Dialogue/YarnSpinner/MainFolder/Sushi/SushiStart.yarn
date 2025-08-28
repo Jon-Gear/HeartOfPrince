@@ -1,0 +1,30 @@
+﻿title: sushi_start
+tags:
+---
+Prince: Hey Sushi.
+
+-> Prince: How are you?
+-> Prince: Follow me.
+    Sushi: Sure.
+    <<Follow "Sushi" "Prince">>
+    <<stop>>
+-> Prince: Stay here.
+    Sushi: Alright, I’ll be here.
+    <<StopFollow "Sushi">>
+    <<stop>>
+-> Prince: {GetDialogueTopicOptionText("Sushi", 0)}
+    <<if GetDialogueTopicOptionText("Sushi", 0) == "...">>
+        <<stop>>
+    <<endif>>
+    <<jump {GetDialogueTopicNodeName("Sushi", 0)}>>
+-> Prince: {GetDialogueTopicOptionText("Sushi", 1)}
+    <<if GetDialogueTopicOptionText("Sushi", 1) == "...">>
+        <<stop>>
+    <<endif>>
+    <<jump {GetDialogueTopicNodeName("Sushi", 1)}>>
+-> Prince: {GetDialogueTopicOptionText("Sushi", 2)}
+    <<if GetDialogueTopicOptionText("Sushi", 2) == "...">>
+        <<stop>>
+    <<endif>>
+    <<jump {GetDialogueTopicNodeName("Sushi", 2)}>>
+===

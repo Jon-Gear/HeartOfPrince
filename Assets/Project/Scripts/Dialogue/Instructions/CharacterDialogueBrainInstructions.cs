@@ -22,10 +22,31 @@ public class InstructionTalkToCharacter : Instruction
         
         if(character == null) return DefaultResult;
 
-        character.StartDialogue();
+        character.PlayerStartDialogue();
         return DefaultResult;
     }
 }
+
+[Title("Character Talk To You")]
+[Description("This will return a topic the NPC wants to ask the player CharacterDialogueBrain")]
+[Image(typeof(IconNodeText), ColorTheme.Type.Green)]
+[Category("YarnSpinner/Dialogue/Character Talk To You")]
+[Serializable]
+public class InstructionCharacterTalkToYou : Instruction
+{
+    public string characterName = "Character";
+    public override string Title => $"{characterName} Talk To You";
+    protected override Task Run(Args args)
+    {
+        CharacterDialogueBrain character = CharacterManager.Instance.GetCharacter(characterName);
+
+        if (character == null) return DefaultResult;
+
+        character.CharacterStartDialogue();
+        return DefaultResult;
+    }
+}
+
 
 [Title("Start Background Dialogue Loop")]
 [Description("This will return a YarnSpinner background dialogue based from CharacterDialogueBrain")]

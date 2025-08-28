@@ -9,17 +9,19 @@ using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
 [Serializable]
-[CreateAssetMenu(menuName = "Dialogue/DialogueTopic")]
-public class DialogueTopic : ScriptableObject
+[CreateAssetMenu(menuName = "Dialogue/DialogueTopicFromPlayer")]
+public class DialogueTopicFromPlayer : ScriptableObject
 {
-    public string TopicName;
+    public string TopicName = "Topic Name";
+    public string OptionText = "Can I ask you about this topic?"; 
+
     public int maxVariants = 3; // Number of dialogue variants available for this topic
     
     public string GetTopicNodeName()
     {
         string nodeName = "";
 
-        nodeName += "{actor}_dialogue_";
+        nodeName += "{actor}_dialogue_topic_from_player_";
 
         nodeName += TopicName.ToLower();
 
@@ -29,6 +31,26 @@ public class DialogueTopic : ScriptableObject
             nodeName += $"_{index}";
         }
 
+        return nodeName;
+    }
+}
+
+[Serializable]
+[CreateAssetMenu(menuName = "Dialogue/DialogueTopicFromCharacter")]
+public class DialogueTopicFromCharacter : ScriptableObject
+{
+    public string TopicName = "Topic Name";
+    public int maxVariants = 3; // Number of dialogue variants available for this topic
+    public string GetTopicNodeName()
+    {
+        string nodeName = "";
+        nodeName += "{actor}_dialogue_topic_from_character_";
+        nodeName += TopicName.ToLower();
+        if (maxVariants > 0)
+        {
+            int index = Random.Range(1, maxVariants + 1);
+            nodeName += $"_{index}";
+        }
         return nodeName;
     }
 }
@@ -89,13 +111,42 @@ public class BackgroundDialogueTopic : ScriptableObject
 }
 
 
+[Serializable]
+[CreateAssetMenu(menuName = "Dialogue/DailyActivityReport")]
+public class DailyActivityReport : ScriptableObject
+{
+    public string activityName = "Activity";
+
+    public string GetTopicNodeName()
+    {
+        string nodeName = "";
+
+        nodeName += "{actor}_activity_";
+
+        nodeName += activityName.ToLower();
+
+        return nodeName;
+    }
+}
+
 
 public class CharacterDialogueBrain : MonoBehaviour
 {
     [SerializeField] private string characterName = "Character";
 
-    [SerializeField] private List<DialogueTopic> dialogueTopics = new List<DialogueTopic>();
+    [Tooltip("Dialogue topics the character wants to ask the player")]
+    [SerializeField] private List<DialogueTopicFromCharacter> topicsFromCharacter = new List<DialogueTopicFromCharacter>();
+
+    [Tooltip("Dialogue topics the player wants to ask the character")]
+    [SerializeField] private List<DialogueTopicFromPlayer> topicsFromPlayer = new List<DialogueTopicFromPlayer>();
+
+    [Tooltip("Daily activities that were done throughout the day")]
+    [SerializeField] private List<DailyActivityReport> dailyActivityReport = new List<DailyActivityReport>();
+
+    [Tooltip("Dialogue topics the character talks about in the background")]
     [SerializeField] private List<BackgroundDialogueTopic> backgroundDialogueTopics = new List<BackgroundDialogueTopic>();
+
+
 
 
     private Coroutine backgroundDialogueLoop;
@@ -119,21 +170,70 @@ public class CharacterDialogueBrain : MonoBehaviour
         
     }
 
-
-    public void StartDialogue()
+    // Player-Initiated Dialogue Functions
+    public void PlayerStartDialogue()
     {
         if (DialogueManager.Instance.IsDialogueRunning())
         {
             return;
         }
+        
+        string nodeName = $"{characterName.ToLower()}_start";
 
-        if (dialogueTopics.Count == 0)
+        DialogueManager.Instance.StartDialogue(nodeName);
+    }
+
+    public string GetDialogueTopicOptionText(int index)
+    {
+        if(index < 0 || index >= topicsFromPlayer.Count)
+        {
+            return "...";
+        }
+        return topicsFromPlayer[index].OptionText;
+    }
+
+    public string GetDialogueTopicNodeName(int index)
+    {
+        if (index < 0 || index >= topicsFromPlayer.Count)
+        {
+            DialogueManager.Instance.StopDialogue();
+            return "...";
+        }
+        return topicsFromPlayer[index].GetTopicNodeName().Replace("{actor}", characterName.ToLower());
+    }
+
+    public void AddDialogueTopicFromPlayer(DialogueTopicFromPlayer topic)
+    {
+        if (!topicsFromPlayer.Contains(topic))
+        {
+            topicsFromPlayer.Add(topic);
+        }
+    }
+
+    // Character-Initiated Dialogue Functions
+    public void CharacterStartDialogue()
+    {
+        if (DialogueManager.Instance.IsDialogueRunning())
         {
             return;
         }
-
-        DialogueManager.Instance.StartDialogue(ChooseDialogueNode());
+        if (topicsFromCharacter.Count == 0)
+        {
+            Debug.LogWarning($"{characterName} has no topics to discuss with the player.");
+            return;
+        }
+        DialogueManager.Instance.StartDialogue(ChooseCharacterDialogueNode());
     }
+
+    private string ChooseCharacterDialogueNode()
+    {
+        string nodeName = topicsFromCharacter[Random.Range(0, topicsFromCharacter.Count)].GetTopicNodeName().Replace("{actor}", characterName.ToLower());
+        return nodeName;
+    }
+
+
+
+    // Background Dialogue Functions
 
     public void StartBackgroundDialogueLoop()
     {
@@ -143,10 +243,13 @@ public class CharacterDialogueBrain : MonoBehaviour
         {
             return;
         }
+        /*
         if (backgroundDialogueTopics.Count == 0)
         {
             return;
         }
+        */
+        Debug.Log($"Starting background dialogue loop for {characterName}.");
 
         backgroundDialogueLoop = StartCoroutine(BackgroundDialogueLoop());
     }
@@ -202,20 +305,14 @@ public class CharacterDialogueBrain : MonoBehaviour
         }
     }
 
-
-    private string ChooseDialogueNode()
-    {
-        
-        string nodeName = dialogueTopics[Random.Range(0, dialogueTopics.Count)].GetTopicNodeName().Replace("{actor}", characterName.ToLower());
-        return nodeName;
-    }
-
+    
     private string ChooseBackgroundDialogueNode()
     {
         string nodeName = backgroundDialogueTopics[Random.Range(0, backgroundDialogueTopics.Count)].GetTopicNodeName().Replace("{actor}", characterName.ToLower());
         return nodeName;
     }
 
+    // Misc Functions
 
     private void OnActiveSceneChanged(Scene oldScene, Scene newScene)
     {

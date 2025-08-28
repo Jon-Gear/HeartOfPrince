@@ -58,12 +58,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characterName: Nacho
-  dialogueTopics:
-  - {fileID: 11400000, guid: 11bc3bbc2ee4f4d438ef4b6c92bd0b47, type: 2}
-  backgroundDialogueTopics:
-  - {fileID: 11400000, guid: a58d3123f30882a478c38b10c3ed4466, type: 2}
-  minInterval: 5
-  maxInterval: 6
+  topicsFromCharacter:
+  - {fileID: 11400000, guid: 3cc228962ce5fae4892f06440f47d9a1, type: 2}
+  topicsFromPlayer: []
+  dailyActivityReport: []
+  backgroundDialogueTopics: []
+  minInterval: 2
+  maxInterval: 3
 --- !u!1 &3245328338253044162
 GameObject:
   m_ObjectHideFlags: 0
@@ -122,8 +123,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characterName: Albeni
-  dialogueTopics:
-  - {fileID: 11400000, guid: 11bc3bbc2ee4f4d438ef4b6c92bd0b47, type: 2}
+  topicsFromCharacter: []
+  topicsFromPlayer: []
+  dailyActivityReport: []
   backgroundDialogueTopics:
   - {fileID: 11400000, guid: a58d3123f30882a478c38b10c3ed4466, type: 2}
   minInterval: 5
@@ -186,8 +188,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characterName: Sushi
-  dialogueTopics:
-  - {fileID: 11400000, guid: 11bc3bbc2ee4f4d438ef4b6c92bd0b47, type: 2}
+  topicsFromCharacter: []
+  topicsFromPlayer: []
+  dailyActivityReport: []
   backgroundDialogueTopics:
   - {fileID: 11400000, guid: a58d3123f30882a478c38b10c3ed4466, type: 2}
   minInterval: 5

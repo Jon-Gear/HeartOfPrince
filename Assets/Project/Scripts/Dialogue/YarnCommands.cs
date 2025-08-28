@@ -1,3 +1,5 @@
+using GameCreator.Runtime.Characters;
+using GameCreator.Runtime.Common;
 using UnityEngine;
 using Yarn.Unity;
 
@@ -13,6 +15,76 @@ public class YarnCommands : MonoBehaviour
     Other ideas:
     - Background dialogue between other characters (like in NITW)
     */
+
+
+    [YarnCommand("Follow")]
+    public static void Follow(string actorName, string targetName)
+    {
+        // Find the actor by name
+        Actor actor = ActorRegistry.Instance.GetActorByName(actorName);
+        if (actor == null)
+        {
+            Debug.LogWarningFormat("Cannot find actor named {0}!", actorName);
+            return;
+        }
+        // Find the target by name
+        Actor target = ActorRegistry.Instance.GetActorByName(targetName);
+        if (target == null)
+        {
+            Debug.LogWarningFormat("Cannot find target named {0}!", targetName);
+            return;
+        }
+
+        Character actorCharacter = actor.gameObject.GetComponent<Character>();
+        Character targetCharacter = target.gameObject.GetComponent<Character>();
+
+        actorCharacter.Motion.StartFollowingTarget(targetCharacter.transform, 0.5f, 2f);
+    }
+
+    [YarnCommand("StopFollow")]
+    public static void StopFollow(string actorName)
+    {
+        // Find the actor by name
+        Actor actor = ActorRegistry.Instance.GetActorByName(actorName);
+        if (actor == null)
+        {
+            Debug.LogWarningFormat("Cannot find actor named {0}!", actorName);
+            return;
+        }
+        
+        Character actorCharacter = actor.gameObject.GetComponent<Character>();
+        
+        actorCharacter.Motion.StopFollowingTarget();
+    }
+
+
+
+    // Dialogue Options Management
+    [YarnFunction("GetDialogueTopicOptionText")]
+    public static string GetDialogueTopicOptionText(string characterName, int index)
+    {
+        CharacterDialogueBrain characaterDialogueBrain = CharacterManager.Instance.GetCharacter(characterName);
+        return characaterDialogueBrain.GetDialogueTopicOptionText(index);
+    }
+
+    [YarnFunction("GetDialogueTopicNodeName")]
+    public static string GetDialogueTopicNodeName(string characterName, int index)
+    {
+        CharacterDialogueBrain characaterDialogueBrain = CharacterManager.Instance.GetCharacter(characterName);
+        return characaterDialogueBrain.GetDialogueTopicNodeName(index);
+    }
+
+    [YarnCommand("AddDialogueTopicFromPlayer")]
+    public static void AddToDialogueTopicFromPlayer(string characterName, string resourcePathToTopic)
+    {
+        DialogueTopicFromPlayer topic = Resources.Load<DialogueTopicFromPlayer>("Dialogues/" + resourcePathToTopic);
+        CharacterDialogueBrain characaterDialogueBrain = CharacterManager.Instance.GetCharacter(characterName);
+        characaterDialogueBrain.AddDialogueTopicFromPlayer(topic);
+    }   
+
+
+
+
 
     [YarnCommand("logDayEntry")]
     public static void LogDayEntry(string entryMessage)

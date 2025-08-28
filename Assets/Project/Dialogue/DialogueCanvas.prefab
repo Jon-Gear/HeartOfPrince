@@ -2344,7 +2344,7 @@ MonoBehaviour:
       data:
         m_Button:
           m_Input:
-            rid: 1724515046714245745
+            rid: 1852311600119415126
         m_MinDistance:
           m_MinDistance: 0
           m_To:
@@ -2355,10 +2355,13 @@ MonoBehaviour:
     - rid: 1724515046714245744
       type: {class: GetGameObjectPlayer, ns: GameCreator.Runtime.Characters, asm: GameCreator.Runtime.Core}
       data: 
-    - rid: 1724515046714245745
-      type: {class: InputButtonKeyboardPress, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+    - rid: 1852311600119415126
+      type: {class: InputButtonInputActionStart, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
-        m_Key: 62
+        m_Input:
+          m_InputAsset: {fileID: -944628639613478452, guid: 289c1b55c9541489481df5cc06664110, type: 3}
+          m_ActionMap: Player
+          m_Action: Next
 --- !u!61 &4940650067355333058
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -3154,7 +3157,7 @@ MonoBehaviour:
       data:
         m_Button:
           m_Input:
-            rid: 1724515046714245741
+            rid: 1852311600119415095
         m_MinDistance:
           m_MinDistance: 0
           m_To:
@@ -3165,10 +3168,13 @@ MonoBehaviour:
     - rid: 1724515046714245740
       type: {class: GetGameObjectPlayer, ns: GameCreator.Runtime.Characters, asm: GameCreator.Runtime.Core}
       data: 
-    - rid: 1724515046714245741
-      type: {class: InputButtonKeyboardPress, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+    - rid: 1852311600119415095
+      type: {class: InputButtonInputActionStart, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
-        m_Key: 61
+        m_Input:
+          m_InputAsset: {fileID: -944628639613478452, guid: 289c1b55c9541489481df5cc06664110, type: 3}
+          m_ActionMap: Player
+          m_Action: Previous
 --- !u!61 &274472514237543775
 BoxCollider2D:
   m_ObjectHideFlags: 0

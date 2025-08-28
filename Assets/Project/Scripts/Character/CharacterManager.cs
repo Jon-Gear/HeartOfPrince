@@ -30,7 +30,7 @@ public class CharacterManager : Singleton<CharacterManager>
             }
         }
 
-        Debug.LogError($"Character '{characterName}' not found in the scene.");
+        //Debug.LogError($"Character '{characterName}' not found in the scene.");
         return null;
     }
 }
