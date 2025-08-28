@@ -58,11 +58,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characterName: Nacho
-  topicsFromCharacter:
-  - {fileID: 11400000, guid: 3cc228962ce5fae4892f06440f47d9a1, type: 2}
+  topicsFromCharacter: []
   topicsFromPlayer: []
   dailyActivityReport: []
-  backgroundDialogueTopics: []
+  backgroundDialogueTopics:
+  - {fileID: 11400000, guid: a58d3123f30882a478c38b10c3ed4466, type: 2}
   minInterval: 2
   maxInterval: 3
 --- !u!1 &3245328338253044162
