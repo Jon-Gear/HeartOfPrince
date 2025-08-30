@@ -8,108 +8,6 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
-[Serializable]
-[CreateAssetMenu(menuName = "Dialogue/DialogueTopicFromPlayer")]
-public class DialogueTopicFromPlayer : ScriptableObject
-{
-    public string TopicName = "Topic Name";
-    public string OptionText = "Can I ask you about this topic?"; 
-
-    public int maxVariants = 3; // Number of dialogue variants available for this topic
-    
-    public string GetTopicNodeName()
-    {
-        string nodeName = "";
-
-        nodeName += "{actor}_dialogue_topic_from_player_";
-
-        nodeName += TopicName.ToLower();
-
-        if (maxVariants > 0)
-        {
-            int index = Random.Range(1, maxVariants + 1);
-            nodeName += $"_{index}";
-        }
-
-        return nodeName;
-    }
-}
-
-[Serializable]
-[CreateAssetMenu(menuName = "Dialogue/DialogueTopicFromCharacter")]
-public class DialogueTopicFromCharacter : ScriptableObject
-{
-    public string TopicName = "Topic Name";
-    public int maxVariants = 3; // Number of dialogue variants available for this topic
-    public string GetTopicNodeName()
-    {
-        string nodeName = "";
-        nodeName += "{actor}_dialogue_topic_from_character_";
-        nodeName += TopicName.ToLower();
-        if (maxVariants > 0)
-        {
-            int index = Random.Range(1, maxVariants + 1);
-            nodeName += $"_{index}";
-        }
-        return nodeName;
-    }
-}
-
-[Serializable]
-[CreateAssetMenu(menuName = "Dialogue/BackgroundDialogueTopic")]
-public class BackgroundDialogueTopic : ScriptableObject
-{
-    public string TopicName;
-    public int maxVariants = 3; // Number of dialogue variants available for this topic
-
-    [Space]
-    [Header("Contextual Factors")]
-    public bool isTimeBased = false; // Whether this topic is time-based (e.g., morning, afternoon, night)
-    public bool isWeatherBased = false; // Whether this topic is weather-based
-    public bool isLocationBased = false; // Whether this topic is location-based
-    public bool isDependentOnWhoIsNearby = false; // Whether this topic depends on who is nearby
-    public List<String> specificCharactersNearby = new List<string>(); // Specific characters that trigger this topic
-
-    public string GetTopicNodeName()
-    {
-        string nodeName = "";
-
-        nodeName += "{actor}_background_dialogue_";
-
-        nodeName += TopicName.ToLower();
-
-        if(isTimeBased)
-        {
-            nodeName += "_{time}";
-        }
-
-        if(isWeatherBased)
-        {
-            nodeName += "_{weather}";
-        }
-
-        if(isLocationBased)
-        {
-            nodeName += "_{location}";
-        }
-
-        if(isDependentOnWhoIsNearby && specificCharactersNearby.Count > 0)
-        {
-            // Randomly choose one of the specific characters to include in the node name
-            string character = specificCharactersNearby[Random.Range(0, specificCharactersNearby.Count)];
-            nodeName += $"_with_{character.ToLower()}";
-        }
-
-        if (maxVariants > 0)
-        {
-            int index = Random.Range(1, maxVariants + 1);
-            nodeName += $"_{index}";
-        }
-
-        return nodeName;
-    }
-}
-
 
 [Serializable]
 [CreateAssetMenu(menuName = "Dialogue/DailyActivityReport")]
@@ -189,15 +87,14 @@ public class CharacterDialogueBrain : MonoBehaviour
         {
             return "...";
         }
-        return topicsFromPlayer[index].OptionText;
+        return $"Talk about {topicsFromPlayer[index].TopicName}";
     }
 
     public string GetDialogueTopicNodeName(int index)
     {
         if (index < 0 || index >= topicsFromPlayer.Count)
         {
-            DialogueManager.Instance.StopDialogue();
-            return "...";
+            return "empty";
         }
         return topicsFromPlayer[index].GetTopicNodeName().Replace("{actor}", characterName.ToLower());
     }
@@ -219,7 +116,6 @@ public class CharacterDialogueBrain : MonoBehaviour
         }
         if (topicsFromCharacter.Count == 0)
         {
-            Debug.LogWarning($"{characterName} has no topics to discuss with the player.");
             return;
         }
         DialogueManager.Instance.StartDialogue(ChooseCharacterDialogueNode());
@@ -305,7 +201,13 @@ public class CharacterDialogueBrain : MonoBehaviour
         }
     }
 
-    
+
+    private void AddRandomBackgroundTopic()
+    {
+        BackgroundDialogueTopic backgroundDialogueTopic = Resources.Load<BackgroundDialogueTopic>("Dialogues/BackgroundTopics/" + "random_background_topic");
+    }
+
+
     private string ChooseBackgroundDialogueNode()
     {
         string nodeName = backgroundDialogueTopics[Random.Range(0, backgroundDialogueTopics.Count)].GetTopicNodeName().Replace("{actor}", characterName.ToLower());

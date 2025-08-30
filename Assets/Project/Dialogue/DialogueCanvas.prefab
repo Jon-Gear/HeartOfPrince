@@ -2327,6 +2327,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Instructions:
     m_Instructions:
+    - rid: 1852311644254765764
     - rid: 1724515046714245737
   m_TriggerEvent:
     rid: 1724515046714245742
@@ -2362,6 +2363,20 @@ MonoBehaviour:
           m_InputAsset: {fileID: -944628639613478452, guid: 289c1b55c9541489481df5cc06664110, type: 3}
           m_ActionMap: Player
           m_Action: Next
+    - rid: 1852311644254765764
+      type: {class: InstructionLogicCheckConditions, ns: GameCreator.Runtime.VisualScripting, asm: GameCreator.Runtime.Core}
+      data:
+        m_Breakpoint: 0
+        m_IsEnabled: 1
+        m_Conditions:
+          m_Conditions:
+          - rid: 1852311644254765785
+    - rid: 1852311644254765785
+      type: {class: ConditionIsDialogueRunning, ns: , asm: Assembly-CSharp}
+      data:
+        m_Breakpoint: 0
+        m_IsEnabled: 1
+        m_Sign: 1
 --- !u!61 &4940650067355333058
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -3140,6 +3155,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Instructions:
     m_Instructions:
+    - rid: 1852311644254765680
     - rid: 1724515046714245736
   m_TriggerEvent:
     rid: 1724515046714245738
@@ -3175,6 +3191,20 @@ MonoBehaviour:
           m_InputAsset: {fileID: -944628639613478452, guid: 289c1b55c9541489481df5cc06664110, type: 3}
           m_ActionMap: Player
           m_Action: Previous
+    - rid: 1852311644254765680
+      type: {class: InstructionLogicCheckConditions, ns: GameCreator.Runtime.VisualScripting, asm: GameCreator.Runtime.Core}
+      data:
+        m_Breakpoint: 0
+        m_IsEnabled: 1
+        m_Conditions:
+          m_Conditions:
+          - rid: 1852311644254765701
+    - rid: 1852311644254765701
+      type: {class: ConditionIsDialogueRunning, ns: , asm: Assembly-CSharp}
+      data:
+        m_Breakpoint: 0
+        m_IsEnabled: 1
+        m_Sign: 1
 --- !u!61 &274472514237543775
 BoxCollider2D:
   m_ObjectHideFlags: 0
