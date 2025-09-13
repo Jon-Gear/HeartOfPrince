@@ -17,41 +17,44 @@ public class PrayerTimes : ScriptableObject
 
     private void OnValidate()
     {
+        // Note for future self: OnValidate is called when the script is loaded or a value changes in the inspector (in the editor only).
+        // It is not called during runtime in a built application.
         SetDayTimes();
+        Debug.Log("PrayerTimes OnValidate called");
     }
 
 
     public DAYTIME GetDayTime(float time)
     {
-        for(int i = 0; i < dayTimes1.Count() - 1; i++)
+        for(int i = 0; i < dayTimes.Count() - 1; i++)
         {
-            if(dayTimes1[i].time <= time && time < dayTimes1[i + 1].time)
+            if(dayTimes[i].time <= time && time < dayTimes[i + 1].time)
             {
-                return dayTimes1[i].dayTime;
+                return dayTimes[i].dayTime;
             }
         }
 
+        Debug.Log("Error: Could not find day time for time " + time);
         return DAYTIME.Night;
     }
 
     public float GetSunAngle(float time)
     {
-        for (int i = 0; i < dayTimes1.Count() - 1; i++)
+        for (int i = 0; i < dayTimes.Count() - 1; i++)
         {
-            if (dayTimes1[i].time <= time && time < dayTimes1[i + 1].time)
+            if (dayTimes[i].time <= time && time < dayTimes[i + 1].time)
             {
-                float t = Mathf.InverseLerp(dayTimes1[i].time, dayTimes1[i + 1].time, time);
-                return Mathf.Lerp(dayTimes1[i].sunAngle, dayTimes1[i + 1].sunAngle, t);
+                float t = Mathf.InverseLerp(dayTimes[i].time, dayTimes[i + 1].time, time);
+                return Mathf.Lerp(dayTimes[i].sunAngle, dayTimes[i + 1].sunAngle, t);
             }
         }
 
+        Debug.Log("Error: Could not find sun angle for time " + time);
         return 0.0f;
     }
 
-    private List<DayTimeData> dayTimes1 = new List<DayTimeData>();
+    private List<DayTimeData> dayTimes = new List<DayTimeData>();
 
-
-    private Dictionary<float, DAYTIME> dayTimes = new Dictionary<float, DAYTIME>();
 
 
     [Header("Morning")]
@@ -73,23 +76,25 @@ public class PrayerTimes : ScriptableObject
     [SerializeField] string nightTime = "20:00";
 
 
-    void SetDayTimes()
+    public void SetDayTimes()
     {
-        dayTimes1.Add(new DayTimeData
+        dayTimes.Clear();
+
+        dayTimes.Add(new DayTimeData
         {
             time = ParseTimeTo1fOrWarn("00:00", "Night"),
             dayTime = DAYTIME.Night,
             sunAngle = 0.0f
         });
 
-        dayTimes1.Add(new DayTimeData
+        dayTimes.Add(new DayTimeData
         {
             time = ParseTimeTo1fOrWarn(morningTime, "Morning"),
             dayTime = DAYTIME.Morning,
             sunAngle = 72.0f
         });
 
-        dayTimes1.Add(new DayTimeData
+        dayTimes.Add(new DayTimeData
         {
             time = ParseTimeTo1fOrWarn(sunriseTime, "Sunrise"),
             dayTime = DAYTIME.Sunrise,
@@ -97,28 +102,28 @@ public class PrayerTimes : ScriptableObject
         });
 
 
-        dayTimes1.Add(new DayTimeData
+        dayTimes.Add(new DayTimeData
         {
             time = ParseTimeTo1fOrWarn(noonTime, "Noon"),
             dayTime = DAYTIME.Noon,
             sunAngle = 195.0f
         });
 
-        dayTimes1.Add(new DayTimeData
+        dayTimes.Add(new DayTimeData
         {
             time = ParseTimeTo1fOrWarn(afternoonTime, "Afternoon"),
             dayTime = DAYTIME.Afternoon,
             sunAngle = 233.5f
         });
 
-        dayTimes1.Add(new DayTimeData
+        dayTimes.Add(new DayTimeData
         {
             time = ParseTimeTo1fOrWarn(eveningTime, "Evening"),
             dayTime = DAYTIME.Evening,
             sunAngle = 260.0f
         });
 
-        dayTimes1.Add(new DayTimeData
+        dayTimes.Add(new DayTimeData
         {
             time = ParseTimeTo1fOrWarn(nightTime, "Night"),
             dayTime = DAYTIME.Night,
@@ -126,12 +131,13 @@ public class PrayerTimes : ScriptableObject
         });
 
 
-        dayTimes1.Add(new DayTimeData
+        dayTimes.Add(new DayTimeData
         {
             time = ParseTimeTo1fOrWarn("24:00", "Night"),
             dayTime = DAYTIME.Night,
             sunAngle = 360
         });
+        Debug.Log("SetDayTimes called, count: " + dayTimes.Count);
     }
     
     

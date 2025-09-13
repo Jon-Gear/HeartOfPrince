@@ -224,7 +224,7 @@ public class TimeManager : EditorSingleton<TimeManager>
     {
         if (prayerTimes == null)
         {
-            Debug.LogWarning("Prayer times is not set.");
+            Debug.Log("Prayer times is not set.");
             return 0.0f;
         }
         return prayerTimes.GetSunAngle(now);
@@ -234,7 +234,7 @@ public class TimeManager : EditorSingleton<TimeManager>
     {
         if (prayerTimes == null)
         {
-            Debug.LogWarning("Prayer times is not set.");
+            Debug.Log("Prayer times is not set.");
             return 0.0f;
         }
         return Mathf.Clamp01(Mathf.Sin((GetSunAngle() - 90) * Mathf.Deg2Rad));
@@ -407,7 +407,14 @@ public class TimeManager : EditorSingleton<TimeManager>
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private void Start()
     {
+        prayerTimes.SetDayTimes();
+     
         now = 0.5f;   
+        Debug.Log($"TimeManager started at {GetTimeString()}");
+
+        TriggerClockUpdate();
+        TriggerDayTimeChanged();
+        TriggerWeekDayChanged();
     }
 
     // Update is called once per frame

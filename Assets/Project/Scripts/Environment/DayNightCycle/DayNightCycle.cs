@@ -3,7 +3,8 @@ using Unity.Multiplayer.Center.Common;
 using UnityEngine;
 
 // should not be singleton
-[ExecuteAlways] public class DayNightCycle : MonoBehaviour
+[ExecuteAlways] 
+public class DayNightCycle : MonoBehaviour
 {   
     [Header("Sun Light")]
     [SerializeField] private bool enableSun = true;

@@ -19,7 +19,24 @@ public class TimeUI : MonoBehaviour
     [SerializeField] Sprite nightIcon;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Awake()
+
+    private void Start()
+    {
+        // DayTime
+        TimeManager.onMorning += OnMorning;
+        TimeManager.onSunrise += OnSunrise;
+        TimeManager.onNoon += OnNoon;
+        TimeManager.onAfternoon += OnAfternoon;
+        TimeManager.onEvening += OnEvening;
+        TimeManager.onNight += OnNight;
+
+        // Weekday
+        TimeManager.onClockUpdate += OnClockUpdate;
+        TimeManager.onDayTimeChanged += OnDayTimeChanged;
+        TimeManager.onWeekDayChanged += OnWeekDayChanged;
+    }
+
+    private void Awake()
     {
         // DayTime
         TimeManager.onMorning += OnMorning;
