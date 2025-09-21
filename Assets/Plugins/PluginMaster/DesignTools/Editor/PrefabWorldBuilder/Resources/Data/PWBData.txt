@@ -23,8 +23,8 @@
     "_unsavedChangesAction": 0,
     "_tempCollidersAction": 1,
     "_paletteManager": {
-        "_selectedPaletteIdx": 0,
-        "_selectedBrushIdx": 389,
+        "_selectedPaletteIdx": 1,
+        "_selectedBrushIdx": -1,
         "_showBrushName": false,
         "_viewList": false,
         "_showTabsInMultipleRows": false,
@@ -538,8 +538,8 @@
         "_unsavedProfile": {
             "_moduleSizeType": 0,
             "_moduleSize": {
-                "x": 2.4999899864196779,
-                "y": 2.996999979019165,
+                "x": 2.5,
+                "y": 6.0,
                 "z": 0.15000000596046449
             },
             "_subtractBrushOffset": true,
@@ -6062,25 +6062,25 @@
             "_snappingEnabled": true,
             "_snappingOn": {
                 "x": true,
-                "y": true,
-                "z": false
-            },
-            "_visibleGrid": false,
-            "_gridOn": {
-                "x": false,
                 "y": false,
                 "z": true
+            },
+            "_visibleGrid": true,
+            "_gridOn": {
+                "x": false,
+                "y": true,
+                "z": false
             },
             "_lockedGrid": true,
             "_boundsSnapping": false,
             "_step": {
-                "x": 0.10000000149011612,
-                "y": 1.0,
-                "z": 0.10000000149011612
+                "x": 2.5,
+                "y": 6.0,
+                "z": 2.5
             },
             "_origin": {
                 "x": 0.0,
-                "y": 3.0,
+                "y": 0.0,
                 "z": 0.0
             },
             "_rotation": {
