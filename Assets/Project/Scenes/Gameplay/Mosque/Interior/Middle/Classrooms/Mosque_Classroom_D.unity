@@ -3937,7 +3937,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Instructions:
     m_Instructions:
-    - rid: 1724515395533799582
+    - rid: 8106394120028946773
   m_TriggerEvent:
     rid: 1724515395533799580
   references:
@@ -3954,50 +3954,51 @@ MonoBehaviour:
     - rid: 1724515395533799581
       type: {class: GetGameObjectPlayer, ns: GameCreator.Runtime.Characters, asm: GameCreator.Runtime.Core}
       data: 
-    - rid: 1724515395533799582
-      type: {class: InstructionCommonSceneLoad, ns: GameCreator.Runtime.VisualScripting, asm: GameCreator.Runtime.Core}
+    - rid: 8106394120028946773
+      type: {class: FadeSceneLoad, ns: , asm: Assembly-CSharp}
       data:
         m_Breakpoint: 0
         m_IsEnabled: 1
         m_Scene:
           m_Property:
-            rid: 1724515395533799584
+            rid: 8106394120028946774
         m_Mode: 0
         m_Async: 0
         m_SceneEntries:
           m_Entries:
           - m_Target:
               m_Property:
-                rid: 1724515395533799586
+                rid: 8106394120028946775
             m_Location:
               m_Property:
-                rid: 1724515395533799587
-    - rid: 1724515395533799584
+                rid: 8106394120028946776
+        m_Duration: 0.5
+    - rid: 8106394120028946774
       type: {class: GetSceneName, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
         m_SceneName:
           m_Property:
-            rid: 1724515395533799585
-    - rid: 1724515395533799585
-      type: {class: GetStringString, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
-      data:
-        m_Value: Mosque_Hallway_R
-    - rid: 1724515395533799586
+            rid: 8106394120028946777
+    - rid: 8106394120028946775
       type: {class: GetGameObjectPlayer, ns: GameCreator.Runtime.Characters, asm: GameCreator.Runtime.Core}
       data: 
-    - rid: 1724515395533799587
+    - rid: 8106394120028946776
       type: {class: GetLocationNavigationMarker, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
         m_Marker:
           m_Property:
-            rid: 1724515395533799589
-    - rid: 1724515395533799589
+            rid: 8106394120028946778
+    - rid: 8106394120028946777
+      type: {class: GetStringString, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_Value: Mosque_Hallway_R
+    - rid: 8106394120028946778
       type: {class: GetGameObjectNavigationMarkerID, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
         m_ID:
           m_Property:
-            rid: 1724515395533799590
-    - rid: 1724515395533799590
+            rid: 8106394120028946779
+    - rid: 8106394120028946779
       type: {class: GetStringString, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
         m_Value: 92263590-7497-4fee-ac17-1b49a33d1e95

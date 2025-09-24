@@ -427,7 +427,7 @@ public class TimeManager : EditorSingleton<TimeManager>
 
         if (Application.isPlaying)
         {
-            now += Time.deltaTime * timeScale / 864000f;
+            now += Time.deltaTime * timeScale / 86400f;
             TriggerClockUpdate();
 
             if (now > 1)

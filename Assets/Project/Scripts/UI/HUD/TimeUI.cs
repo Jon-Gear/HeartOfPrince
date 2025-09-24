@@ -112,6 +112,7 @@ public class TimeUI : MonoBehaviour
     void OnDayTimeChanged(DayPhaseChangedArgs args)
     {
         dayTimeText.text = TimeUtils.DayTimeToString(args.DayTime);
+        //Debug.Log($"DayTime changed to {args.DayTime}, updating text to {dayTimeText.text}");
     }
 
     void OnMorning(DayPhaseChangedArgs args)
