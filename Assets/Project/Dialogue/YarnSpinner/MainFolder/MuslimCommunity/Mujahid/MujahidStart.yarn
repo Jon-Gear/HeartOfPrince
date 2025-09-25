@@ -2,6 +2,7 @@
 tags:
 ---
 Prince: Mujahid..
+Mujahid: Prince.
 -> Prince: How are you?
 -> Prince: {GetDialogueTopicOptionText("Mujahid", 0)}
     <<jump {GetDialogueTopicNodeName("Mujahid", 0)}>>
