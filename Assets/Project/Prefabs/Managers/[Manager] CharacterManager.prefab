@@ -58,10 +58,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characterName: Nacho
-  topicsFromCharacter: []
-  topicsFromPlayer: []
+  topicsFromCharacterToPlayer:
+  - {fileID: 11400000, guid: 41ed1801966ffc6459aa77d3626e6641, type: 2}
+  topicsFromPlayerToCharacter: []
+  monologueTopics: []
+  topicsFromCharacterToOtherCharacter: []
   dailyActivityReport: []
-  backgroundDialogueTopics: []
   minInterval: 2
   maxInterval: 3
 --- !u!1 &3245328338253044162
@@ -122,10 +124,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characterName: Albeni
-  topicsFromCharacter: []
-  topicsFromPlayer: []
+  topicsFromCharacterToPlayer:
+  - {fileID: 11400000, guid: 41ed1801966ffc6459aa77d3626e6641, type: 2}
+  topicsFromPlayerToCharacter: []
+  monologueTopics: []
+  topicsFromCharacterToOtherCharacter: []
   dailyActivityReport: []
-  backgroundDialogueTopics: []
   minInterval: 5
   maxInterval: 6
 --- !u!1 &3823396006111329071
@@ -186,10 +190,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characterName: Sushi
-  topicsFromCharacter: []
-  topicsFromPlayer: []
+  topicsFromCharacterToPlayer:
+  - {fileID: 11400000, guid: 41ed1801966ffc6459aa77d3626e6641, type: 2}
+  topicsFromPlayerToCharacter: []
+  monologueTopics: []
+  topicsFromCharacterToOtherCharacter: []
   dailyActivityReport: []
-  backgroundDialogueTopics: []
   minInterval: 5
   maxInterval: 6
 --- !u!1 &4409061932063158097
@@ -225,6 +231,9 @@ Transform:
   - {fileID: 3182753723883272907}
   - {fileID: 3924342024739096987}
   - {fileID: 8601187938402238372}
+  - {fileID: 7893914217583835527}
+  - {fileID: 7206074853357913221}
+  - {fileID: 5941874756050568993}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7514096572543643067
@@ -239,3 +248,201 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b765fdffd94004782b44ce051ef505bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &4559337654373340850
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5941874756050568993}
+  - component: {fileID: 8765044034293674332}
+  - component: {fileID: 6092915989895864112}
+  m_Layer: 0
+  m_Name: MisterHariri
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5941874756050568993
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4559337654373340850}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6777921619610885219}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8765044034293674332
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4559337654373340850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63345c3d361c65b4bbe921d037452e9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &6092915989895864112
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4559337654373340850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db50fabeac0a2d647b67dc48fc264e4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  characterName: MisterHariri
+  topicsFromCharacterToPlayer:
+  - {fileID: 11400000, guid: 41ed1801966ffc6459aa77d3626e6641, type: 2}
+  topicsFromPlayerToCharacter: []
+  monologueTopics: []
+  topicsFromCharacterToOtherCharacter: []
+  dailyActivityReport: []
+  minInterval: 2
+  maxInterval: 3
+--- !u!1 &4665355961793989137
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7893914217583835527}
+  - component: {fileID: 1122012977010497786}
+  - component: {fileID: 3105328981322808804}
+  m_Layer: 0
+  m_Name: Mujahid
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7893914217583835527
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4665355961793989137}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6777921619610885219}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1122012977010497786
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4665355961793989137}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63345c3d361c65b4bbe921d037452e9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &3105328981322808804
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4665355961793989137}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db50fabeac0a2d647b67dc48fc264e4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  characterName: Mujahid
+  topicsFromCharacterToPlayer:
+  - {fileID: 11400000, guid: 41ed1801966ffc6459aa77d3626e6641, type: 2}
+  topicsFromPlayerToCharacter: []
+  monologueTopics: []
+  topicsFromCharacterToOtherCharacter: []
+  dailyActivityReport: []
+  minInterval: 2
+  maxInterval: 3
+--- !u!1 &8780986244644625960
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7206074853357913221}
+  - component: {fileID: 5197890050525944132}
+  - component: {fileID: 8626648282031538870}
+  m_Layer: 0
+  m_Name: Munir
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7206074853357913221
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8780986244644625960}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6777921619610885219}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5197890050525944132
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8780986244644625960}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63345c3d361c65b4bbe921d037452e9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &8626648282031538870
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8780986244644625960}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db50fabeac0a2d647b67dc48fc264e4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  characterName: Munir
+  topicsFromCharacterToPlayer:
+  - {fileID: 11400000, guid: 41ed1801966ffc6459aa77d3626e6641, type: 2}
+  topicsFromPlayerToCharacter: []
+  monologueTopics: []
+  topicsFromCharacterToOtherCharacter: []
+  dailyActivityReport: []
+  minInterval: 2
+  maxInterval: 3

@@ -74,13 +74,54 @@ public class YarnCommands : MonoBehaviour
         return characaterDialogueBrain.GetDialogueTopicNodeName(index);
     }
 
-    [YarnCommand("AddDialogueTopicFromPlayer")]
-    public static void AddToDialogueTopicFromPlayer(string characterName, string resourcePathToTopic)
+    // Adding Dialogue Topics to Characters
+
+    [YarnCommand("AddToCharacterTopicToAskPlayer")]
+    public static void AddToCharacterTopicToAskPlayer(string characterName, string resourcePathToTopic)
+    {
+        DialogueTopicFromCharacter topic = Resources.Load<DialogueTopicFromCharacter>("Dialogues/" + resourcePathToTopic);
+        CharacterDialogueBrain characaterDialogueBrain = CharacterManager.Instance.GetCharacter(characterName);
+        characaterDialogueBrain.AddDialogueTopicFromCharacterToPlayer(topic);
+    }
+
+    [YarnCommand("AddToPlayerTopicToAskCharacter")]
+    public static void AddToPlayerTopicToAskCharacter(string characterName, string resourcePathToTopic)
     {
         DialogueTopicFromPlayer topic = Resources.Load<DialogueTopicFromPlayer>("Dialogues/" + resourcePathToTopic);
         CharacterDialogueBrain characaterDialogueBrain = CharacterManager.Instance.GetCharacter(characterName);
-        characaterDialogueBrain.AddDialogueTopicFromPlayer(topic);
-    }   
+        characaterDialogueBrain.AddDialogueTopicFromPlayerToCharacter(topic);
+    }
+
+    [YarnCommand("AddToPlayerMonologueTopic")]
+    public static void AddToPlayerMonologueTopic(string characterName, string resourcePathToTopic)
+    {
+        /*
+        DialogueTopicFromPlayer topic = Resources.Load<DialogueTopicFromPlayer>("Dialogues/" + resourcePathToTopic);
+        CharacterDialogueBrain characaterDialogueBrain = CharacterManager.Instance.GetCharacter(characterName);
+        characaterDialogueBrain.(topic);
+        */
+    }
+
+    [YarnCommand("AddToCharacterMonologueTopic")]
+    public static void AddToCharacterMonologueTopic(string characterName, string resourcePathToTopic)
+    {
+        MonologueTopicFromCharacter topic = Resources.Load<MonologueTopicFromCharacter>("Dialogues/" + resourcePathToTopic);
+        CharacterDialogueBrain characaterDialogueBrain = CharacterManager.Instance.GetCharacter(characterName);
+        characaterDialogueBrain.AddMonologueTopic(topic);
+    }
+
+    [YarnCommand("AddToCharacterTopicToAskCharacter")]
+    public static void AddToCharacterTopicToAskCharacter(string characterName, string resourcePathToTopic)
+    {
+        BackgroundDialogueTopic topic = Resources.Load<BackgroundDialogueTopic>("Dialogues/" + resourcePathToTopic);
+        CharacterDialogueBrain characaterDialogueBrain = CharacterManager.Instance.GetCharacter(characterName);
+        characaterDialogueBrain.AddDialogueTopicFromCharacterToCharacter(topic);
+    }
+
+
+
+
+
 
 
 

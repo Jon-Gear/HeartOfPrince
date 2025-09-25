@@ -1,0 +1,12 @@
+﻿title: munir_start
+tags:
+---
+Munir: Hello.
+-> Prince: How are you?
+-> Prince: {GetDialogueTopicOptionText("Munir", 0)}
+    <<jump {GetDialogueTopicNodeName("Munir", 0)}>>
+-> Prince: {GetDialogueTopicOptionText("Munir", 1)}
+    <<jump {GetDialogueTopicNodeName("Munir", 1)}>>
+-> Prince: {GetDialogueTopicOptionText("Munir", 2)}
+    <<jump {GetDialogueTopicNodeName("Munir", 2)}>>
+===

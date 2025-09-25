@@ -1,0 +1,12 @@
+﻿title: mujahid_start
+tags:
+---
+Prince: Mujahid..
+-> Prince: How are you?
+-> Prince: {GetDialogueTopicOptionText("Mujahid", 0)}
+    <<jump {GetDialogueTopicNodeName("Mujahid", 0)}>>
+-> Prince: {GetDialogueTopicOptionText("Mujahid", 1)}
+    <<jump {GetDialogueTopicNodeName("Mujahid", 1)}>>
+-> Prince: {GetDialogueTopicOptionText("Mujahid", 2)}
+    <<jump {GetDialogueTopicNodeName("Mujahid", 2)}>>
+===

@@ -20,9 +20,13 @@ public class InstructionTalkToCharacter : Instruction
     {
         CharacterDialogueBrain character = CharacterManager.Instance.GetCharacter(characterName); 
         
-        if(character == null) return DefaultResult;
+        Debug.Log($"[InstructionTalkToCharacter] character: {character}");
 
-        character.PlayerStartDialogue();
+        if (character == null) return DefaultResult;
+
+        Debug.Log($"[InstructionTalkToCharacter] Starting dialogue with {characterName}");
+
+        character.PlayerStartDialogueWithCharacter();
         return DefaultResult;
     }
 }
@@ -42,7 +46,7 @@ public class InstructionCharacterTalkToYou : Instruction
 
         if (character == null) return DefaultResult;
 
-        character.CharacterStartDialogue();
+        character.CharacterStartDialogueWithPlayer();
         return DefaultResult;
     }
 }
@@ -112,7 +116,9 @@ public class InstructionAddBackgroundDialogueTopic : Instruction
 
         if (character == null) return DefaultResult;
 
-        character.AddBackgroundDialogueTopic(topic);
+
+        // TODO: Fix THIS later
+        //character.AddBackgroundDialogueTopic(topic);
 
         return DefaultResult;
     }
@@ -142,7 +148,8 @@ public class InstructionRemoveBackgroundDialogueTopic : Instruction
 
         if (character == null) return DefaultResult;
 
-        character.RemoveBackgroundDialogueTopic(topic);
+        // TODO: Fix THIS later
+        //character.RemoveBackgroundDialogueTopic(topic);
 
         return DefaultResult;
     }

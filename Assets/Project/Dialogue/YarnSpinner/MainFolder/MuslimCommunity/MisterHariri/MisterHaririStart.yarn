@@ -1,0 +1,13 @@
+﻿title: misterhariri_start
+tags:
+---
+Prince: Mister Hariri..
+
+-> Prince: How are you?
+-> Prince: {GetDialogueTopicOptionText("MisterHariri", 0)}
+    <<jump {GetDialogueTopicNodeName("MisterHariri", 0)}>>
+-> Prince: {GetDialogueTopicOptionText("MisterHariri", 1)}
+    <<jump {GetDialogueTopicNodeName("MisterHariri", 1)}>>
+-> Prince: {GetDialogueTopicOptionText("MisterHariri", 2)}
+    <<jump {GetDialogueTopicNodeName("MisterHariri", 2)}>>
+===
