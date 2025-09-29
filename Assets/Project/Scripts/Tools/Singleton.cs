@@ -1,6 +1,9 @@
+
 using UnityEngine;
 using UnityEngine.SceneManagement;
-
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
 {
     private static T _instance;
@@ -90,6 +93,10 @@ public class EditorSingleton<T> : MonoBehaviour where T : MonoBehaviour
     private static object _lock = new object();
     private static bool _subscribedToSceneLoad = false;
 
+#if UNITY_EDITOR
+    private static bool _subscribedToPlayMode = false;
+#endif
+
     public static T Instance
     {
         get
@@ -102,11 +109,8 @@ public class EditorSingleton<T> : MonoBehaviour where T : MonoBehaviour
 
                     if (_instance == null)
                     {
-                        //GameObject singletonObject = new GameObject(typeof(T).Name);
-                        //_instance = singletonObject.AddComponent<T>();
-
-                        //if (Application.isPlaying)
-                            //DontDestroyOnLoad(singletonObject);
+                        Debug.LogError($"[Singleton] Instance '{typeof(T)}' not found in the scene.");
+                        return null;
                     }
 
                     if (Application.isPlaying && !_subscribedToSceneLoad)
@@ -114,6 +118,14 @@ public class EditorSingleton<T> : MonoBehaviour where T : MonoBehaviour
                         SceneManager.sceneLoaded += OnSceneLoaded;
                         _subscribedToSceneLoad = true;
                     }
+
+#if UNITY_EDITOR
+                    if (!_subscribedToPlayMode)
+                    {
+                        EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+                        _subscribedToPlayMode = true;
+                    }
+#endif
                 }
 
                 return _instance;
@@ -129,12 +141,7 @@ public class EditorSingleton<T> : MonoBehaviour where T : MonoBehaviour
 
             if (Application.isPlaying)
             {
-                DontDestroyOnLoad(gameObject);
-                if (!_subscribedToSceneLoad)
-                {
-                    SceneManager.sceneLoaded += OnSceneLoaded;
-                    _subscribedToSceneLoad = true;
-                }
+                MakePersistent();
             }
         }
         else if (_instance != this)
@@ -146,6 +153,25 @@ public class EditorSingleton<T> : MonoBehaviour where T : MonoBehaviour
         }
     }
 
+    private static void MakePersistent()
+    {
+        if (_instance != null)
+        {
+            DontDestroyOnLoad((_instance as MonoBehaviour).gameObject);
+            Debug.Log($"{typeof(T).Name} moved to DontDestroyOnLoad");
+        }
+    }
+
+#if UNITY_EDITOR
+    private static void OnPlayModeStateChanged(PlayModeStateChange state)
+    {
+        if (state == PlayModeStateChange.EnteredPlayMode)
+        {
+            MakePersistent();
+        }
+    }
+#endif
+
     protected virtual void OnDestroy()
     {
         if (_instance == this && Application.isPlaying)
@@ -153,6 +179,14 @@ public class EditorSingleton<T> : MonoBehaviour where T : MonoBehaviour
             SceneManager.sceneLoaded -= OnSceneLoaded;
             _subscribedToSceneLoad = false;
         }
+
+#if UNITY_EDITOR
+        if (_instance == this && _subscribedToPlayMode)
+        {
+            EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
+            _subscribedToPlayMode = false;
+        }
+#endif
     }
 
     // Optional scene callback for runtime use

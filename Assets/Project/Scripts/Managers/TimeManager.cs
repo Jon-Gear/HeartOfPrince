@@ -76,7 +76,7 @@ public class TimeManager : EditorSingleton<TimeManager>
         isPaused = true;
     }
 
-    public void ResumeTime()
+    public void StartTime()
     {
         isPaused = false;
     }

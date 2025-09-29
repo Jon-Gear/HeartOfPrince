@@ -32,6 +32,8 @@ public class CharacterDialogueBrain : MonoBehaviour
 {
     [SerializeField] private string characterName = "Character";
 
+    [Header("Topics")]
+
     [Tooltip("Dialogue topics the character wants to ask the player")]
     [SerializeField] private List<DialogueTopicFromCharacter> topicsFromCharacterToPlayer = new List<DialogueTopicFromCharacter>();
 
@@ -45,7 +47,7 @@ public class CharacterDialogueBrain : MonoBehaviour
     [SerializeField] private List<BackgroundDialogueTopic> topicsFromCharacterToOtherCharacter = new List<BackgroundDialogueTopic>();
 
 
-
+    [Header("Settings")]
 
 
     [Tooltip("Daily activities that were done throughout the day")]
@@ -58,6 +60,29 @@ public class CharacterDialogueBrain : MonoBehaviour
 
     [Tooltip("Maximum time between background dialogues (seconds).")]
     [SerializeField] private float maxInterval = 2.0f;
+
+
+
+    public void AddTopicFromCharacterToPlayer(DialogueTopicFromCharacter topic)
+    {
+        if (!topicsFromCharacterToPlayer.Contains(topic))
+        {
+            topicsFromCharacterToPlayer.Add(topic);
+        }
+    }
+
+    public void RemoveTopicFromCharacterToPlayer(string topicName)
+    {
+        foreach(DialogueTopicFromCharacter topic in topicsFromCharacterToPlayer)
+        {
+            if(topic.TopicName == topicName)
+            {
+                topicsFromCharacterToPlayer.Remove(topic);
+                return;
+            }
+        }
+    }
+
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -114,6 +139,11 @@ public class CharacterDialogueBrain : MonoBehaviour
     }
 
     // Character-Initiated Dialogue Functions
+    public bool HasTopicsToAskPlayer()
+    {
+        return topicsFromCharacterToPlayer.Count > 0;
+    }
+
     public void CharacterStartDialogueWithPlayer()
     {
         if (DialogueManager.Instance.IsDialogueRunning())

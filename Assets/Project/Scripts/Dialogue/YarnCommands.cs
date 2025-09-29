@@ -118,8 +118,12 @@ public class YarnCommands : MonoBehaviour
         characaterDialogueBrain.AddDialogueTopicFromCharacterToCharacter(topic);
     }
 
-
-
+    [YarnCommand("RemoveTopicFromCharacterToPlayer")]
+    public static void RemoveTopicFromCharacterToPlayer(string characterName, string topicName)
+    {
+        CharacterDialogueBrain characaterDialogueBrain = CharacterManager.Instance.GetCharacter(characterName);
+        characaterDialogueBrain.RemoveTopicFromCharacterToPlayer(topicName);
+    }
 
 
 
@@ -245,7 +249,7 @@ public class YarnCommands : MonoBehaviour
         }
 
         // Trigger the emote on the actor
-        actor.Gesture(emoteName);
+        //actor.Gesture(emoteName);
     }
 
     [YarnCommand("enterState")]
@@ -260,7 +264,7 @@ public class YarnCommands : MonoBehaviour
         }
 
         // Enter the specified state on the actor
-        actor.EnterState(stateName);
+        //actor.EnterState(stateName);
     }
 
     [YarnCommand("exitState")]
@@ -274,6 +278,6 @@ public class YarnCommands : MonoBehaviour
             return;
         }
         // Exit the specified state on the actor
-        actor.ExitState(stateName);
+        //actor.ExitState(stateName);
     }
 }

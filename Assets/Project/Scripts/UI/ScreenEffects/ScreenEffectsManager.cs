@@ -42,7 +42,7 @@ public class ScreenEffectsManager : Singleton<ScreenEffectsManager>
     public Task BasicFadeIn(float duration)
     {
         BasicFadeCanvasGroup.alpha = 1.0f;
-        return FadeCanvasGroup(BasicFadeCanvasGroup, 0f, duration);
+        return FadeCanvasGroup(BasicFadeCanvasGroup, 0.0f, duration);
     }
 
     public Task BasicFadeOut(float duration)

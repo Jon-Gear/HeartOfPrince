@@ -12,8 +12,8 @@ public class Actor : MonoBehaviour
 
     //[SerializeField] private List<ThoughtData> thoughts = new List<ThoughtData>();
 
-    [SerializeField] private List<AnimationStateEntry> animationStates = new List<AnimationStateEntry>();
-    [SerializeField] private List<GestureEntry> gestures = new List<GestureEntry>();
+    //[SerializeField] private List<AnimationStateEntry> animationStates = new List<AnimationStateEntry>();
+    //[SerializeField] private List<GestureEntry> gestures = new List<GestureEntry>();
     
     private Character character;
 
@@ -48,42 +48,6 @@ public class Actor : MonoBehaviour
     }
 
     /*
-    public void AddThought(string thoughtName, int maxVariants = 3)
-    {
-        ThoughtData thought = thoughts.FirstOrDefault(t => t.thoughtName == thoughtName);
-        
-        if (thought == null)
-        {
-            thought = new ThoughtData(thoughtName, maxVariants);
-            thoughts.Add(thought);
-        }
-        
-        Debug.Log($"Thought added: {thoughtName} for actor: {actorName}");
-    }
-
-    public string GetRandomThought()
-    {
-        if (thoughts.Count == 0)
-        {
-            //Debug.LogWarning($"No thoughts available for actor: {actorName}");
-            return null;
-        }
-
-        ThoughtData thought = thoughts[Random.Range(0, thoughts.Count)];
-        
-        string thoughtNodeName = thought.GetThoughtNodeName();
-
-        if (thought.IsThoughtExhausted())
-        {
-            thoughts.Remove(thought);
-            //Debug.LogWarning($"Thought '{thought.thoughtName}' is exhausted for actor: {actorName}");
-        }
-
-        return thoughtNodeName;
-    }
-    */
-
-
     public void Gesture(string gestureName)
     {
         GestureEntry gesture = gestures.FirstOrDefault(g => g.m_Name == gestureName);
@@ -124,6 +88,7 @@ public class Actor : MonoBehaviour
         }
         animationState.ExitAnimationState(character, null);
     }
+    */
 
 
     private void OnDestroy()
