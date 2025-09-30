@@ -11,6 +11,7 @@ using UnityEngine.Events;
 public class TriggerCollider : MonoBehaviour
 {
     [SerializeField] private PropertyGetGameObject m_Target = new PropertyGetGameObject();
+    [SerializeField] private LayerMask targetLayer;
 
     /// <summary>
     /// Raised when another collider enters this trigger.
@@ -33,7 +34,12 @@ public class TriggerCollider : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         GameObject target = m_Target.Get(gameObject);
-        if(target == null || other.gameObject == target)
+
+        // Check if the object is the target OR is in the target layer
+        bool isTarget = target != null && other.gameObject == target;
+        bool isInLayer = ((1 << other.gameObject.layer) & targetLayer.value) != 0;
+
+        if (isTarget || isInLayer)
         {
             TriggerEntered?.Invoke(other);
         }
@@ -42,7 +48,12 @@ public class TriggerCollider : MonoBehaviour
     private void OnTriggerExit(Collider other)
     {
         GameObject target = m_Target.Get(gameObject);
-        if (target == null || other.gameObject == target)
+
+        // Check if the object is the target OR is in the target layer
+        bool isTarget = target != null && other.gameObject == target;
+        bool isInLayer = ((1 << other.gameObject.layer) & targetLayer.value) != 0;
+
+        if (isTarget || isInLayer)
         {
             TriggerExited?.Invoke(other);
         }

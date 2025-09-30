@@ -20,13 +20,11 @@ public class InstructionTalkToCharacter : Instruction
     {
         CharacterDialogueBrain character = CharacterManager.Instance.GetCharacter(characterName); 
         
-        Debug.Log($"[InstructionTalkToCharacter] character: {character}");
-
+        
         if (character == null) return DefaultResult;
 
-        Debug.Log($"[InstructionTalkToCharacter] Starting dialogue with {characterName}");
-
-        character.PlayerStartDialogueWithCharacter();
+        
+        character.PlayerStartDialogue();
         return DefaultResult;
     }
 }
@@ -67,7 +65,7 @@ public class InstructionRunBackgroundDialogue : Instruction
 
         if (character == null) return DefaultResult;
 
-        character.StartBackgroundDialogueLoop();
+        //character.StartBackgroundDialogueLoop();
         return DefaultResult;
     }
 }
@@ -87,7 +85,7 @@ public class InstructionStopBackgroundDialogue : Instruction
 
         if (character == null) return DefaultResult;
 
-        character.StopBackgroundDialogueLoop();
+        //character.StopBackgroundDialogueLoop();
         return DefaultResult;
     }
 }
@@ -100,7 +98,7 @@ public class InstructionStopBackgroundDialogue : Instruction
 public class InstructionAddBackgroundDialogueTopic : Instruction
 {
     [SerializeField] private PropertyGetGameObject target;
-    [SerializeField] private BackgroundDialogueTopic topic = null;
+    //[SerializeField] private BackgroundDialogueTopic topic = null;
     public override string Title => $"Add a background dialogue topic to nearby character";
 
     protected override Task Run(Args args)
@@ -132,7 +130,7 @@ public class InstructionAddBackgroundDialogueTopic : Instruction
 public class InstructionRemoveBackgroundDialogueTopic : Instruction
 {
     [SerializeField] private PropertyGetGameObject target;
-    [SerializeField] private BackgroundDialogueTopic topic = null;
+    //[SerializeField] private BackgroundDialogueTopic topic = null;
     public override string Title => $"Add a background dialogue topic to nearby character";
 
     protected override Task Run(Args args)

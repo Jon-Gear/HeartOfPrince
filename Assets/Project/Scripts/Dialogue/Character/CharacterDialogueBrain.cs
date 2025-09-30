@@ -4,6 +4,7 @@ using NUnit.Framework;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
@@ -28,257 +29,221 @@ public class DailyActivityReport : ScriptableObject
 }
 
 
+
 public class CharacterDialogueBrain : MonoBehaviour
 {
     [SerializeField] private string characterName = "Character";
 
-    [Header("Topics")]
+    [Header("Dialogue Topics")]
 
-    [Tooltip("Dialogue topics the character wants to ask the player")]
-    [SerializeField] private List<DialogueTopicFromCharacter> topicsFromCharacterToPlayer = new List<DialogueTopicFromCharacter>();
+    [Tooltip("Dialogue topics the character can ask the player.")]
+    [SerializeField] private List<TopicCharacterToPlayer> characterToPlayerTopics = new();
 
-    [Tooltip("Dialogue topics the player wants to ask the character")]
-    [SerializeField] private List<DialogueTopicFromPlayer> topicsFromPlayerToCharacter = new List<DialogueTopicFromPlayer>();
+    [Tooltip("Dialogue topics the player can ask the character.")]
+    [SerializeField] private List<TopicPlayerToCharacter> playerToCharacterTopics = new();
 
-    [Tooltip("Monologue topics the character wants to ask to themselves")]
-    [SerializeField] private List<MonologueTopicFromCharacter> monologueTopics = new List<MonologueTopicFromCharacter>();
+    [Tooltip("Monologue topics the character thinks about themselves.")]
+    [SerializeField] private List<TopicCharacterMonologue> monologueTopics = new();
 
-    [Tooltip("Monologue topics the character wants to ask other characters")]
-    [SerializeField] private List<BackgroundDialogueTopic> topicsFromCharacterToOtherCharacter = new List<BackgroundDialogueTopic>();
-
+    [Tooltip("Background dialogue topics between this character and others.")]
+    [SerializeField] private List<TopicCharacterToCharacter> characterToCharacterTopics = new();
 
     [Header("Settings")]
 
-
-    [Tooltip("Daily activities that were done throughout the day")]
-    [SerializeField] private List<DailyActivityReport> dailyActivityReport = new List<DailyActivityReport>();
-
-    private Coroutine backgroundDialogueLoop;
-
-    [Tooltip("Minimum time between background dialogues (seconds).")]
-    [SerializeField] private float minInterval = 1.0f;
-
-    [Tooltip("Maximum time between background dialogues (seconds).")]
-    [SerializeField] private float maxInterval = 2.0f;
+    [Tooltip("Daily activities done throughout the day.")]
+    [SerializeField] private List<DailyActivityReport> dailyActivityReports = new();
 
 
+    // -------------------
+    // Unity Events
+    // -------------------
 
-    public void AddTopicFromCharacterToPlayer(DialogueTopicFromCharacter topic)
-    {
-        if (!topicsFromCharacterToPlayer.Contains(topic))
-        {
-            topicsFromCharacterToPlayer.Add(topic);
-        }
-    }
-
-    public void RemoveTopicFromCharacterToPlayer(string topicName)
-    {
-        foreach(DialogueTopicFromCharacter topic in topicsFromCharacterToPlayer)
-        {
-            if(topic.TopicName == topicName)
-            {
-                topicsFromCharacterToPlayer.Remove(topic);
-                return;
-            }
-        }
-    }
-
-
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        SceneManager.activeSceneChanged += OnActiveSceneChanged;
-    }
-
-    // Update is called once per frame
-    void Update()
+    private void Start()
     {
         
     }
 
-    // Player-Initiated Dialogue Functions
-    public void PlayerStartDialogueWithCharacter()
+    private void Update()
+    {
+        // Reserved for runtime checks if needed
+    }
+
+    // -------------------
+    // Player -> Character
+    // -------------------
+
+    public void AddPlayerToCharacterTopic(TopicPlayerToCharacter topic)
+    {
+        if (!playerToCharacterTopics.Contains(topic))
+            playerToCharacterTopics.Add(topic);
+    }
+
+    public void RemovePlayerToCharacterTopic(string topicName)
+    {
+        playerToCharacterTopics.RemoveAll(t => t.TopicName == topicName);
+    }
+
+    public string GetPlayerTopicOptionText(int index)
+    {
+        if (index < 0 || index >= playerToCharacterTopics.Count)
+            return "...";
+
+        return $"Talk about {playerToCharacterTopics[index].TopicName}";
+    }
+
+    public string GetPlayerTopicNodeName(int index)
+    {
+        if (index < 0 || index >= playerToCharacterTopics.Count)
+            return "empty";
+
+        return playerToCharacterTopics[index]
+            .GetTopicNodeName()
+            .Replace("{actor}", characterName.ToLower());
+    }
+
+    public void PlayerStartDialogue()
     {
         if (DialogueManager.Instance.IsDialogueRunning())
-        {
             return;
-        }
 
         Debug.Log($"Player starting dialogue with {characterName}.");
-
         string nodeName = $"{characterName.ToLower()}_start";
-
         DialogueManager.Instance.StartDialogue(nodeName);
     }
 
-    public string GetDialogueTopicOptionText(int index)
+    // -------------------
+    // Character -> Player
+    // -------------------
+
+    public void AddCharacterToPlayerTopic(TopicCharacterToPlayer topic)
     {
-        if(index < 0 || index >= topicsFromPlayerToCharacter.Count)
-        {
-            return "...";
-        }
-        return $"Talk about {topicsFromPlayerToCharacter[index].TopicName}";
+        if (!characterToPlayerTopics.Contains(topic))
+            characterToPlayerTopics.Add(topic);
     }
 
-    public string GetDialogueTopicNodeName(int index)
+    public void RemoveCharacterToPlayerTopic(string topicName)
     {
-        if (index < 0 || index >= topicsFromPlayerToCharacter.Count)
-        {
-            return "empty";
-        }
-        return topicsFromPlayerToCharacter[index].GetTopicNodeName().Replace("{actor}", characterName.ToLower());
+        characterToPlayerTopics.RemoveAll(t => t.TopicName == topicName);
     }
 
-    public void AddDialogueTopicFromPlayerToCharacter(DialogueTopicFromPlayer topic)
-    {
-        if (!topicsFromPlayerToCharacter.Contains(topic))
-        {
-            topicsFromPlayerToCharacter.Add(topic);
-        }
-    }
-
-    // Character-Initiated Dialogue Functions
-    public bool HasTopicsToAskPlayer()
-    {
-        return topicsFromCharacterToPlayer.Count > 0;
-    }
+    public bool HasTopicsForPlayer() => characterToPlayerTopics.Count > 0;
 
     public void CharacterStartDialogueWithPlayer()
     {
-        if (DialogueManager.Instance.IsDialogueRunning())
-        {
+        if (DialogueManager.Instance.IsDialogueRunning() || characterToPlayerTopics.Count == 0)
             return;
-        }
-        if (topicsFromCharacterToPlayer.Count == 0)
-        {
-            return;
-        }
-        DialogueManager.Instance.StartDialogue(ChooseCharacterToPlayerDialogueNode());
+
+        DialogueManager.Instance.StartDialogue(GetRandomCharacterToPlayerNode());
     }
 
-    private string ChooseCharacterToPlayerDialogueNode()
+    private string GetRandomCharacterToPlayerNode()
     {
-        string nodeName = topicsFromCharacterToPlayer[Random.Range(0, topicsFromCharacterToPlayer.Count)].GetTopicNodeName().Replace("{actor}", characterName.ToLower());
-        return nodeName;
+        return characterToPlayerTopics[Random.Range(0, characterToPlayerTopics.Count)]
+            .GetTopicNodeName()
+            .Replace("{actor}", characterName.ToLower());
     }
 
-    public void AddDialogueTopicFromCharacterToPlayer(DialogueTopicFromCharacter topic)
-    {
-        if (!topicsFromCharacterToPlayer.Contains(topic))
-        {
-            topicsFromCharacterToPlayer.Add(topic);
-        }
-    }
+    // -------------------
+    // Character Monologue
+    // -------------------
 
-    // Background Dialogue Functions
-
-    public void StartBackgroundDialogueLoop()
-    {
-        if (DialogueManager.Instance.IsDialogueRunning() ||
-            DialogueManager.Instance.IsInnerMonologueRunning() ||
-            DialogueManager.Instance.IsBackgroundDialogueRunning())
-        {
-            return;
-        }
-        Debug.Log($"Starting background dialogue loop for {characterName}.");
-
-        backgroundDialogueLoop = StartCoroutine(BackgroundDialogueLoop());
-    }
-
-    private IEnumerator BackgroundDialogueLoop()
-    {
-        while (true)
-        {
-            // Wait a random amount of time between yaps
-            float waitTime = Random.Range(minInterval, maxInterval);
-            yield return new WaitForSeconds(waitTime);
-
-            CharacterStartMonologue();
-            //CharacterStartDialogueWithCharacter();
-        }
-    }
-
-    public void StopBackgroundDialogueLoop()
-    {
-        if (backgroundDialogueLoop != null)
-        {
-            Debug.Log($"Stopping background dialogue loop for {characterName}.");
-            StopCoroutine(backgroundDialogueLoop);
-        }
-    }
-
-
-    private void CharacterStartMonologue()
-    {
-        if (DialogueManager.Instance.IsDialogueRunning() ||
-            DialogueManager.Instance.IsInnerMonologueRunning() ||
-            DialogueManager.Instance.IsBackgroundDialogueRunning())
-        {
-            return;
-        }
-        if (monologueTopics.Count == 0)
-        {
-            return;
-        }
-        DialogueManager.Instance.StartBackgroundDialogue(ChooseMonologueNode());
-    }
-
-    private string ChooseMonologueNode()
-    {
-        string nodeName = monologueTopics[Random.Range(0, monologueTopics.Count)].GetTopicNodeName().Replace("{actor}", characterName.ToLower());
-        return nodeName;
-    }
-
-    public void AddMonologueTopic(MonologueTopicFromCharacter topic)
+    public void AddCharacterMonologueTopic(TopicCharacterMonologue topic)
     {
         if (!monologueTopics.Contains(topic))
-        {
             monologueTopics.Add(topic);
-        }
     }
 
-    private void CharacterStartDialogueWithCharacter()
+    public void RemoveCharacterMonologueTopic(string topicName)
+    {
+        monologueTopics.RemoveAll(t => t.TopicName == topicName);
+    }
+
+    public void TriggerMonologue()
     {
         if (DialogueManager.Instance.IsDialogueRunning() ||
             DialogueManager.Instance.IsInnerMonologueRunning() ||
-            DialogueManager.Instance.IsBackgroundDialogueRunning())
-        {
+            DialogueManager.Instance.IsBackgroundDialogueRunning() ||
+            monologueTopics.Count == 0)
             return;
-        }
-        if (topicsFromCharacterToOtherCharacter.Count == 0)
+
+        DialogueManager.Instance.StartBackgroundDialogue(GetRandomMonologueNode());
+    }
+
+    private string GetRandomMonologueNode()
+    {
+        return monologueTopics[Random.Range(0, monologueTopics.Count)]
+            .GetTopicNodeName()
+            .Replace("{actor}", characterName.ToLower());
+    }
+
+    // -------------------
+    // Character -> Character
+    // -------------------
+
+    public void AddCharacterToCharacterTopic(TopicCharacterToCharacter topic)
+    {
+        if (!characterToCharacterTopics.Contains(topic))
+            characterToCharacterTopics.Add(topic);
+    }
+
+    public void RemoveCharacterToCharacterTopic(string topicName)
+    {
+        characterToCharacterTopics.RemoveAll(t => t.TopicName == topicName);
+    }
+
+    public bool TriggerCharacterToCharacterDialogue(List<Actor> nearbyActors)
+    {
+        if (DialogueManager.Instance.IsDialogueRunning() ||
+            DialogueManager.Instance.IsInnerMonologueRunning() ||
+            DialogueManager.Instance.IsBackgroundDialogueRunning() ||
+            characterToCharacterTopics.Count == 0)
+            return false;
+
+        string bestTopicNodeName = GetBestAvailableTopic(nearbyActors);
+
+        if(bestTopicNodeName == "")
         {
-            return;
+            return false;
         }
-        DialogueManager.Instance.StartBackgroundDialogue(ChooseDialogueWithOtherCharacterNode());
+
+        DialogueManager.Instance.StartBackgroundDialogue(bestTopicNodeName);
+        return true;
     }
 
-    private string ChooseDialogueWithOtherCharacterNode()
+    private String GetBestAvailableTopic(List<Actor> nearbyActors)
     {
-        string nodeName = topicsFromCharacterToOtherCharacter[Random.Range(0, topicsFromCharacterToOtherCharacter.Count)].GetTopicNodeName().Replace("{actor}", characterName.ToLower());
-        return nodeName;
-    }
+        TopicCharacterToCharacter bestTopic = null;
+        int bestScore = -1;
 
-    public void AddDialogueTopicFromCharacterToCharacter(BackgroundDialogueTopic topic)
-    {
-        if (!topicsFromCharacterToOtherCharacter.Contains(topic))
+        foreach (var topic in characterToCharacterTopics)
         {
-            topicsFromCharacterToOtherCharacter.Add(topic);
+            // 1. Check if all required chars are present
+            bool allRequiredPresent = topic.OtherActors
+                .All(req => nearbyActors.Exists(c => c.actorName == req));
+            if (!allRequiredPresent) continue;
+
+            int score = topic.OtherActors.Count;
+
+            // 3. Keep highest scoring topic
+            if (score > bestScore)
+            {
+                bestScore = score;
+                bestTopic = topic;
+            }
         }
-    }
 
+        if(bestTopic == null)
+        {
+            return "";
+        }
+        else
+        {
+            return bestTopic.GetTopicNodeName().Replace("{actor}", characterName.ToLower());
+        }
 
-
-
-
-
-    // Misc Functions
-
-    private void OnActiveSceneChanged(Scene oldScene, Scene newScene)
-    {
-        StopBackgroundDialogueLoop();
     }
 }
+
 
 /*
 

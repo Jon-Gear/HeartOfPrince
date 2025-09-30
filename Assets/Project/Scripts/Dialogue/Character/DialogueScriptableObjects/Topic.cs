@@ -13,6 +13,17 @@ public abstract class Topic : ScriptableObject
 
 
 /*
+
+TopicCharacterToPlayer
+
+TopicPlayerToCharacter
+
+TopicPlayerMonologue
+
+TopicCharacterMonologue
+
+TopicCharacterToCharacter
+
 - Reactive Dialogue (immediate reaction to in-game triggers) 
 - Instructional Dialogue (dialogue with the main intention to teach)
 */

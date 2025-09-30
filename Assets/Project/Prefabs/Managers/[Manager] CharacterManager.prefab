@@ -58,14 +58,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characterName: Nacho
-  topicsFromCharacterToPlayer:
+  characterToPlayerTopics:
   - {fileID: 11400000, guid: 41ed1801966ffc6459aa77d3626e6641, type: 2}
-  topicsFromPlayerToCharacter: []
-  monologueTopics: []
-  topicsFromCharacterToOtherCharacter: []
-  dailyActivityReport: []
-  minInterval: 2
-  maxInterval: 3
+  playerToCharacterTopics: []
+  monologueTopics:
+  - {fileID: 11400000, guid: c20fd46b64d66fd48b1943c67cdb69d9, type: 2}
+  characterToCharacterTopics:
+  - {fileID: 11400000, guid: 62f91d9913a3f4042a2b1e4df1ed393b, type: 2}
+  - {fileID: 11400000, guid: 29c30a76c76e8854495dfd27302bf3f3, type: 2}
+  - {fileID: 11400000, guid: c5332ada86902b04785eef030f37d392, type: 2}
+  dailyActivityReports: []
 --- !u!1 &3245328338253044162
 GameObject:
   m_ObjectHideFlags: 0
@@ -124,14 +126,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characterName: Albeni
-  topicsFromCharacterToPlayer:
-  - {fileID: 11400000, guid: 41ed1801966ffc6459aa77d3626e6641, type: 2}
-  topicsFromPlayerToCharacter: []
+  characterToPlayerTopics: []
+  playerToCharacterTopics: []
   monologueTopics: []
-  topicsFromCharacterToOtherCharacter: []
-  dailyActivityReport: []
-  minInterval: 5
-  maxInterval: 6
+  characterToCharacterTopics: []
+  dailyActivityReports: []
 --- !u!1 &3823396006111329071
 GameObject:
   m_ObjectHideFlags: 0
@@ -190,14 +189,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characterName: Sushi
-  topicsFromCharacterToPlayer:
-  - {fileID: 11400000, guid: 41ed1801966ffc6459aa77d3626e6641, type: 2}
-  topicsFromPlayerToCharacter: []
+  characterToPlayerTopics: []
+  playerToCharacterTopics: []
   monologueTopics: []
-  topicsFromCharacterToOtherCharacter: []
-  dailyActivityReport: []
-  minInterval: 5
-  maxInterval: 6
+  characterToCharacterTopics: []
+  dailyActivityReports: []
 --- !u!1 &4409061932063158097
 GameObject:
   m_ObjectHideFlags: 0
@@ -306,14 +302,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characterName: MisterHariri
-  topicsFromCharacterToPlayer:
-  - {fileID: 11400000, guid: 41ed1801966ffc6459aa77d3626e6641, type: 2}
-  topicsFromPlayerToCharacter: []
+  characterToPlayerTopics: []
+  playerToCharacterTopics: []
   monologueTopics: []
-  topicsFromCharacterToOtherCharacter: []
-  dailyActivityReport: []
-  minInterval: 2
-  maxInterval: 3
+  characterToCharacterTopics: []
+  dailyActivityReports: []
 --- !u!1 &4665355961793989137
 GameObject:
   m_ObjectHideFlags: 0
@@ -372,14 +365,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characterName: Mujahid
-  topicsFromCharacterToPlayer:
-  - {fileID: 11400000, guid: 41ed1801966ffc6459aa77d3626e6641, type: 2}
-  topicsFromPlayerToCharacter: []
+  characterToPlayerTopics: []
+  playerToCharacterTopics: []
   monologueTopics: []
-  topicsFromCharacterToOtherCharacter: []
-  dailyActivityReport: []
-  minInterval: 2
-  maxInterval: 3
+  characterToCharacterTopics: []
+  dailyActivityReports: []
 --- !u!1 &8780986244644625960
 GameObject:
   m_ObjectHideFlags: 0
@@ -438,11 +428,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characterName: Munir
-  topicsFromCharacterToPlayer:
-  - {fileID: 11400000, guid: 41ed1801966ffc6459aa77d3626e6641, type: 2}
-  topicsFromPlayerToCharacter: []
+  characterToPlayerTopics: []
+  playerToCharacterTopics: []
   monologueTopics: []
-  topicsFromCharacterToOtherCharacter: []
-  dailyActivityReport: []
-  minInterval: 2
-  maxInterval: 3
+  characterToCharacterTopics: []
+  dailyActivityReports: []
