@@ -106,7 +106,6 @@ public class CharacterDialogueBrain : MonoBehaviour
         if (DialogueManager.Instance.IsDialogueRunning())
             return;
 
-        Debug.Log($"Player starting dialogue with {characterName}.");
         string nodeName = $"{characterName.ToLower()}_start";
         DialogueManager.Instance.StartDialogue(nodeName);
     }
@@ -123,7 +122,19 @@ public class CharacterDialogueBrain : MonoBehaviour
 
     public void RemoveCharacterToPlayerTopic(string topicName)
     {
+        Debug.Log("Before");
+        for (int i = 0; i < characterToPlayerTopics.Count; i++)
+        {
+            Debug.Log($" {i}: Character to player topic: {characterToPlayerTopics[i].TopicName}");
+        }
         characterToPlayerTopics.RemoveAll(t => t.TopicName == topicName);
+
+        Debug.Log("After");
+        for (int i = 0; i < characterToPlayerTopics.Count; i++)
+        {
+            Debug.Log($" {i}: Character to player topic: {characterToPlayerTopics[i].TopicName}");
+        }
+        Debug.Log("End Removal");
     }
 
     public bool HasTopicsForPlayer() => characterToPlayerTopics.Count > 0;
@@ -133,11 +144,22 @@ public class CharacterDialogueBrain : MonoBehaviour
         if (DialogueManager.Instance.IsDialogueRunning() || characterToPlayerTopics.Count == 0)
             return;
 
-        DialogueManager.Instance.StartDialogue(GetRandomCharacterToPlayerNode());
+        string nodeName = GetRandomCharacterToPlayerNode();
+
+        Debug.Log($"Starting character to player dialogue with node: {nodeName}");
+
+        DialogueManager.Instance.StartDialogue(nodeName);
     }
 
     private string GetRandomCharacterToPlayerNode()
     {
+        Debug.Log($"Character to player topics count: {characterToPlayerTopics.Count}");
+
+        for (int i = 0; i < characterToPlayerTopics.Count; i++)
+        {
+            Debug.Log($" {i}: Character to player topic: {characterToPlayerTopics[i].TopicName}");
+        }
+
         return characterToPlayerTopics[Random.Range(0, characterToPlayerTopics.Count)]
             .GetTopicNodeName()
             .Replace("{actor}", characterName.ToLower());
@@ -156,6 +178,12 @@ public class CharacterDialogueBrain : MonoBehaviour
     public void RemoveCharacterMonologueTopic(string topicName)
     {
         monologueTopics.RemoveAll(t => t.TopicName == topicName);
+    }
+
+    public void RemoveCharacterMonologueTopic(TopicCharacterMonologue topic)
+    {
+        if (monologueTopics.Contains(topic))
+            monologueTopics.Remove(topic);
     }
 
     public void TriggerMonologue()

@@ -409,8 +409,7 @@ public class TimeManager : EditorSingleton<TimeManager>
     {
         prayerTimes.SetDayTimes();
      
-        now = 0.5f;   
-        Debug.Log($"TimeManager started at {GetTimeString()}");
+        now = 0.5f;
 
         TriggerClockUpdate();
         TriggerDayTimeChanged();

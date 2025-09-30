@@ -20,7 +20,6 @@ public class PrayerTimes : ScriptableObject
         // Note for future self: OnValidate is called when the script is loaded or a value changes in the inspector (in the editor only).
         // It is not called during runtime in a built application.
         SetDayTimes();
-        Debug.Log("PrayerTimes OnValidate called");
     }
 
 
@@ -137,7 +136,6 @@ public class PrayerTimes : ScriptableObject
             dayTime = DAYTIME.Night,
             sunAngle = 360
         });
-        Debug.Log("SetDayTimes called, count: " + dayTimes.Count);
     }
     
     

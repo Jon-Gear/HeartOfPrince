@@ -74,7 +74,7 @@ public class CharacterStartMonologue : MonoBehaviour
 
     private void OnActiveSceneChanged(Scene oldScene, Scene newScene)
     {
-        StopMonologueLoop();
+        //StopMonologueLoop();
     }
 
 

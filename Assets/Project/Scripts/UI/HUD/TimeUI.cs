@@ -123,30 +123,50 @@ public class TimeUI : MonoBehaviour
 
     void OnSunrise(DayPhaseChangedArgs args)
     {
+        if (sunriseIcon == null)
+        {
+            return;
+        }
         DayIcon.sprite = sunriseIcon;
         dayTimeText.text = TimeUtils.DayTimeToString(args.DayTime);
     }
 
     void OnNoon(DayPhaseChangedArgs args)
     {
+        if(noonIcon == null)
+        {
+            return;
+        }
         DayIcon.sprite = noonIcon;
         dayTimeText.text = TimeUtils.DayTimeToString(args.DayTime);
     }
 
     void OnAfternoon(DayPhaseChangedArgs args)
     {
+        if (afternoonIcon == null)
+        {
+            return;
+        }
         DayIcon.sprite = afternoonIcon;
         dayTimeText.text = TimeUtils.DayTimeToString(args.DayTime);
     }
 
     void OnEvening(DayPhaseChangedArgs args)
     {
+        if (eveningIcon == null)
+        {
+            return;
+        }
         DayIcon.sprite = eveningIcon;
         dayTimeText.text = TimeUtils.DayTimeToString(args.DayTime);
     }
 
     void OnNight(DayPhaseChangedArgs args)
     {
+        if (nightIcon == null)
+        {
+            return;
+        }
         DayIcon.sprite = nightIcon;
         dayTimeText.text = TimeUtils.DayTimeToString(args.DayTime);
     }

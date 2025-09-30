@@ -158,7 +158,7 @@ public class EditorSingleton<T> : MonoBehaviour where T : MonoBehaviour
         if (_instance != null)
         {
             DontDestroyOnLoad((_instance as MonoBehaviour).gameObject);
-            Debug.Log($"{typeof(T).Name} moved to DontDestroyOnLoad");
+            // Debug.Log($"{typeof(T).Name} moved to DontDestroyOnLoad");
         }
     }
 

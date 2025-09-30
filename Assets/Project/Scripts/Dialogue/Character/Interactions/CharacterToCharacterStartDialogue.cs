@@ -100,6 +100,6 @@ public class CharacterToCharacterStartDialogue : MonoBehaviour
 
     private void OnActiveSceneChanged(Scene oldScene, Scene newScene)
     {
-        StopDialogueLoop();
+        //StopDialogueLoop();
     }
 }
