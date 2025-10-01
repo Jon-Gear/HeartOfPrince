@@ -7,8 +7,7 @@ public class DialogueManager : Singleton<DialogueManager>
 {
     [SerializeField] private DialogueRunner mainDialogueRunner;
     [SerializeField] private DialogueRunner backgroundDialogueRunner;
-    [SerializeField] private DialogueRunner innerMonologueRunner;
-
+    
 
     public bool IsDialogueRunning()
     {
@@ -17,13 +16,13 @@ public class DialogueManager : Singleton<DialogueManager>
 
     public void StartDialogue(string startNodeName)
     {
-        if (IsBackgroundDialogueRunning())
-        {
-            StopBackgroundDialogue();
-        }
         if (IsInnerMonologueRunning())
         {
             StopInnerMonologue();
+        }
+        if(IsBackgroundDialogueRunning())
+        {
+            StopBackgroundDialogue();
         }
         mainDialogueRunner.StartDialogue(startNodeName);
     }
@@ -49,20 +48,16 @@ public class DialogueManager : Singleton<DialogueManager>
 
     public bool IsInnerMonologueRunning()
     {
-        return innerMonologueRunner.IsDialogueRunning;
+        return mainDialogueRunner.IsDialogueRunning;
     }
     public void StartInnerMonologue(string startNodeName)
     {
-        if (IsBackgroundDialogueRunning())
-        {
-            StopBackgroundDialogue();
-        }
-        innerMonologueRunner.StartDialogue(startNodeName);
+        mainDialogueRunner.StartDialogue(startNodeName);
     }
 
     public void StopInnerMonologue()
     {
-        innerMonologueRunner.Stop();
+        mainDialogueRunner.Stop();
     }
 
     protected override void OnActiveSceneChanged(Scene oldScene, Scene newScene)

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 
 /// <summary>
-/// A generic trigger component that raises events when something enters or exits.
+/// A generic trigger component that raises events when something enters, stays, or exits.
 /// Attach this to a GameObject with a Collider (set as Trigger).
 /// </summary>
 [RequireComponent(typeof(Collider))]
@@ -17,6 +17,11 @@ public class TriggerCollider : MonoBehaviour
     /// Raised when another collider enters this trigger.
     /// </summary>
     public event UnityAction<Collider> TriggerEntered;
+
+    /// <summary>
+    /// Raised when another collider stays inside this trigger.
+    /// </summary>
+    public event UnityAction<Collider> TriggerStayed;
 
     /// <summary>
     /// Raised when another collider exits this trigger.
@@ -33,30 +38,36 @@ public class TriggerCollider : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        GameObject target = m_Target.Get(gameObject);
-
-        // Check if the object is the target OR is in the target layer
-        bool isTarget = target != null && other.gameObject == target;
-        bool isInLayer = ((1 << other.gameObject.layer) & targetLayer.value) != 0;
-
-        if (isTarget || isInLayer)
+        if (IsValidTarget(other))
         {
             TriggerEntered?.Invoke(other);
         }
     }
 
+    private void OnTriggerStay(Collider other)
+    {
+        if (IsValidTarget(other))
+        {
+            TriggerStayed?.Invoke(other);
+        }
+    }
+
     private void OnTriggerExit(Collider other)
     {
-        GameObject target = m_Target.Get(gameObject);
-
-        // Check if the object is the target OR is in the target layer
-        bool isTarget = target != null && other.gameObject == target;
-        bool isInLayer = ((1 << other.gameObject.layer) & targetLayer.value) != 0;
-
-        if (isTarget || isInLayer)
+        if (IsValidTarget(other))
         {
             TriggerExited?.Invoke(other);
         }
     }
-}
 
+    /// <summary>
+    /// Checks if the given collider belongs to the configured target or target layer.
+    /// </summary>
+    private bool IsValidTarget(Collider other)
+    {
+        GameObject target = m_Target.Get(gameObject);
+        bool isTarget = target != null && other.gameObject == target;
+        bool isInLayer = ((1 << other.gameObject.layer) & targetLayer.value) != 0;
+        return isTarget || isInLayer;
+    }
+}

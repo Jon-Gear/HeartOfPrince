@@ -8,7 +8,9 @@ public class ActorRegistry : Singleton<ActorRegistry>
     public List<Actor> actors = new List<Actor>();
     
     public Actor playerActor;
-    public Actor currentSpeaker;
+
+    public Actor mainDialogueCurrentSpeaker;
+    public Actor backgroundDialogueCurrentSpeaker;
 
     public void RegisterActor(Actor actor)
     {
@@ -39,29 +41,50 @@ public class ActorRegistry : Singleton<ActorRegistry>
         return null;
     }
 
-    public void SetCurrentSpeaker(string actorName)
+    public void SetMainDialogueCurrentSpeaker(string actorName)
     {
         if (string.IsNullOrEmpty(actorName))
         {
-            currentSpeaker = playerActor;
+            mainDialogueCurrentSpeaker = playerActor;
             return;
         }
 
         Actor actor = GetActorByName(actorName);
         if (actor != null)
         {
-            currentSpeaker = actor;
+            mainDialogueCurrentSpeaker = actor;
         }
         else
         {
-            currentSpeaker = playerActor;
+            mainDialogueCurrentSpeaker = playerActor;
         }
     }
 
+    public void SetMainDialogueCurrentSpeaker()
+    {
+        mainDialogueCurrentSpeaker = playerActor;
+    }
+
+    public void SetBackgroundDialogueCurrentSpeaker(string actorName)
+    {
+        if (string.IsNullOrEmpty(actorName))
+        {
+            backgroundDialogueCurrentSpeaker = playerActor;
+            return;
+        }
+        Actor actor = GetActorByName(actorName);
+        if (actor != null)
+        {
+            backgroundDialogueCurrentSpeaker = actor;
+        }
+        else
+        {
+            backgroundDialogueCurrentSpeaker = playerActor;
+        }
+    }
     protected override void OnActiveSceneChanged(Scene oldScene, Scene newScene)
     {
         playerActor = null;
-        currentSpeaker = null;
         actors.Clear();
     }
 }

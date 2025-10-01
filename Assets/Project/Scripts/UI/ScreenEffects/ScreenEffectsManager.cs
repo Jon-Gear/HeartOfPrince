@@ -7,11 +7,11 @@ using UnityEngine.SceneManagement;
 public class ScreenEffectsManager : Singleton<ScreenEffectsManager>
 {
     [SerializeField] public CanvasGroup BasicFadeCanvasGroup;
+    [SerializeField] public PromptBubble PromptBubble;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
     }
 
     // Update is called once per frame
@@ -20,36 +20,29 @@ public class ScreenEffectsManager : Singleton<ScreenEffectsManager>
         
     }
 
-    /// <summary>
-    /// Fades the CanvasGroup to a target alpha over time.
-    /// </summary>
-    public async Task FadeCanvasGroup(CanvasGroup cg, float targetAlpha, float duration)
-    {
-        float startAlpha = cg.alpha;
-        float time = 0f;
-
-        while (time < duration)
-        {
-            time += Time.deltaTime;
-            cg.alpha = Mathf.Lerp(startAlpha, targetAlpha, time / duration);
-            await Task.Yield();
-        }
-
-        cg.alpha = targetAlpha;
-    }
-
     // Example usage:
     public Task BasicFadeIn(float duration)
     {
-        BasicFadeCanvasGroup.alpha = 1.0f;
-        return FadeCanvasGroup(BasicFadeCanvasGroup, 0.0f, duration);
+        return ScreenEffectUtils.FadeIn(BasicFadeCanvasGroup, duration);
     }
 
     public Task BasicFadeOut(float duration)
     {
-        BasicFadeCanvasGroup.alpha = 0.0f;
-        return FadeCanvasGroup(BasicFadeCanvasGroup, 1.0f, duration);
+        return ScreenEffectUtils.FadeIn(BasicFadeCanvasGroup, duration);
     }
+
+    public void ShowPrompt(string message, GameObject target, Vector3 targetOffset)
+    {
+        PromptBubble.ShowPrompt(message, target, targetOffset);
+    }
+
+    public void HidePrompt()
+    {
+        PromptBubble.HidePrompt();
+    }
+
 }
+
+
 
 

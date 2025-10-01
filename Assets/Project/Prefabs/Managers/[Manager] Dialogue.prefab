@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 6278703524131203433}
   - component: {fileID: 5288849820141387301}
   - component: {fileID: 824412244225841335}
-  - component: {fileID: 1348203817286666015}
   - component: {fileID: 214690807764486446}
   - component: {fileID: 5264984660466763749}
   - component: {fileID: 345680063551267553}
@@ -53,7 +52,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mainDialogueRunner: {fileID: 5288849820141387301}
   backgroundDialogueRunner: {fileID: 824412244225841335}
-  innerMonologueRunner: {fileID: 1348203817286666015}
 --- !u!114 &5288849820141387301
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -71,7 +69,7 @@ MonoBehaviour:
   dialogueViews:
   - {fileID: 7562475544695060685}
   - {fileID: 1933925784934959837}
-  - {fileID: 2770119622146919055}
+  - {fileID: 1523955073441008639}
   startNode: Start
   startAutomatically: 0
   runSelectedOptionAsLine: 0
@@ -132,45 +130,7 @@ MonoBehaviour:
   _variableStorage: {fileID: 214690807764486446}
   dialogueViews:
   - {fileID: 7448581918378439737}
-  - {fileID: 1933925784934959837}
-  - {fileID: 2770119622146919055}
-  startNode: Start
-  startAutomatically: 0
-  runSelectedOptionAsLine: 0
-  lineProvider: {fileID: 0}
-  verboseLogging: 0
-  onNodeStart:
-    m_PersistentCalls:
-      m_Calls: []
-  onNodeComplete:
-    m_PersistentCalls:
-      m_Calls: []
-  onDialogueStart:
-    m_PersistentCalls:
-      m_Calls: []
-  onDialogueComplete:
-    m_PersistentCalls:
-      m_Calls: []
-  onCommand:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &1348203817286666015
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5010746147966974450}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4bec29c0a230741bdac901dba8da47ee, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  yarnProject: {fileID: 7545569452688597077, guid: 8dcc53fee3791407aaea23ffa32cb9b5, type: 3}
-  _variableStorage: {fileID: 214690807764486446}
-  dialogueViews:
-  - {fileID: 2770119622146919055}
-  - {fileID: 4280497242857134523}
+  - {fileID: 5834674212170227065}
   startNode: Start
   startAutomatically: 0
   runSelectedOptionAsLine: 0
@@ -219,7 +179,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   actors: []
   playerActor: {fileID: 0}
-  currentSpeaker: {fileID: 0}
+  mainDialogueCurrentSpeaker: {fileID: 0}
+  backgroundDialogueCurrentSpeaker: {fileID: 0}
 --- !u!114 &345680063551267553
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -537,6 +498,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 53d18115fc9a09c44a4bab498f36549b, type: 3}
+--- !u!114 &1523955073441008639 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 113916444299078164, guid: 53d18115fc9a09c44a4bab498f36549b, type: 3}
+  m_PrefabInstance: {fileID: 1491425364878991851}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4dac26e25f4d08342b48e6c382767142, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1933925784934959837 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1037011224553515830, guid: 53d18115fc9a09c44a4bab498f36549b, type: 3}
@@ -548,26 +520,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9bee9d4e3dbf4a7459d106b7007d8172, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &2770119622146919055 stripped
+--- !u!114 &5834674212170227065 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3658025059952798564, guid: 53d18115fc9a09c44a4bab498f36549b, type: 3}
+  m_CorrespondingSourceObject: {fileID: 4920875560073657490, guid: 53d18115fc9a09c44a4bab498f36549b, type: 3}
   m_PrefabInstance: {fileID: 1491425364878991851}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0515c9d0a1312e6458a0d1f670c484bb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &4280497242857134523 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3446936962485155920, guid: 53d18115fc9a09c44a4bab498f36549b, type: 3}
-  m_PrefabInstance: {fileID: 1491425364878991851}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ddcdd604a328c4ab296f048eb7b3a925, type: 3}
+  m_Script: {fileID: 11500000, guid: 28705a2f60930774a858184881fe5f9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!224 &6461996300193464166 stripped

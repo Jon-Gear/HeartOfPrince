@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+
+[RequireComponent(typeof(TriggerCollider))]
 public class TopicZone : MonoBehaviour
 {
     [SerializeField] private TopicCharacterMonologue topic;

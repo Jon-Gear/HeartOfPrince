@@ -68,9 +68,7 @@ public class CharacterToCharacterStartDialogue : MonoBehaviour
 
     public void StartDialogueLoop()
     {
-        if (DialogueManager.Instance.IsDialogueRunning() ||
-            DialogueManager.Instance.IsInnerMonologueRunning() ||
-            DialogueManager.Instance.IsBackgroundDialogueRunning())
+        if (DialogueManager.Instance.IsBackgroundDialogueRunning())
             return;
 
         dialogueCoroutine = StartCoroutine(DialogueLoop());
