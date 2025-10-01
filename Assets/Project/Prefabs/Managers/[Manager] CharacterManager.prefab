@@ -67,7 +67,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 62f91d9913a3f4042a2b1e4df1ed393b, type: 2}
   - {fileID: 11400000, guid: 29c30a76c76e8854495dfd27302bf3f3, type: 2}
   - {fileID: 11400000, guid: c5332ada86902b04785eef030f37d392, type: 2}
-  dailyActivityReports: []
 --- !u!1 &3245328338253044162
 GameObject:
   m_ObjectHideFlags: 0
@@ -126,11 +125,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characterName: Albeni
-  characterToPlayerTopics: []
+  characterToPlayerTopics:
+  - {fileID: 11400000, guid: 41ed1801966ffc6459aa77d3626e6641, type: 2}
   playerToCharacterTopics: []
   monologueTopics: []
   characterToCharacterTopics: []
-  dailyActivityReports: []
 --- !u!1 &3823396006111329071
 GameObject:
   m_ObjectHideFlags: 0
@@ -189,11 +188,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characterName: Sushi
-  characterToPlayerTopics: []
+  characterToPlayerTopics:
+  - {fileID: 11400000, guid: 41ed1801966ffc6459aa77d3626e6641, type: 2}
   playerToCharacterTopics: []
   monologueTopics: []
   characterToCharacterTopics: []
-  dailyActivityReports: []
 --- !u!1 &4409061932063158097
 GameObject:
   m_ObjectHideFlags: 0
@@ -306,7 +305,6 @@ MonoBehaviour:
   playerToCharacterTopics: []
   monologueTopics: []
   characterToCharacterTopics: []
-  dailyActivityReports: []
 --- !u!1 &4665355961793989137
 GameObject:
   m_ObjectHideFlags: 0
@@ -369,7 +367,6 @@ MonoBehaviour:
   playerToCharacterTopics: []
   monologueTopics: []
   characterToCharacterTopics: []
-  dailyActivityReports: []
 --- !u!1 &8780986244644625960
 GameObject:
   m_ObjectHideFlags: 0
@@ -432,4 +429,3 @@ MonoBehaviour:
   playerToCharacterTopics: []
   monologueTopics: []
   characterToCharacterTopics: []
-  dailyActivityReports: []

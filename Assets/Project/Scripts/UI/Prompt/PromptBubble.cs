@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class PromptBubble : MonoBehaviour
@@ -20,6 +21,7 @@ public class PromptBubble : MonoBehaviour
     {
         isUsed = true;
         HidePrompt();
+        SceneManager.activeSceneChanged += OnActiveSceneChanged;
     }
 
     // Update is called once per frame
@@ -48,5 +50,10 @@ public class PromptBubble : MonoBehaviour
         targetTransform = null;
         text.text = "";
         isUsed = false;
+    }
+
+    private void OnActiveSceneChanged(Scene oldScene, Scene newScene)
+    {
+        targetTransform = null;
     }
 }

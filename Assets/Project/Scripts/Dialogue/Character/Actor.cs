@@ -9,13 +9,10 @@ using UnityEngine;
 public class Actor : MonoBehaviour
 {
     [SerializeField] public string actorName = "Actor";
-
-    //[SerializeField] private List<ThoughtData> thoughts = new List<ThoughtData>();
-
-    //[SerializeField] private List<AnimationStateEntry> animationStates = new List<AnimationStateEntry>();
-    //[SerializeField] private List<GestureEntry> gestures = new List<GestureEntry>();
     
     private Character character;
+    private CharacterBrain characterBrain;
+
 
     public Vector3 messageBubbleOffset = new Vector3(0f, 1.0f, 0f);
     public Vector3 positionWithOffset
@@ -26,10 +23,26 @@ public class Actor : MonoBehaviour
         }
     }
 
+    public CharacterBrain Brain() => characterBrain;
+
+
+    public bool CanTalk()
+    {
+        if (characterBrain == null)
+        {
+            Debug.LogError($"Character Brain not found for actor '{actorName}'");
+            return false;
+        }
+        
+        return characterBrain.Dialogue().CanTalk();
+    }
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private void Start()
     {
         character = GetComponent<Character>();
+
+        characterBrain = CharacterManager.Instance.GetCharacter(actorName);
 
         ActorRegistry.Instance.RegisterActor(this);
         
@@ -46,6 +59,7 @@ public class Actor : MonoBehaviour
             CinemachineManager.Instance.longShot.PreviousStateIsValid = false;
         }
     }
+
 
     /*
     public void Gesture(string gestureName)

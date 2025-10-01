@@ -42,24 +42,6 @@ public class StopDialogueYarn : Instruction
     }
 }
 
-[Title("Play Comment Monologue")]
-[Description("Plays a Yarn Spinner monologue for internal character commentary.")]
-[Image(typeof(IconNodeText), ColorTheme.Type.Teal)]
-[Category("YarnSpinner/Monologue/Play Comment Monologue")]
-[Serializable]
-public class PlayCommentMonologue : Instruction
-{
-    [SerializeField] private CommentMonologue commentMonologue;
-    
-
-    public override string Title => string.Format("Play monologue");
-
-    protected override Task Run(Args args)
-    {
-        commentMonologue.Comment();
-        return DefaultResult;
-    }
-}
 
 
 [Title("Stop Inner Monologue")]

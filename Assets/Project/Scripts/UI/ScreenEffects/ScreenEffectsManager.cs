@@ -28,7 +28,7 @@ public class ScreenEffectsManager : Singleton<ScreenEffectsManager>
 
     public Task BasicFadeOut(float duration)
     {
-        return ScreenEffectUtils.FadeIn(BasicFadeCanvasGroup, duration);
+        return ScreenEffectUtils.FadeOut(BasicFadeCanvasGroup, duration);
     }
 
     public void ShowPrompt(string message, GameObject target, Vector3 targetOffset)

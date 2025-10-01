@@ -21,7 +21,7 @@ public class CharacterToCharacterStartDialogue : MonoBehaviour
 
 
     private Character character;
-    private CharacterDialogueBrain characterDialogueBrain;
+    private CharacterBrain characterBrain;
 
     private Coroutine dialogueCoroutine;
 
@@ -29,7 +29,7 @@ public class CharacterToCharacterStartDialogue : MonoBehaviour
     void Start()
     {
         character = characterActor.gameObject.GetComponent<Character>();
-        characterDialogueBrain = CharacterManager.Instance.GetCharacter(characterActor.actorName);
+        characterBrain = CharacterManager.Instance.GetCharacter(characterActor.actorName);
 
         detectionCollider.TriggerEntered += OnDetectionInRange;
         detectionCollider.TriggerExited += OnDetectionOutOfRange;
@@ -68,11 +68,10 @@ public class CharacterToCharacterStartDialogue : MonoBehaviour
 
     public void StartDialogueLoop()
     {
-        if (DialogueManager.Instance.IsBackgroundDialogueRunning())
+        if (!DialogueManager.Instance.IsAnyBackgroundDialogueAvailable())
             return;
 
         dialogueCoroutine = StartCoroutine(DialogueLoop());
-        Debug.Log($"Started dialogue loop for {characterActor.actorName} with {nearbyActors.Count} nearby actors.");
     }
 
     private IEnumerator DialogueLoop()
@@ -80,10 +79,14 @@ public class CharacterToCharacterStartDialogue : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(Random.Range(minDialogueInterval, maxDialogueInterval));
-            if(characterDialogueBrain.TriggerCharacterToCharacterDialogue(nearbyActors))
+
+            if(!characterActor.CanTalk() || nearbyActors.Count == 0)
             {
-                Debug.Log($"{characterActor.actorName} started a dialogue with another character.");
+                continue;
             }
+
+            characterBrain.Dialogue().TriggerCharacterToCharacterDialogue(nearbyActors);
+            
         }
     }
 
@@ -92,7 +95,6 @@ public class CharacterToCharacterStartDialogue : MonoBehaviour
         if (dialogueCoroutine != null)
         {
             StopCoroutine(dialogueCoroutine);
-            Debug.Log($"Stopped dialogue loop for {characterActor.actorName}.");
         }
     }
 

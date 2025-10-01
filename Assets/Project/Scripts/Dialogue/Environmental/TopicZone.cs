@@ -22,9 +22,9 @@ public class TopicZone : MonoBehaviour
         {
             return;
         }
-        CharacterDialogueBrain dialogueBrain = CharacterManager.Instance.GetCharacter(otherActor.actorName);
+        CharacterBrain brain = CharacterManager.Instance.GetCharacter(otherActor.actorName);
 
-        dialogueBrain.AddCharacterMonologueTopic(topic);
+        brain.Dialogue().AddCharacterMonologueTopic(topic);
 
 
     }
@@ -35,8 +35,8 @@ public class TopicZone : MonoBehaviour
         {
             return;
         }
-        CharacterDialogueBrain dialogueBrain = CharacterManager.Instance.GetCharacter(otherActor.actorName);
+        CharacterBrain brain = CharacterManager.Instance.GetCharacter(otherActor.actorName);
 
-        dialogueBrain.RemoveCharacterMonologueTopic(topic);
+        brain.Dialogue().RemoveCharacterMonologueTopic(topic);
     }
 }

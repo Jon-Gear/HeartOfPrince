@@ -16,37 +16,31 @@ public class CharacterStartMonologue : MonoBehaviour
     [Tooltip("Maximum time between background dialogues (seconds).")]
     [SerializeField] private float maxMonologueInterval = 2.0f;
 
-    private Character character;
-    private CharacterDialogueBrain characterDialogueBrain;
-
     private Coroutine monologueCoroutine;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        character = characterActor.gameObject.GetComponent<Character>();
-        characterDialogueBrain = CharacterManager.Instance.GetCharacter(characterActor.actorName);
-
         detectionCollider.TriggerEntered += OnPlayerInRange;
         detectionCollider.TriggerExited += OnPlayerOutOfRange;
-
-        SceneManager.activeSceneChanged += OnActiveSceneChanged;
     }
 
 
     void OnPlayerInRange(Collider other)
     {
         StartMonologueLoop();
+        Debug.Log($"{characterActor.actorName}: Player in range, starting monologue loop.");
     }
 
     void OnPlayerOutOfRange(Collider other)
     {
         StopMonologueLoop();
+        Debug.Log($"{characterActor.actorName}: Player out of range, stopping monologue loop.");
     }
 
     public void StartMonologueLoop()
     {
-        if (DialogueManager.Instance.IsBackgroundDialogueRunning())
+        if (!DialogueManager.Instance.IsAnyBackgroundDialogueAvailable())
             return;
 
         monologueCoroutine = StartCoroutine(MonologueLoop());
@@ -57,7 +51,15 @@ public class CharacterStartMonologue : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(Random.Range(minMonologueInterval, maxMonologueInterval));
-            characterDialogueBrain.TriggerMonologue();
+            if(characterActor.Brain().Dialogue().CanTalk())
+            {
+                characterActor.Brain().Dialogue().TriggerMonologue();
+                Debug.Log($"{characterActor.actorName}: Triggering monologue.");
+            }
+            else
+            {
+                Debug.Log($"{characterActor.actorName}: Cannot talk right now, skipping monologue.");
+            }
         }
     }
 
@@ -68,12 +70,5 @@ public class CharacterStartMonologue : MonoBehaviour
             StopCoroutine(monologueCoroutine);
         }
     }
-
-
-    private void OnActiveSceneChanged(Scene oldScene, Scene newScene)
-    {
-        //StopMonologueLoop();
-    }
-
 
 }

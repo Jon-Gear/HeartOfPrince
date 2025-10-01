@@ -48,10 +48,7 @@ public class CharacterDialogueBrain : MonoBehaviour
     [Tooltip("Background dialogue topics between this character and others.")]
     [SerializeField] private List<TopicCharacterToCharacter> characterToCharacterTopics = new();
 
-    [Header("Settings")]
-
-    [Tooltip("Daily activities done throughout the day.")]
-    [SerializeField] private List<DailyActivityReport> dailyActivityReports = new();
+    private bool isBusy = false;
 
 
     // -------------------
@@ -66,6 +63,21 @@ public class CharacterDialogueBrain : MonoBehaviour
     private void Update()
     {
         // Reserved for runtime checks if needed
+    }
+
+    public bool CanTalk()
+    {
+        return !isBusy;
+    }
+
+    public void SetBusy()
+    {
+        isBusy = true;
+    }
+
+    public void SetFree()
+    {
+        isBusy = false;
     }
 
     // -------------------
@@ -101,7 +113,7 @@ public class CharacterDialogueBrain : MonoBehaviour
             .Replace("{actor}", characterName.ToLower());
     }
 
-    public void PlayerStartDialogue()
+    public void TriggerPlayerDialogueWithCharacter()
     {
         if (DialogueManager.Instance.IsDialogueRunning())
             return;
@@ -122,44 +134,21 @@ public class CharacterDialogueBrain : MonoBehaviour
 
     public void RemoveCharacterToPlayerTopic(string topicName)
     {
-        Debug.Log("Before");
-        for (int i = 0; i < characterToPlayerTopics.Count; i++)
-        {
-            Debug.Log($" {i}: Character to player topic: {characterToPlayerTopics[i].TopicName}");
-        }
         characterToPlayerTopics.RemoveAll(t => t.TopicName == topicName);
-
-        Debug.Log("After");
-        for (int i = 0; i < characterToPlayerTopics.Count; i++)
-        {
-            Debug.Log($" {i}: Character to player topic: {characterToPlayerTopics[i].TopicName}");
-        }
-        Debug.Log("End Removal");
     }
 
     public bool HasTopicsForPlayer() => characterToPlayerTopics.Count > 0;
 
-    public void CharacterStartDialogueWithPlayer()
+    public void TriggerCharacterDialogueWithPlayer()
     {
-        if (DialogueManager.Instance.IsDialogueRunning() || characterToPlayerTopics.Count == 0)
+        if (isBusy || DialogueManager.Instance.IsDialogueRunning() || characterToPlayerTopics.Count == 0)
             return;
 
-        string nodeName = GetRandomCharacterToPlayerNode();
-
-        Debug.Log($"Starting character to player dialogue with node: {nodeName}");
-
-        DialogueManager.Instance.StartDialogue(nodeName);
+        DialogueManager.Instance.StartDialogue(GetRandomCharacterToPlayerNode());
     }
 
     private string GetRandomCharacterToPlayerNode()
     {
-        Debug.Log($"Character to player topics count: {characterToPlayerTopics.Count}");
-
-        for (int i = 0; i < characterToPlayerTopics.Count; i++)
-        {
-            Debug.Log($" {i}: Character to player topic: {characterToPlayerTopics[i].TopicName}");
-        }
-
         return characterToPlayerTopics[Random.Range(0, characterToPlayerTopics.Count)]
             .GetTopicNodeName()
             .Replace("{actor}", characterName.ToLower());
@@ -188,9 +177,9 @@ public class CharacterDialogueBrain : MonoBehaviour
 
     public void TriggerMonologue()
     {
-        if (DialogueManager.Instance.IsDialogueRunning() ||
-            DialogueManager.Instance.IsInnerMonologueRunning() ||
-            DialogueManager.Instance.IsBackgroundDialogueRunning() ||
+        if (isBusy ||
+            DialogueManager.Instance.IsDialogueRunning() ||
+            !DialogueManager.Instance.IsAnyBackgroundDialogueAvailable() ||
             monologueTopics.Count == 0)
             return;
 
@@ -221,9 +210,9 @@ public class CharacterDialogueBrain : MonoBehaviour
 
     public bool TriggerCharacterToCharacterDialogue(List<Actor> nearbyActors)
     {
-        if (DialogueManager.Instance.IsDialogueRunning() ||
-            DialogueManager.Instance.IsInnerMonologueRunning() ||
-            DialogueManager.Instance.IsBackgroundDialogueRunning() ||
+        if (isBusy ||
+            DialogueManager.Instance.IsDialogueRunning() ||
+            !DialogueManager.Instance.IsAnyBackgroundDialogueAvailable() ||
             characterToCharacterTopics.Count == 0)
             return false;
 
@@ -246,8 +235,12 @@ public class CharacterDialogueBrain : MonoBehaviour
         foreach (var topic in characterToCharacterTopics)
         {
             // 1. Check if all required chars are present
-            bool allRequiredPresent = topic.OtherActors
-                .All(req => nearbyActors.Exists(c => c.actorName == req));
+            bool allRequiredPresent = topic.OtherActors.All(req =>
+            {
+                var actor = nearbyActors.FirstOrDefault(c => c.actorName == req);
+                return actor != null && actor.CanTalk();
+            });
+
             if (!allRequiredPresent) continue;
 
             int score = topic.OtherActors.Count;

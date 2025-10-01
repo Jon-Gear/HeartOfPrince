@@ -18,13 +18,13 @@ public class InstructionTalkToCharacter : Instruction
     public override string Title => $"Talk To {characterName}";
     protected override Task Run(Args args)
     {
-        CharacterDialogueBrain character = CharacterManager.Instance.GetCharacter(characterName); 
+        CharacterBrain character = CharacterManager.Instance.GetCharacter(characterName); 
         
         
         if (character == null) return DefaultResult;
 
         
-        character.PlayerStartDialogue();
+        character.Dialogue().TriggerPlayerDialogueWithCharacter();
         return DefaultResult;
     }
 }
@@ -40,11 +40,11 @@ public class InstructionCharacterTalkToYou : Instruction
     public override string Title => $"{characterName} Talk To You";
     protected override Task Run(Args args)
     {
-        CharacterDialogueBrain character = CharacterManager.Instance.GetCharacter(characterName);
+        CharacterBrain character = CharacterManager.Instance.GetCharacter(characterName);
 
         if (character == null) return DefaultResult;
 
-        character.CharacterStartDialogueWithPlayer();
+        character.Dialogue().TriggerCharacterDialogueWithPlayer();
         return DefaultResult;
     }
 }
@@ -61,9 +61,9 @@ public class InstructionRunBackgroundDialogue : Instruction
     public override string Title => $"Have {characterName} Speak";
     protected override Task Run(Args args)
     {
-        CharacterDialogueBrain character = CharacterManager.Instance.GetCharacter(characterName);
+        //CharacterDialogueBrain character = CharacterManager.Instance.GetCharacter(characterName);
 
-        if (character == null) return DefaultResult;
+        //if (character == null) return DefaultResult;
 
         //character.StartBackgroundDialogueLoop();
         return DefaultResult;
@@ -81,9 +81,9 @@ public class InstructionStopBackgroundDialogue : Instruction
     public override string Title => $"Have {characterName} Stop Speaking";
     protected override Task Run(Args args)
     {
-        CharacterDialogueBrain character = CharacterManager.Instance.GetCharacter(characterName);
+        //CharacterDialogueBrain character = CharacterManager.Instance.GetCharacter(characterName);
 
-        if (character == null) return DefaultResult;
+        //if (character == null) return DefaultResult;
 
         //character.StopBackgroundDialogueLoop();
         return DefaultResult;
@@ -103,16 +103,17 @@ public class InstructionAddBackgroundDialogueTopic : Instruction
 
     protected override Task Run(Args args)
     {
-        GameObject gameObject = this.target.Get(args);
 
-        if(gameObject == null) return DefaultResult;
+        //GameObject gameObject = this.target.Get(args);
 
-        Actor actor = gameObject.GetComponent<Actor>();
-        if(actor == null) return DefaultResult;
+        //if(gameObject == null) return DefaultResult;
 
-        CharacterDialogueBrain character = CharacterManager.Instance.GetCharacter(actor.actorName);
+        //Actor actor = gameObject.GetComponent<Actor>();
+        //if(actor == null) return DefaultResult;
 
-        if (character == null) return DefaultResult;
+        //CharacterDialogueBrain character = CharacterManager.Instance.GetCharacter(actor.actorName);
+
+        //if (character == null) return DefaultResult;
 
 
         // TODO: Fix THIS later
@@ -135,16 +136,16 @@ public class InstructionRemoveBackgroundDialogueTopic : Instruction
 
     protected override Task Run(Args args)
     {
-        GameObject gameObject = this.target.Get(args);
+        //GameObject gameObject = this.target.Get(args);
 
-        if (gameObject == null) return DefaultResult;
+        //if (gameObject == null) return DefaultResult;
 
-        Actor actor = gameObject.GetComponent<Actor>();
-        if (actor == null) return DefaultResult;
+        //Actor actor = gameObject.GetComponent<Actor>();
+        //if (actor == null) return DefaultResult;
 
-        CharacterDialogueBrain character = CharacterManager.Instance.GetCharacter(actor.actorName);
+        //CharacterDialogueBrain character = CharacterManager.Instance.GetCharacter(actor.actorName);
 
-        if (character == null) return DefaultResult;
+        //if (character == null) return DefaultResult;
 
         // TODO: Fix THIS later
         //character.RemoveBackgroundDialogueTopic(topic);

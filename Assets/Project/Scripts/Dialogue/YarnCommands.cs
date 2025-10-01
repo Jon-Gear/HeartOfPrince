@@ -63,15 +63,15 @@ public class YarnCommands : MonoBehaviour
     [YarnFunction("GetDialogueTopicOptionText")]
     public static string GetDialogueTopicOptionText(string characterName, int index)
     {
-        CharacterDialogueBrain characaterDialogueBrain = CharacterManager.Instance.GetCharacter(characterName);
-        return characaterDialogueBrain.GetPlayerTopicOptionText(index);
+        CharacterBrain characterBrain = CharacterManager.Instance.GetCharacter(characterName);
+        return characterBrain.Dialogue().GetPlayerTopicOptionText(index);
     }
 
     [YarnFunction("GetDialogueTopicNodeName")]
     public static string GetDialogueTopicNodeName(string characterName, int index)
     {
-        CharacterDialogueBrain characaterDialogueBrain = CharacterManager.Instance.GetCharacter(characterName);
-        return characaterDialogueBrain.GetPlayerTopicNodeName(index);
+        CharacterBrain characterBrain = CharacterManager.Instance.GetCharacter(characterName);
+        return characterBrain.Dialogue().GetPlayerTopicNodeName(index);
     }
 
 
@@ -83,15 +83,15 @@ public class YarnCommands : MonoBehaviour
     public static void AddToPlayerTopicToAskCharacter(string characterName, string resourcePathToTopic)
     {
         TopicPlayerToCharacter topic = Resources.Load<TopicPlayerToCharacter>("Dialogues/" + resourcePathToTopic);
-        CharacterDialogueBrain controller = CharacterManager.Instance.GetCharacter(characterName);
-        controller.AddPlayerToCharacterTopic(topic);
+        CharacterBrain characterBrain = CharacterManager.Instance.GetCharacter(characterName);
+        characterBrain.Dialogue().AddPlayerToCharacterTopic(topic);
     }
 
     [YarnCommand("RemovePlayerToCharacterTopic")]
     public static void RemovePlayerTopicToAskCharacter(string characterName, string topicName)
     {
-        CharacterDialogueBrain controller = CharacterManager.Instance.GetCharacter(characterName);
-        controller.RemovePlayerToCharacterTopic(topicName);
+        CharacterBrain characterBrain = CharacterManager.Instance.GetCharacter(characterName);
+        characterBrain.Dialogue().RemovePlayerToCharacterTopic(topicName);
     }
 
     // -------------------
@@ -102,15 +102,15 @@ public class YarnCommands : MonoBehaviour
     public static void AddToCharacterTopicToAskPlayer(string characterName, string resourcePathToTopic)
     {
         TopicCharacterToPlayer topic = Resources.Load<TopicCharacterToPlayer>("Dialogues/" + resourcePathToTopic);
-        CharacterDialogueBrain controller = CharacterManager.Instance.GetCharacter(characterName);
-        controller.AddCharacterToPlayerTopic(topic);
+        CharacterBrain characterBrain = CharacterManager.Instance.GetCharacter(characterName);
+        characterBrain.Dialogue().AddCharacterToPlayerTopic(topic);
     }
 
     [YarnCommand("RemoveCharacterToPlayerTopic")]
     public static void RemoveCharacterTopicToAskPlayer(string characterName, string topicName)
     {
-        CharacterDialogueBrain controller = CharacterManager.Instance.GetCharacter(characterName);
-        controller.RemoveCharacterToPlayerTopic(topicName);
+        CharacterBrain characterBrain = CharacterManager.Instance.GetCharacter(characterName);
+        characterBrain.Dialogue().RemoveCharacterToPlayerTopic(topicName);
     }
 
     // -------------------
@@ -121,15 +121,15 @@ public class YarnCommands : MonoBehaviour
     public static void AddToCharacterMonologueTopic(string characterName, string resourcePathToTopic)
     {
         TopicCharacterMonologue topic = Resources.Load<TopicCharacterMonologue>("Dialogues/" + resourcePathToTopic);
-        CharacterDialogueBrain controller = CharacterManager.Instance.GetCharacter(characterName);
-        controller.AddCharacterMonologueTopic(topic);
+        CharacterBrain characterBrain = CharacterManager.Instance.GetCharacter(characterName);
+        characterBrain.Dialogue().AddCharacterMonologueTopic(topic);
     }
 
     [YarnCommand("RemoveCharacterMonologueTopic")]
     public static void RemoveCharacterMonologueTopic(string characterName, string topicName)
     {
-        CharacterDialogueBrain controller = CharacterManager.Instance.GetCharacter(characterName);
-        controller.RemoveCharacterMonologueTopic(topicName);
+        CharacterBrain characterBrain = CharacterManager.Instance.GetCharacter(characterName);
+        characterBrain.Dialogue().RemoveCharacterMonologueTopic(topicName);
     }
 
     // -------------------
@@ -140,15 +140,15 @@ public class YarnCommands : MonoBehaviour
     //public static void AddToPlayerMonologueTopic(string characterName, string resourcePathToTopic)
     //{
     //    TopicPlayerMonologue topic = Resources.Load<TopicPlayerMonologue>("Dialogues/" + resourcePathToTopic);
-    //    CharacterDialogueBrain controller = CharacterManager.Instance.GetCharacter(characterName);
-    //    controller.AddPlayerMonologueTopic(topic);
+    //    CharacterBrain characterBrain = CharacterManager.Instance.GetCharacter(characterName);
+    //    characterBrain.Dialogue().AddPlayerMonologueTopic(topic);
     //}
 
     //[YarnCommand("RemovePlayerMonologueTopic")]
     //public static void RemovePlayerMonologueTopic(string characterName, string topicName)
     //{
-    //    CharacterDialogueBrain controller = CharacterManager.Instance.GetCharacter(characterName);
-    //    controller.RemovePlayerMonologueTopic(topicName);
+    //    CharacterBrain characterBrain = CharacterManager.Instance.GetCharacter(characterName);
+    //    characterBrain.Dialogue().RemovePlayerMonologueTopic(topicName);
     //}
 
     // -------------------
@@ -159,15 +159,15 @@ public class YarnCommands : MonoBehaviour
     public static void AddToCharacterTopicToAskCharacter(string characterName, string resourcePathToTopic)
     {
         TopicCharacterToCharacter topic = Resources.Load<TopicCharacterToCharacter>("Dialogues/" + resourcePathToTopic);
-        CharacterDialogueBrain controller = CharacterManager.Instance.GetCharacter(characterName);
-        controller.AddCharacterToCharacterTopic(topic);
+        CharacterBrain characterBrain = CharacterManager.Instance.GetCharacter(characterName);
+        characterBrain.Dialogue().AddCharacterToCharacterTopic(topic);
     }
 
     [YarnCommand("RemoveCharacterToCharacterTopic")]
     public static void RemoveCharacterTopicToAskCharacter(string characterName, string topicName)
     {
-        CharacterDialogueBrain controller = CharacterManager.Instance.GetCharacter(characterName);
-        controller.RemoveCharacterToCharacterTopic(topicName);
+        CharacterBrain characterBrain = CharacterManager.Instance.GetCharacter(characterName);
+        characterBrain.Dialogue().RemoveCharacterToCharacterTopic(topicName);
     }
 
 

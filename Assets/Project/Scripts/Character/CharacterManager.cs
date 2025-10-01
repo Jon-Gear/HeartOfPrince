@@ -18,11 +18,11 @@ public class CharacterManager : Singleton<CharacterManager>
     }
 
 
-    public CharacterDialogueBrain GetCharacter(string characterName)
+    public CharacterBrain GetCharacter(string characterName)
     {
-        CharacterDialogueBrain[] characters = FindObjectsByType<CharacterDialogueBrain>(FindObjectsSortMode.None);
+        CharacterBrain[] characters = FindObjectsByType<CharacterBrain>(FindObjectsSortMode.None);
         
-        foreach (CharacterDialogueBrain character in characters)
+        foreach (CharacterBrain character in characters)
         {
             if (character.name == characterName)
             {

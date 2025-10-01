@@ -9,7 +9,7 @@ public class CharacterToPlayerStartDialogue : MonoBehaviour
     [SerializeField] private TriggerCollider detectionCollider;
 
     private Character character;
-    private CharacterDialogueBrain characterDialogueBrain;
+    private CharacterBrain characterBrain;
     
     private bool isFollowingPlayerToAskTopic = false;
 
@@ -17,7 +17,7 @@ public class CharacterToPlayerStartDialogue : MonoBehaviour
     void Start()
     {
         character = characterActor.gameObject.GetComponent<Character>();
-        characterDialogueBrain = CharacterManager.Instance.GetCharacter(characterActor.actorName);
+        characterBrain = CharacterManager.Instance.GetCharacter(characterActor.actorName);
 
         interactionCollider.TriggerEntered += OnInteractInRange;
         detectionCollider.TriggerEntered += OnDetectionInRange;
@@ -37,7 +37,7 @@ public class CharacterToPlayerStartDialogue : MonoBehaviour
 
     private void OnInteractInRange(Collider other)
     {
-        if (!characterDialogueBrain.HasTopicsForPlayer())
+        if (!characterBrain.Dialogue().HasTopicsForPlayer())
         {
             return;
         }
@@ -48,7 +48,7 @@ public class CharacterToPlayerStartDialogue : MonoBehaviour
 
     private void OnDetectionInRange(Collider other)
     {
-        if(!characterDialogueBrain.HasTopicsForPlayer())
+        if(!characterBrain.Dialogue().HasTopicsForPlayer())
         {
             return;
         }
@@ -74,8 +74,7 @@ public class CharacterToPlayerStartDialogue : MonoBehaviour
 
     void Talk()
     {
-        Debug.Log($"{characterActor.actorName} has topics for player: {characterDialogueBrain.HasTopicsForPlayer()}");
-        characterDialogueBrain.CharacterStartDialogueWithPlayer();
+        characterBrain.Dialogue().TriggerCharacterDialogueWithPlayer();
     }
 
     void Follow(Collider other)
