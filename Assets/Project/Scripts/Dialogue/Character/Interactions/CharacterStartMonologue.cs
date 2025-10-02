@@ -51,7 +51,7 @@ public class CharacterStartMonologue : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(Random.Range(minMonologueInterval, maxMonologueInterval));
-            if(characterActor.Brain().Dialogue().CanTalk())
+            if(characterActor.Brain().Dialogue().CanStartCharacterMonologue())
             {
                 characterActor.Brain().Dialogue().TriggerMonologue();
                 Debug.Log($"{characterActor.actorName}: Triggering monologue.");

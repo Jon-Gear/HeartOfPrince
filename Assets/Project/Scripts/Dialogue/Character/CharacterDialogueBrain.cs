@@ -10,25 +10,15 @@ using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
 
-[Serializable]
-[CreateAssetMenu(menuName = "Dialogue/DailyActivityReport")]
-public class DailyActivityReport : ScriptableObject
+public enum DialogueIntention
 {
-    public string activityName = "Activity";
-
-    public string GetTopicNodeName()
-    {
-        string nodeName = "";
-
-        nodeName += "{actor}_activity_";
-
-        nodeName += activityName.ToLower();
-
-        return nodeName;
-    }
+    None,                // free to start something
+    ToPlayer,            // character intends to talk to the player
+    ToCharacter,         // character intends to talk to another NPC
+    Monologue,           // character intends to monologue
+    SpokenTo,            // character has been spoken to and is responding
+    ApproachingPlayer,   // character is approaching the player to start dialogue
 }
-
-
 
 public class CharacterDialogueBrain : MonoBehaviour
 {
@@ -48,8 +38,11 @@ public class CharacterDialogueBrain : MonoBehaviour
     [Tooltip("Background dialogue topics between this character and others.")]
     [SerializeField] private List<TopicCharacterToCharacter> characterToCharacterTopics = new();
 
-    private bool isBusy = false;
-
+    
+    private DialogueIntention currentIntention = DialogueIntention.None;
+    public DialogueIntention CurrentIntention => currentIntention;
+    public bool IsFree => currentIntention == DialogueIntention.None;
+    
 
     // -------------------
     // Unity Events
@@ -65,20 +58,36 @@ public class CharacterDialogueBrain : MonoBehaviour
         // Reserved for runtime checks if needed
     }
 
-    public bool CanTalk()
+    public void SetIntention(DialogueIntention intention)
     {
-        return !isBusy;
+        currentIntention = intention;
     }
 
-    public void SetBusy()
+    public void ClearIntention()
     {
-        isBusy = true;
+        currentIntention = DialogueIntention.None;
     }
 
-    public void SetFree()
+    public bool CanStartPlayerToCharacterDialogue()
     {
-        isBusy = false;
+        return IsFree && !DialogueManager.Instance.main.IsRunning();
     }
+
+    public bool CanStartCharacterToPlayerDialogue()
+    {
+        return (IsFree || CurrentIntention == DialogueIntention.ApproachingPlayer) && !DialogueManager.Instance.main.IsRunning() && characterToPlayerTopics.Count > 0;
+    }
+
+    public bool CanStartCharacterMonologue()
+    {
+        return IsFree && !DialogueManager.Instance.main.IsRunning() && DialogueManager.Instance.IsAnyBackgroundDialogueAvailable() && monologueTopics.Count > 0;
+    }
+
+    public bool CanStartCharacterToCharacterDialogue()
+    {
+        return IsFree && !DialogueManager.Instance.main.IsRunning() && DialogueManager.Instance.IsAnyBackgroundDialogueAvailable() && characterToCharacterTopics.Count > 0;
+    }
+
 
     // -------------------
     // Player -> Character
@@ -115,10 +124,12 @@ public class CharacterDialogueBrain : MonoBehaviour
 
     public void TriggerPlayerDialogueWithCharacter()
     {
-        if (DialogueManager.Instance.IsDialogueRunning())
+        if (!CanStartPlayerToCharacterDialogue())
+        {
             return;
-
+        }
         string nodeName = $"{characterName.ToLower()}_start";
+        SetIntention(DialogueIntention.SpokenTo);
         DialogueManager.Instance.StartDialogue(nodeName);
     }
 
@@ -141,9 +152,11 @@ public class CharacterDialogueBrain : MonoBehaviour
 
     public void TriggerCharacterDialogueWithPlayer()
     {
-        if (isBusy || DialogueManager.Instance.IsDialogueRunning() || characterToPlayerTopics.Count == 0)
+        if(!CanStartCharacterToPlayerDialogue())
+        {
             return;
-
+        }
+        SetIntention(DialogueIntention.ToPlayer);
         DialogueManager.Instance.StartDialogue(GetRandomCharacterToPlayerNode());
     }
 
@@ -177,12 +190,9 @@ public class CharacterDialogueBrain : MonoBehaviour
 
     public void TriggerMonologue()
     {
-        if (isBusy ||
-            DialogueManager.Instance.IsDialogueRunning() ||
-            !DialogueManager.Instance.IsAnyBackgroundDialogueAvailable() ||
-            monologueTopics.Count == 0)
+        if (!CanStartCharacterMonologue())
             return;
-
+        SetIntention(DialogueIntention.Monologue);
         DialogueManager.Instance.StartBackgroundDialogue(GetRandomMonologueNode());
     }
 
@@ -210,10 +220,7 @@ public class CharacterDialogueBrain : MonoBehaviour
 
     public bool TriggerCharacterToCharacterDialogue(List<Actor> nearbyActors)
     {
-        if (isBusy ||
-            DialogueManager.Instance.IsDialogueRunning() ||
-            !DialogueManager.Instance.IsAnyBackgroundDialogueAvailable() ||
-            characterToCharacterTopics.Count == 0)
+        if (!CanStartCharacterToCharacterDialogue())
             return false;
 
         string bestTopicNodeName = GetBestAvailableTopic(nearbyActors);
@@ -222,7 +229,7 @@ public class CharacterDialogueBrain : MonoBehaviour
         {
             return false;
         }
-
+        SetIntention(DialogueIntention.ToCharacter);
         DialogueManager.Instance.StartBackgroundDialogue(bestTopicNodeName);
         return true;
     }
@@ -238,7 +245,7 @@ public class CharacterDialogueBrain : MonoBehaviour
             bool allRequiredPresent = topic.OtherActors.All(req =>
             {
                 var actor = nearbyActors.FirstOrDefault(c => c.actorName == req);
-                return actor != null && actor.CanTalk();
+                return actor != null && actor.Brain().Dialogue().IsFree;
             });
 
             if (!allRequiredPresent) continue;

@@ -29,6 +29,9 @@ public class SingleOptionsBubble : DialogueViewBase
         canvasGroup.blocksRaycasts = false;
         optionView = GetComponent<OptionView>();
         optionView.OnOptionSelected = OptionViewWasSelected;
+
+        prevOption.SetActive(false);
+        nextOption.SetActive(false);
     }
 
     public void PrevOption()
@@ -95,6 +98,9 @@ public class SingleOptionsBubble : DialogueViewBase
 
     public override void RunOptions(DialogueOption[] dialogueOptions, Action<int> onOptionSelected)
     {
+        prevOption.SetActive(true);
+        nextOption.SetActive(true);
+
         _dialogueOptions = dialogueOptions;
         OnOptionSelected = onOptionSelected;
 
@@ -117,6 +123,9 @@ public class SingleOptionsBubble : DialogueViewBase
             canvasGroup.blocksRaycasts = false;
 
             _dialogueOptions = null;
+
+            prevOption.SetActive(false);
+            nextOption.SetActive(false);
 
             StartCoroutine(FadeAndDisableOptionViews(canvasGroup, canvasGroup.alpha, 0, fadeTime));
         }

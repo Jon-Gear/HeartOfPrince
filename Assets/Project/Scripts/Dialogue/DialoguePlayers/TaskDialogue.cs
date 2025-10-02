@@ -9,7 +9,7 @@ public class TaskDialogue : TDialogue
 
     public override void Talk()
     {
-        if (DialogueManager.Instance.IsDialogueRunning())
+        if (DialogueManager.Instance.main.IsRunning())
         {
             return;
         }

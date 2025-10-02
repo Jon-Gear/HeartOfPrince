@@ -2573,6 +2573,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   backgroundDialogueIndex: 1
   dialogueRect: {fileID: 8225246014917899419}
+  otherDialogueRects:
+  - {fileID: 4389676395884368316}
+  - {fileID: 1891722081714133135}
+  separationDistance: 320
 --- !u!114 &2547365652301860369
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2587,6 +2591,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   backgroundDialogueIndex: 2
   dialogueRect: {fileID: 4389676395884368316}
+  otherDialogueRects: []
+  separationDistance: 0
 --- !u!114 &3806116696375099116
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2601,6 +2607,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   backgroundDialogueIndex: 3
   dialogueRect: {fileID: 1891722081714133135}
+  otherDialogueRects: []
+  separationDistance: 0
 --- !u!223 &7340130246056279852
 Canvas:
   m_ObjectHideFlags: 0

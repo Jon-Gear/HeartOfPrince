@@ -80,7 +80,7 @@ public class CharacterToCharacterStartDialogue : MonoBehaviour
         {
             yield return new WaitForSeconds(Random.Range(minDialogueInterval, maxDialogueInterval));
 
-            if(!characterActor.CanTalk() || nearbyActors.Count == 0)
+            if(!characterBrain.Dialogue().CanStartCharacterToCharacterDialogue() || nearbyActors.Count == 0)
             {
                 continue;
             }

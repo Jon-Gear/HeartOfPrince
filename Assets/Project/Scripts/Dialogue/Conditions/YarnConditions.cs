@@ -12,6 +12,7 @@ public class ConditionIsDialogueRunning : Condition
 {
     protected override bool Run(Args args)
     {
-        return DialogueManager.Instance.IsDialogueRunning();
+        return false;
+        //return DialogueManager.Instance.IsDialogueRunning();
     }
 }

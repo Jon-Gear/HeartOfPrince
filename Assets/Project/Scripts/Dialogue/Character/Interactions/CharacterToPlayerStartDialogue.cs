@@ -37,7 +37,7 @@ public class CharacterToPlayerStartDialogue : MonoBehaviour
 
     private void OnInteractInRange(Collider other)
     {
-        if (!characterBrain.Dialogue().HasTopicsForPlayer())
+        if (!characterBrain.Dialogue().CanStartCharacterToPlayerDialogue())
         {
             return;
         }
@@ -48,7 +48,7 @@ public class CharacterToPlayerStartDialogue : MonoBehaviour
 
     private void OnDetectionInRange(Collider other)
     {
-        if(!characterBrain.Dialogue().HasTopicsForPlayer())
+        if(!characterBrain.Dialogue().CanStartCharacterToPlayerDialogue())
         {
             return;
         }
@@ -83,6 +83,8 @@ public class CharacterToPlayerStartDialogue : MonoBehaviour
 
         character.Motion.StartFollowingTarget(targetCharacter.transform, 0.5f, 2f);
 
+        characterActor.Brain().Dialogue().SetIntention(DialogueIntention.ApproachingPlayer);
+
         isFollowingPlayerToAskTopic = true;
     }
 
@@ -90,5 +92,6 @@ public class CharacterToPlayerStartDialogue : MonoBehaviour
     {
         character.Motion.StopFollowingTarget();
         isFollowingPlayerToAskTopic = false;
+        characterActor.Brain().Dialogue().ClearIntention();
     }
 }

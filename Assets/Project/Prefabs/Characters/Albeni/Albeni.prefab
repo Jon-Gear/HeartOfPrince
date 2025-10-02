@@ -649,7 +649,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &4939230145638371336
 Transform:
   m_ObjectHideFlags: 0
@@ -825,8 +825,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterActor: {fileID: 5709011892382168349}
   detectionCollider: {fileID: 4535897561678806811}
-  minMonologueInterval: 1
-  maxMonologueInterval: 2
+  minMonologueInterval: 3
+  maxMonologueInterval: 4
 --- !u!1 &2061682560421284181
 GameObject:
   m_ObjectHideFlags: 0
@@ -3093,7 +3093,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 5
+  m_Radius: 15
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &4535897561678806811
 MonoBehaviour:

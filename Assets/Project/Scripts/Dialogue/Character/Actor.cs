@@ -22,20 +22,8 @@ public class Actor : MonoBehaviour
             return transform.position + messageBubbleOffset;   
         }
     }
-
+    public Character Character() => character;
     public CharacterBrain Brain() => characterBrain;
-
-
-    public bool CanTalk()
-    {
-        if (characterBrain == null)
-        {
-            Debug.LogError($"Character Brain not found for actor '{actorName}'");
-            return false;
-        }
-        
-        return characterBrain.Dialogue().CanTalk();
-    }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private void Start()

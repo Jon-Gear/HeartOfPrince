@@ -37,7 +37,7 @@ public class StopDialogueYarn : Instruction
 {
     protected override Task Run(Args args)
     {
-        DialogueManager.Instance.StopDialogue();
+        //DialogueManager.Instance.StopDialogue();
         return DefaultResult;
     }
 }
@@ -53,7 +53,7 @@ public class StopInnerMonologue : Instruction
 {
     protected override Task Run(Args args)
     {
-        DialogueManager.Instance.StopInnerMonologue();
+        //DialogueManager.Instance.StopInnerMonologue();
         return DefaultResult;
     }
 }

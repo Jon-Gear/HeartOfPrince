@@ -18,7 +18,7 @@ public class ExamineZone : MonoBehaviour
 
     public void Examine()
     {
-        if (DialogueManager.Instance.IsDialogueRunning())
+        if (DialogueManager.Instance.main.IsRunning())
         {
             return;
         }
@@ -27,12 +27,12 @@ public class ExamineZone : MonoBehaviour
             Debug.LogWarning($"ExamineZone on {gameObject.name} has no Topic assigned!");
             return;
         }
-        DialogueManager.Instance.StartInnerMonologue(topic.GetTopicNodeName());
+        DialogueManager.Instance.StartDialogue(topic.GetTopicNodeName());
     }
 
     private void OnZoneEntered(Collider other)
     {
-        if(DialogueManager.Instance.IsDialogueRunning())
+        if (DialogueManager.Instance.main.IsRunning())
         {
             return;
         }
@@ -41,7 +41,7 @@ public class ExamineZone : MonoBehaviour
 
     private void OnZoneStayed(Collider other)
     {
-        if (!DialogueManager.Instance.IsDialogueRunning())
+        if (!DialogueManager.Instance.main.IsRunning())
         {
             ScreenEffectsManager.Instance.ShowPrompt(promptText, this.gameObject, promptOffset);
         }

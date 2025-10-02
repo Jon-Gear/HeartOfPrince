@@ -14,40 +14,42 @@ public class CharacterViewBackgroundDialogue : DialogueViewBase
     private int backgroundDialogueIndex = 1;
     [Tooltip("for best results, set the rectTransform anchors to middle-center, and make sure the rectTransform's pivot Y is set to 0")]
     public RectTransform dialogueRect;
+    private Dialogue dialogue;
 
     private Canvas canvas;
 
     public override void RunLine(LocalizedLine dialogueLine, Action onDialogueLineFinished)
     {
-        switch(backgroundDialogueIndex)
-        {
-            case 1:
-                DialogueManager.Instance.SetBackgroundDialogueSpeaker_1(dialogueLine.CharacterName);
-                break;
-            case 2:
-                DialogueManager.Instance.SetBackgroundDialogueSpeaker_2(dialogueLine.CharacterName);
-                break;
-            case 3:
-                DialogueManager.Instance.SetBackgroundDialogueSpeaker_3(dialogueLine.CharacterName);
-                break;
-        }
-
-        ActorRegistry.Instance.SetBackgroundDialogueCurrentSpeaker(dialogueLine.CharacterName);
+        dialogue.SetSpeaker(dialogueLine.CharacterName);
         onDialogueLineFinished();
     }
 
     private void Start()
     {
         canvas = GetComponent<Canvas>();
+        switch (backgroundDialogueIndex)
+        {
+            case 1:
+                dialogue = DialogueManager.Instance.background_1;
+                break;
+            case 2:
+                dialogue = DialogueManager.Instance.background_2;
+                break;
+            case 3:
+                dialogue = DialogueManager.Instance.background_3;
+                break;
+        }
     }
 
     void Update()
     {
-        if(!DialogueManager.Instance.IsAnyBackgroundDialogueRunning()) return;
+        if (!dialogue.IsRunning()) return;
+        if (dialogue.GetSpeaker() == null) return;
+
 
         if (dialogueRect != null && dialogueRect.gameObject.activeInHierarchy)
         {
-            dialogueRect.anchoredPosition = ScreenEffectUtils.AnchorToWorldPosition(dialogueRect, ActorRegistry.Instance.backgroundDialogueCurrentSpeaker.positionWithOffset, canvas, Camera.main);
+            dialogueRect.anchoredPosition = ScreenEffectUtils.AnchorToWorldPosition(dialogueRect, dialogue.GetSpeaker().positionWithOffset, canvas, Camera.main);
         }
     }
 }
