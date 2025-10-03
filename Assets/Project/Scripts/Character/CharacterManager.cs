@@ -1,3 +1,5 @@
+using NUnit.Framework;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Numerics;
 using UnityEngine;
@@ -32,5 +34,37 @@ public class CharacterManager : Singleton<CharacterManager>
 
         //Debug.LogError($"Character '{characterName}' not found in the scene.");
         return null;
+    }
+
+    public void AddTopicPlayerToCharacter(TopicPlayerToCharacter topic, List<string> characterNames)
+    {
+        foreach (string characterName in characterNames)
+        {
+            CharacterBrain character = GetCharacter(characterName);
+            if (character != null)
+            {
+                character.Dialogue().AddPlayerToCharacterTopic(topic);
+            }
+            else
+            {
+                Debug.LogWarning($"Character '{characterName}' not found. Cannot add topic.");
+            }
+        }
+    }
+
+    public void RemoveTopicPlayerToCharacter(TopicPlayerToCharacter topic, List<string> characterNames)
+    {
+        foreach (string characterName in characterNames)
+        {
+            CharacterBrain character = GetCharacter(characterName);
+            if (character != null)
+            {
+                character.Dialogue().RemovePlayerToCharacterTopic(topic);
+            }
+            else
+            {
+                Debug.LogWarning($"Character '{characterName}' not found. Cannot remove topic.");
+            }
+        }
     }
 }

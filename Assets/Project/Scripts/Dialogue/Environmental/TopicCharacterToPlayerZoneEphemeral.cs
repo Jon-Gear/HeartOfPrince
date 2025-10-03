@@ -1,12 +1,11 @@
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-
 
 [RequireComponent(typeof(TriggerCollider))]
-public class TopicZone : MonoBehaviour
+public class TopicCharacterToPlayerZoneEphemeral : MonoBehaviour
 {
-    [SerializeField] private TopicCharacterMonologue topic;
-
+    [SerializeField] private TopicCharacterToPlayer topic;
+    [SerializeField] private List<string> AffectedCharacters;
     private TriggerCollider triggerArea;
 
     void Start()
@@ -23,11 +22,11 @@ public class TopicZone : MonoBehaviour
         {
             return;
         }
-        CharacterBrain brain = CharacterManager.Instance.GetCharacter(otherActor.actorName);
-
-        brain.Dialogue().AddCharacterMonologueTopic(topic);
-
-
+        if (!AffectedCharacters.Contains(otherActor.actorName))
+        {
+            return;
+        }
+        otherActor.Brain().Dialogue().AddCharacterToPlayerTopic(topic);
     }
     private void OnZoneExited(Collider other)
     {
@@ -36,8 +35,10 @@ public class TopicZone : MonoBehaviour
         {
             return;
         }
-        CharacterBrain brain = CharacterManager.Instance.GetCharacter(otherActor.actorName);
-
-        brain.Dialogue().RemoveCharacterMonologueTopic(topic);
+        if (!AffectedCharacters.Contains(otherActor.actorName))
+        {
+            return;
+        }
+        otherActor.Brain().Dialogue().RemoveCharacterToPlayerTopic(topic);
     }
 }

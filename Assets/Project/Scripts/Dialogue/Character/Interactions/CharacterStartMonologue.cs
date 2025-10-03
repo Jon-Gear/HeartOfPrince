@@ -29,20 +29,15 @@ public class CharacterStartMonologue : MonoBehaviour
     void OnPlayerInRange(Collider other)
     {
         StartMonologueLoop();
-        Debug.Log($"{characterActor.actorName}: Player in range, starting monologue loop.");
     }
 
     void OnPlayerOutOfRange(Collider other)
     {
         StopMonologueLoop();
-        Debug.Log($"{characterActor.actorName}: Player out of range, stopping monologue loop.");
     }
 
     public void StartMonologueLoop()
     {
-        if (!DialogueManager.Instance.IsAnyBackgroundDialogueAvailable())
-            return;
-
         monologueCoroutine = StartCoroutine(MonologueLoop());
     }
 

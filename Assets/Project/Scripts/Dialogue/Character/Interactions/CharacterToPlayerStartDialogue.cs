@@ -1,4 +1,5 @@
 using GameCreator.Runtime.Characters;
+using System.Collections;
 using UnityEngine;
 
 public class CharacterToPlayerStartDialogue : MonoBehaviour
@@ -8,10 +9,22 @@ public class CharacterToPlayerStartDialogue : MonoBehaviour
     [SerializeField] private TriggerCollider interactionCollider;
     [SerializeField] private TriggerCollider detectionCollider;
 
+    [Header("Settings")]
+    [Tooltip("Minimum time between background dialogues (seconds).")]
+    [SerializeField] private float minAskInterval = 1.0f;
+
+    [Tooltip("Maximum time between background dialogues (seconds).")]
+    [SerializeField] private float maxAskInterval = 2.0f;
+
     private Character character;
     private CharacterBrain characterBrain;
     
     private bool isFollowingPlayerToAskTopic = false;
+    private bool isInInteractionRange = false;
+
+    private Coroutine dialogueCoroutine;
+
+    private Collider otherCollider;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -20,50 +33,83 @@ public class CharacterToPlayerStartDialogue : MonoBehaviour
         characterBrain = CharacterManager.Instance.GetCharacter(characterActor.actorName);
 
         interactionCollider.TriggerEntered += OnInteractInRange;
-        detectionCollider.TriggerEntered += OnDetectionInRange;
-
-        detectionCollider.TriggerExited += OnDetectionOutOfRange;
+        interactionCollider.TriggerStayed += OnInteractStayInRange;
         interactionCollider.TriggerExited += OnDetectionOutOfRange;
+
+        detectionCollider.TriggerEntered += OnDetectionInRange;
+        detectionCollider.TriggerStayed += OnDetectionStayInRange;
+        detectionCollider.TriggerExited += OnDetectionOutOfRange;
     }
 
-    private void OnDestroy()
-    {
-        interactionCollider.TriggerEntered -= OnInteractInRange;
-        detectionCollider.TriggerEntered -= OnDetectionInRange;
-
-        detectionCollider.TriggerExited -= OnDetectionOutOfRange;
-        interactionCollider.TriggerExited -= OnDetectionOutOfRange;
-    }
 
     private void OnInteractInRange(Collider other)
     {
+        
+    }
+
+    private void OnInteractStayInRange(Collider other)
+    {
         if (!characterBrain.Dialogue().CanStartCharacterToPlayerDialogue())
         {
+            isInInteractionRange = false;
             return;
         }
 
-        Talk();
-        StopFollow();
+        isInInteractionRange = true;
     }
+
+    private void OnInteractionOutOfRange(Collider other)
+    {
+
+    }
+
 
     private void OnDetectionInRange(Collider other)
     {
-        if(!characterBrain.Dialogue().CanStartCharacterToPlayerDialogue())
-        {
-            return;
-        }
+        dialogueCoroutine = StartCoroutine(Loop());
+    }
 
-        Follow(other);
+    private void OnDetectionStayInRange(Collider other)
+    {
+        otherCollider = other;
     }
 
     private void OnDetectionOutOfRange(Collider other)
     {
-        if(!isFollowingPlayerToAskTopic)
+        if(dialogueCoroutine != null)
         {
-            return;
+            StopCoroutine(dialogueCoroutine);
         }
+
+        otherCollider = null;
+
         StopFollow();
     }
+
+    private IEnumerator Loop()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(Random.Range(minAskInterval, maxAskInterval));
+
+            if(characterActor.Brain().Dialogue().CanStartPlayerToCharacterDialogue())
+            {
+                Follow(otherCollider);
+            }
+
+
+            if (characterActor.Brain().Dialogue().CanStartCharacterToPlayerDialogue() && isInInteractionRange)
+            {
+                Talk();
+                StopFollow();
+            }
+            else
+            {
+                Debug.Log($"{characterActor.actorName}: Cannot talk right now, skipping monologue.");
+            }
+        }
+    }
+
 
 
     // Update is called once per frame
@@ -81,7 +127,7 @@ public class CharacterToPlayerStartDialogue : MonoBehaviour
     {
         Character targetCharacter = other.gameObject.GetComponent<Character>();
 
-        character.Motion.StartFollowingTarget(targetCharacter.transform, 0.5f, 2f);
+        character.Motion.StartFollowingTarget(targetCharacter.transform, 1f, 2f);
 
         characterActor.Brain().Dialogue().SetIntention(DialogueIntention.ApproachingPlayer);
 

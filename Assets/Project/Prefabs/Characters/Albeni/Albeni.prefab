@@ -681,8 +681,8 @@ MonoBehaviour:
   characterActor: {fileID: 5709011892382168349}
   detectionCollider: {fileID: 5456492032501676346}
   nearbyActors: []
-  minDialogueInterval: 5
-  maxDialogueInterval: 10
+  minDialogueInterval: 1
+  maxDialogueInterval: 60
 --- !u!1 &1614405008308754945
 GameObject:
   m_ObjectHideFlags: 0
@@ -825,8 +825,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterActor: {fileID: 5709011892382168349}
   detectionCollider: {fileID: 4535897561678806811}
-  minMonologueInterval: 3
-  maxMonologueInterval: 4
+  minMonologueInterval: 1
+  maxMonologueInterval: 60
 --- !u!1 &2061682560421284181
 GameObject:
   m_ObjectHideFlags: 0
@@ -2196,6 +2196,8 @@ MonoBehaviour:
   characterActor: {fileID: 5709011892382168349}
   interactionCollider: {fileID: 2315524475779924489}
   detectionCollider: {fileID: 5753636766241875660}
+  minAskInterval: 1
+  maxAskInterval: 2
 --- !u!1 &6205232145994632346
 GameObject:
   m_ObjectHideFlags: 0

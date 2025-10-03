@@ -104,6 +104,12 @@ public class CharacterDialogueBrain : MonoBehaviour
         playerToCharacterTopics.RemoveAll(t => t.TopicName == topicName);
     }
 
+    public void RemovePlayerToCharacterTopic(TopicPlayerToCharacter topic)
+    {
+        if (playerToCharacterTopics.Contains(topic))
+            playerToCharacterTopics.Remove(topic);
+    }
+
     public string GetPlayerTopicOptionText(int index)
     {
         if (index < 0 || index >= playerToCharacterTopics.Count)
@@ -146,6 +152,12 @@ public class CharacterDialogueBrain : MonoBehaviour
     public void RemoveCharacterToPlayerTopic(string topicName)
     {
         characterToPlayerTopics.RemoveAll(t => t.TopicName == topicName);
+    }
+
+    public void RemoveCharacterToPlayerTopic(TopicCharacterToPlayer topic)
+    {
+        if (characterToPlayerTopics.Contains(topic))
+            characterToPlayerTopics.Remove(topic);
     }
 
     public bool HasTopicsForPlayer() => characterToPlayerTopics.Count > 0;
