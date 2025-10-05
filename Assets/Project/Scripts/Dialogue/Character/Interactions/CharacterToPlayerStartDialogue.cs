@@ -1,143 +1,193 @@
-using GameCreator.Runtime.Characters;
 using System.Collections;
 using UnityEngine;
+using GameCreator.Runtime.Characters;
 
+/// <summary>
+/// This component allows an NPC to periodically check for a nearby player,
+/// approach them, and initiate dialogue if conditions are met.
+/// </summary>
 public class CharacterToPlayerStartDialogue : MonoBehaviour
 {
+    [Header("References")]
     [SerializeField] private Actor characterActor;
-
     [SerializeField] private TriggerCollider interactionCollider;
     [SerializeField] private TriggerCollider detectionCollider;
 
-    [Header("Settings")]
-    [Tooltip("Minimum time between background dialogues (seconds).")]
+    [Header("Dialogue Settings")]
+    [Tooltip("Minimum delay between dialogue attempts (seconds).")]
     [SerializeField] private float minAskInterval = 1.0f;
 
-    [Tooltip("Maximum time between background dialogues (seconds).")]
+    [Tooltip("Maximum delay between dialogue attempts (seconds).")]
     [SerializeField] private float maxAskInterval = 2.0f;
 
     private Character character;
     private CharacterBrain characterBrain;
-    
-    private bool isFollowingPlayerToAskTopic = false;
-    private bool isInInteractionRange = false;
+    private Collider detectedPlayer;
 
-    private Coroutine dialogueCoroutine;
+    private bool isFollowingPlayer;
+    private bool isPlayerInInteractionRange;
 
-    private Collider otherCollider;
+    private Coroutine dialogueLoopCoroutine;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    // ----------------------------------------------------------------------
+
+    private void Start()
     {
-        character = characterActor.gameObject.GetComponent<Character>();
-        characterBrain = CharacterManager.Instance.GetCharacter(characterActor.actorName);
-
-        interactionCollider.TriggerEntered += OnInteractInRange;
-        interactionCollider.TriggerStayed += OnInteractStayInRange;
-        interactionCollider.TriggerExited += OnDetectionOutOfRange;
-
-        detectionCollider.TriggerEntered += OnDetectionInRange;
-        detectionCollider.TriggerStayed += OnDetectionStayInRange;
-        detectionCollider.TriggerExited += OnDetectionOutOfRange;
-    }
-
-
-    private void OnInteractInRange(Collider other)
-    {
-        
-    }
-
-    private void OnInteractStayInRange(Collider other)
-    {
-        if (!characterBrain.Dialogue().CanStartCharacterToPlayerDialogue())
+        if (characterActor == null)
         {
-            isInInteractionRange = false;
+            Debug.LogError($"[{nameof(CharacterToPlayerStartDialogue)}] Missing characterActor reference.");
+            enabled = false;
             return;
         }
 
-        isInInteractionRange = true;
-    }
+        character = characterActor.GetComponent<Character>();
+        characterBrain = CharacterManager.Instance.GetCharacter(characterActor.actorName);
 
-    private void OnInteractionOutOfRange(Collider other)
-    {
-
-    }
-
-
-    private void OnDetectionInRange(Collider other)
-    {
-        dialogueCoroutine = StartCoroutine(Loop());
-    }
-
-    private void OnDetectionStayInRange(Collider other)
-    {
-        otherCollider = other;
-    }
-
-    private void OnDetectionOutOfRange(Collider other)
-    {
-        if(dialogueCoroutine != null)
+        if (character == null || characterBrain == null)
         {
-            StopCoroutine(dialogueCoroutine);
+            Debug.LogError($"[{nameof(CharacterToPlayerStartDialogue)}] Could not initialize character or brain.");
+            enabled = false;
+            return;
         }
 
-        otherCollider = null;
+        // Subscribe to trigger events
+        interactionCollider.TriggerEntered += OnInteractionEnter;
+        interactionCollider.TriggerStayed += OnInteractionStay;
+        interactionCollider.TriggerExited += OnInteractionExit;
 
-        StopFollow();
+        detectionCollider.TriggerEntered += OnDetectionEnter;
+        detectionCollider.TriggerStayed += OnDetectionStay;
+        detectionCollider.TriggerExited += OnDetectionExit;
     }
 
-    private IEnumerator Loop()
-    {
-        while (true)
-        {
-            yield return new WaitForSeconds(Random.Range(minAskInterval, maxAskInterval));
+    // ----------------------------------------------------------------------
+    #region Interaction Colliders
 
-            if(characterActor.Brain().Dialogue().CanStartPlayerToCharacterDialogue())
+    private void OnInteractionEnter(Collider other)
+    {
+        // Optionally handle visual cues or prompts here
+    }
+
+    private void OnInteractionStay(Collider other)
+    {
+        if (characterBrain.Dialogue().CanStartCharacterToPlayerDialogue())
+        {
+            isPlayerInInteractionRange = true;
+        }
+        else
+        {
+            isPlayerInInteractionRange = false;
+        }
+    }
+
+    private void OnInteractionExit(Collider other)
+    {
+        isPlayerInInteractionRange = false;
+    }
+
+    #endregion
+
+    // ----------------------------------------------------------------------
+    #region Detection Colliders
+
+    private void OnDetectionEnter(Collider other)
+    {
+        detectedPlayer = other;
+        StartDialogueLoop();
+    }
+
+    private void OnDetectionStay(Collider other)
+    {
+        detectedPlayer = other;
+    }
+
+    private void OnDetectionExit(Collider other)
+    {
+        StopDialogueLoop();
+        StopFollowing();
+        detectedPlayer = null;
+    }
+
+    #endregion
+
+    // ----------------------------------------------------------------------
+    #region Dialogue Loop
+
+    private void StartDialogueLoop()
+    {
+        if (dialogueLoopCoroutine == null)
+        {
+            dialogueLoopCoroutine = StartCoroutine(DialogueLoop());
+        }
+    }
+
+    private void StopDialogueLoop()
+    {
+        if (dialogueLoopCoroutine != null)
+        {
+            StopCoroutine(dialogueLoopCoroutine);
+            dialogueLoopCoroutine = null;
+        }
+    }
+
+    private IEnumerator DialogueLoop()
+    {
+        while (detectedPlayer != null)
+        {
+            float waitTime = Random.Range(minAskInterval, maxAskInterval);
+            yield return new WaitForSeconds(waitTime);
+
+            if (detectedPlayer == null) yield break;
+
+            bool canApproach = characterActor.Brain().Dialogue().CanStartPlayerToCharacterDialogue();
+            bool canTalkNow = characterActor.Brain().Dialogue().CanStartCharacterToPlayerDialogue();
+
+            if (canApproach && !isFollowingPlayer)
             {
-                Follow(otherCollider);
+                FollowPlayer(detectedPlayer);
             }
 
-
-            if (characterActor.Brain().Dialogue().CanStartCharacterToPlayerDialogue() && isInInteractionRange)
+            if (canTalkNow && isPlayerInInteractionRange)
             {
-                Talk();
-                StopFollow();
+                StartDialogue();
+                StopFollowing();
             }
             else
             {
-                Debug.Log($"{characterActor.actorName}: Cannot talk right now, skipping monologue.");
+                Debug.Log($"{characterActor.actorName}: No suitable dialogue conditions, skipping attempt.");
             }
         }
     }
 
+    #endregion
 
+    // ----------------------------------------------------------------------
+    #region Character Actions
 
-    // Update is called once per frame
-    void Update()
+    private void FollowPlayer(Collider playerCollider)
     {
-        
+        Character playerCharacter = playerCollider.GetComponent<Character>();
+        if (playerCharacter == null) return;
+
+        character.Motion.StartFollowingTarget(playerCharacter.transform, 1f, 2f);
+        characterActor.Brain().Dialogue().SetIntention(DialogueIntention.ApproachingPlayer);
+        isFollowingPlayer = true;
     }
 
-    void Talk()
+    private void StopFollowing()
+    {
+        if (isFollowingPlayer)
+        {
+            character.Motion.StopFollowingTarget();
+            characterActor.Brain().Dialogue().ClearIntention();
+            isFollowingPlayer = false;
+        }
+    }
+
+    private void StartDialogue()
     {
         characterBrain.Dialogue().TriggerCharacterDialogueWithPlayer();
     }
 
-    void Follow(Collider other)
-    {
-        Character targetCharacter = other.gameObject.GetComponent<Character>();
-
-        character.Motion.StartFollowingTarget(targetCharacter.transform, 1f, 2f);
-
-        characterActor.Brain().Dialogue().SetIntention(DialogueIntention.ApproachingPlayer);
-
-        isFollowingPlayerToAskTopic = true;
-    }
-
-    void StopFollow()
-    {
-        character.Motion.StopFollowingTarget();
-        isFollowingPlayerToAskTopic = false;
-        characterActor.Brain().Dialogue().ClearIntention();
-    }
+    #endregion
 }
