@@ -80,17 +80,17 @@ public class YarnCommands : MonoBehaviour
     // -------------------
 
     [YarnCommand("AddPlayerToCharacterTopic")]
-    public static void AddToPlayerTopicToAskCharacter(string characterName, string resourcePathToTopic)
+    public static void AddToPlayerTopicToAskCharacter(string characterToAsk, string resourcePathToTopic)
     {
-        TopicPlayerToCharacter topic = Resources.Load<TopicPlayerToCharacter>("Dialogues/" + resourcePathToTopic);
-        CharacterBrain characterBrain = CharacterManager.Instance.GetCharacter(characterName);
+        TopicPlayerToCharacter topic = Resources.Load<TopicPlayerToCharacter>("TopicPlayerToCharacter/" + resourcePathToTopic);
+        CharacterBrain characterBrain = CharacterManager.Instance.GetCharacter(characterToAsk);
         characterBrain.Dialogue().AddPlayerToCharacterTopic(topic);
     }
 
     [YarnCommand("RemovePlayerToCharacterTopic")]
-    public static void RemovePlayerTopicToAskCharacter(string characterName, string topicName)
+    public static void RemovePlayerTopicToAskCharacter(string characterToAsk, string topicName)
     {
-        CharacterBrain characterBrain = CharacterManager.Instance.GetCharacter(characterName);
+        CharacterBrain characterBrain = CharacterManager.Instance.GetCharacter(characterToAsk);
         characterBrain.Dialogue().RemovePlayerToCharacterTopic(topicName);
     }
 

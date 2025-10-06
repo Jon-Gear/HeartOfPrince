@@ -70,7 +70,7 @@ public class CharacterDialogueBrain : MonoBehaviour
 
     public bool CanStartPlayerToCharacterDialogue()
     {
-        return IsFree && !DialogueManager.Instance.main.IsRunning();
+        return (IsFree) && !DialogueManager.Instance.main.IsRunning();
     }
 
     public bool CanStartCharacterToPlayerDialogue()

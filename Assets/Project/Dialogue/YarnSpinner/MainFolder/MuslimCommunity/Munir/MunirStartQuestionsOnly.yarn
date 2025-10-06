@@ -1,7 +1,6 @@
-﻿title: munir_start
+﻿title: munir_start_questions_only
 tags: actor:Munir actor:Prince
 ---
-Prince: Hey, Munir
 -> Prince: {GetDialogueTopicOptionText("Munir", 0)}
     <<jump {GetDialogueTopicNodeName("Munir", 0)}>>
 -> Prince: {GetDialogueTopicOptionText("Munir", 1)}

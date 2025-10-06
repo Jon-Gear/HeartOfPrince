@@ -72,12 +72,10 @@ public class CharacterToPlayerStartDialogue : MonoBehaviour
     {
         if (characterBrain.Dialogue().CanStartCharacterToPlayerDialogue())
         {
-            isPlayerInInteractionRange = true;
+            StartDialogue();
+            StopFollowing();
         }
-        else
-        {
-            isPlayerInInteractionRange = false;
-        }
+        
     }
 
     private void OnInteractionExit(Collider other)
@@ -134,28 +132,22 @@ public class CharacterToPlayerStartDialogue : MonoBehaviour
     {
         while (detectedPlayer != null)
         {
-            float waitTime = Random.Range(minAskInterval, maxAskInterval);
-            yield return new WaitForSeconds(waitTime);
-
             if (detectedPlayer == null) yield break;
 
-            bool canApproach = characterActor.Brain().Dialogue().CanStartPlayerToCharacterDialogue();
             bool canTalkNow = characterActor.Brain().Dialogue().CanStartCharacterToPlayerDialogue();
 
-            if (canApproach && !isFollowingPlayer)
+            if (canTalkNow && !isFollowingPlayer)
             {
                 FollowPlayer(detectedPlayer);
             }
 
-            if (canTalkNow && isPlayerInInteractionRange)
+            if (!canTalkNow && isFollowingPlayer)
             {
-                StartDialogue();
                 StopFollowing();
             }
-            else
-            {
-                Debug.Log($"{characterActor.actorName}: No suitable dialogue conditions, skipping attempt.");
-            }
+
+            float waitTime = Random.Range(minAskInterval, maxAskInterval);
+            yield return new WaitForSeconds(waitTime);
         }
     }
 
