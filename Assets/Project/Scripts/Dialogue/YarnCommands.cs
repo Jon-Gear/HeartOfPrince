@@ -83,6 +83,13 @@ public class YarnCommands : MonoBehaviour
     public static void AddToPlayerTopicToAskCharacter(string characterToAsk, string resourcePathToTopic)
     {
         TopicPlayerToCharacter topic = Resources.Load<TopicPlayerToCharacter>("TopicPlayerToCharacter/" + resourcePathToTopic);
+
+        if (topic == null)
+        {
+            Debug.LogWarning($"Cannot add topic {resourcePathToTopic} to {characterToAsk}");
+            return;
+        }
+
         CharacterBrain characterBrain = CharacterManager.Instance.GetCharacter(characterToAsk);
         characterBrain.Dialogue().AddPlayerToCharacterTopic(topic);
     }

@@ -101,7 +101,7 @@ public class CharacterDialogueBrain : MonoBehaviour
 
     public void RemovePlayerToCharacterTopic(string topicName)
     {
-        playerToCharacterTopics.RemoveAll(t => t.TopicName == topicName);
+        playerToCharacterTopics.RemoveAll(t => t.TopicName.ToLower() == topicName.ToLower());
     }
 
     public void RemovePlayerToCharacterTopic(TopicPlayerToCharacter topic)
@@ -115,12 +115,18 @@ public class CharacterDialogueBrain : MonoBehaviour
         if (index < 0 || index >= playerToCharacterTopics.Count)
             return "...";
 
+        if(playerToCharacterTopics[index] == null)
+            return "...";
+
         return $"Talk about {playerToCharacterTopics[index].TopicName}";
     }
 
     public string GetPlayerTopicNodeName(int index)
     {
         if (index < 0 || index >= playerToCharacterTopics.Count)
+            return "empty";
+
+        if (playerToCharacterTopics[index] == null)
             return "empty";
 
         return playerToCharacterTopics[index]
