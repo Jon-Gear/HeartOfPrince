@@ -9,6 +9,7 @@ Munir: This will help guide you further.
 
 -> Prince: Okay.
 -> Prince: Why should I learn?
+    <<detour munir_detour_why_learn>>
 
 <<RemovePlayerToCharacterTopic "Munir" "what am I supposed to do">>
 <<AddPlayerToCharacterTopic "Munir" "ToMuslimCommunity/ToMunir/WhatToLearn">>
@@ -26,6 +27,9 @@ Prince: What does that mean?
 
 Munir: Tawheed is in Arabic.
 Munir: It means to "to affirm the Oneness of Allah" 
+
+<<activateQuest "Munir/MunirArc">>
+<<trackQuest "Munir/MunirArc">>
 
 <<RemovePlayerToCharacterTopic "Munir" "what to learn">>
 <<AddPlayerToCharacterTopic "Munir" "ToMuslimCommunity/ToMunir/Islam/Tawheed/WhatIsTawheed">>

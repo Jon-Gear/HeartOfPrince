@@ -20,59 +20,11 @@ public class TimeUI : MonoBehaviour
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
 
-    private void Start()
-    {
-        // DayTime
-        TimeManager.onMorning += OnMorning;
-        TimeManager.onSunrise += OnSunrise;
-        TimeManager.onNoon += OnNoon;
-        TimeManager.onAfternoon += OnAfternoon;
-        TimeManager.onEvening += OnEvening;
-        TimeManager.onNight += OnNight;
-
-        // Weekday
-        TimeManager.onClockUpdate += OnClockUpdate;
-        TimeManager.onDayTimeChanged += OnDayTimeChanged;
-        TimeManager.onWeekDayChanged += OnWeekDayChanged;
-    }
-
     private void Awake()
     {
         // DayTime
         TimeManager.onMorning += OnMorning;
         TimeManager.onSunrise += OnSunrise;
-        TimeManager.onNoon += OnNoon;   
-        TimeManager.onAfternoon += OnAfternoon;
-        TimeManager.onEvening += OnEvening;
-        TimeManager.onNight += OnNight;
-
-        // Weekday
-        TimeManager.onClockUpdate += OnClockUpdate;
-        TimeManager.onDayTimeChanged += OnDayTimeChanged;
-        TimeManager.onWeekDayChanged += OnWeekDayChanged;
-
-    }
-
-    private void OnDestroy()
-    {
-        // DayTime
-        TimeManager.onMorning -= OnMorning;
-        TimeManager.onSunrise -= OnSunrise;
-        TimeManager.onNoon -= OnNoon;   
-        TimeManager.onAfternoon -= OnAfternoon;
-        TimeManager.onEvening -= OnEvening;
-        TimeManager.onNight -= OnNight;
-        // Weekday
-        TimeManager.onClockUpdate -= OnClockUpdate;
-        TimeManager.onDayTimeChanged -= OnDayTimeChanged;
-        TimeManager.onWeekDayChanged -= OnWeekDayChanged;
-    }
-
-    private void OnEnable()
-    {
-        // DayTime
-        TimeManager.onMorning += OnMorning;
-        TimeManager.onSunrise += OnSunrise;
         TimeManager.onNoon += OnNoon;
         TimeManager.onAfternoon += OnAfternoon;
         TimeManager.onEvening += OnEvening;
@@ -82,21 +34,17 @@ public class TimeUI : MonoBehaviour
         TimeManager.onClockUpdate += OnClockUpdate;
         TimeManager.onDayTimeChanged += OnDayTimeChanged;
         TimeManager.onWeekDayChanged += OnWeekDayChanged;
+
     }
 
-    private void OnDisable()
+
+    private void Start()
     {
-        // DayTime
-        TimeManager.onMorning -= OnMorning;
-        TimeManager.onSunrise -= OnSunrise;
-        TimeManager.onNoon -= OnNoon;   
-        TimeManager.onAfternoon -= OnAfternoon;
-        TimeManager.onEvening -= OnEvening;
-        TimeManager.onNight -= OnNight;
-        // Weekday
-        TimeManager.onClockUpdate -= OnClockUpdate;
-        TimeManager.onDayTimeChanged -= OnDayTimeChanged;
-        TimeManager.onWeekDayChanged -= OnWeekDayChanged;
+        clockText.text = TimeManager.Instance.GetTimeString();
+        weekDayText.text = TimeUtils.WeekDayToString(TimeManager.Instance.GetWeekDay());
+
+        dayTimeText.text = TimeUtils.DayTimeToString(TimeManager.Instance.GetDayTime());
+        UpdateIcon();
     }
 
     void OnClockUpdate(ClockChangedArgs args)
@@ -171,13 +119,14 @@ public class TimeUI : MonoBehaviour
         dayTimeText.text = TimeUtils.DayTimeToString(args.DayTime);
     }
 
-    /*
+    
     void UpdateIcon()
     {
         var dayTime = TimeManager.Instance.GetDayTime();
         switch (dayTime)
         {
             case DAYTIME.Morning:
+                DayIcon.sprite = morningIcon;
                 break;
             case DAYTIME.Sunrise:
                 DayIcon.sprite = sunriseIcon;
@@ -196,5 +145,5 @@ public class TimeUI : MonoBehaviour
                 break;
         }
     }
-    */
+    
 }

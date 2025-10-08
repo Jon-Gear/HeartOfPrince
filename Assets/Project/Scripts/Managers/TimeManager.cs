@@ -63,7 +63,7 @@ public class WeekDayPhaseChangedArgs
 }
 
 
-public class TimeManager : EditorSingleton<TimeManager>
+public class TimeManager : Singleton<TimeManager>
 {
     // Methods
     public void ToggleTime()
@@ -408,12 +408,6 @@ public class TimeManager : EditorSingleton<TimeManager>
     private void Start()
     {
         prayerTimes.SetDayTimes();
-     
-        now = 0.5f;
-
-        TriggerClockUpdate();
-        TriggerDayTimeChanged();
-        TriggerWeekDayChanged();
     }
 
     // Update is called once per frame

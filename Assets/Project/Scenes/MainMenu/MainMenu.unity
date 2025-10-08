@@ -11428,6 +11428,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 119828736633522129, guid: b7f76d0a74003aa439da60a7a55604ee, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1809260388992845294, guid: b7f76d0a74003aa439da60a7a55604ee, type: 3}
       propertyPath: m_LocalPosition.x
       value: -2.22958
@@ -11471,6 +11475,30 @@ PrefabInstance:
     - target: {fileID: 2001268631137963239, guid: b7f76d0a74003aa439da60a7a55604ee, type: 3}
       propertyPath: m_Name
       value: '[Manager] ScreenEffects'
+      objectReference: {fileID: 0}
+    - target: {fileID: 4131018578882957506, guid: b7f76d0a74003aa439da60a7a55604ee, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4131018578882957506, guid: b7f76d0a74003aa439da60a7a55604ee, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4131018578882957506, guid: b7f76d0a74003aa439da60a7a55604ee, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4131018578882957506, guid: b7f76d0a74003aa439da60a7a55604ee, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4131018578882957506, guid: b7f76d0a74003aa439da60a7a55604ee, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4131018578882957506, guid: b7f76d0a74003aa439da60a7a55604ee, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -20037,9 +20065,9 @@ MonoBehaviour:
       type: {class: GetSceneAsset, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
         m_Scene:
-          m_Scene: {fileID: 102900000, guid: 757333ace8844834e9a218b5bad80e02, type: 3}
-          m_SceneName: Hideout_Hub
-          m_SceneIndex: 3
+          m_Scene: {fileID: 102900000, guid: 14e13e46b59d3b54a83ef794ef6caf10, type: 3}
+          m_SceneName: Hospital_Room
+          m_SceneIndex: 2
     - rid: 8106394054872793366
       type: {class: InstructionGameObjectDestroy, ns: GameCreator.Runtime.VisualScripting, asm: GameCreator.Runtime.Core}
       data:
