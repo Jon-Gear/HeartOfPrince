@@ -63,7 +63,7 @@ public class WeekDayPhaseChangedArgs
 }
 
 
-public class TimeManager : Singleton<TimeManager>
+public class TimeManager : GameSystem
 {
     // Methods
     public void ToggleTime()
@@ -407,8 +407,18 @@ public class TimeManager : Singleton<TimeManager>
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private void Start()
     {
+        
+    }
+
+    public override void Init()
+    {
         prayerTimes.SetDayTimes();
     }
+
+    public override void Shutdown()
+    {
+    }
+
 
     // Update is called once per frame
     private void Update()
@@ -436,6 +446,8 @@ public class TimeManager : Singleton<TimeManager>
 
         }
     }
+
+    
 }
 public static class TimeUtils
 {
@@ -467,4 +479,10 @@ public static class TimeUtils
             default: return "Unknown";
         }
     }
+}
+
+
+public class EditorTimeManager : EditorSingleton<TimeManager>
+{
+
 }

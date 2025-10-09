@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[ExecuteAlways]
+//[ExecuteAlways]
 public class ArtificialLightEmissiveController : MonoBehaviour
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -21,11 +21,11 @@ public class ArtificialLightEmissiveController : MonoBehaviour
 
     private void UpdateLight()
     {
-        if (TimeManager.Instance.GetSunIntensity() < sunIntensityThreshold)
+        if (GameManager.Instance.GetSystem<TimeManager>().GetSunIntensity() < sunIntensityThreshold)
         {
             TurnOnLight();
         }
-        else if (TimeManager.Instance.GetSunIntensity() >= sunIntensityThreshold)
+        else if (GameManager.Instance.GetSystem<TimeManager>().GetSunIntensity() >= sunIntensityThreshold)
         {
             TurnOffLight();
         }

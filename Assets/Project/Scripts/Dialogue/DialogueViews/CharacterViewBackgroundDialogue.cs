@@ -30,13 +30,13 @@ public class CharacterViewBackgroundDialogue : DialogueViewBase
         switch (backgroundDialogueIndex)
         {
             case 1:
-                dialogue = DialogueManager.Instance.background_1;
+                dialogue = GameManager.Instance.GetSystem<DialogueManager>().background_1;
                 break;
             case 2:
-                dialogue = DialogueManager.Instance.background_2;
+                dialogue = GameManager.Instance.GetSystem<DialogueManager>().background_2;
                 break;
             case 3:
-                dialogue = DialogueManager.Instance.background_3;
+                dialogue = GameManager.Instance.GetSystem<DialogueManager>().background_3;
                 break;
         }
     }

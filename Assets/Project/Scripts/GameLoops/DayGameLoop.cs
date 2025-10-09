@@ -23,18 +23,18 @@ public class DayGameLoop : Singleton<DayGameLoop>
     async void OnWeekDayChanged(WeekDayPhaseChangedArgs args)
     {
         Debug.Log("Fading");
-        await ScreenEffectsManager.Instance.BasicFadeOut(0.5f);
+        await GameManager.Instance.GetSystem<ScreenEffectsManager>().BasicFadeOut(0.5f);
 
-        TimeManager.Instance.StopTime();
-        TimeManager.Instance.SetTime("6:00");
+        GameManager.Instance.GetSystem<TimeManager>().StopTime();
+        GameManager.Instance.GetSystem<TimeManager>().SetTime("6:00");
         Debug.Log("Loading");
         
         
         await LoadSceneAsyncAwait("Hideout_Prince_Room", LoadSceneMode.Single);
-        TimeManager.Instance.StartTime();
+        GameManager.Instance.GetSystem<TimeManager>().StartTime();
 
         Debug.Log("Unfading");
-        await ScreenEffectsManager.Instance.BasicFadeIn(0.5f);
+        await GameManager.Instance.GetSystem<ScreenEffectsManager>().BasicFadeIn(0.5f);
     }
 
     public async Task LoadSceneAsyncAwait(string sceneName, LoadSceneMode mode = LoadSceneMode.Single)

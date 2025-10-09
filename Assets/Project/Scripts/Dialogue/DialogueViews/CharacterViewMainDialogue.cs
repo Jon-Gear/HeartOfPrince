@@ -17,7 +17,7 @@ public class CharacterViewMainDialogue : DialogueViewBase
 
     public override void RunLine(LocalizedLine dialogueLine, Action onDialogueLineFinished)
     {
-        DialogueManager.Instance.main.SetSpeaker(dialogueLine.CharacterName);
+        GameManager.Instance.GetSystem<DialogueManager>().main.SetSpeaker(dialogueLine.CharacterName);
         onDialogueLineFinished();
     }
 
@@ -26,7 +26,7 @@ public class CharacterViewMainDialogue : DialogueViewBase
         base.RunOptions(dialogueOptions, onOptionSelected);
 
 
-        DialogueManager.Instance.main.SetSpeaker(ActorRegistry.Instance.playerActor.actorName);
+        GameManager.Instance.GetSystem<DialogueManager>().main.SetSpeaker(ActorRegistry.Instance.playerActor.actorName);
     }
 
     private void Start()
@@ -36,14 +36,14 @@ public class CharacterViewMainDialogue : DialogueViewBase
 
     void Update()
     {
-        if (!DialogueManager.Instance.main.IsRunning()) return;
-        if(DialogueManager.Instance.main.GetSpeaker() == null) return;
+        if (!GameManager.Instance.GetSystem<DialogueManager>().main.IsRunning()) return;
+        if(GameManager.Instance.GetSystem<DialogueManager>().main.GetSpeaker() == null) return;
 
         for (int i = 0; i < dialogueRects.Length; i++)
         {
             if (dialogueRects[i] != null && dialogueRects[i].gameObject.activeInHierarchy)
             {
-                dialogueRects[i].anchoredPosition = ScreenEffectUtils.AnchorToWorldPosition(dialogueRects[i], DialogueManager.Instance.main.GetSpeaker().positionWithOffset, canvas, Camera.main);
+                dialogueRects[i].anchoredPosition = ScreenEffectUtils.AnchorToWorldPosition(dialogueRects[i], GameManager.Instance.GetSystem<DialogueManager>().main.GetSpeaker().positionWithOffset, canvas, Camera.main);
             }
         }
     }

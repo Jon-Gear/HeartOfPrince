@@ -40,10 +40,10 @@ public class TimeUI : MonoBehaviour
 
     private void Start()
     {
-        clockText.text = TimeManager.Instance.GetTimeString();
-        weekDayText.text = TimeUtils.WeekDayToString(TimeManager.Instance.GetWeekDay());
+        clockText.text = GameManager.Instance.GetSystem<TimeManager>().GetTimeString();
+        weekDayText.text = TimeUtils.WeekDayToString(GameManager.Instance.GetSystem<TimeManager>().GetWeekDay());
 
-        dayTimeText.text = TimeUtils.DayTimeToString(TimeManager.Instance.GetDayTime());
+        dayTimeText.text = TimeUtils.DayTimeToString(GameManager.Instance.GetSystem<TimeManager>().GetDayTime());
         UpdateIcon();
     }
 
@@ -122,7 +122,7 @@ public class TimeUI : MonoBehaviour
     
     void UpdateIcon()
     {
-        var dayTime = TimeManager.Instance.GetDayTime();
+        var dayTime = GameManager.Instance.GetSystem<TimeManager>().GetDayTime();
         switch (dayTime)
         {
             case DAYTIME.Morning:

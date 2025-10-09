@@ -44,44 +44,44 @@ public class TaskConditionalObject : MonoBehaviour
     void CheckAndSetState()
     {
         // Check Quest State
-        if (QuestManager.Instance.journal.IsQuestInactive(this.m_Task.Quest))
+        if (GameManager.Instance.GetSystem<QuestManager>().journal.IsQuestInactive(this.m_Task.Quest))
         {
             SetInactive(m_Task.Quest, m_Task.TaskId);
             return;
         }
-        else if (QuestManager.Instance.journal.IsQuestActive(this.m_Task.Quest))
+        else if (GameManager.Instance.GetSystem<QuestManager>().journal.IsQuestActive(this.m_Task.Quest))
         {
-            if (QuestManager.Instance.journal.IsTaskInactive(this.m_Task.Quest, this.m_Task.TaskId))
+            if (GameManager.Instance.GetSystem<QuestManager>().journal.IsTaskInactive(this.m_Task.Quest, this.m_Task.TaskId))
             {
                 SetInactive(m_Task.Quest, m_Task.TaskId);
             }
-            else if (QuestManager.Instance.journal.IsTaskActive(this.m_Task.Quest, this.m_Task.TaskId))
+            else if (GameManager.Instance.GetSystem<QuestManager>().journal.IsTaskActive(this.m_Task.Quest, this.m_Task.TaskId))
             {
                 SetActive(m_Task.Quest, m_Task.TaskId);
             }
-            else if (QuestManager.Instance.journal.IsTaskCompleted(this.m_Task.Quest, this.m_Task.TaskId))
+            else if (GameManager.Instance.GetSystem<QuestManager>().journal.IsTaskCompleted(this.m_Task.Quest, this.m_Task.TaskId))
             {
                 SetTaskCompleted(m_Task.Quest, m_Task.TaskId);
             }
-            else if (QuestManager.Instance.journal.IsTaskAbandoned(this.m_Task.Quest, this.m_Task.TaskId))
+            else if (GameManager.Instance.GetSystem<QuestManager>().journal.IsTaskAbandoned(this.m_Task.Quest, this.m_Task.TaskId))
             {
                 SetTaskAbandoned(m_Task.Quest, m_Task.TaskId);
             }
-            else if (QuestManager.Instance.journal.IsTaskFailed(this.m_Task.Quest, this.m_Task.TaskId))
+            else if (GameManager.Instance.GetSystem<QuestManager>().journal.IsTaskFailed(this.m_Task.Quest, this.m_Task.TaskId))
             {
                 SetTaskFailed(m_Task.Quest, m_Task.TaskId);
             }
         }
 
-        if(QuestManager.Instance.journal.IsQuestCompleted(this.m_Task.Quest))
+        if(GameManager.Instance.GetSystem<QuestManager>().journal.IsQuestCompleted(this.m_Task.Quest))
         {
             SetQuestCompleted(m_Task.Quest);
         }
-        else if(QuestManager.Instance.journal.IsQuestAbandoned(this.m_Task.Quest))
+        else if(GameManager.Instance.GetSystem<QuestManager>().journal.IsQuestAbandoned(this.m_Task.Quest))
         {
             SetQuestAbandoned(m_Task.Quest);
         }
-        else if(QuestManager.Instance.journal.IsQuestFailed(this.m_Task.Quest))
+        else if(GameManager.Instance.GetSystem<QuestManager>().journal.IsQuestFailed(this.m_Task.Quest))
         {
             SetQuestFailed(m_Task.Quest);
         }
@@ -224,20 +224,20 @@ public class TaskConditionalObject : MonoBehaviour
     {
         // Tasks
 
-        QuestManager.Instance.journal.EventTaskDeactivate -= this.SetInactive;
-        QuestManager.Instance.journal.EventTaskDeactivate += this.SetInactive;
+        GameManager.Instance.GetSystem<QuestManager>().journal.EventTaskDeactivate -= this.SetInactive;
+        GameManager.Instance.GetSystem<QuestManager>().journal.EventTaskDeactivate += this.SetInactive;
 
-        QuestManager.Instance.journal.EventTaskActivate -= this.SetActive;
-        QuestManager.Instance.journal.EventTaskActivate += this.SetActive;
+        GameManager.Instance.GetSystem<QuestManager>().journal.EventTaskActivate -= this.SetActive;
+        GameManager.Instance.GetSystem<QuestManager>().journal.EventTaskActivate += this.SetActive;
 
-        QuestManager.Instance.journal.EventTaskComplete -= this.SetTaskCompleted;
-        QuestManager.Instance.journal.EventTaskComplete += this.SetTaskCompleted;
+        GameManager.Instance.GetSystem<QuestManager>().journal.EventTaskComplete -= this.SetTaskCompleted;
+        GameManager.Instance.GetSystem<QuestManager>().journal.EventTaskComplete += this.SetTaskCompleted;
 
-        QuestManager.Instance.journal.EventTaskAbandon -= this.SetTaskAbandoned;
-        QuestManager.Instance.journal.EventTaskAbandon += this.SetTaskAbandoned;
+        GameManager.Instance.GetSystem<QuestManager>().journal.EventTaskAbandon -= this.SetTaskAbandoned;
+        GameManager.Instance.GetSystem<QuestManager>().journal.EventTaskAbandon += this.SetTaskAbandoned;
 
-        QuestManager.Instance.journal.EventTaskFail -= this.SetTaskFailed;
-        QuestManager.Instance.journal.EventTaskFail += this.SetTaskFailed;
+        GameManager.Instance.GetSystem<QuestManager>().journal.EventTaskFail -= this.SetTaskFailed;
+        GameManager.Instance.GetSystem<QuestManager>().journal.EventTaskFail += this.SetTaskFailed;
 
         // Quests
 
@@ -246,16 +246,16 @@ public class TaskConditionalObject : MonoBehaviour
 
     protected void Unsubscribe()
     {
-        if (QuestManager.IsQuitting) return;
+        //if (QuestManager.IsQuitting) return;
 
-        QuestManager.Instance.journal.EventTaskDeactivate -= this.SetInactive;
+        GameManager.Instance.GetSystem<QuestManager>().journal.EventTaskDeactivate -= this.SetInactive;
 
-        QuestManager.Instance.journal.EventTaskActivate -= this.SetActive;
+        GameManager.Instance.GetSystem<QuestManager>().journal.EventTaskActivate -= this.SetActive;
 
-        QuestManager.Instance.journal.EventTaskComplete -= this.SetTaskCompleted;
+        GameManager.Instance.GetSystem<QuestManager>().journal.EventTaskComplete -= this.SetTaskCompleted;
 
-        QuestManager.Instance.journal.EventTaskAbandon -= this.SetTaskAbandoned;
+        GameManager.Instance.GetSystem<QuestManager>().journal.EventTaskAbandon -= this.SetTaskAbandoned;
 
-        QuestManager.Instance.journal.EventTaskFail -= this.SetTaskFailed;
+        GameManager.Instance.GetSystem<QuestManager>().journal.EventTaskFail -= this.SetTaskFailed;
     }
 }

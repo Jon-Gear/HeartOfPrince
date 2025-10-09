@@ -4,17 +4,21 @@ using GameCreator.Runtime.Quests;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class QuestManager : Singleton<QuestManager>
+public class QuestManager : GameSystem
 {
     [SerializeField] public Journal journal;
     [SerializeField] public GameObject deadlines;
-    protected override void Awake()
+    public override void Init()
     {
-        base.Awake();
         journal = GetComponent<Journal>();
-
-        //ActivateQuest("MainQuest"); // Activate the main quest by default, delete later
     }
+
+    public override void Shutdown()
+    {
+        throw new System.NotImplementedException();
+    }
+
+
 
     public void ActivateQuest(string questName)
     {
@@ -78,18 +82,6 @@ public class QuestManager : Singleton<QuestManager>
     }
 
 
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
     private static int FindTaskIdByName(TasksTree tasksTree, string name)
     {

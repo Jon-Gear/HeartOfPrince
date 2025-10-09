@@ -63,14 +63,14 @@ public class YarnCommands : MonoBehaviour
     [YarnFunction("GetDialogueTopicOptionText")]
     public static string GetDialogueTopicOptionText(string characterName, int index)
     {
-        CharacterBrain characterBrain = CharacterManager.Instance.GetCharacter(characterName);
+        CharacterBrain characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
         return characterBrain.Dialogue().GetPlayerTopicOptionText(index);
     }
 
     [YarnFunction("GetDialogueTopicNodeName")]
     public static string GetDialogueTopicNodeName(string characterName, int index)
     {
-        CharacterBrain characterBrain = CharacterManager.Instance.GetCharacter(characterName);
+        CharacterBrain characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
         return characterBrain.Dialogue().GetPlayerTopicNodeName(index);
     }
 
@@ -90,14 +90,14 @@ public class YarnCommands : MonoBehaviour
             return;
         }
 
-        CharacterBrain characterBrain = CharacterManager.Instance.GetCharacter(characterToAsk);
+        CharacterBrain characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterToAsk);
         characterBrain.Dialogue().AddPlayerToCharacterTopic(topic);
     }
 
     [YarnCommand("RemovePlayerToCharacterTopic")]
     public static void RemovePlayerTopicToAskCharacter(string characterToAsk, string topicName)
     {
-        CharacterBrain characterBrain = CharacterManager.Instance.GetCharacter(characterToAsk);
+        CharacterBrain characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterToAsk);
         characterBrain.Dialogue().RemovePlayerToCharacterTopic(topicName);
     }
 
@@ -109,14 +109,14 @@ public class YarnCommands : MonoBehaviour
     public static void AddToCharacterTopicToAskPlayer(string characterName, string resourcePathToTopic)
     {
         TopicCharacterToPlayer topic = Resources.Load<TopicCharacterToPlayer>("Dialogues/" + resourcePathToTopic);
-        CharacterBrain characterBrain = CharacterManager.Instance.GetCharacter(characterName);
+        CharacterBrain characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
         characterBrain.Dialogue().AddCharacterToPlayerTopic(topic);
     }
 
     [YarnCommand("RemoveCharacterToPlayerTopic")]
     public static void RemoveCharacterTopicToAskPlayer(string characterName, string topicName)
     {
-        CharacterBrain characterBrain = CharacterManager.Instance.GetCharacter(characterName);
+        CharacterBrain characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
         characterBrain.Dialogue().RemoveCharacterToPlayerTopic(topicName);
     }
 
@@ -128,14 +128,14 @@ public class YarnCommands : MonoBehaviour
     public static void AddToCharacterMonologueTopic(string characterName, string resourcePathToTopic)
     {
         TopicCharacterMonologue topic = Resources.Load<TopicCharacterMonologue>("Dialogues/" + resourcePathToTopic);
-        CharacterBrain characterBrain = CharacterManager.Instance.GetCharacter(characterName);
+        CharacterBrain characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
         characterBrain.Dialogue().AddCharacterMonologueTopic(topic);
     }
 
     [YarnCommand("RemoveCharacterMonologueTopic")]
     public static void RemoveCharacterMonologueTopic(string characterName, string topicName)
     {
-        CharacterBrain characterBrain = CharacterManager.Instance.GetCharacter(characterName);
+        CharacterBrain characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
         characterBrain.Dialogue().RemoveCharacterMonologueTopic(topicName);
     }
 
@@ -147,14 +147,14 @@ public class YarnCommands : MonoBehaviour
     //public static void AddToPlayerMonologueTopic(string characterName, string resourcePathToTopic)
     //{
     //    TopicPlayerMonologue topic = Resources.Load<TopicPlayerMonologue>("Dialogues/" + resourcePathToTopic);
-    //    CharacterBrain characterBrain = CharacterManager.Instance.GetCharacter(characterName);
+    //    CharacterBrain characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
     //    characterBrain.Dialogue().AddPlayerMonologueTopic(topic);
     //}
 
     //[YarnCommand("RemovePlayerMonologueTopic")]
     //public static void RemovePlayerMonologueTopic(string characterName, string topicName)
     //{
-    //    CharacterBrain characterBrain = CharacterManager.Instance.GetCharacter(characterName);
+    //    CharacterBrain characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
     //    characterBrain.Dialogue().RemovePlayerMonologueTopic(topicName);
     //}
 
@@ -166,14 +166,14 @@ public class YarnCommands : MonoBehaviour
     public static void AddToCharacterTopicToAskCharacter(string characterName, string resourcePathToTopic)
     {
         TopicCharacterToCharacter topic = Resources.Load<TopicCharacterToCharacter>("Dialogues/" + resourcePathToTopic);
-        CharacterBrain characterBrain = CharacterManager.Instance.GetCharacter(characterName);
+        CharacterBrain characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
         characterBrain.Dialogue().AddCharacterToCharacterTopic(topic);
     }
 
     [YarnCommand("RemoveCharacterToCharacterTopic")]
     public static void RemoveCharacterTopicToAskCharacter(string characterName, string topicName)
     {
-        CharacterBrain characterBrain = CharacterManager.Instance.GetCharacter(characterName);
+        CharacterBrain characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
         characterBrain.Dialogue().RemoveCharacterToCharacterTopic(topicName);
     }
 
@@ -212,13 +212,13 @@ public class YarnCommands : MonoBehaviour
     [YarnCommand("setLongShot")]
     public static void SetLongShot()
     {
-        CinemachineManager.Instance.SetLongShot();
+        GameManager.Instance.GetSystem<CinemachineManager>().SetLongShot();
     }
 
     [YarnCommand("setCloseUpShot")]
     public static void SetCloseUpShot()
     {
-        CinemachineManager.Instance.SetCloseUpShot();
+        GameManager.Instance.GetSystem<CinemachineManager>().SetCloseUpShot();
     }
 
     [YarnCommand("addActorToShot")]
@@ -233,9 +233,9 @@ public class YarnCommands : MonoBehaviour
         }
 
         // Add the target to the camera manager
-        CinemachineManager.Instance.targetGroup.AddMember(actor.transform, 1f, 0.5f);
+        GameManager.Instance.GetSystem<CinemachineManager>().targetGroup.AddMember(actor.transform, 1f, 0.5f);
 
-        //CinemachineManager.Instance.cameraTarget.AddTarget(actor.transform);
+        //GameManager.Instance.GetSystem<CinemachineManager>().cameraTarget.AddTarget(actor.transform);
     }
 
     [YarnCommand("removeActorFromShot")]
@@ -249,11 +249,11 @@ public class YarnCommands : MonoBehaviour
             return;
         }
 
-        CinemachineManager.Instance.targetGroup.RemoveMember(actor.transform);
+        GameManager.Instance.GetSystem<CinemachineManager>().targetGroup.RemoveMember(actor.transform);
 
 
         // Add the target to the camera manager
-        //CinemachineManager.Instance.cameraTarget.RemoveTarget(actor.transform);
+        //GameManager.Instance.GetSystem<CinemachineManager>().cameraTarget.RemoveTarget(actor.transform);
     }
 
 
@@ -265,25 +265,25 @@ public class YarnCommands : MonoBehaviour
     [YarnCommand("activateQuest")]
     public static void ActivateQuest(string questName)
     {
-        QuestManager.Instance.ActivateQuest(questName);
+        GameManager.Instance.GetSystem<QuestManager>().ActivateQuest(questName);
     }
 
     [YarnCommand("trackQuest")]
     public static void TrackQuest(string questName)
     {
-        QuestManager.Instance.TrackQuest(questName);
+        GameManager.Instance.GetSystem<QuestManager>().TrackQuest(questName);
     }
 
     [YarnCommand("completeTask")]
     public static void CompleteTask(string questName, string taskName)
     {
-        QuestManager.Instance.CompleteTask(questName, taskName);
+        GameManager.Instance.GetSystem<QuestManager>().CompleteTask(questName, taskName);
     }
 
     [YarnCommand("updateTaskProgressBy")]
     public static void UpdateTaskProgressBy(string questName, string taskName, float progress)
     {
-        QuestManager.Instance.UpdateTaskProgressBy(questName, taskName, progress);
+        GameManager.Instance.GetSystem<QuestManager>().UpdateTaskProgressBy(questName, taskName, progress);
     }
 
     // Actor Expressions

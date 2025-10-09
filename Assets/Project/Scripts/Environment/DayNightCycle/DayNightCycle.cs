@@ -4,7 +4,7 @@ using Unity.Multiplayer.Center.Common;
 using UnityEngine;
 
 // should not be singleton
-[ExecuteAlways] 
+//[ExecuteAlways] 
 public class DayNightCycle : MonoBehaviour
 {   
     [Header("Sun Light")]
@@ -37,7 +37,7 @@ public class DayNightCycle : MonoBehaviour
 
     private void RotateSun()
     {
-        float _sunAngle = TimeManager.Instance.GetSunAngle();
+        float _sunAngle = GameManager.Instance.GetSystem<TimeManager>().GetSunAngle();
 
         dailyRotation.transform.localRotation = Quaternion.Euler(new Vector3(_sunAngle, 0f, 0f));
     }

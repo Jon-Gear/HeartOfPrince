@@ -1,7 +1,7 @@
 using UnityEngine;
 
 
-[ExecuteAlways]
+//[ExecuteAlways]
 public class LightRayController : MonoBehaviour
 {
 
@@ -25,7 +25,7 @@ public class LightRayController : MonoBehaviour
 
     void SetLightRayColor()
     {
-        lightRayMaterial.SetColor("_TintColor", lightRayColor.Evaluate(TimeManager.Instance.GetSunIntensity()));
+        lightRayMaterial.SetColor("_TintColor", lightRayColor.Evaluate(GameManager.Instance.GetSystem<TimeManager>().GetSunIntensity()));
     }
 
     // Original color: A98D45

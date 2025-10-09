@@ -12,7 +12,7 @@ public class AddTaskDeadline : Instruction
     [SerializeField] private Deadline m_Deadline = new Deadline();
     protected override System.Threading.Tasks.Task Run(Args args)
     {
-        QuestManager.Instance.AddTaskDeadline(m_Task, m_Deadline);
+        GameManager.Instance.GetSystem<QuestManager>().AddTaskDeadline(m_Task, m_Deadline);
         return DefaultResult;
     }
 }
@@ -26,9 +26,9 @@ public class AddTaskDeadlineToday : Instruction
         Deadline deadline = new Deadline();
 
         deadline.Time = m_Time;
-        deadline.WeekDay = TimeManager.Instance.GetWeekDay(); // Set to today
+        deadline.WeekDay = GameManager.Instance.GetSystem<TimeManager>().GetWeekDay(); // Set to today
 
-        QuestManager.Instance.AddTaskDeadline(m_Task, deadline);
+        GameManager.Instance.GetSystem<QuestManager>().AddTaskDeadline(m_Task, deadline);
         return DefaultResult;
     }
 }
@@ -40,9 +40,9 @@ public class AddTaskDeadlineInHoursFromNow : Instruction
     protected override System.Threading.Tasks.Task Run(Args args)
     {
         Deadline deadline = new Deadline();
-        deadline.Time = TimeManager.Instance.GetTimeFromHoursAndMinutesFromNowString(m_HoursFromNow);
-        deadline.WeekDay = TimeManager.Instance.GetWeekDay(); // Set to today
-        QuestManager.Instance.AddTaskDeadline(m_Task, deadline);
+        deadline.Time = GameManager.Instance.GetSystem<TimeManager>().GetTimeFromHoursAndMinutesFromNowString(m_HoursFromNow);
+        deadline.WeekDay = GameManager.Instance.GetSystem<TimeManager>().GetWeekDay(); // Set to today
+        GameManager.Instance.GetSystem<QuestManager>().AddTaskDeadline(m_Task, deadline);
         return DefaultResult;
     }
 }
@@ -57,8 +57,8 @@ public class AddTaskDeadlineInDays : Instruction
     {
         Deadline deadline = new Deadline();
         deadline.Time = m_Time;
-        deadline.WeekDay = TimeManager.Instance.GetWeekDay() + m_DaysFromToday; // Set to today + specified days
-        QuestManager.Instance.AddTaskDeadline(m_Task, deadline);
+        deadline.WeekDay = GameManager.Instance.GetSystem<TimeManager>().GetWeekDay() + m_DaysFromToday; // Set to today + specified days
+        GameManager.Instance.GetSystem<QuestManager>().AddTaskDeadline(m_Task, deadline);
         return DefaultResult;
     }
 }

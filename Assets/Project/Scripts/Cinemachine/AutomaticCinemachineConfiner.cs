@@ -4,6 +4,6 @@ public class AutomaticCinemachineConfiner : MonoBehaviour
 {
     void Start()
     {
-        CinemachineManager.Instance.UpdateCinemachineConfiner(GetComponent<BoxCollider>());
+        GameManager.Instance.GetSystem<CinemachineManager>().UpdateCinemachineConfiner(GetComponent<BoxCollider>());
     }
 }

@@ -9,9 +9,6 @@ public class ActorRegistry : Singleton<ActorRegistry>
     
     public Actor playerActor;
 
-    public Actor mainDialogueCurrentSpeaker;
-    public Actor backgroundDialogueCurrentSpeaker;
-
     public void RegisterActor(Actor actor)
     {
         if (!actors.Contains(actor))
@@ -41,47 +38,6 @@ public class ActorRegistry : Singleton<ActorRegistry>
         return null;
     }
 
-    public void SetMainDialogueCurrentSpeaker(string actorName)
-    {
-        if (string.IsNullOrEmpty(actorName))
-        {
-            mainDialogueCurrentSpeaker = playerActor;
-            return;
-        }
-
-        Actor actor = GetActorByName(actorName);
-        if (actor != null)
-        {
-            mainDialogueCurrentSpeaker = actor;
-        }
-        else
-        {
-            mainDialogueCurrentSpeaker = playerActor;
-        }
-    }
-
-    public void SetMainDialogueCurrentSpeaker()
-    {
-        mainDialogueCurrentSpeaker = playerActor;
-    }
-
-    public void SetBackgroundDialogueCurrentSpeaker(string actorName)
-    {
-        if (string.IsNullOrEmpty(actorName))
-        {
-            backgroundDialogueCurrentSpeaker = playerActor;
-            return;
-        }
-        Actor actor = GetActorByName(actorName);
-        if (actor != null)
-        {
-            backgroundDialogueCurrentSpeaker = actor;
-        }
-        else
-        {
-            backgroundDialogueCurrentSpeaker = playerActor;
-        }
-    }
     protected override void OnActiveSceneChanged(Scene oldScene, Scene newScene)
     {
         playerActor = null;

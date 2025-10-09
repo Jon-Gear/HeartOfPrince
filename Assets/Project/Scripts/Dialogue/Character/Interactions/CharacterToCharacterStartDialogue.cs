@@ -29,7 +29,7 @@ public class CharacterToCharacterStartDialogue : MonoBehaviour
     void Start()
     {
         character = characterActor.gameObject.GetComponent<Character>();
-        characterBrain = CharacterManager.Instance.GetCharacter(characterActor.actorName);
+        characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterActor.actorName);
 
         detectionCollider.TriggerEntered += OnDetectionInRange;
         detectionCollider.TriggerExited += OnDetectionOutOfRange;
@@ -68,7 +68,7 @@ public class CharacterToCharacterStartDialogue : MonoBehaviour
 
     public void StartDialogueLoop()
     {
-        if (!DialogueManager.Instance.IsAnyBackgroundDialogueAvailable())
+        if (!GameManager.Instance.GetSystem<DialogueManager>().IsAnyBackgroundDialogueAvailable())
             return;
 
         dialogueCoroutine = StartCoroutine(DialogueLoop());

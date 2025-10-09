@@ -96,7 +96,7 @@ public class Dialogue
 
 
 
-public class DialogueManager : Singleton<DialogueManager>
+public class DialogueManager : GameSystem 
 {
     [Header("Dialogue")]
 
@@ -104,14 +104,27 @@ public class DialogueManager : Singleton<DialogueManager>
     [SerializeField] public Dialogue background_1;
     [SerializeField] public Dialogue background_2;
     [SerializeField] public Dialogue background_3;
-
-
-    private void Start()
+    
+    public override void Init()
     {
         main.Start();
         background_1.Start();
         background_2.Start();
         background_3.Start();
+    }
+
+    public override void Shutdown()
+    {
+        main.Stop();
+        background_1.Stop();
+        background_2.Stop();
+        background_3.Stop();
+    }
+
+
+    private void Start()
+    {
+        
     }
 
     // --- Main Dialogue ---
@@ -161,4 +174,5 @@ public class DialogueManager : Singleton<DialogueManager>
         StopAllBackgroundDialogue();
     }
 
+    
 }

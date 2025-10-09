@@ -41,9 +41,9 @@ public class LightSwitch : MonoBehaviour
         TimeManager.onNight += OnNight;
 
 
-        var args = new DayPhaseChangedArgs(TimeManager.Instance.GetTimePercentage(), TimeManager.Instance.GetDayTime());
+        var args = new DayPhaseChangedArgs(GameManager.Instance.GetSystem<TimeManager>().GetTimePercentage(), GameManager.Instance.GetSystem<TimeManager>().GetDayTime());
 
-        switch (TimeManager.Instance.GetDayTime())
+        switch (GameManager.Instance.GetSystem<TimeManager>().GetDayTime())
         {
             case DAYTIME.Morning: OnMorning(args); break;
             case DAYTIME.Sunrise: OnSunrise(args); break;

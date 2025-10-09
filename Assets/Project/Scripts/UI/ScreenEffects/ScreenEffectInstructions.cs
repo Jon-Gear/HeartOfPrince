@@ -13,7 +13,7 @@ public class FadeOut : Instruction
     [SerializeField] private float m_Duration = 1.0f;
     protected override async Task Run(Args args)
     {
-        await ScreenEffectsManager.Instance.BasicFadeOut(m_Duration);
+        await GameManager.Instance.GetSystem<ScreenEffectsManager>().BasicFadeOut(m_Duration);
     }
 }
 
@@ -26,7 +26,7 @@ public class FadeIn : Instruction
     [SerializeField] private float m_Duration = 1.0f;
     protected override async Task Run(Args args)
     {
-        await ScreenEffectsManager.Instance.BasicFadeIn(m_Duration);
+        await GameManager.Instance.GetSystem<ScreenEffectsManager>().BasicFadeIn(m_Duration);
     }
 }
 
@@ -40,7 +40,7 @@ public class Fade : Instruction
     
     protected override async Task Run(Args args)
     {
-        await ScreenEffectsManager.Instance.BasicFadeOut(m_Duration);
-        await ScreenEffectsManager.Instance.BasicFadeIn(m_Duration);
+        await GameManager.Instance.GetSystem<ScreenEffectsManager>().BasicFadeOut(m_Duration);
+        await GameManager.Instance.GetSystem<ScreenEffectsManager>().BasicFadeIn(m_Duration);
     }
 }

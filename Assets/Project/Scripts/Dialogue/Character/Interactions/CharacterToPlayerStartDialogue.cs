@@ -41,7 +41,7 @@ public class CharacterToPlayerStartDialogue : MonoBehaviour
         }
 
         character = characterActor.GetComponent<Character>();
-        characterBrain = CharacterManager.Instance.GetCharacter(characterActor.actorName);
+        characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterActor.actorName);
 
         if (character == null || characterBrain == null)
         {

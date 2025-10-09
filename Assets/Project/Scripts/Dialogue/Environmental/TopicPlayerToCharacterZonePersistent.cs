@@ -17,6 +17,6 @@ public class TopicPlayerToCharacterZonePersistent : MonoBehaviour
 
     private void OnZoneEntered(Collider other)
     {
-        CharacterManager.Instance.AddTopicPlayerToCharacter(topic, CharactersToAsk);
+        GameManager.Instance.GetSystem<CharacterManager>().AddTopicPlayerToCharacter(topic, CharactersToAsk);
     }
 }

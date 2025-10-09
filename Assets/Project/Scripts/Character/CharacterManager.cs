@@ -4,21 +4,17 @@ using System.Drawing;
 using System.Numerics;
 using UnityEngine;
 
-public class CharacterManager : Singleton<CharacterManager>
+public class CharacterManager : GameSystem
 {
+    public override void Init()
+    {
+        
+    }
+
+    public override void Shutdown()
+    {
     
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
 
     public CharacterBrain GetCharacter(string characterName)
     {

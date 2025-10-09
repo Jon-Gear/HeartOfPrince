@@ -18,7 +18,7 @@ public class Deadline
 
     private bool IsDayPast()
     {
-        if (WeekDay < TimeManager.Instance.GetWeekDay())
+        if (WeekDay < GameManager.Instance.GetSystem<TimeManager>().GetWeekDay())
         {
             return true;
         }
@@ -40,7 +40,7 @@ public class Deadline
             minutes = Mathf.Clamp(minutes, 0, 59);
             float deadlineTime = (hours + (minutes / 60f)) / 24f;
             // Compare with current time
-            return TimeManager.Instance.GetTimePercentage() > deadlineTime;
+            return GameManager.Instance.GetSystem<TimeManager>().GetTimePercentage() > deadlineTime;
         }
         else
         {
@@ -69,14 +69,14 @@ public class TaskDeadline : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (QuestManager.Instance.journal.IsTaskInactive(m_Task.Quest, m_Task.TaskId) ||
-            QuestManager.Instance.journal.IsQuestInactive(m_Task.Quest) || 
-            QuestManager.Instance.journal.IsTaskCompleted(m_Task.Quest, m_Task.TaskId) ||
-            QuestManager.Instance.journal.IsQuestCompleted(m_Task.Quest) ||
-            QuestManager.Instance.journal.IsTaskAbandoned(m_Task.Quest, m_Task.TaskId) ||
-            QuestManager.Instance.journal.IsQuestAbandoned(m_Task.Quest) ||
-            QuestManager.Instance.journal.IsTaskFailed(m_Task.Quest, m_Task.TaskId) || 
-            QuestManager.Instance.journal.IsQuestFailed(m_Task.Quest)
+        if (GameManager.Instance.GetSystem<QuestManager>().journal.IsTaskInactive(m_Task.Quest, m_Task.TaskId) ||
+            GameManager.Instance.GetSystem<QuestManager>().journal.IsQuestInactive(m_Task.Quest) || 
+            GameManager.Instance.GetSystem<QuestManager>().journal.IsTaskCompleted(m_Task.Quest, m_Task.TaskId) ||
+            GameManager.Instance.GetSystem<QuestManager>().journal.IsQuestCompleted(m_Task.Quest) ||
+            GameManager.Instance.GetSystem<QuestManager>().journal.IsTaskAbandoned(m_Task.Quest, m_Task.TaskId) ||
+            GameManager.Instance.GetSystem<QuestManager>().journal.IsQuestAbandoned(m_Task.Quest) ||
+            GameManager.Instance.GetSystem<QuestManager>().journal.IsTaskFailed(m_Task.Quest, m_Task.TaskId) || 
+            GameManager.Instance.GetSystem<QuestManager>().journal.IsQuestFailed(m_Task.Quest)
             )
         {
             Destroy(this);
@@ -85,7 +85,7 @@ public class TaskDeadline : MonoBehaviour
 
         if(deadline.IsPast())
         {
-            _ = QuestManager.Instance.journal.FailTask(m_Task.Quest, m_Task.TaskId);   
+            _ = GameManager.Instance.GetSystem<QuestManager>().journal.FailTask(m_Task.Quest, m_Task.TaskId);   
         }
     }
 }

@@ -2,7 +2,7 @@ using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class CinemachineManager : Singleton<CinemachineManager>
+public class CinemachineManager : GameSystem
 {
     CinemachineBrain brain;
 
@@ -10,7 +10,18 @@ public class CinemachineManager : Singleton<CinemachineManager>
     public CinemachineCamera closeUpShot;
 
     [SerializeField] public CinemachineTargetGroup targetGroup;
-    
+
+    public override void Init()
+    {
+        brain = Camera.main.GetComponent<CinemachineBrain>();
+    }
+
+    public override void Shutdown()
+    {
+    }
+
+
+
     public void SetLongShot()
     {
         longShot.Priority = 1;
@@ -27,30 +38,5 @@ public class CinemachineManager : Singleton<CinemachineManager>
     {
         longShot.GetComponent<CinemachineConfiner3D>().BoundingVolume = newConfine;
         closeUpShot.GetComponent<CinemachineConfiner3D>().BoundingVolume = newConfine;
-    }
-
-    protected override void Awake()
-    {
-        base.Awake();
-        brain = Camera.main.GetComponent<CinemachineBrain>();
-        //longShot.Follow = cameraTarget.transform;
-        //closeUpShot.Follow = cameraTarget.transform;
-        
-    }
-    protected override void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-    }
-
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

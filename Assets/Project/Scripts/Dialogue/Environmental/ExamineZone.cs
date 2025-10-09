@@ -18,7 +18,7 @@ public class ExamineZone : MonoBehaviour
 
     public void Examine()
     {
-        if (DialogueManager.Instance.main.IsRunning())
+        if (GameManager.Instance.GetSystem<DialogueManager>().main.IsRunning())
         {
             return;
         }
@@ -27,31 +27,31 @@ public class ExamineZone : MonoBehaviour
             Debug.LogWarning($"ExamineZone on {gameObject.name} has no Topic assigned!");
             return;
         }
-        DialogueManager.Instance.StartDialogue(topic.GetTopicNodeName());
+        GameManager.Instance.GetSystem<DialogueManager>().StartDialogue(topic.GetTopicNodeName());
     }
 
     private void OnZoneEntered(Collider other)
     {
-        if (DialogueManager.Instance.main.IsRunning())
+        if (GameManager.Instance.GetSystem<DialogueManager>().main.IsRunning())
         {
             return;
         }
-        ScreenEffectsManager.Instance.ShowPrompt(promptText, this.gameObject, promptOffset);
+        GameManager.Instance.GetSystem<ScreenEffectsManager>().ShowPrompt(promptText, this.gameObject, promptOffset);
     }
 
     private void OnZoneStayed(Collider other)
     {
-        if (!DialogueManager.Instance.main.IsRunning())
+        if (!GameManager.Instance.GetSystem<DialogueManager>().main.IsRunning())
         {
-            ScreenEffectsManager.Instance.ShowPrompt(promptText, this.gameObject, promptOffset);
+            GameManager.Instance.GetSystem<ScreenEffectsManager>().ShowPrompt(promptText, this.gameObject, promptOffset);
         }
         else
         {
-            ScreenEffectsManager.Instance.HidePrompt();
+            GameManager.Instance.GetSystem<ScreenEffectsManager>().HidePrompt();
         }
     }
     private void OnZoneExited(Collider other)
     {
-        ScreenEffectsManager.Instance.HidePrompt();
+        GameManager.Instance.GetSystem<ScreenEffectsManager>().HidePrompt();
     }
 }

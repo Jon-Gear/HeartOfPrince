@@ -76,18 +76,18 @@ public class FadeSceneLoad : Instruction
 
         if (this.m_Async)
         {
-            await ScreenEffectsManager.Instance.BasicFadeOut(m_Duration);
+            await GameManager.Instance.GetSystem<ScreenEffectsManager>().BasicFadeOut(m_Duration);
 
             this.m_Loader = SceneManager.LoadSceneAsync(scene, this.m_Mode);
             await this.Until(() => this.m_Loader.isDone || ApplicationManager.IsExiting);
 
-            await ScreenEffectsManager.Instance.BasicFadeIn(m_Duration);
+            await GameManager.Instance.GetSystem<ScreenEffectsManager>().BasicFadeIn(m_Duration);
         }
         else
         {
-            await ScreenEffectsManager.Instance.BasicFadeOut(m_Duration);
+            await GameManager.Instance.GetSystem<ScreenEffectsManager>().BasicFadeOut(m_Duration);
             SceneManager.LoadScene(scene, this.m_Mode);
-            await ScreenEffectsManager.Instance.BasicFadeIn(m_Duration);
+            await GameManager.Instance.GetSystem<ScreenEffectsManager>().BasicFadeIn(m_Duration);
         }
     }
 }

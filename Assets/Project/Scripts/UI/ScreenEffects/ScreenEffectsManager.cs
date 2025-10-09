@@ -4,10 +4,21 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class ScreenEffectsManager : Singleton<ScreenEffectsManager>
+public class ScreenEffectsManager : GameSystem
 {
     [SerializeField] public CanvasGroup BasicFadeCanvasGroup;
     [SerializeField] public PromptBubble PromptBubble;
+
+    public override void Init()
+    {
+
+    }
+
+    public override void Shutdown()
+    {
+
+    }
+
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -41,6 +52,7 @@ public class ScreenEffectsManager : Singleton<ScreenEffectsManager>
         PromptBubble.HidePrompt();
     }
 
+    
 }
 
 

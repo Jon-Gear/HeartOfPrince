@@ -9,18 +9,18 @@ public class TaskDialogue : TDialogue
 
     public override void Talk()
     {
-        if (DialogueManager.Instance.main.IsRunning())
+        if (GameManager.Instance.GetSystem<DialogueManager>().main.IsRunning())
         {
             return;
         }
 
         string nodeName = GetDialogueNode();
-        DialogueManager.Instance.StartDialogue(nodeName);
+        GameManager.Instance.GetSystem<DialogueManager>().StartDialogue(nodeName);
     }
 
     string GetDialogueNode()
     {
-        State questState = QuestManager.Instance.GetQuestState(GetTaskPath());
+        State questState = GameManager.Instance.GetSystem<QuestManager>().GetQuestState(GetTaskPath());
 
         switch (questState)
         {

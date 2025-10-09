@@ -70,22 +70,24 @@ public class CharacterDialogueBrain : MonoBehaviour
 
     public bool CanStartPlayerToCharacterDialogue()
     {
-        return (IsFree) && !DialogueManager.Instance.main.IsRunning();
+
+
+        return (IsFree) && !GameManager.Instance.GetSystem<DialogueManager>().main.IsRunning();
     }
 
     public bool CanStartCharacterToPlayerDialogue()
     {
-        return (IsFree || CurrentIntention == DialogueIntention.ApproachingPlayer) && !DialogueManager.Instance.main.IsRunning() && characterToPlayerTopics.Count > 0;
+        return (IsFree || CurrentIntention == DialogueIntention.ApproachingPlayer) && !GameManager.Instance.GetSystem<DialogueManager>().main.IsRunning() && characterToPlayerTopics.Count > 0;
     }
 
     public bool CanStartCharacterMonologue()
     {
-        return IsFree && !DialogueManager.Instance.main.IsRunning() && DialogueManager.Instance.IsAnyBackgroundDialogueAvailable() && monologueTopics.Count > 0;
+        return IsFree && !GameManager.Instance.GetSystem<DialogueManager>().main.IsRunning() && GameManager.Instance.GetSystem<DialogueManager>().IsAnyBackgroundDialogueAvailable() && monologueTopics.Count > 0;
     }
 
     public bool CanStartCharacterToCharacterDialogue()
     {
-        return IsFree && !DialogueManager.Instance.main.IsRunning() && DialogueManager.Instance.IsAnyBackgroundDialogueAvailable() && characterToCharacterTopics.Count > 0;
+        return IsFree && !GameManager.Instance.GetSystem<DialogueManager>().main.IsRunning() && GameManager.Instance.GetSystem<DialogueManager>().IsAnyBackgroundDialogueAvailable() && characterToCharacterTopics.Count > 0;
     }
 
 
@@ -142,7 +144,7 @@ public class CharacterDialogueBrain : MonoBehaviour
         }
         string nodeName = $"{characterName.ToLower()}_start";
         SetIntention(DialogueIntention.SpokenTo);
-        DialogueManager.Instance.StartDialogue(nodeName);
+        GameManager.Instance.GetSystem<DialogueManager>().StartDialogue(nodeName);
     }
 
     // -------------------
@@ -175,7 +177,7 @@ public class CharacterDialogueBrain : MonoBehaviour
             return;
         }
         SetIntention(DialogueIntention.ToPlayer);
-        DialogueManager.Instance.StartDialogue(GetRandomCharacterToPlayerNode());
+        GameManager.Instance.GetSystem<DialogueManager>().StartDialogue(GetRandomCharacterToPlayerNode());
     }
 
     private string GetRandomCharacterToPlayerNode()
@@ -211,7 +213,7 @@ public class CharacterDialogueBrain : MonoBehaviour
         if (!CanStartCharacterMonologue())
             return;
         SetIntention(DialogueIntention.Monologue);
-        DialogueManager.Instance.StartBackgroundDialogue(GetRandomMonologueNode());
+        GameManager.Instance.GetSystem<DialogueManager>().StartBackgroundDialogue(GetRandomMonologueNode());
     }
 
     private string GetRandomMonologueNode()
@@ -248,7 +250,7 @@ public class CharacterDialogueBrain : MonoBehaviour
             return false;
         }
         SetIntention(DialogueIntention.ToCharacter);
-        DialogueManager.Instance.StartBackgroundDialogue(bestTopicNodeName);
+        GameManager.Instance.GetSystem<DialogueManager>().StartBackgroundDialogue(bestTopicNodeName);
         return true;
     }
 

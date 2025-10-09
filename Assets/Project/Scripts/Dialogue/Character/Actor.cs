@@ -30,7 +30,7 @@ public class Actor : MonoBehaviour
     {
         character = GetComponent<Character>();
 
-        characterBrain = CharacterManager.Instance.GetCharacter(actorName);
+        characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(actorName);
 
         ActorRegistry.Instance.RegisterActor(this);
         
@@ -43,8 +43,8 @@ public class Actor : MonoBehaviour
             }
 
             ActorRegistry.Instance.playerActor = this;
-            CinemachineManager.Instance.targetGroup.AddMember(character.transform, 1f, 0.5f) ;
-            CinemachineManager.Instance.longShot.PreviousStateIsValid = false;
+            GameManager.Instance.GetSystem<CinemachineManager>().targetGroup.AddMember(character.transform, 1f, 0.5f) ;
+            GameManager.Instance.GetSystem<CinemachineManager>().longShot.PreviousStateIsValid = false;
         }
     }
 
@@ -97,7 +97,7 @@ public class Actor : MonoBehaviour
     {
         if (ActorRegistry.IsQuitting) return;
 
-        CinemachineManager.Instance.targetGroup.RemoveMember(character.transform);
+        GameManager.Instance.GetSystem<CinemachineManager>().targetGroup.RemoveMember(character.transform);
 
         ActorRegistry.Instance.UnregisterActor(this);
     }
