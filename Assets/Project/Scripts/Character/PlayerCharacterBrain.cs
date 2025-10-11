@@ -1,26 +1,17 @@
-using GameCreator.Runtime.Characters;
 using GameCreator.Runtime.Stats;
 using UnityEngine;
 
-
-[RequireComponent(typeof(CharacterDialogueBrain))]
-public class CharacterBrain : MonoBehaviour
+public class PlayerCharacterBrain : MonoBehaviour
 {
     private TraitsOperator traits;
-    private CharacterDialogueBrain characterDialogueBrain;
-    
     public TraitsOperator Traits() => traits;
-    public CharacterDialogueBrain Dialogue() => characterDialogueBrain;
-
+    
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         traits = GetComponent<TraitsOperator>();
-        characterDialogueBrain = GetComponent<CharacterDialogueBrain>();
     }
-
-
 
     // Update is called once per frame
     void Update()

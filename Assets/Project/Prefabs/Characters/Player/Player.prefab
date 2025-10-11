@@ -1329,7 +1329,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1793972296288166232}
   - component: {fileID: 2596650277260859950}
-  - component: {fileID: 8908693421579515348}
   - component: {fileID: 1665693158485693602}
   m_Layer: 0
   m_Name: Player
@@ -1517,30 +1516,6 @@ MonoBehaviour:
     - rid: 6678815558586859637
       type: {class: RagdollNone, ns: GameCreator.Runtime.Characters, asm: GameCreator.Runtime.Core}
       data: 
---- !u!114 &8908693421579515348
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4715974037236951035}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3c924eacff884626a5aa4c90cf311c23, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Class: {fileID: 11400000, guid: 704e068e2d7a64affb0c931116aa7aad, type: 2}
-  m_OverrideAttributes:
-    m_Keys: []
-    m_Values: []
-  m_OverrideStats:
-    m_Keys:
-    - m_String: faith
-    m_Values:
-    - m_IsExpanded: 0
-      m_ChangeBase:
-        m_IsEnabled: 0
-        m_Value: 1
 --- !u!114 &1665693158485693602
 MonoBehaviour:
   m_ObjectHideFlags: 0

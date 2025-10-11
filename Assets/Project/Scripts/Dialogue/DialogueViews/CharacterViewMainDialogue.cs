@@ -17,7 +17,10 @@ public class CharacterViewMainDialogue : DialogueViewBase
 
     public override void RunLine(LocalizedLine dialogueLine, Action onDialogueLineFinished)
     {
-        GameManager.Instance.GetSystem<DialogueManager>().main.SetSpeaker(dialogueLine.CharacterName);
+        var dialogueManager = GameManager.Instance.GetSystem<DialogueManager>();
+        dialogueManager.main.SetSpeaker(dialogueLine.CharacterName);
+        dialogueManager.main.RunLine();
+
         onDialogueLineFinished();
     }
 

@@ -70,8 +70,6 @@ public class CharacterDialogueBrain : MonoBehaviour
 
     public bool CanStartPlayerToCharacterDialogue()
     {
-
-
         return (IsFree) && !GameManager.Instance.GetSystem<DialogueManager>().main.IsRunning();
     }
 
@@ -142,6 +140,16 @@ public class CharacterDialogueBrain : MonoBehaviour
         {
             return;
         }
+
+        var dialogueManager = GameManager.Instance.GetSystem<DialogueManager>();
+        var playerCharacter = GameManager.Instance.GetSystem<CharacterManager>().GetPlayerCharacter();
+        
+        if (playerCharacter.Traits().GetAttribute("attribute-energy") == 0.0f)
+        {
+            dialogueManager.StartDialogue("prince_tired");
+            return;
+        }
+
         string nodeName = $"{characterName.ToLower()}_start";
         SetIntention(DialogueIntention.SpokenTo);
         GameManager.Instance.GetSystem<DialogueManager>().StartDialogue(nodeName);

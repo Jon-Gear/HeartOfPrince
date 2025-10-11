@@ -25,13 +25,37 @@ MonoBehaviour:
     m_Property:
       rid: 3582672035064054755
   m_Attributes:
-    m_Attributes: []
+    m_Attributes:
+    - rid: 1456250592780877853
   m_Stats:
     m_Stats:
-    - rid: 3582672035991519405
+    - rid: 1456250592780878075
   references:
     version: 2
     RefIds:
+    - rid: 1456250592780877853
+      type: {class: AttributeItem, ns: GameCreator.Runtime.Stats, asm: GameCreator.Runtime.Stats}
+      data:
+        m_Breakpoint: 0
+        m_IsEnabled: 1
+        m_IsHidden: 0
+        m_Attribute: {fileID: 11400000, guid: 3008368b5664b5042a0aa9f927effedd, type: 2}
+        m_ChangeStartPercent:
+          m_IsEnabled: 0
+          m_Value: 1
+    - rid: 1456250592780878075
+      type: {class: StatItem, ns: GameCreator.Runtime.Stats, asm: GameCreator.Runtime.Stats}
+      data:
+        m_Breakpoint: 0
+        m_IsEnabled: 1
+        m_IsHidden: 0
+        m_Stat: {fileID: 11400000, guid: 19f884e16bf2c3b4798bb41a49b1e34e, type: 2}
+        m_ChangeBase:
+          m_IsEnabled: 0
+          m_Value: 100
+        m_ChangeFormula:
+          m_IsEnabled: 0
+          m_Value: {fileID: 0}
     - rid: 3582672035064054753
       type: {class: GetStringTextArea, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
@@ -43,19 +67,6 @@ MonoBehaviour:
     - rid: 3582672035064054755
       type: {class: GetColorColorsWhite, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data: 
-    - rid: 3582672035991519405
-      type: {class: StatItem, ns: GameCreator.Runtime.Stats, asm: GameCreator.Runtime.Stats}
-      data:
-        m_Breakpoint: 0
-        m_IsEnabled: 1
-        m_IsHidden: 0
-        m_Stat: {fileID: 11400000, guid: 0d99f0b6910ab4786a46b53e517ee42c, type: 2}
-        m_ChangeBase:
-          m_IsEnabled: 0
-          m_Value: 100
-        m_ChangeFormula:
-          m_IsEnabled: 0
-          m_Value: {fileID: 0}
     - rid: 3582672035991519406
       type: {class: GetStringString, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:

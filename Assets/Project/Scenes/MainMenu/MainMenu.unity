@@ -1765,6 +1765,66 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4935506699228492, guid: eaa9aec4d1387c245b1b1cd8660fe82d, type: 3}
   m_PrefabInstance: {fileID: 40301445}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &54495974
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 54495976}
+  - component: {fileID: 54495975}
+  m_Layer: 0
+  m_Name: SetState
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &54495975
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 54495974}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ecd922218e245e2b85d51f9f08338c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Instructions:
+    m_Instructions:
+    - rid: 1456250564342711226
+  m_TriggerEvent:
+    rid: 1456250564342711225
+  references:
+    version: 2
+    RefIds:
+    - rid: 1456250564342711225
+      type: {class: EventOnStart, ns: GameCreator.Runtime.VisualScripting, asm: GameCreator.Runtime.Core}
+      data: 
+    - rid: 1456250564342711226
+      type: {class: ChangeGameStateToMainMenu, ns: , asm: Assembly-CSharp}
+      data:
+        m_Breakpoint: 0
+        m_IsEnabled: 1
+--- !u!4 &54495976
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 54495974}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.85849, y: 1.9116, z: 7.05913}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &55488235
 GameObject:
   m_ObjectHideFlags: 0
@@ -6439,37 +6499,6 @@ Transform:
   m_Children:
   - {fileID: 1212112067}
   m_Father: {fileID: 1644040029}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &293283287
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 293283288}
-  m_Layer: 0
-  m_Name: GameObject
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &293283288
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 293283287}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 387.7132, y: 234.25545, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &294594120
 PrefabInstance:
@@ -19946,11 +19975,16 @@ MonoBehaviour:
   m_Instructions:
     m_Instructions:
     - rid: 8106394054872793303
-    - rid: 8106394054872793366
     - rid: 8106394054872793309
+    - rid: 1456250564342711205
   references:
     version: 2
     RefIds:
+    - rid: 1456250564342711205
+      type: {class: ChangeGameStateToGameplay, ns: , asm: Assembly-CSharp}
+      data:
+        m_Breakpoint: 0
+        m_IsEnabled: 1
     - rid: 8106394054872793303
       type: {class: InstructionCommonDebugText, ns: GameCreator.Runtime.VisualScripting, asm: GameCreator.Runtime.Core}
       data:
@@ -19983,18 +20017,6 @@ MonoBehaviour:
           m_Scene: {fileID: 102900000, guid: 14e13e46b59d3b54a83ef794ef6caf10, type: 3}
           m_SceneName: Hospital_Room
           m_SceneIndex: 2
-    - rid: 8106394054872793366
-      type: {class: InstructionGameObjectDestroy, ns: GameCreator.Runtime.VisualScripting, asm: GameCreator.Runtime.Core}
-      data:
-        m_Breakpoint: 0
-        m_IsEnabled: 1
-        m_GameObject:
-          m_Property:
-            rid: 8106394054872793367
-    - rid: 8106394054872793367
-      type: {class: GetGameObjectInstance, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
-      data:
-        m_GameObject: {fileID: 0}
 --- !u!4 &907874595 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4589466718841716, guid: b41bd60e33b0a4045bf7eade1653383d, type: 3}
@@ -47965,4 +47987,4 @@ SceneRoots:
   - {fileID: 1716554343}
   - {fileID: 735801981}
   - {fileID: 1144857314}
-  - {fileID: 293283288}
+  - {fileID: 54495976}

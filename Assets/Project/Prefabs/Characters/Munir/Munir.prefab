@@ -2253,6 +2253,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5709885442566728310}
   - component: {fileID: 3710948212363538533}
+  - component: {fileID: 5449193699205115192}
   m_Layer: 0
   m_Name: PlayerStartDialogue
   m_TagString: Untagged
@@ -2289,18 +2290,32 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Instructions:
     m_Instructions:
-    - rid: 1852311555628073595
+    - rid: 1456250592780878197
   m_TriggerEvent:
     rid: 1852311555628073714
   references:
     version: 2
     RefIds:
-    - rid: 1852311555628073595
-      type: {class: InstructionTalkToCharacter, ns: , asm: Assembly-CSharp}
+    - rid: 1456250592780878197
+      type: {class: InstructionLogicCallMethod, ns: GameCreator.Runtime.VisualScripting, asm: GameCreator.Runtime.Core}
       data:
         m_Breakpoint: 0
         m_IsEnabled: 1
-        characterName: Munir
+        m_Method:
+          m_PersistentCalls:
+            m_Calls:
+            - m_Target: {fileID: 5449193699205115192}
+              m_TargetAssemblyTypeName: PlayerStartDialogue, Assembly-CSharp
+              m_MethodName: StartDialogue
+              m_Mode: 1
+              m_Arguments:
+                m_ObjectArgument: {fileID: 0}
+                m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+                m_IntArgument: 0
+                m_FloatArgument: 0
+                m_StringArgument: 
+                m_BoolArgument: 0
+              m_CallState: 2
     - rid: 1852311555628073714
       type: {class: EventCharacterOnInteract, ns: GameCreator.Runtime.VisualScripting, asm: GameCreator.Runtime.Core}
       data:
@@ -2317,6 +2332,19 @@ MonoBehaviour:
     - rid: 1852311555628073715
       type: {class: GetGameObjectPlayer, ns: GameCreator.Runtime.Characters, asm: GameCreator.Runtime.Core}
       data: 
+--- !u!114 &5449193699205115192
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7382425928616943654}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54a3b165da1eca14cb090000664f103e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  characterActor: {fileID: 6599178260995081617}
 --- !u!1 &7535793248039479382
 GameObject:
   m_ObjectHideFlags: 0

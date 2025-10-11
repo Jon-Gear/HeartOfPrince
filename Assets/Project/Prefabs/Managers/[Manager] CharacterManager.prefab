@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 3182753723883272907}
   - component: {fileID: 6688653414734157622}
   - component: {fileID: 831296107912017572}
+  - component: {fileID: 7193594603570959302}
+  - component: {fileID: 1774465578180596510}
   m_Layer: 0
   m_Name: Nacho
   m_TagString: Untagged
@@ -67,6 +69,37 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 62f91d9913a3f4042a2b1e4df1ed393b, type: 2}
   - {fileID: 11400000, guid: 29c30a76c76e8854495dfd27302bf3f3, type: 2}
   - {fileID: 11400000, guid: c5332ada86902b04785eef030f37d392, type: 2}
+--- !u!114 &7193594603570959302
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 783943241080763222}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c924eacff884626a5aa4c90cf311c23, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Class: {fileID: 11400000, guid: 31ab55d5d7cf04341b0fb16947b59397, type: 2}
+  m_OverrideAttributes:
+    m_Keys: []
+    m_Values: []
+  m_OverrideStats:
+    m_Keys: []
+    m_Values: []
+--- !u!114 &1774465578180596510
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 783943241080763222}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3404d77a1847be546938ab894e9303ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3245328338253044162
 GameObject:
   m_ObjectHideFlags: 0
@@ -78,6 +111,8 @@ GameObject:
   - component: {fileID: 8601187938402238372}
   - component: {fileID: 214199998296485527}
   - component: {fileID: 7091370823463166983}
+  - component: {fileID: 3651223616668814326}
+  - component: {fileID: 5637698187040530011}
   m_Layer: 0
   m_Name: Albeni
   m_TagString: Untagged
@@ -130,6 +165,37 @@ MonoBehaviour:
   playerToCharacterTopics: []
   monologueTopics: []
   characterToCharacterTopics: []
+--- !u!114 &3651223616668814326
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3245328338253044162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c924eacff884626a5aa4c90cf311c23, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Class: {fileID: 11400000, guid: 31ab55d5d7cf04341b0fb16947b59397, type: 2}
+  m_OverrideAttributes:
+    m_Keys: []
+    m_Values: []
+  m_OverrideStats:
+    m_Keys: []
+    m_Values: []
+--- !u!114 &5637698187040530011
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3245328338253044162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3404d77a1847be546938ab894e9303ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3823396006111329071
 GameObject:
   m_ObjectHideFlags: 0
@@ -141,6 +207,8 @@ GameObject:
   - component: {fileID: 3924342024739096987}
   - component: {fileID: 5153317414228896254}
   - component: {fileID: 540543758622739989}
+  - component: {fileID: 3864829398758878734}
+  - component: {fileID: 5301038750621280571}
   m_Layer: 0
   m_Name: Sushi
   m_TagString: Untagged
@@ -193,6 +261,37 @@ MonoBehaviour:
   playerToCharacterTopics: []
   monologueTopics: []
   characterToCharacterTopics: []
+--- !u!114 &3864829398758878734
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3823396006111329071}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c924eacff884626a5aa4c90cf311c23, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Class: {fileID: 11400000, guid: 31ab55d5d7cf04341b0fb16947b59397, type: 2}
+  m_OverrideAttributes:
+    m_Keys: []
+    m_Values: []
+  m_OverrideStats:
+    m_Keys: []
+    m_Values: []
+--- !u!114 &5301038750621280571
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3823396006111329071}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3404d77a1847be546938ab894e9303ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4409061932063158097
 GameObject:
   m_ObjectHideFlags: 0
@@ -223,6 +322,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 8170503320637357310}
   - {fileID: 3182753723883272907}
   - {fileID: 3924342024739096987}
   - {fileID: 8601187938402238372}
@@ -254,6 +354,8 @@ GameObject:
   - component: {fileID: 5941874756050568993}
   - component: {fileID: 8765044034293674332}
   - component: {fileID: 6092915989895864112}
+  - component: {fileID: 8153603859934494919}
+  - component: {fileID: 2491531397874983990}
   m_Layer: 0
   m_Name: MisterHariri
   m_TagString: Untagged
@@ -305,6 +407,37 @@ MonoBehaviour:
   playerToCharacterTopics: []
   monologueTopics: []
   characterToCharacterTopics: []
+--- !u!114 &8153603859934494919
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4559337654373340850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c924eacff884626a5aa4c90cf311c23, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Class: {fileID: 11400000, guid: 31ab55d5d7cf04341b0fb16947b59397, type: 2}
+  m_OverrideAttributes:
+    m_Keys: []
+    m_Values: []
+  m_OverrideStats:
+    m_Keys: []
+    m_Values: []
+--- !u!114 &2491531397874983990
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4559337654373340850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3404d77a1847be546938ab894e9303ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4665355961793989137
 GameObject:
   m_ObjectHideFlags: 0
@@ -316,6 +449,8 @@ GameObject:
   - component: {fileID: 7893914217583835527}
   - component: {fileID: 1122012977010497786}
   - component: {fileID: 3105328981322808804}
+  - component: {fileID: 7354940019156828678}
+  - component: {fileID: 6642628084346922179}
   m_Layer: 0
   m_Name: Mujahid
   m_TagString: Untagged
@@ -367,6 +502,124 @@ MonoBehaviour:
   playerToCharacterTopics: []
   monologueTopics: []
   characterToCharacterTopics: []
+--- !u!114 &7354940019156828678
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4665355961793989137}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c924eacff884626a5aa4c90cf311c23, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Class: {fileID: 11400000, guid: 31ab55d5d7cf04341b0fb16947b59397, type: 2}
+  m_OverrideAttributes:
+    m_Keys: []
+    m_Values: []
+  m_OverrideStats:
+    m_Keys: []
+    m_Values: []
+--- !u!114 &6642628084346922179
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4665355961793989137}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3404d77a1847be546938ab894e9303ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &7531265091036148419
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8170503320637357310}
+  - component: {fileID: 6739181862872034106}
+  - component: {fileID: 2288073312366839400}
+  - component: {fileID: 6562709680929933118}
+  m_Layer: 0
+  m_Name: Prince
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8170503320637357310
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7531265091036148419}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6777921619610885219}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6739181862872034106
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7531265091036148419}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21f6821582997304cbeee726faf86a4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2288073312366839400
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7531265091036148419}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c924eacff884626a5aa4c90cf311c23, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Class: {fileID: 11400000, guid: 704e068e2d7a64affb0c931116aa7aad, type: 2}
+  m_OverrideAttributes:
+    m_Keys:
+    - m_String: attribute-energy
+    m_Values:
+    - m_IsExpanded: 0
+      m_ChangeStartPercent:
+        m_IsEnabled: 0
+        m_Value: 1
+  m_OverrideStats:
+    m_Keys:
+    - m_String: stat-max-energy
+    m_Values:
+    - m_IsExpanded: 0
+      m_ChangeBase:
+        m_IsEnabled: 0
+        m_Value: 1
+--- !u!114 &6562709680929933118
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7531265091036148419}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3404d77a1847be546938ab894e9303ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8780986244644625960
 GameObject:
   m_ObjectHideFlags: 0
@@ -378,6 +631,8 @@ GameObject:
   - component: {fileID: 7206074853357913221}
   - component: {fileID: 5197890050525944132}
   - component: {fileID: 8626648282031538870}
+  - component: {fileID: 2595844993154383025}
+  - component: {fileID: 5302770426362097204}
   m_Layer: 0
   m_Name: Munir
   m_TagString: Untagged
@@ -430,3 +685,34 @@ MonoBehaviour:
   playerToCharacterTopics: []
   monologueTopics: []
   characterToCharacterTopics: []
+--- !u!114 &2595844993154383025
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8780986244644625960}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c924eacff884626a5aa4c90cf311c23, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Class: {fileID: 11400000, guid: 31ab55d5d7cf04341b0fb16947b59397, type: 2}
+  m_OverrideAttributes:
+    m_Keys: []
+    m_Values: []
+  m_OverrideStats:
+    m_Keys: []
+    m_Values: []
+--- !u!114 &5302770426362097204
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8780986244644625960}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3404d77a1847be546938ab894e9303ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

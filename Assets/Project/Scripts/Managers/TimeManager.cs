@@ -132,6 +132,34 @@ public class TimeManager : GameSystem
     }
 
 
+    public void AdvanceByMinutes(float minutes)
+    {
+        if (minutes == 0f) return;
+
+        // Convert the float minutes to a normalized fraction of a day.
+        // 1440 minutes in one full day (24 * 60)
+        float delta = minutes / 1440f;
+
+        now += delta;
+
+        // If time goes beyond the end of the day, loop and trigger next day events
+        if (now >= 1f)
+        {
+            now %= 1f;
+            TriggerWeekDayChanged();
+        }
+
+        // Update the day phase if needed
+        if (currentDayTime != GetDayTime())
+        {
+            TriggerDayTimeChanged();
+        }
+
+        // Always trigger a clock update event after changing time
+        TriggerClockUpdate();
+    }
+
+
     public void SetTime(int _hours, int _minutes)
     {
         _hours = Mathf.Clamp(_hours, 0, 23);

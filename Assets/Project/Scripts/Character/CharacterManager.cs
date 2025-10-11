@@ -6,9 +6,14 @@ using UnityEngine;
 
 public class CharacterManager : GameSystem
 {
+    private PlayerCharacterBrain playerCharacter;
+    private CharacterBrain[] characters;
+
+
     public override void Init()
     {
-        
+        characters = GetComponentsInChildren<CharacterBrain>();
+        playerCharacter = GetComponentInChildren<PlayerCharacterBrain>();
     }
 
     public override void Shutdown()
@@ -16,10 +21,13 @@ public class CharacterManager : GameSystem
     
     }
 
+    public PlayerCharacterBrain GetPlayerCharacter()
+    {
+        return playerCharacter;
+    }
+
     public CharacterBrain GetCharacter(string characterName)
     {
-        CharacterBrain[] characters = FindObjectsByType<CharacterBrain>(FindObjectsSortMode.None);
-        
         foreach (CharacterBrain character in characters)
         {
             if (character.name == characterName)
@@ -28,7 +36,6 @@ public class CharacterManager : GameSystem
             }
         }
 
-        //Debug.LogError($"Character '{characterName}' not found in the scene.");
         return null;
     }
 

@@ -9,7 +9,10 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
 
     [SerializeField] private List<GameSystem> systems = new List<GameSystem>();
-    
+
+    [SerializeField] private GameState currentState;
+
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -20,7 +23,6 @@ public class GameManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
-
         RegisterAllSystems();
     }
 
@@ -33,7 +35,7 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Get a system of a specific type (like AudioManager or UIManager)
+    /// Get a system of a specific type
     /// </summary>
     public T GetSystem<T>() where T : GameSystem
     {
@@ -69,15 +71,39 @@ public class GameManager : MonoBehaviour
 
 
 
+
+
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        ChangeState(new StartupState());
+        ChangeState(new GameplayState());
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        currentState?.Update();
+    }
+
+    public GameState GetCurrentState() => currentState;
+
+    public void ChangeState(GameState newState)
+    {
+        if (currentState != null)
+        {
+            Debug.Log($"Exiting state: {currentState.GetType().Name}");
+            currentState.Exit();
+        }
+
+        currentState = newState;
+
+        if (currentState != null)
+        {
+            Debug.Log($"Entering state: {currentState.GetType().Name}");
+            currentState.Enter();
+        }
     }
 
 

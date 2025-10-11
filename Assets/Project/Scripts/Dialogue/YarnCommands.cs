@@ -75,6 +75,41 @@ public class YarnCommands : MonoBehaviour
     }
 
 
+
+    [YarnFunction("GetPlayerStat")]
+    public static float GetPlayerStat(string statID)
+    {
+        var characterManager = GameManager.Instance.GetSystem<CharacterManager>();
+        var playerCharacter = characterManager.GetPlayerCharacter();
+        return playerCharacter.Traits().GetStat(statID);
+    }
+
+    [YarnFunction("GetPlayerAttribute")]
+    public static float GetPlayerAttribute(string attributeID)
+    {
+        var characterManager = GameManager.Instance.GetSystem<CharacterManager>();
+        var playerCharacter = characterManager.GetPlayerCharacter();
+        return playerCharacter.Traits().GetAttribute(attributeID);
+    }
+
+    [YarnCommand("PlayerAttributeAdd")]
+    public static void PlayerAttributeAdd(string attributeID, float value)
+    {
+        var characterManager = GameManager.Instance.GetSystem<CharacterManager>();
+        var playerCharacter = characterManager.GetPlayerCharacter();
+        playerCharacter.Traits().AttributeAdd(attributeID, value);
+    }
+
+    [YarnCommand("PlayerAttributeSubtract")]
+    public static void PlayerAttributeSubtract(string attributeID, float value)
+    {
+        var characterManager = GameManager.Instance.GetSystem<CharacterManager>();
+        var playerCharacter = characterManager.GetPlayerCharacter();
+        playerCharacter.Traits().AttributeSubtract(attributeID, value);
+    }
+
+
+
     // -------------------
     // Player -> Character
     // -------------------

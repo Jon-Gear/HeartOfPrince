@@ -1,7 +1,9 @@
+using GameCreator.Runtime.Common;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Yarn.Unity;
+using static Unity.Collections.Unicode;
 
 [System.Serializable]
 public class Dialogue
@@ -71,7 +73,6 @@ public class Dialogue
                 if (actor.Brain() != null && actor.Brain().Dialogue().CurrentIntention == DialogueIntention.None)
                 {
                     actor.Brain().Dialogue().SetIntention(DialogueIntention.SpokenTo);
-                    
                 }
             }
         }
@@ -80,10 +81,43 @@ public class Dialogue
             // No tags found, default to current speaker if set
             Debug.LogWarning($"No actor tags found in node {nodeName}");
         }
+
+        var timeManager = GameManager.Instance.GetSystem<TimeManager>();
+        timeManager.StopTime();
+    }
+
+    public void RunLine()
+    {
+        var timeManager = GameManager.Instance.GetSystem<TimeManager>();
+        timeManager.AdvanceByMinutes(1.0f);
     }
 
     private void OnNodeComplete(string nodeName)
     {
+        int energy_cost = 0;
+
+        IEnumerable<string> tags = dialogueRunner.GetTagsForNode(nodeName);
+        foreach (var tag in tags)
+        {
+            if (tag.StartsWith("actor:"))
+            {
+                string actorName = tag.Substring("actor:".Length).Trim();
+                Actor actor = ActorRegistry.Instance.GetActorByName(actorName);
+                if (actor == null) actor = ActorRegistry.Instance.playerActor;
+                activeActors.Add(actor);
+                if (actor.Brain() != null && actor.Brain().Dialogue().CurrentIntention == DialogueIntention.None)
+                {
+                    actor.Brain().Dialogue().SetIntention(DialogueIntention.SpokenTo);
+                }
+            }
+
+            if(tag.StartsWith("energy_cost:"))
+            {
+                energy_cost = int.Parse(tag.Substring("energy_cost:".Length).Trim());
+            }
+        }
+
+
         currentSpeaker = null;
         foreach (var actor in activeActors)
         {
@@ -91,6 +125,13 @@ public class Dialogue
                 actor.Brain().Dialogue().ClearIntention();
         }
         activeActors.Clear();
+
+        var playerCharacter = GameManager.Instance.GetSystem<CharacterManager>().GetPlayerCharacter();
+
+        playerCharacter.Traits().AttributeSubtract("attribute-energy", energy_cost);
+        var timeManager = GameManager.Instance.GetSystem<TimeManager>();
+        timeManager.StartTime();
+
     }
 }
 
