@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Numerics;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class CharacterManager : GameSystem
 {
@@ -67,6 +68,23 @@ public class CharacterManager : GameSystem
             else
             {
                 Debug.LogWarning($"Character '{characterName}' not found. Cannot remove topic.");
+            }
+        }
+    }
+
+    protected override void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        foreach (CharacterBrain character in characters)
+        {
+            TimeEntry currentEntry = character.Schedule().FindCurrentEntry();
+            if(currentEntry == null)
+            {
+                continue;
+            }
+
+            if(currentEntry.sceneName == scene.name)
+            {
+                Debug.Log($"Spawning {character.name}");
             }
         }
     }

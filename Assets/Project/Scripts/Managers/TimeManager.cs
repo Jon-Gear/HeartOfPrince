@@ -430,14 +430,6 @@ public class TimeManager : GameSystem
         onWeekDayChanged?.Invoke(args);
     }
 
-
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    private void Start()
-    {
-        
-    }
-
     public override void Init()
     {
         prayerTimes.SetDayTimes();
@@ -479,6 +471,34 @@ public class TimeManager : GameSystem
 }
 public static class TimeUtils
 {
+    public static float GetTimePercentageFromString(string time)
+    {
+        (int _hours, int _minutes) = GetTimeFromString(time);
+        
+        float hours = Mathf.Clamp(_hours, 0, 23);
+        float minutes = Mathf.Clamp(_minutes, 0, 59);
+        float now = (hours + (minutes / 60f)) / 24f;
+
+        return now;
+    }
+
+    public static (int, int) GetTimeFromString(string time)
+    {
+        // Expecting format "HH:mm"
+        if (string.IsNullOrEmpty(time)) return (0, 0);
+
+        string[] parts = time.Split(':');
+        if (parts.Length != 2) return (0, 0);
+
+        // Parse directly, no condition
+        int.TryParse(parts[0], out int hours);
+        int.TryParse(parts[1], out int minutes);
+
+        return (hours, minutes);    
+    }
+
+
+
     public static string WeekDayToString(WEEKDAY input)
     {
         switch (input)

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3182753723883272907}
   - component: {fileID: 6688653414734157622}
   - component: {fileID: 831296107912017572}
+  - component: {fileID: 7975221337139972833}
   - component: {fileID: 7193594603570959302}
   - component: {fileID: 1774465578180596510}
   m_Layer: 0
@@ -47,6 +48,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63345c3d361c65b4bbe921d037452e9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_Prefab:
+    m_Property:
+      rid: 1456250655132090534
+  references:
+    version: 2
+    RefIds:
+    - rid: 1456250655132090534
+      type: {class: GetGameObjectInstance, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_GameObject: {fileID: 0}
 --- !u!114 &831296107912017572
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -69,6 +80,19 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 62f91d9913a3f4042a2b1e4df1ed393b, type: 2}
   - {fileID: 11400000, guid: 29c30a76c76e8854495dfd27302bf3f3, type: 2}
   - {fileID: 11400000, guid: c5332ada86902b04785eef030f37d392, type: 2}
+--- !u!114 &7975221337139972833
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 783943241080763222}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 816dd8847e02f164c80a6ee73daeb789, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  routine: {fileID: 0}
 --- !u!114 &7193594603570959302
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -111,6 +135,7 @@ GameObject:
   - component: {fileID: 8601187938402238372}
   - component: {fileID: 214199998296485527}
   - component: {fileID: 7091370823463166983}
+  - component: {fileID: 3047599449274656551}
   - component: {fileID: 3651223616668814326}
   - component: {fileID: 5637698187040530011}
   m_Layer: 0
@@ -147,6 +172,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63345c3d361c65b4bbe921d037452e9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_Prefab:
+    m_Property:
+      rid: 1456250655132090533
+  references:
+    version: 2
+    RefIds:
+    - rid: 1456250655132090533
+      type: {class: GetGameObjectInstance, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_GameObject: {fileID: 0}
 --- !u!114 &7091370823463166983
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -165,6 +200,19 @@ MonoBehaviour:
   playerToCharacterTopics: []
   monologueTopics: []
   characterToCharacterTopics: []
+--- !u!114 &3047599449274656551
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3245328338253044162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 816dd8847e02f164c80a6ee73daeb789, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  routine: {fileID: 0}
 --- !u!114 &3651223616668814326
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -207,6 +255,7 @@ GameObject:
   - component: {fileID: 3924342024739096987}
   - component: {fileID: 5153317414228896254}
   - component: {fileID: 540543758622739989}
+  - component: {fileID: 7794082830686437092}
   - component: {fileID: 3864829398758878734}
   - component: {fileID: 5301038750621280571}
   m_Layer: 0
@@ -243,6 +292,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63345c3d361c65b4bbe921d037452e9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_Prefab:
+    m_Property:
+      rid: 1456250655132090531
+  references:
+    version: 2
+    RefIds:
+    - rid: 1456250655132090531
+      type: {class: GetGameObjectInstance, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_GameObject: {fileID: 0}
 --- !u!114 &540543758622739989
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -261,6 +320,19 @@ MonoBehaviour:
   playerToCharacterTopics: []
   monologueTopics: []
   characterToCharacterTopics: []
+--- !u!114 &7794082830686437092
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3823396006111329071}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 816dd8847e02f164c80a6ee73daeb789, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  routine: {fileID: 0}
 --- !u!114 &3864829398758878734
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -354,6 +426,7 @@ GameObject:
   - component: {fileID: 5941874756050568993}
   - component: {fileID: 8765044034293674332}
   - component: {fileID: 6092915989895864112}
+  - component: {fileID: 4019782535929561864}
   - component: {fileID: 8153603859934494919}
   - component: {fileID: 2491531397874983990}
   m_Layer: 0
@@ -390,6 +463,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63345c3d361c65b4bbe921d037452e9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_Prefab:
+    m_Property:
+      rid: 1456250655132090530
+  references:
+    version: 2
+    RefIds:
+    - rid: 1456250655132090530
+      type: {class: GetGameObjectInstance, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_GameObject: {fileID: 0}
 --- !u!114 &6092915989895864112
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -407,6 +490,19 @@ MonoBehaviour:
   playerToCharacterTopics: []
   monologueTopics: []
   characterToCharacterTopics: []
+--- !u!114 &4019782535929561864
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4559337654373340850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 816dd8847e02f164c80a6ee73daeb789, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  routine: {fileID: 0}
 --- !u!114 &8153603859934494919
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -449,6 +545,7 @@ GameObject:
   - component: {fileID: 7893914217583835527}
   - component: {fileID: 1122012977010497786}
   - component: {fileID: 3105328981322808804}
+  - component: {fileID: 7065685670463842069}
   - component: {fileID: 7354940019156828678}
   - component: {fileID: 6642628084346922179}
   m_Layer: 0
@@ -485,6 +582,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63345c3d361c65b4bbe921d037452e9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_Prefab:
+    m_Property:
+      rid: 1456250655132090532
+  references:
+    version: 2
+    RefIds:
+    - rid: 1456250655132090532
+      type: {class: GetGameObjectInstance, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_GameObject: {fileID: 0}
 --- !u!114 &3105328981322808804
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -502,6 +609,19 @@ MonoBehaviour:
   playerToCharacterTopics: []
   monologueTopics: []
   characterToCharacterTopics: []
+--- !u!114 &7065685670463842069
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4665355961793989137}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 816dd8847e02f164c80a6ee73daeb789, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  routine: {fileID: 0}
 --- !u!114 &7354940019156828678
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -630,8 +750,9 @@ GameObject:
   m_Component:
   - component: {fileID: 7206074853357913221}
   - component: {fileID: 5197890050525944132}
-  - component: {fileID: 8626648282031538870}
   - component: {fileID: 2595844993154383025}
+  - component: {fileID: 8626648282031538870}
+  - component: {fileID: 8202277155980889759}
   - component: {fileID: 5302770426362097204}
   m_Layer: 0
   m_Name: Munir
@@ -667,24 +788,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63345c3d361c65b4bbe921d037452e9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &8626648282031538870
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8780986244644625960}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: db50fabeac0a2d647b67dc48fc264e4a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  characterName: Munir
-  characterToPlayerTopics:
-  - {fileID: 11400000, guid: 41ed1801966ffc6459aa77d3626e6641, type: 2}
-  playerToCharacterTopics: []
-  monologueTopics: []
-  characterToCharacterTopics: []
+  m_Prefab:
+    m_Property:
+      rid: 1456250655132090528
+  references:
+    version: 2
+    RefIds:
+    - rid: 1456250655132090528
+      type: {class: GetGameObjectInstance, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_GameObject: {fileID: 8388543769646505666, guid: a5dc90f823f7b8b4383efc1f60ea9543, type: 3}
 --- !u!114 &2595844993154383025
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -704,6 +817,37 @@ MonoBehaviour:
   m_OverrideStats:
     m_Keys: []
     m_Values: []
+--- !u!114 &8626648282031538870
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8780986244644625960}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db50fabeac0a2d647b67dc48fc264e4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  characterName: Munir
+  characterToPlayerTopics:
+  - {fileID: 11400000, guid: 41ed1801966ffc6459aa77d3626e6641, type: 2}
+  playerToCharacterTopics: []
+  monologueTopics: []
+  characterToCharacterTopics: []
+--- !u!114 &8202277155980889759
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8780986244644625960}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 816dd8847e02f164c80a6ee73daeb789, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  routine: {fileID: 11400000, guid: a75c6c5f2d6a7b6489506a73694cf61f, type: 2}
 --- !u!114 &5302770426362097204
 MonoBehaviour:
   m_ObjectHideFlags: 0

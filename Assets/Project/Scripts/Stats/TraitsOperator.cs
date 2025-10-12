@@ -3,6 +3,15 @@ using GameCreator.Runtime.Stats;
 using System;
 using UnityEngine;
 
+
+/*
+
+How stats interact with other systems:
+- Dialogue layer - Stats unlock or block dialogue options. (e.g., High Stress -> “snaps” at someone; High Faith -> “restrains anger.”)
+
+*/
+
+
 [RequireComponent(typeof(Traits))]
 public class TraitsOperator : MonoBehaviour
 {
