@@ -48,13 +48,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63345c3d361c65b4bbe921d037452e9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Prefab:
+  characterPrefab:
     m_Property:
-      rid: 1456250655132090534
+      rid: 1456250655132090738
   references:
     version: 2
     RefIds:
-    - rid: 1456250655132090534
+    - rid: 1456250655132090738
       type: {class: GetGameObjectInstance, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
         m_GameObject: {fileID: 0}
@@ -93,6 +93,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   routine: {fileID: 0}
+  currentEntry:
+    TimePeriod: 00:00-24:00
+    sceneName: 
+    markerID: 
 --- !u!114 &7193594603570959302
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -172,13 +176,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63345c3d361c65b4bbe921d037452e9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Prefab:
+  characterPrefab:
     m_Property:
-      rid: 1456250655132090533
+      rid: 1456250655132090737
   references:
     version: 2
     RefIds:
-    - rid: 1456250655132090533
+    - rid: 1456250655132090737
       type: {class: GetGameObjectInstance, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
         m_GameObject: {fileID: 0}
@@ -213,6 +217,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   routine: {fileID: 0}
+  currentEntry:
+    TimePeriod: 00:00-24:00
+    sceneName: 
+    markerID: 
 --- !u!114 &3651223616668814326
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -292,13 +300,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63345c3d361c65b4bbe921d037452e9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Prefab:
+  characterPrefab:
     m_Property:
-      rid: 1456250655132090531
+      rid: 1456250655132090735
   references:
     version: 2
     RefIds:
-    - rid: 1456250655132090531
+    - rid: 1456250655132090735
       type: {class: GetGameObjectInstance, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
         m_GameObject: {fileID: 0}
@@ -333,6 +341,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   routine: {fileID: 0}
+  currentEntry:
+    TimePeriod: 00:00-24:00
+    sceneName: 
+    markerID: 
 --- !u!114 &3864829398758878734
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -463,13 +475,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63345c3d361c65b4bbe921d037452e9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Prefab:
+  characterPrefab:
     m_Property:
-      rid: 1456250655132090530
+      rid: 1456250655132090739
   references:
     version: 2
     RefIds:
-    - rid: 1456250655132090530
+    - rid: 1456250655132090739
       type: {class: GetGameObjectInstance, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
         m_GameObject: {fileID: 0}
@@ -503,6 +515,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   routine: {fileID: 0}
+  currentEntry:
+    TimePeriod: 00:00-24:00
+    sceneName: 
+    markerID: 
 --- !u!114 &8153603859934494919
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -582,13 +598,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63345c3d361c65b4bbe921d037452e9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Prefab:
+  characterPrefab:
     m_Property:
-      rid: 1456250655132090532
+      rid: 1456250655132090736
   references:
     version: 2
     RefIds:
-    - rid: 1456250655132090532
+    - rid: 1456250655132090736
       type: {class: GetGameObjectInstance, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
         m_GameObject: {fileID: 0}
@@ -622,6 +638,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   routine: {fileID: 0}
+  currentEntry:
+    TimePeriod: 00:00-24:00
+    sceneName: 
+    markerID: 
 --- !u!114 &7354940019156828678
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -788,13 +808,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63345c3d361c65b4bbe921d037452e9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Prefab:
+  characterPrefab:
     m_Property:
-      rid: 1456250655132090528
+      rid: 1456250655132090733
   references:
     version: 2
     RefIds:
-    - rid: 1456250655132090528
+    - rid: 1456250655132090733
       type: {class: GetGameObjectInstance, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
         m_GameObject: {fileID: 8388543769646505666, guid: a5dc90f823f7b8b4383efc1f60ea9543, type: 3}
@@ -848,6 +868,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   routine: {fileID: 11400000, guid: a75c6c5f2d6a7b6489506a73694cf61f, type: 2}
+  currentEntry:
+    TimePeriod: 00:00-24:00
+    sceneName: 
+    markerID: 
 --- !u!114 &5302770426362097204
 MonoBehaviour:
   m_ObjectHideFlags: 0

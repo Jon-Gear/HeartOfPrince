@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class CharacterScheduleBrain : MonoBehaviour
 {
-    [SerializeField] private PropertyGetInstantiate characterPrefab = new PropertyGetInstantiate();
     [SerializeField] private RoutineData routine;
     [SerializeField] public TimeEntry currentEntry = null;
 
@@ -70,12 +69,4 @@ public class CharacterScheduleBrain : MonoBehaviour
 
         return timeEntry;
     }
-
-
-    private void SpawnCharacterInScene()
-    {
-        
-    }
-
-
 }

@@ -1,3 +1,4 @@
+using GameCreator.Runtime.Common;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Drawing;
@@ -39,6 +40,20 @@ public class CharacterManager : GameSystem
 
         return null;
     }
+
+
+    //WE STOPPED HERE, SPAWNING CHACHARCTER.
+
+    public void SpawnCharacter(CharacterBrain character, TimeEntry entry)
+    {
+        Marker marker =
+
+        Character character = target.Get<Character>();
+
+
+        Instantiate(character.Prefab(), entry.TargetLocation, Quaternion.identity);
+    }
+
 
     public void AddTopicPlayerToCharacter(TopicPlayerToCharacter topic, List<string> characterNames)
     {
