@@ -15,7 +15,6 @@ GameObject:
   - component: {fileID: 7985229174449724229}
   - component: {fileID: 1182256239330190879}
   - component: {fileID: 214690807764486446}
-  - component: {fileID: 5264984660466763749}
   - component: {fileID: 345680063551267553}
   m_Layer: 0
   m_Name: '[Manager] Dialogue'
@@ -255,22 +254,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   showDebug: 0
   debugTextView: {fileID: 0}
---- !u!114 &5264984660466763749
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5010746147966974450}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dfe305fbf3171c749b3bba38eed547a5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  actors: []
-  playerActor: {fileID: 0}
-  mainDialogueCurrentSpeaker: {fileID: 0}
-  backgroundDialogueCurrentSpeaker: {fileID: 0}
 --- !u!114 &345680063551267553
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -279,6 +279,11 @@ public class TimeManager : GameSystem
     [SerializeField] private float targetDayLengthInMinutes = 24f;
     [SerializeField] public PrayerTimes prayerTimes;
 
+
+    [ContextMenu("Advance By 1 Minute")]
+    private void AdvanceBy1Minute() => AdvanceByMinutes(1);
+
+
     private int hours => Mathf.FloorToInt(now * 24f);
     private int minutes => Mathf.FloorToInt(((now * 24f) - hours) * 60f);
     private bool isPaused = false;

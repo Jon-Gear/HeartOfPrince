@@ -22,7 +22,7 @@ public enum DialogueIntention
 
 public class CharacterDialogueBrain : MonoBehaviour
 {
-    [SerializeField] private string characterName = "Character";
+    [SerializeField] public string characterName = "Character";
 
     [Header("Dialogue Topics")]
 

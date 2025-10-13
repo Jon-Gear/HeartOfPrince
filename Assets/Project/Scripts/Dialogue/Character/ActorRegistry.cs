@@ -3,11 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class ActorRegistry : Singleton<ActorRegistry>
+public class ActorRegistry : GameSystem
 {
     public List<Actor> actors = new List<Actor>();
     
     public Actor playerActor;
+
+    public override void Init() {}
+
+    public override void Shutdown() {}
+
 
     public void RegisterActor(Actor actor)
     {
@@ -43,4 +48,6 @@ public class ActorRegistry : Singleton<ActorRegistry>
         playerActor = null;
         actors.Clear();
     }
+
+    
 }

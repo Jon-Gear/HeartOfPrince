@@ -1,5 +1,6 @@
 using GameCreator.Runtime.Characters;
 using GameCreator.Runtime.Common;
+using GameCreator.Runtime.Dialogue;
 using GameCreator.Runtime.Stats;
 using UnityEngine;
 
@@ -35,4 +36,96 @@ public class CharacterBrain : MonoBehaviour
     {
         
     }
+
+    public void SpawnCharacterAtMarker(Marker marker)
+    {
+        if (Prefab() == null)
+        {
+            Debug.LogWarning($"SpawnCharacter: Character '{gameObject.name}' has no assigned prefab.");
+            return;
+        }
+
+        Vector3 offset = new Vector3(0, 1, 0);
+
+        GameObject instance = Instantiate(Prefab(), marker.transform.position + offset, marker.transform.rotation);
+
+    }
+
+    public void SpawnCharacterAtMarkerID(string markerID)
+    {
+        Marker targetMarker = Marker.GetMarkerByID(markerID);
+
+        if (targetMarker == null)
+        {
+            Debug.LogWarning($"SpawnCharacter: No Marker found with ID '{markerID}'.");
+            return;
+        }
+
+        SpawnCharacterAtMarker(targetMarker);
+    }
+
+    public void DespawnCharacter(Character character, bool foo)
+    {
+        Destroy(character.gameObject);
+    }
+
+
+    public void MoveCharacterToMarkerThenDespawn(Marker marker)
+    {
+        var actorRegistry = GameManager.Instance.GetSystem<ActorRegistry>();
+
+        Actor actor = actorRegistry.GetActorByName(Dialogue().characterName);
+
+        if (actor == null)
+        {
+            Debug.LogWarning($"{Dialogue().characterName} character not found");
+            return;
+        }
+
+        actor.Character().Motion.MoveToMarker(marker, 0.1f, DespawnCharacter);
+    }
+
+    public void MoveCharacterToMarkerIDThenDespawn(string markerID)
+    {
+        
+        Marker targetMarker = Marker.GetMarkerByID(markerID);
+
+        if (targetMarker == null)
+        {
+            Debug.LogWarning($"SpawnCharacter: No Marker found with ID '{markerID}'.");
+            return;
+        }
+
+        MoveCharacterToMarkerThenDespawn(targetMarker);
+
+    }
+
+    public void MoveCharacterToMarkerID(string markerID)
+    {
+        var actorRegistry = GameManager.Instance.GetSystem<ActorRegistry>();
+
+        Actor actor = actorRegistry.GetActorByName(Dialogue().characterName);
+
+        if (actor == null)
+        {
+            Debug.LogWarning($"{Dialogue().characterName} character not found");
+            return;
+        }
+
+        Marker targetMarker = Marker.GetMarkerByID(markerID);
+
+        if (targetMarker == null)
+        {
+            Debug.LogWarning($"SpawnCharacter: No Marker found with ID '{markerID}'.");
+            return;
+        }
+
+        actor.Character().Motion.MoveToMarker(targetMarker, 0.1f, OnMarkerReached);
+    }
+
+    private void OnMarkerReached(Character character, bool foo)
+    {
+        Debug.Log($"{character.name} reached marker {foo}");
+    }
+
 }

@@ -43,17 +43,19 @@ public class Dialogue
     public Actor GetSpeaker() => currentSpeaker;
     public void SetSpeaker(string actorName)
     {
+        var actorRegistry = GameManager.Instance.GetSystem<ActorRegistry>();
+
         if (string.IsNullOrEmpty(actorName))
         {
             Debug.LogWarning("DialogueManager: Actor name is null or empty. Defaulting to player actor.");
-            currentSpeaker = ActorRegistry.Instance.playerActor;
+            currentSpeaker = actorRegistry.playerActor;
             return;
         }
-        Actor actor = ActorRegistry.Instance.GetActorByName(actorName);
+        Actor actor = actorRegistry.GetActorByName(actorName);
         if (actor == null)
         {
             Debug.LogWarning($"DialogueManager: Actor with name '{actorName}' not found. Defaulting to player actor.");
-            currentSpeaker = ActorRegistry.Instance.playerActor;
+            currentSpeaker = actorRegistry.playerActor;
             return;
         }
         currentSpeaker = actor;
@@ -61,14 +63,16 @@ public class Dialogue
 
     private void OnNodeStart(string nodeName)
     {
+        var actorRegistry = GameManager.Instance.GetSystem<ActorRegistry>();
+
         IEnumerable<string> tags = dialogueRunner.GetTagsForNode(nodeName);
         foreach (var tag in tags)
         {
             if (tag.StartsWith("actor:"))
             {
                 string actorName = tag.Substring("actor:".Length).Trim();
-                Actor actor = ActorRegistry.Instance.GetActorByName(actorName);
-                if (actor == null) actor = ActorRegistry.Instance.playerActor;
+                Actor actor = actorRegistry.GetActorByName(actorName);
+                if (actor == null) actor = actorRegistry.playerActor;
                 activeActors.Add(actor);
                 if (actor.Brain() != null && actor.Brain().Dialogue().CurrentIntention == DialogueIntention.None)
                 {
@@ -94,6 +98,8 @@ public class Dialogue
 
     private void OnNodeComplete(string nodeName)
     {
+        var actorRegistry = GameManager.Instance.GetSystem<ActorRegistry>();
+
         int energy_cost = 0;
 
         IEnumerable<string> tags = dialogueRunner.GetTagsForNode(nodeName);
@@ -102,8 +108,8 @@ public class Dialogue
             if (tag.StartsWith("actor:"))
             {
                 string actorName = tag.Substring("actor:".Length).Trim();
-                Actor actor = ActorRegistry.Instance.GetActorByName(actorName);
-                if (actor == null) actor = ActorRegistry.Instance.playerActor;
+                Actor actor = actorRegistry.GetActorByName(actorName);
+                if (actor == null) actor = actorRegistry.playerActor;
                 activeActors.Add(actor);
                 if (actor.Brain() != null && actor.Brain().Dialogue().CurrentIntention == DialogueIntention.None)
                 {

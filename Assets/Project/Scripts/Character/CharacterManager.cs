@@ -2,7 +2,7 @@ using GameCreator.Runtime.Common;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Numerics;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -43,16 +43,14 @@ public class CharacterManager : GameSystem
 
 
     //WE STOPPED HERE, SPAWNING CHACHARCTER.
-
     public void SpawnCharacter(CharacterBrain character, TimeEntry entry)
     {
-        Marker marker =
-
-        Character character = target.Get<Character>();
-
-
-        Instantiate(character.Prefab(), entry.TargetLocation, Quaternion.identity);
+        
+        //Debug.Log($"SpawnCharacter: Spawned '{character.name}' at marker '{targetMarker.name}'.");
     }
+
+
+
 
 
     public void AddTopicPlayerToCharacter(TopicPlayerToCharacter topic, List<string> characterNames)
@@ -83,23 +81,6 @@ public class CharacterManager : GameSystem
             else
             {
                 Debug.LogWarning($"Character '{characterName}' not found. Cannot remove topic.");
-            }
-        }
-    }
-
-    protected override void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        foreach (CharacterBrain character in characters)
-        {
-            TimeEntry currentEntry = character.Schedule().FindCurrentEntry();
-            if(currentEntry == null)
-            {
-                continue;
-            }
-
-            if(currentEntry.sceneName == scene.name)
-            {
-                Debug.Log($"Spawning {character.name}");
             }
         }
     }

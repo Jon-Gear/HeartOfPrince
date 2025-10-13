@@ -27,9 +27,10 @@ public class CharacterViewMainDialogue : DialogueViewBase
     public override void RunOptions(DialogueOption[] dialogueOptions, Action<int> onOptionSelected)
     {
         base.RunOptions(dialogueOptions, onOptionSelected);
+        var actorRegistry = GameManager.Instance.GetSystem<ActorRegistry>();
 
 
-        GameManager.Instance.GetSystem<DialogueManager>().main.SetSpeaker(ActorRegistry.Instance.playerActor.actorName);
+        GameManager.Instance.GetSystem<DialogueManager>().main.SetSpeaker(actorRegistry.playerActor.actorName);
     }
 
     private void Start()
