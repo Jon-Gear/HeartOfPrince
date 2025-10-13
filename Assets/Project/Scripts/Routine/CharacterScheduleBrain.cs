@@ -15,8 +15,6 @@ public class CharacterScheduleBrain : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-
-        
         characterBrain = GetComponent<CharacterBrain>();
 
         SceneManager.activeSceneChanged += OnActiveSceneChanged;
@@ -110,6 +108,8 @@ public class CharacterScheduleBrain : MonoBehaviour
         {
             return;
         }
+
+        currentEntry = newEntry;
 
         if(newEntry.sceneName == newScene.name)
         {

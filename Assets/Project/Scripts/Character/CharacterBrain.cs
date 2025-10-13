@@ -2,7 +2,32 @@ using GameCreator.Runtime.Characters;
 using GameCreator.Runtime.Common;
 using GameCreator.Runtime.Dialogue;
 using GameCreator.Runtime.Stats;
+using Tools;
 using UnityEngine;
+
+
+
+/*
+
+What the character can be doing:
+
+Nothing
+Talking
+
+
+
+
+None,                // free to start something
+ToPlayer,            // character intends to talk to the player
+ToCharacter,         // character intends to talk to another NPC
+Monologue,           // character intends to monologue
+SpokenTo,            // character has been spoken to and is responding
+ApproachingPlayer,   // character is approaching the player to start dialogue
+
+
+
+*/
+
 
 
 [RequireComponent(typeof(CharacterDialogueBrain))]
@@ -10,6 +35,7 @@ public class CharacterBrain : MonoBehaviour
 {
     [SerializeField] private PropertyGetGameObject characterPrefab = GetGameObjectInstance.Create();
 
+    private StateMachine characterStateMachine;
     private TraitsOperator traits;
     private CharacterDialogueBrain characterDialogueBrain;
     private CharacterScheduleBrain characterScheduleBrain;
@@ -18,7 +44,7 @@ public class CharacterBrain : MonoBehaviour
     public TraitsOperator Traits() => traits;
     public CharacterDialogueBrain Dialogue() => characterDialogueBrain;
     public CharacterScheduleBrain Schedule() => characterScheduleBrain;
-
+    public StateMachine StateMachine() => characterStateMachine;
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -27,15 +53,19 @@ public class CharacterBrain : MonoBehaviour
         traits = GetComponent<TraitsOperator>();
         characterDialogueBrain = GetComponent<CharacterDialogueBrain>();
         characterScheduleBrain = GetComponent<CharacterScheduleBrain>();
+        characterStateMachine = GetComponent<StateMachine>();
     }
 
 
-
-    // Update is called once per frame
-    void Update()
+    public void TryStartInteraction()
     {
-        
+
     }
+
+
+
+
+    // I don't think it is supposed to be doing this.
 
     public void SpawnCharacterAtMarker(Marker marker)
     {

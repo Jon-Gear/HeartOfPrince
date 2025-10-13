@@ -770,6 +770,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7206074853357913221}
   - component: {fileID: 5197890050525944132}
+  - component: {fileID: 2371936695547843246}
   - component: {fileID: 2595844993154383025}
   - component: {fileID: 8626648282031538870}
   - component: {fileID: 8202277155980889759}
@@ -818,6 +819,18 @@ MonoBehaviour:
       type: {class: GetGameObjectInstance, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
         m_GameObject: {fileID: 8388543769646505666, guid: a5dc90f823f7b8b4383efc1f60ea9543, type: 3}
+--- !u!114 &2371936695547843246
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8780986244644625960}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 497eee5cc14edb84b810824e9abf3f5a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &2595844993154383025
 MonoBehaviour:
   m_ObjectHideFlags: 0

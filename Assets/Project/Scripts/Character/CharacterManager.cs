@@ -42,17 +42,6 @@ public class CharacterManager : GameSystem
     }
 
 
-    //WE STOPPED HERE, SPAWNING CHACHARCTER.
-    public void SpawnCharacter(CharacterBrain character, TimeEntry entry)
-    {
-        
-        //Debug.Log($"SpawnCharacter: Spawned '{character.name}' at marker '{targetMarker.name}'.");
-    }
-
-
-
-
-
     public void AddTopicPlayerToCharacter(TopicPlayerToCharacter topic, List<string> characterNames)
     {
         foreach (string characterName in characterNames)

@@ -12,6 +12,7 @@ public class GameplayState : GameState
         gameManager.ActivateSystem<DialogueManager>();
         gameManager.ActivateSystem<CharacterManager>();
         gameManager.ActivateSystem<CinemachineManager>();
+        gameManager.ActivateSystem<ActorRegistry>();
     }
 
     public override void Exit()
@@ -23,6 +24,7 @@ public class GameplayState : GameState
         gameManager.DeactivateSystem<DialogueManager>();
         gameManager.DeactivateSystem<CharacterManager>();
         gameManager.DeactivateSystem<CinemachineManager>();
+        gameManager.DeactivateSystem<ActorRegistry>();
     }
 
     public override void Update()
