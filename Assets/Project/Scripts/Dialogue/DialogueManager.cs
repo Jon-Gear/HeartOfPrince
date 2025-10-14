@@ -128,7 +128,9 @@ public class Dialogue
         foreach (var actor in activeActors)
         {
             if (actor?.Brain() != null)
+            {
                 actor.Brain().Dialogue().ClearIntention();
+            }
         }
         activeActors.Clear();
 
@@ -187,7 +189,7 @@ public class DialogueManager : GameSystem
     public void StartBackgroundDialogue(string startNodeName)
     {
         var runner = GetAvailableBackgroundRunner();
-        Debug.Log($"Starting background dialogue '{startNodeName}' on runner: {runner?.dialogueRunner?.name ?? "None"}");
+        //Debug.Log($"Starting background dialogue '{startNodeName}' on runner: {runner?.dialogueRunner?.name ?? "None"}");
         if (runner != null)
         {
             runner.dialogueRunner.StartDialogue(startNodeName);
@@ -200,7 +202,7 @@ public class DialogueManager : GameSystem
 
     public bool IsAnyBackgroundDialogueAvailable() => GetAvailableBackgroundRunner() != null;
 
-    private Dialogue GetAvailableBackgroundRunner()
+    public Dialogue GetAvailableBackgroundRunner()
     {
         return !background_1.IsRunning() ? background_1 :
                !background_2.IsRunning() ? background_2 :

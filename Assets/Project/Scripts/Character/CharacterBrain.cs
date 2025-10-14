@@ -70,40 +70,35 @@ public class CharacterBrain : MonoBehaviour
 {
     [SerializeField] private PropertyGetGameObject characterPrefab = GetGameObjectInstance.Create();
 
-    private StateMachine mainStateMachine;
+
     private TraitsOperator traits;
+    private CharacterActivityBrain activityBrain;
     private CharacterDialogueBrain characterDialogueBrain;
     private CharacterScheduleBrain characterScheduleBrain;
 
     public GameObject Prefab() => characterPrefab.Get(gameObject);
+    public CharacterActivityBrain Activity() => activityBrain;
     public TraitsOperator Traits() => traits;
     public CharacterDialogueBrain Dialogue() => characterDialogueBrain;
     public CharacterScheduleBrain Schedule() => characterScheduleBrain;
     
-    
-    public StateMachine MainStateMachine() => mainStateMachine;
 
 
-
-
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        activityBrain = GetComponent<CharacterActivityBrain>();
         traits = GetComponent<TraitsOperator>();
         characterDialogueBrain = GetComponent<CharacterDialogueBrain>();
         characterScheduleBrain = GetComponent<CharacterScheduleBrain>();
-        mainStateMachine = GetComponent<StateMachine>();
-    }
-
-
-    public void TryStartInteraction()
-    {
-
     }
 
 
 
+
+
+
+
+    #region hidden
 
     // I don't think it is supposed to be doing this.
 
@@ -197,5 +192,5 @@ public class CharacterBrain : MonoBehaviour
     {
         Debug.Log($"{character.name} reached marker {foo}");
     }
-
+    #endregion
 }

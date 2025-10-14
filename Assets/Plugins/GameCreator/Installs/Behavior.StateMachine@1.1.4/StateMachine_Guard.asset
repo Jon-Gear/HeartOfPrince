@@ -24,6 +24,14 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
+    - rid: 1456250676916519356
+      type: {class: GetAnimationInstance, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_Value: {fileID: 0}
+    - rid: 1456250676916519357
+      type: {class: GetAnimationInstance, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
+      data:
+        m_Value: {fileID: 0}
     - rid: 4340017179469284065
       type: {class: NodeStateMachineEnter, ns: GameCreator.Runtime.Behavior, asm: GameCreator.Runtime.Behavior}
       data:
@@ -61,7 +69,7 @@ MonoBehaviour:
       data:
         m_Id:
           m_String: 66d08d8a-a070-4fbe-a91a-6bb20fdc5447
-        m_Position: {x: 110, y: 0}
+        m_Position: {x: 110.76666, y: 0.76665497}
         m_Ports:
           m_Inputs:
           - rid: 4340017179469284070
@@ -133,7 +141,9 @@ MonoBehaviour:
             rid: 4340017179469284079
         m_State:
           m_StateType: 2
-          m_AnimationClip: {fileID: 0}
+          m_AnimationClip:
+            m_Property:
+              rid: 1456250676916519356
           m_RuntimeController: {fileID: 0}
           m_State: {fileID: 11400000, guid: 00afd52627d16433c9d96078527cdf66, type: 2}
           m_AvatarMask: {fileID: 0}
@@ -385,7 +395,7 @@ MonoBehaviour:
       data:
         m_Id:
           m_String: 36f22ac5-4bcf-4af2-9f2d-147a936cc9ca
-        m_Position: {x: 460, y: -170}
+        m_Position: {x: 460.76666, y: -169.23334}
         m_Ports:
           m_Inputs:
           - rid: 4340017179469284121
@@ -452,7 +462,9 @@ MonoBehaviour:
             rid: 4340017179469284129
         m_State:
           m_StateType: 2
-          m_AnimationClip: {fileID: 0}
+          m_AnimationClip:
+            m_Property:
+              rid: 1456250676916519357
           m_RuntimeController: {fileID: 0}
           m_State: {fileID: 11400000, guid: dbd6d6c3d984c4a279cbf4bc5404fd16, type: 2}
           m_AvatarMask: {fileID: 0}
@@ -521,7 +533,7 @@ MonoBehaviour:
       data:
         m_Id:
           m_String: 5286b7dd-e1bf-4179-a15d-04540b1d6b81
-        m_Position: {x: 590, y: -270}
+        m_Position: {x: 590.76666, y: -269.23334}
         m_Ports:
           m_Inputs:
           - rid: 4340017179469284139
@@ -547,7 +559,7 @@ MonoBehaviour:
       data:
         m_Id:
           m_String: 869f85ef-38b8-4705-805d-b2beb3ab0fda
-        m_Position: {x: -20, y: -270}
+        m_Position: {x: -19.233334, y: -269.23334}
         m_Ports:
           m_Inputs:
           - rid: 4340017179469284142

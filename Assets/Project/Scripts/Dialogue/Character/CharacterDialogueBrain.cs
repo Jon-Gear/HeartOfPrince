@@ -42,7 +42,7 @@ public class CharacterDialogueBrain : MonoBehaviour
     private DialogueIntention currentIntention = DialogueIntention.None;
     public DialogueIntention CurrentIntention => currentIntention;
     public bool IsFree => currentIntention == DialogueIntention.None;
-    
+
 
     // -------------------
     // Unity Events
@@ -138,15 +138,6 @@ public class CharacterDialogueBrain : MonoBehaviour
     {
         if (!CanStartPlayerToCharacterDialogue())
         {
-            return;
-        }
-
-        var dialogueManager = GameManager.Instance.GetSystem<DialogueManager>();
-        var playerCharacter = GameManager.Instance.GetSystem<CharacterManager>().GetPlayerCharacter();
-        
-        if (playerCharacter.Traits().GetAttribute("attribute-energy") == 0.0f)
-        {
-            dialogueManager.StartDialogue("prince_tired");
             return;
         }
 
