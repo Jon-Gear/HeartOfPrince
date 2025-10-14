@@ -46,6 +46,11 @@ public class CharacterStartMonologue : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(Random.Range(minMonologueInterval, maxMonologueInterval));
+
+            // I dont think this should be necessarily possible to do for what is essentially a detector.
+            // Why is the detector also is the activator????
+
+
             if(characterActor.Brain().Dialogue().CanStartCharacterMonologue())
             {
                 characterActor.Brain().Dialogue().TriggerMonologue();

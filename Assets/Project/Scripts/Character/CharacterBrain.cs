@@ -28,6 +28,41 @@ ApproachingPlayer,   // character is approaching the player to start dialogue
 
 */
 
+public enum InteractionType
+{
+    // Core
+    Idle,
+    Walking,
+    ApproachingPlayer,
+    EnteringScene,
+    ExitingScene,
+
+    // Dialogue
+    TalkingToPlayer,
+    TalkingToCharacter,
+    Monologue,
+    SpokenTo,
+    Greeting,
+
+    // Task / Schedule
+    PerformingTask,
+    Working,
+    Praying,
+    Eating,
+    Socializing,
+    Sleeping,
+
+    // Reactive / Expressive
+    Reacting,
+    Observing,
+    Thinking,
+
+    // System / Control
+    Disabled,
+    CutsceneControlled,
+}
+
+
 
 
 [RequireComponent(typeof(CharacterDialogueBrain))]
@@ -35,7 +70,7 @@ public class CharacterBrain : MonoBehaviour
 {
     [SerializeField] private PropertyGetGameObject characterPrefab = GetGameObjectInstance.Create();
 
-    private StateMachine characterStateMachine;
+    private StateMachine mainStateMachine;
     private TraitsOperator traits;
     private CharacterDialogueBrain characterDialogueBrain;
     private CharacterScheduleBrain characterScheduleBrain;
@@ -44,7 +79,12 @@ public class CharacterBrain : MonoBehaviour
     public TraitsOperator Traits() => traits;
     public CharacterDialogueBrain Dialogue() => characterDialogueBrain;
     public CharacterScheduleBrain Schedule() => characterScheduleBrain;
-    public StateMachine StateMachine() => characterStateMachine;
+    
+    
+    public StateMachine MainStateMachine() => mainStateMachine;
+
+
+
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -53,7 +93,7 @@ public class CharacterBrain : MonoBehaviour
         traits = GetComponent<TraitsOperator>();
         characterDialogueBrain = GetComponent<CharacterDialogueBrain>();
         characterScheduleBrain = GetComponent<CharacterScheduleBrain>();
-        characterStateMachine = GetComponent<StateMachine>();
+        mainStateMachine = GetComponent<StateMachine>();
     }
 
 
