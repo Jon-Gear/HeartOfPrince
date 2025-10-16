@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
@@ -134,7 +135,7 @@ public class CharacterDialogueBrain : MonoBehaviour
             .Replace("{actor}", characterName.ToLower());
     }
 
-    public void TriggerPlayerDialogueWithCharacter()
+    public void TriggerPlayerDialogueWithCharacter(UnityAction onFinish = null)
     {
         if (!CanStartPlayerToCharacterDialogue())
         {
@@ -143,7 +144,9 @@ public class CharacterDialogueBrain : MonoBehaviour
 
         string nodeName = $"{characterName.ToLower()}_start";
         SetIntention(DialogueIntention.SpokenTo);
-        GameManager.Instance.GetSystem<DialogueManager>().StartDialogue(nodeName);
+        var dialogueManager = GameManager.Instance.GetSystem<DialogueManager>();
+        dialogueManager.RegisterOnDialogueEnd(dialogueManager.main, onFinish);
+        dialogueManager.StartDialogue(nodeName);
     }
 
     // -------------------
@@ -169,14 +172,17 @@ public class CharacterDialogueBrain : MonoBehaviour
 
     public bool HasTopicsForPlayer() => characterToPlayerTopics.Count > 0;
 
-    public void TriggerCharacterDialogueWithPlayer()
+    public void TriggerCharacterDialogueWithPlayer(UnityAction onFinish = null)
     {
         if(!CanStartCharacterToPlayerDialogue())
         {
             return;
         }
         SetIntention(DialogueIntention.ToPlayer);
-        GameManager.Instance.GetSystem<DialogueManager>().StartDialogue(GetRandomCharacterToPlayerNode());
+
+        var dialogueManager = GameManager.Instance.GetSystem<DialogueManager>();
+        dialogueManager.RegisterOnDialogueEnd(dialogueManager.main, onFinish);
+        dialogueManager.StartDialogue(GetRandomCharacterToPlayerNode());
     }
 
     private string GetRandomCharacterToPlayerNode()
@@ -207,12 +213,18 @@ public class CharacterDialogueBrain : MonoBehaviour
             monologueTopics.Remove(topic);
     }
 
-    public void TriggerMonologue()
+    public void TriggerMonologue(UnityAction onFinish)
     {
         if (!CanStartCharacterMonologue())
             return;
         SetIntention(DialogueIntention.Monologue);
-        GameManager.Instance.GetSystem<DialogueManager>().StartBackgroundDialogue(GetRandomMonologueNode());
+
+        var dialogueManager = GameManager.Instance.GetSystem<DialogueManager>();
+        var dialogue = dialogueManager.GetAvailableBackgroundRunner();
+
+        dialogueManager.RegisterOnDialogueEnd(dialogue, onFinish);
+
+        dialogue.dialogueRunner.StartDialogue(GetRandomMonologueNode());
     }
 
     private string GetRandomMonologueNode()

@@ -1,6 +1,7 @@
 using GameCreator.Runtime.Common;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using Yarn.Unity;
 using static Unity.Collections.Unicode;
@@ -223,5 +224,18 @@ public class DialogueManager : GameSystem
         StopAllBackgroundDialogue();
     }
 
-    
+    public void RegisterOnDialogueEnd(Dialogue dialogue, UnityAction onFinish)
+    {
+        if (onFinish == null) return;
+
+        void Handler()
+        {
+            dialogue.dialogueRunner.onDialogueComplete.RemoveListener(Handler);
+            onFinish?.Invoke();
+        }
+
+        dialogue.dialogueRunner.onDialogueComplete.AddListener(Handler);
+    }
+
+
 }

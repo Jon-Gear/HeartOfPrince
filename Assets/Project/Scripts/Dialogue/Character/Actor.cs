@@ -50,51 +50,6 @@ public class Actor : MonoBehaviour
         }
     }
 
-
-    /*
-    public void Gesture(string gestureName)
-    {
-        GestureEntry gesture = gestures.FirstOrDefault(g => g.m_Name == gestureName);
-        
-        Debug.Log($"Emote called: {gestureName} for actor: {actorName}");
-
-        Debug.Log($"Gesture found: {gesture != null} with name {gesture.m_Name}");
-
-
-        if (gesture == null)
-        {
-            Debug.LogError($"Emote '{gestureName}' not found for actor '{actorName}'");
-            return;
-        }
-
-        gesture.PlayGesture(character, null);
-    }
-
-    public void EnterState(string animationStateName)
-    {
-        AnimationStateEntry animationState = animationStates.FirstOrDefault(s => s.m_Name == animationStateName);
-
-        if(animationState == null)
-        {
-            Debug.LogError($"Animation state '{animationStateName}' not found for actor '{actorName}'");
-            return;
-        }
-        animationState.EnterAnimationState(character, null);
-    }
-    
-    public void ExitState(string animationStateName)
-    {
-        AnimationStateEntry animationState = animationStates.FirstOrDefault(s => s.m_Name == animationStateName);
-        if(animationState == null)
-        {
-            Debug.LogError($"Animation state '{animationStateName}' not found for actor '{actorName}'");
-            return;
-        }
-        animationState.ExitAnimationState(character, null);
-    }
-    */
-
-
     private void OnDestroy()
     {
         GameManager.Instance.GetSystem<CinemachineManager>().targetGroup.RemoveMember(character.transform);

@@ -1885,7 +1885,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1642900330901539740
 Transform:
   m_ObjectHideFlags: 0
@@ -2683,10 +2683,40 @@ MonoBehaviour:
     m_Property:
       rid: 8339121052726067243
   m_RuntimeData:
-    m_Overrides: []
+    m_Overrides:
+    - rid: 1456250706443895205
+    - rid: 1456250706443895206
   references:
     version: 2
     RefIds:
+    - rid: 1456250706443895205
+      type: {class: Parameter, ns: GameCreator.Runtime.Behavior, asm: GameCreator.Runtime.Behavior}
+      data:
+        m_Breakpoint: 0
+        m_IsEnabled: 1
+        m_Value:
+          rid: 1456250706443895207
+        m_Name: Thing1
+    - rid: 1456250706443895206
+      type: {class: Parameter, ns: GameCreator.Runtime.Behavior, asm: GameCreator.Runtime.Behavior}
+      data:
+        m_Breakpoint: 0
+        m_IsEnabled: 1
+        m_Value:
+          rid: 1456250706443895208
+        m_Name: Thing2
+    - rid: 1456250706443895207
+      type: {class: ValueStat, ns: GameCreator.Runtime.Stats, asm: GameCreator.Runtime.Stats}
+      data:
+        m_Breakpoint: 0
+        m_IsEnabled: 1
+        m_Value: {fileID: 11400000, guid: 19f884e16bf2c3b4798bb41a49b1e34e, type: 2}
+    - rid: 1456250706443895208
+      type: {class: ValueAttribute, ns: GameCreator.Runtime.Stats, asm: GameCreator.Runtime.Stats}
+      data:
+        m_Breakpoint: 0
+        m_IsEnabled: 1
+        m_Value: {fileID: 11400000, guid: 3008368b5664b5042a0aa9f927effedd, type: 2}
     - rid: 8339121052726067243
       type: {class: GetDecimalDecimal, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:

@@ -1,11 +1,12 @@
+using GameCreator.Runtime.Characters;
 using GameCreator.Runtime.Melee;
 using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public class ActivityCharacterMonologue : Activity
+public class ActivityCharacterToPlayerDialogue : Activity
 {
-    public override string Name() => "Activity Character Monologue";
+    public override string Name() => "Activity Character -> Player Dialogue";
 
     bool isWaitingPeriodFinished = true;
     private float minMonologueInterval = 1.0f;
@@ -13,20 +14,18 @@ public class ActivityCharacterMonologue : Activity
 
     public override float EvaluateScore(CharacterBrain brain)
     {
-        if(!isWaitingPeriodFinished)
+        if (!isWaitingPeriodFinished)
         {
             return 0.0f;
         }
 
-        if(!brain.Dialogue().CanStartCharacterMonologue())
+        if (!brain.Dialogue().CanStartCharacterToPlayerDialogue())
         {
             return 0.0f;
         }
 
-        
-        float score = 0.0f;
 
-        score += 0.1f;
+        float score = 1.0f;
 
         // Idea: You can compare traits to lower or higher the score!
         // brain.Traits();
@@ -36,9 +35,11 @@ public class ActivityCharacterMonologue : Activity
 
     public override void Start(CharacterBrain brain)
     {
-        steps.Add(new StartMonologueStep());
+        steps.Add(new ApproachPlayerStep());
+        steps.Add(new StartCharacterToPlayerDialogueStep());
         RechargeTimer();
     }
+
 
     public override void Finish(CharacterBrain brain)
     {

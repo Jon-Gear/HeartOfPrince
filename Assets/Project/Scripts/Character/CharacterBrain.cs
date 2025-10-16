@@ -82,6 +82,10 @@ public class CharacterBrain : MonoBehaviour
     public CharacterDialogueBrain Dialogue() => characterDialogueBrain;
     public CharacterScheduleBrain Schedule() => characterScheduleBrain;
     
+    public Actor Actor()
+    {
+        return GameManager.Instance.GetSystem<ActorRegistry>().GetActorByName(Dialogue().characterName);
+    }
 
 
     void Start()

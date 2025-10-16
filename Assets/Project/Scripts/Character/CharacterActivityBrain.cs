@@ -2,14 +2,50 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public abstract class Activity
+public abstract class ActivityStep
 {
-    public abstract float EvaluateScore(CharacterBrain brain);
-    public abstract bool IsCompleted(CharacterBrain brain);
-
+    public bool IsComplete { get; protected set; }
     public abstract void Start(CharacterBrain brain);
     public abstract void Tick(CharacterBrain brain);
+
+}
+
+public abstract class Activity
+{
+    public abstract string Name();
+
+    protected List<ActivityStep> steps = new List<ActivityStep>();
+    private int currentStepIndex = 0;
+    public abstract float EvaluateScore(CharacterBrain brain);
+    public bool IsCompleted()
+    {
+        return currentStepIndex >= steps.Count;
+    }
+
+    // Execution
+    public abstract void Start(CharacterBrain brain);
+    public void Tick(CharacterBrain brain)
+    {
+        if (IsCompleted())
+        {
+            return;
+        }
+
+        var currentStep = steps[currentStepIndex];
+        currentStep.Tick(brain);
+        if(currentStep.IsComplete)
+        {
+            currentStepIndex++;
+            if (!IsCompleted())
+            {
+                steps[currentStepIndex].Start(brain);
+            }
+        }
+    }
+
     public abstract void Finish(CharacterBrain brain);
+
+    
 
 }
 
@@ -25,7 +61,7 @@ public class CharacterActivityBrain : MonoBehaviour
     {
         if (currentActivity == null)
         {
-            Debug.Log("No activity, successful interruption of Activity");
+            Debug.Log("Current activity is none. Interrupting");
             SwitchActivity(newActivity);
             return;
         }
@@ -50,17 +86,22 @@ public class CharacterActivityBrain : MonoBehaviour
     public void AddActivity(Activity newActivity)
     {
         availableActivities.Add(newActivity);
+        Debug.Log($"Added activity {newActivity.Name()}");
     }
 
     public void RemoveActivity(Activity oldActivity)
     {
         availableActivities.Remove(oldActivity);
+        Debug.Log($"removed activity {oldActivity.Name()}");
     }
     private void ChooseNewActivity()
     {
         Activity newActivity = ChooseHighestScoringActivity();
-        
-        //if (newActivity == null) return;
+
+        if (newActivity != null)
+        {
+            Debug.Log($"Chose activity {newActivity?.Name()}");
+        }
 
         SwitchActivity(newActivity);
     }
@@ -107,7 +148,7 @@ public class CharacterActivityBrain : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(currentActivity == null || currentActivity.IsCompleted(brain))
+        if(currentActivity == null || currentActivity.IsCompleted())
         {
             ChooseNewActivity();
         }

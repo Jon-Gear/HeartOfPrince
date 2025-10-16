@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class ActivityPlayerToCharacterDialogue : Activity
 {
+    public override string Name() => "Activity Player -> Character Dialogue";
     public override float EvaluateScore(CharacterBrain brain)
     {   
         if(!brain.Dialogue().CanStartPlayerToCharacterDialogue())
@@ -21,30 +22,15 @@ public class ActivityPlayerToCharacterDialogue : Activity
         return score;
     }
 
-    public override bool IsCompleted(CharacterBrain brain)
-    {
-        return brain.Dialogue().IsFree == true;
-    }
-
     public override void Start(CharacterBrain brain)
     {
-        
-        var dialogueManager = GameManager.Instance.GetSystem<DialogueManager>();
-        var playerCharacter = GameManager.Instance.GetSystem<CharacterManager>().GetPlayerCharacter();
+        steps.Add(new StartPlayerToCharacterDialogueStep());
 
-        if (playerCharacter.Traits().GetAttribute("attribute-energy") == 0.0f)
-        {
-            dialogueManager.StartDialogue("prince_tired");
-            return;
-        }
-
-        brain.Dialogue().TriggerPlayerDialogueWithCharacter();
-    }
-
-    public override void Tick(CharacterBrain brain)
-    {
     }
     public override void Finish(CharacterBrain brain)
     {
+        steps.Clear();
     }
+
+    
 }

@@ -23,6 +23,12 @@ public class PlayerStartDialogue : MonoBehaviour
 
     public void StartDialogue()
     {
+        var dialogueManager = GameManager.Instance.GetSystem<DialogueManager>();
+        if(dialogueManager.main.IsRunning())
+        {
+            return;
+        }
+
         characterActor.Brain().Activity().InterruptActivity(activityPlayerToCharacterDialogue);
     }
 }
