@@ -8,8 +8,6 @@ public class CharacterStartMonologue : MonoBehaviour
     [SerializeField] private Actor characterActor;
     [SerializeField] private TriggerCollider detectionCollider;
 
-    private ActivityCharacterMonologue activityCharacterMonologue = new ActivityCharacterMonologue();
-
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -20,11 +18,11 @@ public class CharacterStartMonologue : MonoBehaviour
 
     void OnPlayerInRange(Collider other)
     {
-        characterActor.Brain().Activity().AddActivity(activityCharacterMonologue);
+        characterActor.Brain().Activity().AddActivity<ActivityCharacterMonologue>();
     }
 
     void OnPlayerOutOfRange(Collider other)
     {
-        characterActor.Brain().Activity().RemoveActivity(activityCharacterMonologue);
+        characterActor.Brain().Activity().RemoveActivity<ActivityCharacterMonologue>();
     }
 }

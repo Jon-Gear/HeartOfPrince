@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class StartMonologueStep : ActivityStep
 {
+    
+
     public override void Start(CharacterBrain brain)
     {
         brain.Dialogue().TriggerMonologue(OnFinish);
@@ -11,10 +13,16 @@ public class StartMonologueStep : ActivityStep
     public override void Tick(CharacterBrain brain)
     {
 
+    
+    }
+
+    public override void Finish(CharacterBrain brain)
+    {
     }
 
     private void OnFinish()
     {
-        IsComplete = false;
+        Debug.Log("Finished monologue");
+        IsComplete = true;
     }
 }

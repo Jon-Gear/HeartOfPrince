@@ -80,10 +80,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 62f91d9913a3f4042a2b1e4df1ed393b, type: 2}
   - {fileID: 11400000, guid: 29c30a76c76e8854495dfd27302bf3f3, type: 2}
   - {fileID: 11400000, guid: c5332ada86902b04785eef030f37d392, type: 2}
-  CurrentDialogue:
-    dialogueRunner: {fileID: 0}
-    currentSpeaker: {fileID: 0}
-    activeActors: []
 --- !u!114 &7975221337139972833
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -220,10 +216,6 @@ MonoBehaviour:
   playerToCharacterTopics: []
   monologueTopics: []
   characterToCharacterTopics: []
-  CurrentDialogue:
-    dialogueRunner: {fileID: 0}
-    currentSpeaker: {fileID: 0}
-    activeActors: []
 --- !u!114 &3047599449274656551
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -348,10 +340,6 @@ MonoBehaviour:
   playerToCharacterTopics: []
   monologueTopics: []
   characterToCharacterTopics: []
-  CurrentDialogue:
-    dialogueRunner: {fileID: 0}
-    currentSpeaker: {fileID: 0}
-    activeActors: []
 --- !u!114 &7794082830686437092
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -526,10 +514,6 @@ MonoBehaviour:
   playerToCharacterTopics: []
   monologueTopics: []
   characterToCharacterTopics: []
-  CurrentDialogue:
-    dialogueRunner: {fileID: 0}
-    currentSpeaker: {fileID: 0}
-    activeActors: []
 --- !u!114 &4019782535929561864
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -653,10 +637,6 @@ MonoBehaviour:
   playerToCharacterTopics: []
   monologueTopics: []
   characterToCharacterTopics: []
-  CurrentDialogue:
-    dialogueRunner: {fileID: 0}
-    currentSpeaker: {fileID: 0}
-    activeActors: []
 --- !u!114 &7065685670463842069
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -896,15 +876,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characterName: Munir
-  characterToPlayerTopics: []
+  characterToPlayerTopics:
+  - {fileID: 11400000, guid: 41ed1801966ffc6459aa77d3626e6641, type: 2}
   playerToCharacterTopics: []
   monologueTopics:
   - {fileID: 11400000, guid: c20fd46b64d66fd48b1943c67cdb69d9, type: 2}
   characterToCharacterTopics: []
-  CurrentDialogue:
-    dialogueRunner: {fileID: 0}
-    currentSpeaker: {fileID: 0}
-    activeActors: []
 --- !u!114 &8202277155980889759
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -917,7 +894,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 816dd8847e02f164c80a6ee73daeb789, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  routine: {fileID: 11400000, guid: a75c6c5f2d6a7b6489506a73694cf61f, type: 2}
+  routine: {fileID: 11400000, guid: 2d27e1a645de6c245939b514b3dc2612, type: 2}
   currentEntry:
     TimePeriod: 00:00-24:00
     sceneName: 

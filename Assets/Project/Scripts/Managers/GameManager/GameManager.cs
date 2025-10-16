@@ -34,6 +34,13 @@ public class GameManager : MonoBehaviour
         }
     }
 
+
+    public Level GetLevel()
+    {
+        return FindFirstObjectByType<Level>();
+    }
+
+
     /// <summary>
     /// Get a system of a specific type
     /// </summary>

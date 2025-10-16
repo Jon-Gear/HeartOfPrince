@@ -75,28 +75,25 @@ public class CharacterScheduleBrain : MonoBehaviour
 
     private void LeaveScene()
     {
-        Level level = FindFirstObjectByType<Level>();
-        characterBrain.MoveCharacterToMarkerThenDespawn(level.GetRandomExit());
+        characterBrain.Activity().AddActivity<ActivityExitScene>();
     }
 
     private void MoveInScene()
     {
-        Level level = FindFirstObjectByType<Level>();
-        characterBrain.MoveCharacterToMarkerID(currentEntry.markerID);
+        //Level level = FindFirstObjectByType<Level>();
+        //characterBrain.MoveCharacterToMarkerID(currentEntry.markerID);
     }
 
     private void SpawnInScene()
     {
-        characterBrain.SpawnCharacterAtMarkerID(currentEntry.markerID);
+        // TODO: This needs to be different!
+        characterBrain.Activity().AddActivity<ActivityEnterScene>();
     }
 
 
-    private async Task EnterScene()
+    private void EnterScene()
     {
-        Level level = FindFirstObjectByType<Level>();
-        characterBrain.SpawnCharacterAtMarker(level.GetRandomEntrance());
-        await Task.Yield();
-        characterBrain.MoveCharacterToMarkerID(currentEntry.markerID);
+        characterBrain.Activity().AddActivity<ActivityEnterScene>();
     }
 
 

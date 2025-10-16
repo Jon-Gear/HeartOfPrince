@@ -25,6 +25,7 @@ public class Actor : MonoBehaviour
     public Character Character() => character;
     public CharacterBrain Brain() => characterBrain;
 
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private void Start()
     {
@@ -49,6 +50,9 @@ public class Actor : MonoBehaviour
             GameManager.Instance.GetSystem<CinemachineManager>().longShot.PreviousStateIsValid = false;
         }
     }
+
+
+
 
     private void OnDestroy()
     {

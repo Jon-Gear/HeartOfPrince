@@ -34,15 +34,12 @@ public class ActivityCharacterMonologue : Activity
         return score;
     }
 
-    public override void Start(CharacterBrain brain)
+    protected override void CreateSteps(CharacterBrain brain)
     {
         steps.Add(new StartMonologueStep());
-        RechargeTimer();
     }
-
-    public override void Finish(CharacterBrain brain)
+    protected override void Init(CharacterBrain brain)
     {
-        steps.Clear();
     }
 
     private async void RechargeTimer()
@@ -50,5 +47,10 @@ public class ActivityCharacterMonologue : Activity
         isWaitingPeriodFinished = false;
         await Task.Delay((int)(Random.Range(minMonologueInterval, maxMonologueInterval) * 1000));
         isWaitingPeriodFinished = true;
+    }
+
+    protected override void Shutdown(CharacterBrain brain)
+    {
+        RechargeTimer();
     }
 }

@@ -1,6 +1,7 @@
 using GameCreator.Runtime.Characters;
 using GameCreator.Runtime.Common;
 using GameCreator.Runtime.Dialogue;
+using GameCreator.Runtime.Melee;
 using GameCreator.Runtime.Stats;
 using Tools;
 using UnityEngine;
@@ -96,17 +97,7 @@ public class CharacterBrain : MonoBehaviour
         characterScheduleBrain = GetComponent<CharacterScheduleBrain>();
     }
 
-
-
-
-
-
-
-    #region hidden
-
-    // I don't think it is supposed to be doing this.
-
-    public void SpawnCharacterAtMarker(Marker marker)
+    public void SpawnActor(Marker spawnMarker)
     {
         if (Prefab() == null)
         {
@@ -115,60 +106,25 @@ public class CharacterBrain : MonoBehaviour
         }
 
         Vector3 offset = new Vector3(0, 1, 0);
-
-        GameObject instance = Instantiate(Prefab(), marker.transform.position + offset, marker.transform.rotation);
-
+        Instantiate(Prefab(), spawnMarker.transform.position + offset, spawnMarker.transform.rotation);
     }
 
-    public void SpawnCharacterAtMarkerID(string markerID)
-    {
-        Marker targetMarker = Marker.GetMarkerByID(markerID);
 
-        if (targetMarker == null)
+    public void DespawnActor()
+    {
+        Actor actor = Actor();
+        if(actor != null) 
         {
-            Debug.LogWarning($"SpawnCharacter: No Marker found with ID '{markerID}'.");
-            return;
+            Destroy(actor.gameObject);
         }
-
-        SpawnCharacterAtMarker(targetMarker);
-    }
-
-    public void DespawnCharacter(Character character, bool foo)
-    {
-        Destroy(character.gameObject);
     }
 
 
-    public void MoveCharacterToMarkerThenDespawn(Marker marker)
-    {
-        var actorRegistry = GameManager.Instance.GetSystem<ActorRegistry>();
 
-        Actor actor = actorRegistry.GetActorByName(Dialogue().characterName);
 
-        if (actor == null)
-        {
-            Debug.LogWarning($"{Dialogue().characterName} character not found");
-            return;
-        }
+    #region hidden
 
-        actor.Character().Motion.MoveToMarker(marker, 0.1f, DespawnCharacter);
-    }
-
-    public void MoveCharacterToMarkerIDThenDespawn(string markerID)
-    {
-        
-        Marker targetMarker = Marker.GetMarkerByID(markerID);
-
-        if (targetMarker == null)
-        {
-            Debug.LogWarning($"SpawnCharacter: No Marker found with ID '{markerID}'.");
-            return;
-        }
-
-        MoveCharacterToMarkerThenDespawn(targetMarker);
-
-    }
-
+    // I don't think it is supposed to be doing this.
     public void MoveCharacterToMarkerID(string markerID)
     {
         var actorRegistry = GameManager.Instance.GetSystem<ActorRegistry>();

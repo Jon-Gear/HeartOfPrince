@@ -22,15 +22,16 @@ public class ActivityPlayerToCharacterDialogue : Activity
         return score;
     }
 
-    public override void Start(CharacterBrain brain)
+    protected override void CreateSteps(CharacterBrain brain)
     {
         steps.Add(new StartPlayerToCharacterDialogueStep());
-
     }
-    public override void Finish(CharacterBrain brain)
+
+    protected override void Init(CharacterBrain brain)
     {
-        steps.Clear();
     }
 
-    
+    protected override void Shutdown(CharacterBrain brain)
+    {
+    }
 }

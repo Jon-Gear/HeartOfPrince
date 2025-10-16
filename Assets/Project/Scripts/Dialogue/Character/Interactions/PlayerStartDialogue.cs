@@ -6,8 +6,7 @@ public class PlayerStartDialogue : MonoBehaviour
 {
     [SerializeField] private Actor characterActor;
 
-    private ActivityPlayerToCharacterDialogue activityPlayerToCharacterDialogue = new ActivityPlayerToCharacterDialogue();
-
+    
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -29,6 +28,6 @@ public class PlayerStartDialogue : MonoBehaviour
             return;
         }
 
-        characterActor.Brain().Activity().InterruptActivity(activityPlayerToCharacterDialogue);
+        characterActor.Brain().Activity().ForceStartActivity<ActivityPlayerToCharacterDialogue>();
     }
 }

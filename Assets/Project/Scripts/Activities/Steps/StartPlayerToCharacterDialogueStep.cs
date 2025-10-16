@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class StartPlayerToCharacterDialogueStep : ActivityStep
 {
+    
     public override void Start(CharacterBrain brain)
     {
         var dialogueManager = GameManager.Instance.GetSystem<DialogueManager>();
@@ -19,6 +20,11 @@ public class StartPlayerToCharacterDialogueStep : ActivityStep
     public override void Tick(CharacterBrain brain)
     {
     }
+
+    public override void Finish(CharacterBrain brain)
+    {
+    }
+
 
     private void OnFinish()
     {
