@@ -68,11 +68,7 @@ public abstract class Activity
 
             currentStepIndex++;
 
-            if (IsCompleted())
-            {
-                Finish(brain);
-            }
-            else
+            if (!IsCompleted())
             {
                 steps[currentStepIndex].Start(brain);
             }
@@ -93,8 +89,8 @@ public abstract class Activity
 
     public void Finish(CharacterBrain brain)
     {
-        Shutdown(brain);
         steps.Clear();
+        Shutdown(brain);
     }
 }
 
@@ -105,6 +101,12 @@ public class CharacterActivityBrain : MonoBehaviour
     private List<Activity> availableActivities = new();
     private Stack<Activity> currentActivities = new();
 
+
+    public void ClearAllActivities()
+    {
+        currentActivities.Clear();
+        availableActivities.Clear();
+    }
 
     public void ForceStartActivity<T>() where T : Activity, new()
     {
@@ -139,8 +141,6 @@ public class CharacterActivityBrain : MonoBehaviour
 
     private void StartNewActivity(Activity newActivity)
     {
-        
-
         if (newActivity != null)
         {
             if (currentActivities.Count > 0)
@@ -155,13 +155,13 @@ public class CharacterActivityBrain : MonoBehaviour
     }
     private void FinishCurrentActivity()
     {
-        if (currentActivities.Count != 0)
+        if (currentActivities.Count > 0)
         {
             Debug.Log($"Finished activity {currentActivities.Peek().Name()}");
             currentActivities.Peek().Finish(brain);
             currentActivities.Pop();
 
-            if (currentActivities.Count != 0)
+            if (currentActivities.Count > 0)
             {
                 Debug.Log($"Continuing activity {currentActivities.Peek().Name()}");
                 currentActivities.Peek().Continue(brain);
@@ -209,14 +209,14 @@ public class CharacterActivityBrain : MonoBehaviour
             StartNewActivity(ChooseHighestScoringActivity());
         }
 
+        if (currentActivities.Count > 0)
+        {
+            currentActivities.Peek().Tick(brain);
+        }
+
         if (currentActivities.Count > 0 && currentActivities.Peek().IsCompleted())
         {
             FinishCurrentActivity();
-        }
-
-        if(currentActivities.Count > 0)
-        {
-            currentActivities.Peek().Tick(brain);
         }
     }
 }

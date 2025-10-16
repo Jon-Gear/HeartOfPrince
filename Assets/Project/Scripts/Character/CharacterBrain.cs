@@ -115,6 +115,7 @@ public class CharacterBrain : MonoBehaviour
         Actor actor = Actor();
         if(actor != null) 
         {
+            Activity().ClearAllActivities();
             Destroy(actor.gameObject);
         }
     }

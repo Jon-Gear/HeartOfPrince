@@ -13,7 +13,7 @@ public class GoToMarkerStep : ActivityStep
 
     public override void Start(CharacterBrain brain)
     {
-        brain.Actor().Character().Motion.MoveToMarker(targetMarker, 0.1f, OnMarkerReached);
+        brain.Actor()?.Character().Motion.MoveToMarker(targetMarker, 0.1f, OnMarkerReached);
     }
 
     public override void Tick(CharacterBrain brain)
@@ -22,20 +22,15 @@ public class GoToMarkerStep : ActivityStep
 
     public override void Finish(CharacterBrain brain)
     {
-        brain.Actor().Character().Motion.StopToDirection();
+        brain.Actor()?.Character().Motion.StopToDirection();
     }
 
-    public void OnMarkerReached(Character character, bool hasReached)
+    private void OnMarkerReached(Character character, bool hasReached)
     {
         if(hasReached)
         {
             IsComplete = true;
             Debug.Log("Destination reached");
-        }
-        else
-        {
-            IsComplete = false;
-            Debug.Log("Destination not reached");
         }
     }
 
