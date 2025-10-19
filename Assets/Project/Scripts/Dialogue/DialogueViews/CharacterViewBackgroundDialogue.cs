@@ -8,8 +8,9 @@ using Yarn.Unity;
 using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(Canvas))]
-public class CharacterViewBackgroundDialogue : DialogueViewBase 
+public class CharacterViewBackgroundDialogue 
 {
+    /*
     [SerializeField, Range(1, 3)]
     private int backgroundDialogueIndex = 1;
     [Tooltip("for best results, set the rectTransform anchors to middle-center, and make sure the rectTransform's pivot Y is set to 0")]
@@ -52,4 +53,5 @@ public class CharacterViewBackgroundDialogue : DialogueViewBase
             dialogueRect.anchoredPosition = ScreenEffectUtils.AnchorToWorldPosition(dialogueRect, dialogue.GetSpeaker().positionWithOffset, canvas, Camera.main);
         }
     }
+    */
 }

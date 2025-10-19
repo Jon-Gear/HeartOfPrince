@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class ActivityCharacterMonologue : Activity
 {
-    public override string Name() => "Activity Character Monologue";
 
     bool isWaitingPeriodFinished = true;
     private float minMonologueInterval = 1.0f;

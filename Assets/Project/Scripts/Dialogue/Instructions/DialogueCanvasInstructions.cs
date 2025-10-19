@@ -14,10 +14,10 @@ using Yarn.Unity;
 [Serializable]
 public class ContinueToNextLine : Instruction
 {
-    [SerializeField] LineView lineView;
+    //[SerializeField] LineView lineView;
     protected override Task Run(Args args)
     {
-        lineView.OnContinueClicked();
+        //lineView.OnContinueClicked();
         return DefaultResult;
     }
 }
@@ -29,10 +29,10 @@ public class ContinueToNextLine : Instruction
 [Serializable]
 public class NextOption : Instruction
 {
-    [SerializeField] SingleOptionsBubble optionView;
+    //[SerializeField] SingleOptionsBubble optionView;
     protected override Task Run(Args args)
     {
-        optionView.NextOption();
+        //optionView.NextOption();
         return DefaultResult;
     }
 }
@@ -43,10 +43,10 @@ public class NextOption : Instruction
 [Serializable]
 public class PrevOption : Instruction
 {
-    [SerializeField] SingleOptionsBubble optionView;
+    //[SerializeField] SingleOptionsBubble optionView;
     protected override Task Run(Args args)
     {
-        optionView.PrevOption();
+        //optionView.PrevOption();
         return DefaultResult;
     }
 }

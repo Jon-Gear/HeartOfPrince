@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class ActivityPlayerToCharacterDialogue : Activity
 {
-    public override string Name() => "Activity Player -> Character Dialogue";
     public override float EvaluateScore(CharacterBrain brain)
     {   
         if(!brain.Dialogue().CanStartPlayerToCharacterDialogue())

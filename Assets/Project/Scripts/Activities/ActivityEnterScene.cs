@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class ActivityEnterScene : Activity
 {
-    public override string Name() => "Enter Scene";
     
     public override float EvaluateScore(CharacterBrain brain)
     {

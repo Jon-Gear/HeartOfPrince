@@ -6,7 +6,6 @@ using UnityEngine;
 
 public class ActivityCharacterToPlayerDialogue : Activity
 {
-    public override string Name() => "Activity Character -> Player Dialogue";
 
     private bool isWaitingPeriodFinished = true;
     private float minInterval = 1.0f;

@@ -27,10 +27,15 @@ public class GoToMarkerStep : ActivityStep
 
     private void OnMarkerReached(Character character, bool hasReached)
     {
-        if(hasReached)
+        if (hasReached)
         {
             IsComplete = true;
             Debug.Log("Destination reached");
+        }
+        else
+        {
+            IsComplete = true;
+            Debug.Log("Destination not reached");
         }
     }
 

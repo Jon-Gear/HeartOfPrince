@@ -6,19 +6,32 @@ using UnityEngine;
 using UnityEngine.UI;
 using Yarn.Unity;
 using UnityEngine.SceneManagement;
+using System.Threading;
 
 [RequireComponent(typeof(Canvas))]
-public class CharacterViewMainDialogue : DialogueViewBase
+public class CharacterViewMainDialogue
 {
+    /**
     [Tooltip("for best results, set the rectTransform anchors to middle-center, and make sure the rectTransform's pivot Y is set to 0")]
     public RectTransform[] dialogueRects;
 
     private Canvas canvas;
 
-    public override void RunLine(LocalizedLine dialogueLine, Action onDialogueLineFinished)
+    public override YarnTask OnDialogueCompleteAsync()
+    {
+        throw new NotImplementedException();
+    }
+
+    public override YarnTask OnDialogueStartedAsync()
+    {
+        throw new NotImplementedException();
+    }
+
+
+    public override YarnTask RunLineAsync(LocalizedLine line, LineCancellationToken token)
     {
         var dialogueManager = GameManager.Instance.GetSystem<DialogueManager>();
-        dialogueManager.main.SetSpeaker(dialogueLine.CharacterName);
+        dialogueManager.main.SetSpeaker(line.CharacterName);
         dialogueManager.main.RunLine();
 
         onDialogueLineFinished();
@@ -26,11 +39,18 @@ public class CharacterViewMainDialogue : DialogueViewBase
 
     public override void RunOptions(DialogueOption[] dialogueOptions, Action<int> onOptionSelected)
     {
+    }
+
+    public override YarnTask<DialogueOption> RunOptionsAsync(DialogueOption[] dialogueOptions, CancellationToken cancellationToken)
+    {
         base.RunOptions(dialogueOptions, onOptionSelected);
         var actorRegistry = GameManager.Instance.GetSystem<ActorRegistry>();
 
 
         GameManager.Instance.GetSystem<DialogueManager>().main.SetSpeaker(actorRegistry.playerActor.actorName);
+
+        return YarnTask<DialogueOption>.FromResult(null);
+
     }
 
     private void Start()
@@ -51,4 +71,5 @@ public class CharacterViewMainDialogue : DialogueViewBase
             }
         }
     }
+    /**/
 }

@@ -213,7 +213,6 @@ MonoBehaviour:
       data:
         m_Breakpoint: 0
         m_IsEnabled: 1
-        lineView: {fileID: 8953670661167782182}
 --- !u!61 &3893103228865081000
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -551,7 +550,6 @@ GameObject:
   - component: {fileID: 4943672731628831756}
   - component: {fileID: 8810893069624974209}
   - component: {fileID: 1141530030447318929}
-  - component: {fileID: 8353111598399133138}
   - component: {fileID: 4908641253410292859}
   m_Layer: 5
   m_Name: BackgroundDialogueBubble1
@@ -660,41 +658,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &8353111598399133138
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 816894872104732305}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ddcdd604a328c4ab296f048eb7b3a925, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  canvasGroup: {fileID: 4908641253410292859}
-  useFadeEffect: 1
-  fadeInTime: 0.25
-  fadeOutTime: 0.05
-  lineText: {fileID: 5009049889984566771}
-  showCharacterNameInLineView: 0
-  characterNameText: {fileID: 7430019802571268845}
-  characterNameContainer: {fileID: 7609679689439476648}
-  useTypewriterEffect: 1
-  onCharacterTyped:
-    m_PersistentCalls:
-      m_Calls: []
-  onPauseStarted:
-    m_PersistentCalls:
-      m_Calls: []
-  onPauseEnded:
-    m_PersistentCalls:
-      m_Calls: []
-  typewriterEffectSpeed: 40
-  continueButton: {fileID: 5451089195215458700}
-  holdTime: 1.5
-  autoAdvance: 1
-  palette: {fileID: 0}
 --- !u!225 &4908641253410292859
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -856,7 +819,6 @@ GameObject:
   - component: {fileID: 681975804155460290}
   - component: {fileID: 6517774958198931269}
   - component: {fileID: 738697394123260989}
-  - component: {fileID: 8773284520502523811}
   - component: {fileID: 6106792896014320078}
   m_Layer: 5
   m_Name: BackgroundDialogueBubble2
@@ -965,41 +927,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &8773284520502523811
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2085715640623612216}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ddcdd604a328c4ab296f048eb7b3a925, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  canvasGroup: {fileID: 6106792896014320078}
-  useFadeEffect: 1
-  fadeInTime: 0.25
-  fadeOutTime: 0.05
-  lineText: {fileID: 6522621112250885627}
-  showCharacterNameInLineView: 0
-  characterNameText: {fileID: 5723762419392259101}
-  characterNameContainer: {fileID: 9203679233246308031}
-  useTypewriterEffect: 1
-  onCharacterTyped:
-    m_PersistentCalls:
-      m_Calls: []
-  onPauseStarted:
-    m_PersistentCalls:
-      m_Calls: []
-  onPauseEnded:
-    m_PersistentCalls:
-      m_Calls: []
-  typewriterEffectSpeed: 40
-  continueButton: {fileID: 7847369606822181384}
-  holdTime: 1.5
-  autoAdvance: 1
-  palette: {fileID: 0}
 --- !u!225 &6106792896014320078
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -1297,7 +1224,6 @@ GameObject:
   - component: {fileID: 554338214545774322}
   - component: {fileID: 8854937028505522314}
   - component: {fileID: 5802598460787027754}
-  - component: {fileID: 2234779087835993815}
   - component: {fileID: 1642216191592064544}
   m_Layer: 5
   m_Name: BackgroundDialogueBubble3
@@ -1406,41 +1332,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &2234779087835993815
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2722793848587392329}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ddcdd604a328c4ab296f048eb7b3a925, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  canvasGroup: {fileID: 1642216191592064544}
-  useFadeEffect: 1
-  fadeInTime: 0.25
-  fadeOutTime: 0.05
-  lineText: {fileID: 4967847512752456289}
-  showCharacterNameInLineView: 0
-  characterNameText: {fileID: 7795129131967370153}
-  characterNameContainer: {fileID: 734496180625004818}
-  useTypewriterEffect: 1
-  onCharacterTyped:
-    m_PersistentCalls:
-      m_Calls: []
-  onPauseStarted:
-    m_PersistentCalls:
-      m_Calls: []
-  onPauseEnded:
-    m_PersistentCalls:
-      m_Calls: []
-  typewriterEffectSpeed: 40
-  continueButton: {fileID: 4919706472899019841}
-  holdTime: 1.5
-  autoAdvance: 1
-  palette: {fileID: 0}
 --- !u!225 &1642216191592064544
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -1603,8 +1494,6 @@ GameObject:
   - component: {fileID: 4021800067377907867}
   - component: {fileID: 7324209766542853377}
   - component: {fileID: 446102796740859756}
-  - component: {fileID: 1037011224553515830}
-  - component: {fileID: 7109546144064139970}
   - component: {fileID: 6979078137345552096}
   m_Layer: 5
   m_Name: DialogueOptionsBubble
@@ -1725,67 +1614,6 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
---- !u!114 &1037011224553515830
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4540035742964640866}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9bee9d4e3dbf4a7459d106b7007d8172, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  canvasGroup: {fileID: 446102796740859756}
-  lineText: {fileID: 3183065740307463336}
-  prevOption: {fileID: 8149315889595942864}
-  nextOption: {fileID: 7483746604808428818}
-  fadeTime: 0.1
---- !u!114 &7109546144064139970
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4540035742964640866}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4b2a56d6679de44298207eec0bbcf044, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Navigation:
-    m_Mode: 0
-    m_WrapAround: 0
-    m_SelectOnUp: {fileID: 0}
-    m_SelectOnDown: {fileID: 0}
-    m_SelectOnLeft: {fileID: 0}
-    m_SelectOnRight: {fileID: 0}
-  m_Transition: 1
-  m_Colors:
-    m_NormalColor: {r: 0.6792453, g: 0.54366606, b: 0.46457815, a: 1}
-    m_HighlightedColor: {r: 0.92156863, g: 0.8666667, b: 0.85490197, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.92156863, g: 0.8666667, b: 0.85490197, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
-    m_ColorMultiplier: 1
-    m_FadeDuration: 0.1
-  m_SpriteState:
-    m_HighlightedSprite: {fileID: 0}
-    m_PressedSprite: {fileID: 0}
-    m_SelectedSprite: {fileID: 0}
-    m_DisabledSprite: {fileID: 0}
-  m_AnimationTriggers:
-    m_NormalTrigger: Normal
-    m_HighlightedTrigger: Highlighted
-    m_PressedTrigger: Pressed
-    m_SelectedTrigger: Selected
-    m_DisabledTrigger: Disabled
-  m_Interactable: 1
-  m_TargetGraphic: {fileID: 7324209766542853377}
-  text: {fileID: 3183065740307463336}
-  showCharacterName: 0
-  palette: {fileID: 11400000, guid: 0dbdbcc0ff0aa0547abe494646d6ef61, type: 2}
 --- !u!95 &6979078137345552096
 Animator:
   serializedVersion: 7
@@ -2021,7 +1849,6 @@ MonoBehaviour:
       data:
         m_Breakpoint: 0
         m_IsEnabled: 1
-        lineView: {fileID: 2234779087835993815}
 --- !u!61 &8139950806661517988
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -2081,7 +1908,6 @@ GameObject:
   - component: {fileID: 8378680367482385830}
   - component: {fileID: 5557380766700329826}
   - component: {fileID: 4333259031019759750}
-  - component: {fileID: 8953670661167782182}
   - component: {fileID: 3465314905929691280}
   m_Layer: 5
   m_Name: DialogueBubble
@@ -2190,41 +2016,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &8953670661167782182
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5040743080728836467}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ddcdd604a328c4ab296f048eb7b3a925, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  canvasGroup: {fileID: 3465314905929691280}
-  useFadeEffect: 1
-  fadeInTime: 0.25
-  fadeOutTime: 0.05
-  lineText: {fileID: 8699201160068830563}
-  showCharacterNameInLineView: 0
-  characterNameText: {fileID: 96591853667265992}
-  characterNameContainer: {fileID: 730785101114347567}
-  useTypewriterEffect: 1
-  onCharacterTyped:
-    m_PersistentCalls:
-      m_Calls: []
-  onPauseStarted:
-    m_PersistentCalls:
-      m_Calls: []
-  onPauseEnded:
-    m_PersistentCalls:
-      m_Calls: []
-  typewriterEffectSpeed: 40
-  continueButton: {fileID: 706610475276083532}
-  holdTime: 1
-  autoAdvance: 0
-  palette: {fileID: 11400000, guid: 0dbdbcc0ff0aa0547abe494646d6ef61, type: 2}
 --- !u!225 &3465314905929691280
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -2450,7 +2241,6 @@ MonoBehaviour:
       data:
         m_Breakpoint: 0
         m_IsEnabled: 1
-        lineView: {fileID: 8353111598399133138}
 --- !u!61 &3441508214898050824
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -2506,10 +2296,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5557164942541840013}
-  - component: {fileID: 113916444299078164}
-  - component: {fileID: 4920875560073657490}
-  - component: {fileID: 2547365652301860369}
-  - component: {fileID: 3806116696375099116}
   - component: {fileID: 7340130246056279852}
   - component: {fileID: 342909655742903584}
   - component: {fileID: 5927958440008966704}
@@ -2544,63 +2330,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!114 &113916444299078164
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6442762486157110085}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4dac26e25f4d08342b48e6c382767142, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dialogueRects:
-  - {fileID: 6297321883113728224}
-  - {fileID: 493957158750087317}
---- !u!114 &4920875560073657490
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6442762486157110085}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 28705a2f60930774a858184881fe5f9e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  backgroundDialogueIndex: 1
-  dialogueRect: {fileID: 8225246014917899419}
---- !u!114 &2547365652301860369
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6442762486157110085}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 28705a2f60930774a858184881fe5f9e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  backgroundDialogueIndex: 2
-  dialogueRect: {fileID: 4389676395884368316}
---- !u!114 &3806116696375099116
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6442762486157110085}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 28705a2f60930774a858184881fe5f9e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  backgroundDialogueIndex: 3
-  dialogueRect: {fileID: 1891722081714133135}
 --- !u!223 &7340130246056279852
 Canvas:
   m_ObjectHideFlags: 0
@@ -3080,8 +2809,8 @@ MonoBehaviour:
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
-    m_SelectOnLeft: {fileID: 7109546144064139970}
-    m_SelectOnRight: {fileID: 7109546144064139970}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
   m_Transition: 0
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
@@ -3125,12 +2854,13 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
     - rid: 1724515046714245737
       type: {class: NextOption, ns: , asm: Assembly-CSharp}
       data:
         m_Breakpoint: 0
         m_IsEnabled: 1
-        optionView: {fileID: 1037011224553515830}
     - rid: 1724515046714245742
       type: {class: EventOnInputButton, ns: GameCreator.Runtime.VisualScripting, asm: GameCreator.Runtime.Core}
       data:
@@ -3702,7 +3432,6 @@ MonoBehaviour:
       data:
         m_Breakpoint: 0
         m_IsEnabled: 1
-        lineView: {fileID: 8773284520502523811}
 --- !u!61 &748655088021518495
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -4165,8 +3894,8 @@ MonoBehaviour:
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
-    m_SelectOnLeft: {fileID: 7109546144064139970}
-    m_SelectOnRight: {fileID: 7109546144064139970}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
   m_Transition: 0
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
@@ -4210,12 +3939,13 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
     - rid: 1724515046714245736
       type: {class: PrevOption, ns: , asm: Assembly-CSharp}
       data:
         m_Breakpoint: 0
         m_IsEnabled: 1
-        optionView: {fileID: 1037011224553515830}
     - rid: 1724515046714245738
       type: {class: EventOnInputButton, ns: GameCreator.Runtime.VisualScripting, asm: GameCreator.Runtime.Core}
       data:

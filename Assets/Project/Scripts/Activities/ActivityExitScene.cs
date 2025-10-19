@@ -2,8 +2,6 @@ using UnityEngine;
 
 public class ActivityExitScene : Activity
 {
-    public override string Name() => "Exit Scene";
-
     public override float EvaluateScore(CharacterBrain brain)
     {
         return 1.0f;
@@ -23,6 +21,5 @@ public class ActivityExitScene : Activity
 
     protected override void Shutdown(CharacterBrain brain)
     {
-        brain.Activity().RemoveActivity<ActivityExitScene>();
     }
 }

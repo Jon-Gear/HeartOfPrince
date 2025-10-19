@@ -64,7 +64,9 @@ public class Dialogue
 
     private void OnNodeStart(string nodeName)
     {
+        /*
         var actorRegistry = GameManager.Instance.GetSystem<ActorRegistry>();
+
 
         IEnumerable<string> tags = dialogueRunner.GetTagsForNode(nodeName);
         foreach (var tag in tags)
@@ -89,6 +91,7 @@ public class Dialogue
 
         var timeManager = GameManager.Instance.GetSystem<TimeManager>();
         timeManager.StopTime();
+        */
     }
 
     public void RunLine()
@@ -99,6 +102,7 @@ public class Dialogue
 
     private void OnNodeComplete(string nodeName)
     {
+        /*
         var actorRegistry = GameManager.Instance.GetSystem<ActorRegistry>();
 
         int energy_cost = 0;
@@ -140,6 +144,7 @@ public class Dialogue
         playerCharacter.Traits().AttributeSubtract("attribute-energy", energy_cost);
         var timeManager = GameManager.Instance.GetSystem<TimeManager>();
         timeManager.StartTime();
+        */
 
     }
 }

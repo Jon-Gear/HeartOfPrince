@@ -1,3 +1,5 @@
+using GameCreator.Runtime.Common;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,14 +15,11 @@ public abstract class ActivityStep
 
 public abstract class Activity
 {
-    public abstract string Name();
-
     protected List<ActivityStep> steps = new List<ActivityStep>();
     private int currentStepIndex = 0;
     private bool started = false;
 
     public abstract float EvaluateScore(CharacterBrain brain);
-
 
     protected abstract void Init(CharacterBrain brain);
 
@@ -42,7 +41,7 @@ public abstract class Activity
 
         if (steps.Count == 0)
         {
-            UnityEngine.Debug.LogWarning($"Activity {Name()} has no steps!");
+            UnityEngine.Debug.LogWarning($"Activity {GetType().Name} has no steps!");
             return;
         }
 
@@ -114,11 +113,11 @@ public class CharacterActivityBrain : MonoBehaviour
         StartNewActivity(activity);
     }
 
-    public void AddActivity<T>() where T : Activity, new()
+    public void AddActivity<T>(params object[] args) where T : Activity
     {
-        T activity = new T();
+        T activity = (T)Activator.CreateInstance(typeof(T), args);
         availableActivities.Add(activity);
-        Debug.Log($"Added activity {activity.Name()}");
+        Debug.Log($"Added activity {activity.GetType().Name}");
     }
 
     public void RemoveActivity<T>() where T : Activity
@@ -128,7 +127,7 @@ public class CharacterActivityBrain : MonoBehaviour
         if(activity != null)
         {
             availableActivities.Remove(activity);
-            Debug.Log($"Removed activity {activity.Name()}");
+            Debug.Log($"Removed activity {activity.GetType().Name}");
         }
         else
         {
@@ -145,10 +144,10 @@ public class CharacterActivityBrain : MonoBehaviour
         {
             if (currentActivities.Count > 0)
             {
-                Debug.Log($"Interrupting activity {currentActivities.Peek().Name()}");
+                Debug.Log($"Interrupting activity {currentActivities.Peek().GetType().Name}");
                 currentActivities.Peek().Interrupt(brain);
             }
-            Debug.Log($"Starting activity {newActivity.Name()}");
+            Debug.Log($"Starting activity {newActivity.GetType().Name}");
             currentActivities.Push(newActivity);
             currentActivities.Peek().Start(brain);
         }
@@ -157,13 +156,13 @@ public class CharacterActivityBrain : MonoBehaviour
     {
         if (currentActivities.Count > 0)
         {
-            Debug.Log($"Finished activity {currentActivities.Peek().Name()}");
+            Debug.Log($"Finished activity {currentActivities.Peek().GetType().Name}");
             currentActivities.Peek().Finish(brain);
             currentActivities.Pop();
 
             if (currentActivities.Count > 0)
             {
-                Debug.Log($"Continuing activity {currentActivities.Peek().Name()}");
+                Debug.Log($"Continuing activity {currentActivities.Peek().GetType().Name}");
                 currentActivities.Peek().Continue(brain);
             }
 

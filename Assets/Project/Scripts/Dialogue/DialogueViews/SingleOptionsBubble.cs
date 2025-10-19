@@ -5,8 +5,9 @@ using TMPro;
 using System.Collections;
 using UnityEngine.EventSystems;
 
-public class SingleOptionsBubble : DialogueViewBase
+public class SingleOptionsBubble
 {
+    /*
     [SerializeField] CanvasGroup canvasGroup;
     [SerializeField] internal TextMeshProUGUI lineText = null;
     [SerializeField] GameObject prevOption = null;
@@ -135,4 +136,5 @@ public class SingleOptionsBubble : DialogueViewBase
     {
         yield return Effects.FadeAlpha(canvasGroup, from, to, fadeTime);
     }
+    */
 }
