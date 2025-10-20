@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 64936961583060392}
   - component: {fileID: 64351928507337730}
   - component: {fileID: 5798842224688951814}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: SM_Prop_LightPole_Base_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -146,6 +146,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 768bf04fd2843204e9670a94c399590f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sunIntensityThreshold: 0.3
   artificialLight: {fileID: 1132914940123529704}
 --- !u!1 &1132914940123529704
 GameObject:
@@ -156,7 +157,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4060830583367138240}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -190,7 +191,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4576695925374906798}
   - component: {fileID: 8764820025684648212}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Spot Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -285,9 +286,29 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 4060830583367138240}
     m_Modifications:
+    - target: {fileID: 1003353593542122, guid: a4c7ad1396a74b4488b514d794bb3c3d, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 1474033407746352, guid: a4c7ad1396a74b4488b514d794bb3c3d, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 1670081676222104, guid: a4c7ad1396a74b4488b514d794bb3c3d, type: 3}
       propertyPath: m_Name
       value: SM_LightRayRound
+      objectReference: {fileID: 0}
+    - target: {fileID: 1670081676222104, guid: a4c7ad1396a74b4488b514d794bb3c3d, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 1964538110358036, guid: a4c7ad1396a74b4488b514d794bb3c3d, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 1989344865869426, guid: a4c7ad1396a74b4488b514d794bb3c3d, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 4058720824593588, guid: a4c7ad1396a74b4488b514d794bb3c3d, type: 3}
       propertyPath: m_LocalScale.x
