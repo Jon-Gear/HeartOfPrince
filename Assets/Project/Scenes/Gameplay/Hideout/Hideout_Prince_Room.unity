@@ -1128,7 +1128,7 @@ Transform:
   m_GameObject: {fileID: 360942465}
   serializedVersion: 2
   m_LocalRotation: {x: 0.11303898, y: -0.4957226, z: 0.06526311, w: 0.85861635}
-  m_LocalPosition: {x: 2.4007807, y: 2.1828349, z: -1.1567442}
+  m_LocalPosition: {x: 4.2, y: 2.241, z: -1.1599998}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4288,9 +4288,13 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1446395495180010420, guid: 99855051b0e884f29b95ae90b1d1ccf5, type: 3}
-      propertyPath: m_IsActive
-      value: 1
+    - target: {fileID: 1793972296288166232, guid: 99855051b0e884f29b95ae90b1d1ccf5, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1.891
+      objectReference: {fileID: 0}
+    - target: {fileID: 1793972296288166232, guid: 99855051b0e884f29b95ae90b1d1ccf5, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.121
       objectReference: {fileID: 0}
     - target: {fileID: 1793972296288166232, guid: 99855051b0e884f29b95ae90b1d1ccf5, type: 3}
       propertyPath: m_LocalRotation.w
@@ -4319,6 +4323,14 @@ PrefabInstance:
     - target: {fileID: 1793972296288166232, guid: 99855051b0e884f29b95ae90b1d1ccf5, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2036354429015483563, guid: 99855051b0e884f29b95ae90b1d1ccf5, type: 3}
+      propertyPath: Delay
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 2036354429015483563, guid: 99855051b0e884f29b95ae90b1d1ccf5, type: 3}
+      propertyPath: TrailSize
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 4715974037236951035, guid: 99855051b0e884f29b95ae90b1d1ccf5, type: 3}
       propertyPath: m_Name
@@ -4632,7 +4644,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_SplineSettings:
     Spline: {fileID: 1006064450}
-    Position: 6.493408
+    Position: 8.328937
     Units: 0
   SplineOffset: {x: 0, y: 0, z: 0}
   CameraRotation: 0
@@ -4708,7 +4720,7 @@ Transform:
   m_GameObject: {fileID: 1608777479}
   serializedVersion: 2
   m_LocalRotation: {x: 0.11303897, y: -0.49572253, z: 0.06526309, w: 0.8586164}
-  m_LocalPosition: {x: 2.4007807, y: 2.1828349, z: -1.1567442}
+  m_LocalPosition: {x: 4.2, y: 2.241, z: -1.1599998}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
