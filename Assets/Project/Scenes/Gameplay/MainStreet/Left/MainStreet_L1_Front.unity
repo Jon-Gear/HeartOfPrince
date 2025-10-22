@@ -16983,6 +16983,8 @@ MonoBehaviour:
     - rid: 1456250840168530068
     m_FootstepSounds:
       m_SoundsAsset: {fileID: 11400000, guid: cc9a58db4035e493199624217f60c661, type: 2}
+    m_FootstepDetector:
+      rid: 1456250887490765503
   m_Ragdoll:
     m_Ragdoll:
       rid: 1456250840168530069
@@ -17102,6 +17104,11 @@ MonoBehaviour:
     - rid: 1456250840168530078
       type: {class: AxonometryNone, ns: GameCreator.Runtime.Characters, asm: GameCreator.Runtime.Core}
       data: 
+    - rid: 1456250887490765503
+      type: {class: FootstepDetectorAnimationCurves, ns: GameCreator.Runtime.Characters, asm: GameCreator.Runtime.Core}
+      data:
+        m_Breakpoint: 0
+        m_IsEnabled: 1
 --- !u!4 &693447554
 Transform:
   m_ObjectHideFlags: 0
@@ -43717,6 +43724,8 @@ MonoBehaviour:
     - rid: 1456250840168529922
     m_FootstepSounds:
       m_SoundsAsset: {fileID: 11400000, guid: cc9a58db4035e493199624217f60c661, type: 2}
+    m_FootstepDetector:
+      rid: 1456250887490765504
   m_Ragdoll:
     m_Ragdoll:
       rid: 1456250840168529923
@@ -43836,6 +43845,11 @@ MonoBehaviour:
     - rid: 1456250840168529932
       type: {class: AxonometryNone, ns: GameCreator.Runtime.Characters, asm: GameCreator.Runtime.Core}
       data: 
+    - rid: 1456250887490765504
+      type: {class: FootstepDetectorAnimationCurves, ns: GameCreator.Runtime.Characters, asm: GameCreator.Runtime.Core}
+      data:
+        m_Breakpoint: 0
+        m_IsEnabled: 1
 --- !u!4 &1758925132
 Transform:
   m_ObjectHideFlags: 0
@@ -53748,6 +53762,8 @@ MonoBehaviour:
     - rid: 1456250835245466021
     m_FootstepSounds:
       m_SoundsAsset: {fileID: 11400000, guid: cc9a58db4035e493199624217f60c661, type: 2}
+    m_FootstepDetector:
+      rid: 1456250887490765505
   m_Ragdoll:
     m_Ragdoll:
       rid: 1456250835245466022
@@ -53867,6 +53883,11 @@ MonoBehaviour:
     - rid: 1456250835245466031
       type: {class: AxonometryNone, ns: GameCreator.Runtime.Characters, asm: GameCreator.Runtime.Core}
       data: 
+    - rid: 1456250887490765505
+      type: {class: FootstepDetectorAnimationCurves, ns: GameCreator.Runtime.Characters, asm: GameCreator.Runtime.Core}
+      data:
+        m_Breakpoint: 0
+        m_IsEnabled: 1
 --- !u!4 &2131438262
 Transform:
   m_ObjectHideFlags: 0

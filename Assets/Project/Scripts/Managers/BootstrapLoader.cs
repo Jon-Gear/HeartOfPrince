@@ -9,7 +9,7 @@ public class BootstrapLoader : MonoBehaviour
     {
         if (SceneManager.GetActiveScene().name != "Bootstrap")
         {
-            SceneManager.LoadScene("Bootstrap", LoadSceneMode.Additive);
+            //SceneManager.LoadScene("Bootstrap", LoadSceneMode.Additive);
         }
     }
 }
