@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2641772535965517009}
   - component: {fileID: 8735120697161602303}
   - component: {fileID: 7219019876227155339}
+  - component: {fileID: -1491171912648695435}
   m_Layer: 0
   m_Name: Light_Warm_Ceiling_Toggleable
   m_TagString: Untagged
@@ -116,3 +117,26 @@ MonoBehaviour:
   onAfternoon: 1
   onEvening: 1
   onNight: 0
+--- !u!114 &-1491171912648695435
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3770722420733599990}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Version: 3
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_LightLayerMask: 1
+  m_RenderingLayers: 1
+  m_CustomShadowLayers: 0
+  m_ShadowLayerMask: 1
+  m_ShadowRenderingLayers: 1
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
