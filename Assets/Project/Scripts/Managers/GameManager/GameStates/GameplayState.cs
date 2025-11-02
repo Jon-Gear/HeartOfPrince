@@ -8,6 +8,8 @@ public class GameplayState : GameState
         var gameManager = GameManager.Instance;
 
         gameManager.ActivateSystem<TimeManager>();
+        gameManager.ActivateSystem<LightingManager>();
+
         gameManager.ActivateSystem<QuestManager>();
         gameManager.ActivateSystem<DialogueManager>();
         gameManager.ActivateSystem<CharacterManager>();

@@ -3,37 +3,50 @@ using GameCreator.Runtime.Variables;
 using Unity.Multiplayer.Center.Common;
 using UnityEngine;
 
-// should not be singleton
 //[ExecuteAlways] 
 public class DayNightCycle : MonoBehaviour
-{   
+{
+    [Header("Ambient Color")]
+    [SerializeField] private Gradient ambientColor;
+    [SerializeField] private Gradient fogColor;
+    [SerializeField] private AnimationCurve fogDensityCurve;
+
+
+
     [Header("Sun Light")]
-    [SerializeField] private bool enableSun = true;
     [SerializeField] private Light sun;
     [SerializeField] private float sunBaseIntensity = 1f;
     [SerializeField] private float sunIntensityVariation = 1.5f;
     [SerializeField] private Gradient sunColor;
-    [SerializeField] private Gradient ambientColor;
     private float intensity;
-
+    
     [Header("Rotations")]
     [SerializeField] private Transform dailyRotation;
 
     private void Start()
     {
-        if(!enableSun)
-        {
-            sun.enabled = false;
-        }
+        RenderSettings.sun = sun;
+        RenderSettings.fog = true;
     }
 
     // Update is called once per frame
     private void Update()
     {
+        CalculateAmbience();
+
+
         RotateSun();
         SetIntensity();
         AdjustColor();
     }
+
+    private void CalculateAmbience()
+    {
+        RenderSettings.fogColor = fogColor.Evaluate(intensity);
+        GameManager.Instance.GetSystem<LightingManager>().AddToFogDensity(fogDensityCurve.Evaluate(intensity));
+    }
+
+
 
     private void RotateSun()
     {
@@ -53,6 +66,6 @@ public class DayNightCycle : MonoBehaviour
     private void AdjustColor()
     {
         sun.color = sunColor.Evaluate(intensity);
-        RenderSettings.ambientLight = ambientColor.Evaluate(intensity);
+
     }
 }

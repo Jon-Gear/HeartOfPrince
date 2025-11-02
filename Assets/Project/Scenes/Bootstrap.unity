@@ -2299,6 +2299,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   systems:
   - {fileID: 1545426221}
+  - {fileID: 2005608146}
   - {fileID: 8737150781514078274}
   - {fileID: 7514096571054469052}
   - {fileID: 3787812144902210285}
@@ -2722,6 +2723,52 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9f17569d8665e57498a5377ef9140396, type: 3}
+--- !u!1 &2005608144
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2005608145}
+  - component: {fileID: 2005608146}
+  m_Layer: 0
+  m_Name: '[GameSystem] Lighting'
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2005608145
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2005608144}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2005608146
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2005608144}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55e98253c4aa27749b137e5f34955299, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  finalAmbientColor: {r: 0, g: 0, b: 0, a: 0}
+  contributorCount: 0
 --- !u!1001 &2041365269
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3159,6 +3206,7 @@ SceneRoots:
   m_Roots:
   - {fileID: 1889096242}
   - {fileID: 1545426220}
+  - {fileID: 2005608145}
   - {fileID: 1962196994}
   - {fileID: 1809777159}
   - {fileID: 584895832}
