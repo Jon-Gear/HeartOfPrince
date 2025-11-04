@@ -10,11 +10,11 @@ public class StartPlayerToCharacterDialogueStep : ActivityStep
 
         if (playerCharacter.Traits().GetAttribute("attribute-energy") == 0.0f)
         {
-            dialogueManager.StartDialogue("prince_tired");
+            //dialogueManager.StartDialogue("prince_tired");
             return;
         }
 
-        brain.Dialogue().TriggerPlayerDialogueWithCharacter(OnFinish);
+        //brain.Dialogue().TriggerPlayerDialogueWithCharacter(OnFinish);
     }
 
     public override void Tick(CharacterBrain brain)

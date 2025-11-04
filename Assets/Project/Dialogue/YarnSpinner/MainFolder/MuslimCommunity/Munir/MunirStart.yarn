@@ -1,11 +1,18 @@
 ﻿title: munir_start
-tags: actor:Munir actor:Prince
+when: current_actor() == "Munir"
 ---
 Prince: Hey, Munir
--> Prince: {GetDialogueTopicOptionText("Munir", 0)}
-    <<jump {GetDialogueTopicNodeName("Munir", 0)}>>
--> Prince: {GetDialogueTopicOptionText("Munir", 1)}
-    <<jump {GetDialogueTopicNodeName("Munir", 1)}>>
--> Prince: {GetDialogueTopicOptionText("Munir", 2)}
-    <<jump {GetDialogueTopicNodeName("Munir", 2)}>>
+===
+
+
+title:munir_start
+when: current_actor() == "Prince"
+---
+test 2
+===
+
+title: munir_start
+when: always
+---
+not this.
 ===

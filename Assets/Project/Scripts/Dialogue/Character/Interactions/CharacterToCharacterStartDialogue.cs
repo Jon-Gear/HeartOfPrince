@@ -68,7 +68,7 @@ public class CharacterToCharacterStartDialogue : MonoBehaviour
 
     public void StartDialogueLoop()
     {
-        if (!GameManager.Instance.GetSystem<DialogueManager>().IsAnyBackgroundDialogueAvailable())
+        //if (!GameManager.Instance.GetSystem<DialogueManager>().IsAnyBackgroundDialogueAvailable())
             return;
 
         dialogueCoroutine = StartCoroutine(DialogueLoop());

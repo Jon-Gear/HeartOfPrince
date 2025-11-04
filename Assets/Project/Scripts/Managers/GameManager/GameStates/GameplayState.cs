@@ -13,7 +13,6 @@ public class GameplayState : GameState
         gameManager.ActivateSystem<QuestManager>();
         gameManager.ActivateSystem<DialogueManager>();
         gameManager.ActivateSystem<CharacterManager>();
-        gameManager.ActivateSystem<CinemachineManager>();
         gameManager.ActivateSystem<ActorRegistry>();
     }
 
@@ -25,7 +24,6 @@ public class GameplayState : GameState
         gameManager.DeactivateSystem<QuestManager>();
         gameManager.DeactivateSystem<DialogueManager>();
         gameManager.DeactivateSystem<CharacterManager>();
-        gameManager.DeactivateSystem<CinemachineManager>();
         gameManager.DeactivateSystem<ActorRegistry>();
     }
 

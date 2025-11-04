@@ -13,15 +13,6 @@ public class Actor : MonoBehaviour
     private Character character;
     private CharacterBrain characterBrain;
 
-
-    public Vector3 messageBubbleOffset = new Vector3(0f, 1.0f, 0f);
-    public Vector3 positionWithOffset
-    {
-        get
-        {
-            return transform.position + messageBubbleOffset;   
-        }
-    }
     public Character Character() => character;
     public CharacterBrain Brain() => characterBrain;
 
@@ -46,8 +37,6 @@ public class Actor : MonoBehaviour
             }
 
             actorRegistry.playerActor = this;
-            GameManager.Instance.GetSystem<CinemachineManager>().targetGroup.AddMember(character.transform, 1f, 0.5f) ;
-            GameManager.Instance.GetSystem<CinemachineManager>().longShot.PreviousStateIsValid = false;
         }
     }
 
@@ -56,7 +45,6 @@ public class Actor : MonoBehaviour
 
     private void OnDestroy()
     {
-        GameManager.Instance.GetSystem<CinemachineManager>().targetGroup.RemoveMember(character.transform);
         GameManager.Instance.GetSystem<ActorRegistry>().UnregisterActor(this);
     }
 }

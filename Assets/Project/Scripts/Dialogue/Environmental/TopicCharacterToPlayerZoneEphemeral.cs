@@ -26,7 +26,7 @@ public class TopicCharacterToPlayerZoneEphemeral : MonoBehaviour
         {
             return;
         }
-        otherActor.Brain().Dialogue().AddCharacterToPlayerTopic(topic);
+        //otherActor.Brain().Dialogue().AddCharacterToPlayerTopic(topic);
     }
     private void OnZoneExited(Collider other)
     {
@@ -39,6 +39,6 @@ public class TopicCharacterToPlayerZoneEphemeral : MonoBehaviour
         {
             return;
         }
-        otherActor.Brain().Dialogue().RemoveCharacterToPlayerTopic(topic);
+        //otherActor.Brain().Dialogue().RemoveCharacterToPlayerTopic(topic);
     }
 }

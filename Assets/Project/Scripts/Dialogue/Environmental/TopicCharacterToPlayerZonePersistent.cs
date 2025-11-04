@@ -25,6 +25,6 @@ public class TopicCharacterToPlayerZonePersistent : MonoBehaviour
         {
             return;
         }
-        otherActor.Brain().Dialogue().AddCharacterToPlayerTopic(topic);    
+        //otherActor.Brain().Dialogue().AddCharacterToPlayerTopic(topic);    
     }
 }

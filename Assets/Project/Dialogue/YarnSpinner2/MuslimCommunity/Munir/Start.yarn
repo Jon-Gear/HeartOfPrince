@@ -1,0 +1,25 @@
+﻿title: Start
+when: current_actor() == "Munir"
+---
+Prince: Hey Munir!
+
+-> Talk about {GetPlayerToCharacterTopic("Munir", 0)}
+    <<detour {GetPlayerToCharacterTopic("Munir", 0)}>>
+-> Talk about {GetPlayerToCharacterTopic("Munir", 1)}
+    <<detour {GetPlayerToCharacterTopic("Munir", 1)}>>
+-> Talk about {GetPlayerToCharacterTopic("Munir", 2)}
+    <<detour {GetPlayerToCharacterTopic("Munir", 2)}>>
+===
+
+title: Start
+when: current_actor() == "Munir"
+---
+Prince: Wassup Munir!
+===
+
+
+title: Start
+when: current_actor() == "Munir"
+---
+Prince: Hola Munir!
+===

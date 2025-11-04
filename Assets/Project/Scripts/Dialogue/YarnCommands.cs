@@ -61,23 +61,6 @@ public class YarnCommands : MonoBehaviour
 
 
 
-    // Dialogue Options Management
-    [YarnFunction("GetDialogueTopicOptionText")]
-    public static string GetDialogueTopicOptionText(string characterName, int index)
-    {
-        CharacterBrain characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
-        return characterBrain.Dialogue().GetPlayerTopicOptionText(index);
-    }
-
-    [YarnFunction("GetDialogueTopicNodeName")]
-    public static string GetDialogueTopicNodeName(string characterName, int index)
-    {
-        CharacterBrain characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
-        return characterBrain.Dialogue().GetPlayerTopicNodeName(index);
-    }
-
-
-
     [YarnFunction("GetPlayerStat")]
     public static float GetPlayerStat(string statID)
     {
@@ -117,25 +100,25 @@ public class YarnCommands : MonoBehaviour
     // -------------------
 
     [YarnCommand("AddPlayerToCharacterTopic")]
-    public static void AddToPlayerTopicToAskCharacter(string characterToAsk, string resourcePathToTopic)
+    public static void AddPlayerToCharacterTopic(string characterToAsk, string topicName)
     {
-        TopicPlayerToCharacter topic = Resources.Load<TopicPlayerToCharacter>("TopicPlayerToCharacter/" + resourcePathToTopic);
-
-        if (topic == null)
-        {
-            Debug.LogWarning($"Cannot add topic {resourcePathToTopic} to {characterToAsk}");
-            return;
-        }
-
         CharacterBrain characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterToAsk);
-        characterBrain.Dialogue().AddPlayerToCharacterTopic(topic);
+
+        if (!characterBrain.Dialogue().PlayerToCharacterTopics().Contains(topicName))
+        {
+            characterBrain.Dialogue().PlayerToCharacterTopics().Add(topicName);
+        }
     }
 
     [YarnCommand("RemovePlayerToCharacterTopic")]
-    public static void RemovePlayerTopicToAskCharacter(string characterToAsk, string topicName)
+    public static void RemovePlayerToCharacterTopic(string characterToAsk, string topicName)
     {
         CharacterBrain characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterToAsk);
-        characterBrain.Dialogue().RemovePlayerToCharacterTopic(topicName);
+
+        if(characterBrain.Dialogue().PlayerToCharacterTopics().Contains(topicName))
+        {
+            characterBrain.Dialogue().PlayerToCharacterTopics().Remove(topicName);
+        }
     }
 
     // -------------------
@@ -143,37 +126,51 @@ public class YarnCommands : MonoBehaviour
     // -------------------
 
     [YarnCommand("AddCharacterToPlayerTopic")]
-    public static void AddToCharacterTopicToAskPlayer(string characterName, string resourcePathToTopic)
+    public static void AddToCharacterTopicToAskPlayer(string characterName, string topicName)
     {
-        TopicCharacterToPlayer topic = Resources.Load<TopicCharacterToPlayer>("Dialogues/" + resourcePathToTopic);
         CharacterBrain characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
-        characterBrain.Dialogue().AddCharacterToPlayerTopic(topic);
+
+        if (!characterBrain.Dialogue().CharacterToPlayerTopics().Contains(topicName))
+        {
+            characterBrain.Dialogue().CharacterToPlayerTopics().Add(topicName);
+        }
     }
 
     [YarnCommand("RemoveCharacterToPlayerTopic")]
     public static void RemoveCharacterTopicToAskPlayer(string characterName, string topicName)
     {
         CharacterBrain characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
-        characterBrain.Dialogue().RemoveCharacterToPlayerTopic(topicName);
+
+        if (characterBrain.Dialogue().CharacterToPlayerTopics().Contains(topicName))
+        {
+            characterBrain.Dialogue().CharacterToPlayerTopics().Remove(topicName);
+        }
     }
 
     // -------------------
     // Character Monologue
     // -------------------
 
-    [YarnCommand("AddToCharacterMonologueTopic")]
-    public static void AddToCharacterMonologueTopic(string characterName, string resourcePathToTopic)
+    [YarnCommand("AddCharacterMonologueTopic")]
+    public static void AddCharacterMonologueTopic(string characterName, string topicName)
     {
-        TopicCharacterMonologue topic = Resources.Load<TopicCharacterMonologue>("Dialogues/" + resourcePathToTopic);
         CharacterBrain characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
-        characterBrain.Dialogue().AddCharacterMonologueTopic(topic);
+
+        if (!characterBrain.Dialogue().MonologueTopics().Contains(topicName))
+        {
+            characterBrain.Dialogue().MonologueTopics().Add(topicName);
+        }
     }
 
     [YarnCommand("RemoveCharacterMonologueTopic")]
     public static void RemoveCharacterMonologueTopic(string characterName, string topicName)
     {
         CharacterBrain characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
-        characterBrain.Dialogue().RemoveCharacterMonologueTopic(topicName);
+
+        if (characterBrain.Dialogue().MonologueTopics().Contains(topicName))
+        {
+            characterBrain.Dialogue().MonologueTopics().Remove(topicName);
+        }
     }
 
     // -------------------

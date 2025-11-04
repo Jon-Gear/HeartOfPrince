@@ -49,7 +49,7 @@ public class CharacterManager : GameSystem
             CharacterBrain character = GetCharacter(characterName);
             if (character != null)
             {
-                character.Dialogue().AddPlayerToCharacterTopic(topic);
+                //character.Dialogue().AddPlayerToCharacterTopic(topic);
             }
             else
             {
@@ -65,7 +65,7 @@ public class CharacterManager : GameSystem
             CharacterBrain character = GetCharacter(characterName);
             if (character != null)
             {
-                character.Dialogue().RemovePlayerToCharacterTopic(topic);
+                //character.Dialogue().RemovePlayerToCharacterTopic(topic);
             }
             else
             {

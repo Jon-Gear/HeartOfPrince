@@ -151,96 +151,36 @@ public class Dialogue
 
 
 
+public struct DialogueVariables
+{
+    string currentActor;
+
+}
+
+
 public class DialogueManager : GameSystem 
 {
-    [Header("Dialogue")]
+    [SerializeField] private DialogueRunner primary;
 
-    [SerializeField] public Dialogue main;
-    [SerializeField] public Dialogue background_1;
-    [SerializeField] public Dialogue background_2;
-    [SerializeField] public Dialogue background_3;
-    
+    private DialogueVariables currentDialogueVariables = new DialogueVariables();
+
+
     public override void Init()
     {
-        main.Start();
-        background_1.Start();
-        background_2.Start();
-        background_3.Start();
     }
+
+    public DialogueRunner Primary() => primary;
 
     public override void Shutdown()
     {
-        main.Stop();
-        background_1.Stop();
-        background_2.Stop();
-        background_3.Stop();
     }
 
 
-    private void Start()
+
+    [YarnFunction("current_actor")]
+    public static string CurrentActor()
     {
-        
+        return "Munir";
+        //return GameManager.Instance.GetSystem<DialogueManager>().currentActor?.actorName;
     }
-
-    // --- Main Dialogue ---
-    public void StartDialogue(string startNodeName)
-    {
-        StopAllBackgroundDialogue();
-        main.dialogueRunner.StartDialogue(startNodeName);
-    }
-
-
-    
-    // --- Background Dialogue ---
-    public void StartBackgroundDialogue(string startNodeName)
-    {
-        var runner = GetAvailableBackgroundRunner();
-        //Debug.Log($"Starting background dialogue '{startNodeName}' on runner: {runner?.dialogueRunner?.name ?? "None"}");
-        if (runner != null)
-        {
-            runner.dialogueRunner.StartDialogue(startNodeName);
-        }
-        else
-        {
-            Debug.LogWarning("All background dialogue runners are busy!");
-        }
-    }
-
-    public bool IsAnyBackgroundDialogueAvailable() => GetAvailableBackgroundRunner() != null;
-
-    public Dialogue GetAvailableBackgroundRunner()
-    {
-        return !background_1.IsRunning() ? background_1 :
-               !background_2.IsRunning() ? background_2 :
-               !background_3.IsRunning() ? background_3 : null;
-    }
-
-    public void StopAllBackgroundDialogue()
-    {
-        background_1.Stop();
-        background_2.Stop();
-        background_3.Stop();
-    }
-
-    // --- Cleanup on Scene Change ---
-    protected override void OnActiveSceneChanged(Scene oldScene, Scene newScene)
-    {
-        main.Stop();
-        StopAllBackgroundDialogue();
-    }
-
-    public void RegisterOnDialogueEnd(Dialogue dialogue, UnityAction onFinish)
-    {
-        if (onFinish == null) return;
-
-        void Handler()
-        {
-            dialogue.dialogueRunner.onDialogueComplete.RemoveListener(Handler);
-            onFinish?.Invoke();
-        }
-
-        dialogue.dialogueRunner.onDialogueComplete.AddListener(Handler);
-    }
-
-
 }
