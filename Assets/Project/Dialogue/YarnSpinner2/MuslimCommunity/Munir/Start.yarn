@@ -1,25 +1,15 @@
 ﻿title: Start
-when: current_actor() == "Munir"
+when: CurrentActor("Munir")
+when: always
 ---
-Prince: Hey Munir!
-
--> Talk about {GetPlayerToCharacterTopic("Munir", 0)}
-    <<detour {GetPlayerToCharacterTopic("Munir", 0)}>>
--> Talk about {GetPlayerToCharacterTopic("Munir", 1)}
-    <<detour {GetPlayerToCharacterTopic("Munir", 1)}>>
--> Talk about {GetPlayerToCharacterTopic("Munir", 2)}
-    <<detour {GetPlayerToCharacterTopic("Munir", 2)}>>
-===
-
-title: Start
-when: current_actor() == "Munir"
----
-Prince: Wassup Munir!
+<<detour Greet>>
+<<detour TopicHub>>
 ===
 
 
 title: Start
-when: current_actor() == "Munir"
+when: CurrentActor("Munir")
+when: once
 ---
-Prince: Hola Munir!
+<<detour FirstContact>>
 ===

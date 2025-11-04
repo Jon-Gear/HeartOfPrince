@@ -2,11 +2,13 @@ using UnityEngine;
 
 public class StartMonologueStep : ActivityStep
 {
-    
-
     public override void Start(CharacterBrain brain)
     {
-        brain.Dialogue().TriggerMonologue(OnFinish);
+        var dialogueManager = GameManager.Instance.GetSystem<DialogueManager>();
+
+        dialogueManager.Secondary().onDialogueComplete.AddListener(OnDialogueComplete);
+        dialogueManager.Secondary().StartDialogue(brain.Dialogue().ChooseMonologueTopic());
+
         Debug.Log("Triggering monologue");
     }
 
@@ -18,9 +20,12 @@ public class StartMonologueStep : ActivityStep
 
     public override void Finish(CharacterBrain brain)
     {
+        var dialogueManager = GameManager.Instance.GetSystem<DialogueManager>();
+
+        dialogueManager.Secondary().onDialogueComplete.RemoveListener(OnDialogueComplete);
     }
 
-    private void OnFinish()
+    private void OnDialogueComplete()
     {
         Debug.Log("Finished monologue");
         IsComplete = true;

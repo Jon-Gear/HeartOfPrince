@@ -48,16 +48,26 @@ public class CharacterDialogueBrain : MonoBehaviour
     public List<string> MonologueTopics() => monologueTopics;
 
 
-
-
     private DialogueIntention currentIntention = DialogueIntention.None;
     public DialogueIntention CurrentIntention => currentIntention;
     public bool IsFree => currentIntention == DialogueIntention.None;
 
 
     // -------------------
-    // Unity Events
+    // Choosing Topics
     // -------------------
+
+    public string ChooseMonologueTopic()
+    {
+        return monologueTopics[Random.Range(0, monologueTopics.Count)];
+    }
+
+
+
+
+
+
+
 
     private void Start()
     {
@@ -91,7 +101,12 @@ public class CharacterDialogueBrain : MonoBehaviour
 
     public bool CanStartCharacterMonologue()
     {
-        return IsFree; // && !GameManager.Instance.GetSystem<DialogueManager>().main.IsRunning() && GameManager.Instance.GetSystem<DialogueManager>().IsAnyBackgroundDialogueAvailable() && monologueTopics.Count > 0;
+        var dialogueManager = GameManager.Instance.GetSystem<DialogueManager>();
+        return 
+            IsFree && 
+            !dialogueManager.Primary().IsDialogueRunning && 
+            !dialogueManager.Secondary().IsDialogueRunning && 
+            monologueTopics.Count > 0;
     }
 
     public bool CanStartCharacterToCharacterDialogue()
@@ -110,6 +125,13 @@ public class CharacterDialogueBrain : MonoBehaviour
         dialogueManager.Primary().StartDialogue("Start");
     }
 
+    [YarnFunction("PlayerToCharacterTopicCount")]
+    public static int PlayerToCharacterTopicCount(string characterName)
+    {
+        CharacterBrain character = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
+        return character.Dialogue().playerToCharacterTopics.Count;
+    }
+
     [YarnCommand("ShufflePlayerToCharacterTopics")]
     public static void ShufflePlayerToCharacterTopics(string characterName)
     {
@@ -122,15 +144,15 @@ public class CharacterDialogueBrain : MonoBehaviour
     public static string GetPlayerToCharacterTopic(string characterName, int index)
     {
         var character = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
-        
-        if(index > character.Dialogue().playerToCharacterTopics.Count || index < 0)
+
+        if (character.Dialogue().playerToCharacterTopics.Count == 0 || 
+            index >= character.Dialogue().playerToCharacterTopics.Count || 
+            index < 0)
         {
             return "...";
         }
-        else
-        {
-            return character.Dialogue().playerToCharacterTopics[index];
-        }
+        return character.Dialogue().playerToCharacterTopics[index];
+    
     }
 
 
@@ -220,9 +242,7 @@ public class CharacterDialogueBrain : MonoBehaviour
     {
 
         return "";
-        //return monologueTopics[Random.Range(0, monologueTopics.Count)]
-        //    .GetTopicNodeName()
-        //    .Replace("{actor}", characterName.ToLower());
+        
     }
 
     // -------------------

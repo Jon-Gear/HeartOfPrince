@@ -1,0 +1,17 @@
+title: TopicHub
+---
+<<declare $topic1 = "...">>
+<<declare $topic2 = "...">>
+<<declare $topic3 = "...">>
+
+<<set $topic1 = GetPlayerToCharacterTopic(GetCurrentActor(), 0)>>
+<<set $topic2 = GetPlayerToCharacterTopic(GetCurrentActor(), 1)>>
+<<set $topic3 = GetPlayerToCharacterTopic(GetCurrentActor(), 2)>>
+
+-> Talk about {$topic1} <<if $topic1 != "...">>
+    <<detour {$topic1}>>
+-> Talk about {$topic2} <<if $topic2 != "...">>
+    <<detour {$topic2}>>
+-> Talk about {$topic3} <<if $topic3 != "...">>
+    <<detour {$topic3}>>
+===
