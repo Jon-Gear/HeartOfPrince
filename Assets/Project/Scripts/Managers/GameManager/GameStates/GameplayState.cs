@@ -13,7 +13,7 @@ public class GameplayState : GameState
         gameManager.ActivateSystem<QuestManager>();
         gameManager.ActivateSystem<DialogueManager>();
         gameManager.ActivateSystem<CharacterManager>();
-        gameManager.ActivateSystem<ActorRegistry>();
+        gameManager.ActivateSystem<CharacterManager>();
     }
 
     public override void Exit()
@@ -24,7 +24,7 @@ public class GameplayState : GameState
         gameManager.DeactivateSystem<QuestManager>();
         gameManager.DeactivateSystem<DialogueManager>();
         gameManager.DeactivateSystem<CharacterManager>();
-        gameManager.DeactivateSystem<ActorRegistry>();
+        gameManager.DeactivateSystem<CharacterManager>();
     }
 
     public override void Update()

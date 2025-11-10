@@ -62,6 +62,10 @@ public class CharacterDialogueBrain : MonoBehaviour
         return monologueTopics[Random.Range(0, monologueTopics.Count)];
     }
 
+    public string ChooseCharacterToPlayerTopic()
+    {
+        return characterToPlayerTopics[Random.Range(0, characterToPlayerTopics.Count)];
+    }
 
 
 
@@ -155,110 +159,10 @@ public class CharacterDialogueBrain : MonoBehaviour
     
     }
 
-
-
-
-
-    public void StartCharacterToPlayerDialogue()
-    {
-        if(characterToPlayerTopics.Count == 0)
-        {
-            Debug.LogWarning($"CharacterDialogueBrain: No character-to-player topics available for {characterName}.");
-            return;
-        }
-
-        var dialogueManager = GameManager.Instance.GetSystem<DialogueManager>();
-
-
-        string randomTopic = characterToPlayerTopics[Random.Range(0, characterToPlayerTopics.Count)];
-
-        dialogueManager.Primary().StartDialogue(randomTopic);
-    }
-
-
-
-    // -------------------
-    // Character -> Player
-    // -------------------
-
-
-    public void TriggerCharacterDialogueWithPlayer(UnityAction onFinish = null)
-    {
-        if(!CanStartCharacterToPlayerDialogue())
-        {
-            return;
-        }
-        SetIntention(DialogueIntention.ToPlayer);
-
-        //var dialogueManager = GameManager.Instance.GetSystem<DialogueManager>();
-        //dialogueManager.RegisterOnDialogueEnd(dialogueManager.main, onFinish);
-        //dialogueManager.StartDialogue(GetRandomCharacterToPlayerNode());
-    }
-
-    private string GetRandomCharacterToPlayerNode()
-    {
-        return "";
-        //return characterToPlayerTopics[Random.Range(0, characterToPlayerTopics.Count)]
-        //    .GetTopicNodeName()
-        //    .Replace("{actor}", characterName.ToLower());
-    }
-
-    // -------------------
-    // Character Monologue
-    // -------------------
-
-    public void AddCharacterMonologueTopic(TopicCharacterMonologue topic)
-    {
-        //if (!monologueTopics.Contains(topic))
-        //    monologueTopics.Add(topic);
-    }
-
-    public void RemoveCharacterMonologueTopic(string topicName)
-    {
-        //monologueTopics.RemoveAll(t => t.TopicName == topicName);
-    }
-
-    public void RemoveCharacterMonologueTopic(TopicCharacterMonologue topic)
-    {
-        //if (monologueTopics.Contains(topic))
-        //    monologueTopics.Remove(topic);
-    }
-
-    public void TriggerMonologue(UnityAction onFinish)
-    {
-        if (!CanStartCharacterMonologue())
-            return;
-        SetIntention(DialogueIntention.Monologue);
-
-        //var dialogueManager = GameManager.Instance.GetSystem<DialogueManager>();
-        //var dialogue = dialogueManager.GetAvailableBackgroundRunner();
-
-        //dialogueManager.RegisterOnDialogueEnd(dialogue, onFinish);
-
-        //dialogue.dialogueRunner.StartDialogue(GetRandomMonologueNode());
-    }
-
-    private string GetRandomMonologueNode()
-    {
-
-        return "";
-        
-    }
-
     // -------------------
     // Character -> Character
     // -------------------
 
-    public void AddCharacterToCharacterTopic(TopicCharacterToCharacter topic)
-    {
-        //if (!characterToCharacterTopics.Contains(topic))
-        //    characterToCharacterTopics.Add(topic);
-    }
-
-    public void RemoveCharacterToCharacterTopic(string topicName)
-    {
-        //characterToCharacterTopics.RemoveAll(t => t.TopicName == topicName);
-    }
 
     public bool TriggerCharacterToCharacterDialogue(List<Actor> nearbyActors)
     {

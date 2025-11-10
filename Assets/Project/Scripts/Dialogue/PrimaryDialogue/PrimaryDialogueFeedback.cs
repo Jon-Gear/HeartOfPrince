@@ -3,13 +3,29 @@ using System.Collections.Generic;
 using UnityEngine;
 using Yarn;
 using Yarn.Unity;
+using Unity.Cinemachine;
 
 #nullable enable
 
-public class NewDialoguePresenter : DialoguePresenterBase
+public class PrimaryDialogueFeedback : DialoguePresenterBase
 {
+    [SerializeField] private CinemachineCamera dialogueCamera;
+
+    [SerializeField] private CinemachineTargetGroup targetGroup;
+
     public override async YarnTask OnDialogueStartedAsync()
     {
+        var characterManager = GameManager.Instance.GetSystem<CharacterManager>();
+        var playerActor = characterManager.GetPlayerActor();
+        var otherActor = characterManager.GetActorByName("Munir");
+
+        targetGroup.AddMember(playerActor.transform, 1f, 2f);
+        targetGroup.AddMember(otherActor.transform, 1f, 2f);
+
+        dialogueCamera.Priority = 20;
+
+
+
         // Called by the Dialogue Runner to signal that dialogue has just
         // started up.
         //
@@ -22,6 +38,8 @@ public class NewDialoguePresenter : DialoguePresenterBase
 
     public override async YarnTask OnDialogueCompleteAsync()
     {
+        dialogueCamera.Priority = 0;
+        targetGroup.Targets.Clear();
         // Called by the Dialogue Runner to signal that dialogue has ended.
         //
         // You can use this method to clean up after running dialogue, like

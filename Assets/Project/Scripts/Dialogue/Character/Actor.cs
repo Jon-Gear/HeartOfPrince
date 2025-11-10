@@ -21,23 +21,16 @@ public class Actor : MonoBehaviour
     private void Start()
     {
         character = GetComponent<Character>();
+		var characterManager = GameManager.Instance.GetSystem<CharacterManager>();
 
-        characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(actorName);
-        var actorRegistry = GameManager.Instance.GetSystem<ActorRegistry>();
+		characterBrain = characterManager.GetCharacter(actorName);
 
-
-        actorRegistry.RegisterActor(this);
+		characterManager.RegisterActor(this);
         
         if (character.IsPlayer)
         {
-            if (actorRegistry.playerActor != null)
-            {
-                Debug.LogError("Actor Registry Error: There cannot be two player actors");
-                return;
-            }
-
-            actorRegistry.playerActor = this;
-        }
+			characterManager.RegisterPlayerActor(this);
+		}
     }
 
 
@@ -45,6 +38,6 @@ public class Actor : MonoBehaviour
 
     private void OnDestroy()
     {
-        GameManager.Instance.GetSystem<ActorRegistry>().UnregisterActor(this);
+        GameManager.Instance.GetSystem<CharacterManager>().UnregisterActor(this);
     }
 }

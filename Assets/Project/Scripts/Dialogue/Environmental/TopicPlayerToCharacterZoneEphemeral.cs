@@ -19,10 +19,10 @@ public class TopicPlayerToCharacterZoneEphemeral : MonoBehaviour
 
     private void OnZoneEntered(Collider other)
     {
-        GameManager.Instance.GetSystem<CharacterManager>().AddTopicPlayerToCharacter(topic, CharactersToAsk);
+        //GameManager.Instance.GetSystem<CharacterManager>().AddTopicPlayerToCharacter(topic, CharactersToAsk);
     }
     private void OnZoneExited(Collider other)
     {
-        GameManager.Instance.GetSystem<CharacterManager>().RemoveTopicPlayerToCharacter(topic, CharactersToAsk);
+        //GameManager.Instance.GetSystem<CharacterManager>().RemoveTopicPlayerToCharacter(topic, CharactersToAsk);
     }
 }

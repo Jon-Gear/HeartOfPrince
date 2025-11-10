@@ -8,7 +8,7 @@ public class ApproachPlayerStep : ActivityStep
 
     public override void Start(CharacterBrain brain)
     {
-        playerCharacter = GameManager.Instance.GetSystem<ActorRegistry>().GetActorByName("Prince").Character();
+        playerCharacter = GameManager.Instance.GetSystem<CharacterManager>().GetActorByName("Prince").Character();
         var myCharacter = brain.Actor().Character();
 
 

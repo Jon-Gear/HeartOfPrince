@@ -1,0 +1,119 @@
+﻿title: FirstContact
+when: CurrentActor("Munir")
+when: once
+---
+Munir: Assalamu alaikum, young man. 
+Munir: You seem a little lost. Can I help you with something?  
+
+// Prince: Uh… yeah.  
+// Prince: I’m lookin’ for a man named Munir.  
+// Prince: Tall dude, supposed to be here.  
+
+// Munir: Then you have found him.
+// Munir: My name is Munir.  
+// Munir: And who might you be?  
+
+// Prince: Name’s Prince.
+// Prince: Mister Hariri told me to come find you.  
+// Prince: Said you run this place.
+// Prince: Said you could help me out.
+
+// Munir: Ah… Ustaadh Hariri.
+// Munir: He mentioned you, yes.
+// Munir: You were both at the hospital, right?
+
+// Prince: Yeah.
+// -> Prince: I planned to kill Oldboy and Buddy during our last burglary. <<if false>>
+// -> Prince: It didn't go as planned, I chased Oldboy and Buddy throughout the city. <<if false>>
+// -> Prince: I caught up to them and got into a fight<<if false>>
+// -> Prince: I struck Oldboy in the head. <<if false>>
+// -> Prince: I strangled Buddy with my hands. <<if false>>
+// -> Prince: My heart stopped and I dropped Buddy on the ground. <<if false>>
+// -> Prince: I don't know how I ended up in the hospital. <<if false>>
+// -> Prince: I wanted to die. <<if false>>
+// -> Prince: Just say it wasn't the best week.
+// Prince: Wasn’t my best week.  
+// Prince: They said my heart’s messed up.  
+// Prince: Real bad.  
+
+// Munir: I’m sorry to hear that.  
+// Munir: How are you feeling now?  
+
+// Prince: Physically?  
+// Prince: Like I’m wearin’ bricks under my ribs.  
+// Prince: Mentally? 
+// -> Prince: I want to die. <<if false>>
+// -> Prince: I'm stressed out of my mind <<if false>>
+// -> Prince: I feel like I'm drowning. <<if false>>
+// -> Prince: I don't know.
+// Prince: …I don’t know.  
+// Prince: I guess that’s why I’m here.  
+
+// Munir: What is troubling you, Prince?
+
+// -> Prince: I'm a seventeen year old kid with no family, no home, and no future. <<if false>>
+// -> Prince: I'm a thief and a criminal, and I don't know how to stop. <<if false>>
+// -> Prince: I have no idea what I'm doing with my life. <<if false>>
+// -> Prince: I have 20 kids depending on me to keep them safe and fed. <<if false>>
+// -> Prince: I'm scared all the time, and I don't know why. <<if false>>
+// -> Prince: I struck the head of my closest friend and strangled his 10 year old brother. <<if false>>
+// -> Prince: I have a failing heart and only have 2 years left to live. <<if false>>
+// -> Prince: Lot's of things.
+
+// Prince: Heh.
+// Prince: Lotta things.  
+// Prince: But mostly—  
+// Prince: I got people who depend on me.
+// Prince: And I have no idea what to do.
+
+// Munir: Family?
+
+// Prince: Kinda.
+// Prince: A group of kids.
+// Prince: 20 of them.
+// Prince: And I'm like a...
+// -> Prince: A gang leader... <<if false>>
+// -> Prince: An older brother...
+// Prince: I'm like an older brother to them.
+
+// Prince: We are like a family.
+
+// Prince: We...
+// -> Prince: Steal from storage units and warehouses. <<if false>>
+// -> Prince: Steal car parts. <<if false>>
+// -> Prince: Steal fuel. <<if false>>
+// -> Prince: Conceal and lie to Munir about what you do.
+// Prince: We... 
+// Prince: ...stick together.  
+// Prince: Help each other out.  
+// Prince: Some of us sell scrap, some run errands for shops, some fix stuff.  
+// Prince: Just tryna make ends meet, you know?  
+
+// Munir: *Masha’Allah.*
+// Munir: You’ve carried a heavy duty for someone your age.
+// Munir: But I can sense something behind your tone.  
+// Munir: You’re afraid for them, aren’t you?  
+
+// Prince: Yeah, I am.
+// Prince: I have no idea what I'm doing with my life.
+// Prince: I never gave it that much thought before.
+// Prince: But now...
+// Prince: I'm afraid of what will happen to my boys when I'm gone.
+
+// Munir: Subhanallah.
+// Munir: I see that you're stressed.
+// Munir: And I see that you have a lot of questions on your mind.
+// Munir: If you wish, we can talk each day. 
+// Munir: And I will try to answer all of your questions.
+// Munir: I'm always here, at the mosque.
+
+Prince: Thanks. 
+
+//<<completeTask "Munir/MunirStart" "Meet Munir">>
+
+<<RemoveCharacterToPlayerTopic "Munir" "FirstContact">>
+
+//<<AddPlayerToCharacterTopic "Munir" "ToMuslimCommunity/ToMunir/WhatAmISupposedToDo">>
+
+//<<jump munir_start_questions_only>>
+===

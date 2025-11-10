@@ -20,16 +20,16 @@ public class YarnCommands : MonoBehaviour
     [YarnCommand("Follow")]
     public static void Follow(string actorName, string targetName)
     {
-        var actorRegistry = GameManager.Instance.GetSystem<ActorRegistry>();
+        var CharacterManager = GameManager.Instance.GetSystem<CharacterManager>();
         // Find the actor by name
-        Actor actor = actorRegistry.GetActorByName(actorName);
+        Actor actor = CharacterManager.GetActorByName(actorName);
         if (actor == null)
         {
             Debug.LogWarningFormat("Cannot find actor named {0}!", actorName);
             return;
         }
         // Find the target by name
-        Actor target = actorRegistry.GetActorByName(targetName);
+        Actor target = CharacterManager.GetActorByName(targetName);
         if (target == null)
         {
             Debug.LogWarningFormat("Cannot find target named {0}!", targetName);
@@ -45,9 +45,9 @@ public class YarnCommands : MonoBehaviour
     [YarnCommand("StopFollow")]
     public static void StopFollow(string actorName)
     {
-        var actorRegistry = GameManager.Instance.GetSystem<ActorRegistry>();
+        var CharacterManager = GameManager.Instance.GetSystem<CharacterManager>();
         // Find the actor by name
-        Actor actor = actorRegistry.GetActorByName(actorName);
+        Actor actor = CharacterManager.GetActorByName(actorName);
         if (actor == null)
         {
             Debug.LogWarningFormat("Cannot find actor named {0}!", actorName);
@@ -197,18 +197,23 @@ public class YarnCommands : MonoBehaviour
     // -------------------
 
     [YarnCommand("AddCharacterToCharacterTopic")]
-    public static void AddToCharacterTopicToAskCharacter(string characterName, string resourcePathToTopic)
+    public static void AddToCharacterTopicToAskCharacter(string characterName, string topicName)
     {
-        TopicCharacterToCharacter topic = Resources.Load<TopicCharacterToCharacter>("Dialogues/" + resourcePathToTopic);
         CharacterBrain characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
-        characterBrain.Dialogue().AddCharacterToCharacterTopic(topic);
+        if (!characterBrain.Dialogue().CharacterToCharacterTopics().Contains(topicName))
+        {
+            characterBrain.Dialogue().CharacterToCharacterTopics().Add(topicName);
+        }
     }
 
     [YarnCommand("RemoveCharacterToCharacterTopic")]
     public static void RemoveCharacterTopicToAskCharacter(string characterName, string topicName)
     {
         CharacterBrain characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
-        characterBrain.Dialogue().RemoveCharacterToCharacterTopic(topicName);
+        if (characterBrain.Dialogue().CharacterToCharacterTopics().Contains(topicName))
+        {
+            characterBrain.Dialogue().CharacterToCharacterTopics().Remove(topicName);
+        }
     }
 
 
@@ -227,9 +232,9 @@ public class YarnCommands : MonoBehaviour
     [YarnCommand("addThought")]
     public static void AddThought(string actorName, string thoughtName, int maxVariants)
     {
-        var actorRegistry = GameManager.Instance.GetSystem<ActorRegistry>();
+        var CharacterManager = GameManager.Instance.GetSystem<CharacterManager>();
         // Find the actor by name
-        Actor actor = actorRegistry.GetActorByName(actorName);
+        Actor actor = CharacterManager.GetActorByName(actorName);
         if (actor == null)
         {
             Debug.LogWarningFormat("Cannot find actor named {0}!", actorName);
@@ -260,8 +265,8 @@ public class YarnCommands : MonoBehaviour
     public static void AddActorToShot(string actorName)
     {
         // Find the actor by name
-        var actorRegistry = GameManager.Instance.GetSystem<ActorRegistry>();
-        Actor actor = actorRegistry.GetActorByName(actorName);
+        var CharacterManager = GameManager.Instance.GetSystem<CharacterManager>();
+        Actor actor = CharacterManager.GetActorByName(actorName);
         if (actor == null)
         {
             Debug.LogWarningFormat("Cannot find actor named {0}!", actorName);
@@ -278,7 +283,7 @@ public class YarnCommands : MonoBehaviour
     public static void RemoveActorFromShot(string actorName)
     {
         // Find the actor by name
-        Actor actor = GameManager.Instance.GetSystem<ActorRegistry>().GetActorByName(actorName);
+        Actor actor = GameManager.Instance.GetSystem<CharacterManager>().GetActorByName(actorName);
         if (actor == null)
         {
             Debug.LogWarningFormat("Cannot find actor named {0}!", actorName);
@@ -328,7 +333,7 @@ public class YarnCommands : MonoBehaviour
     public static void Gesture(string actorName, string emoteName)
     {
         // Find the actor by name
-        Actor actor = GameManager.Instance.GetSystem<ActorRegistry>().GetActorByName(actorName);
+        Actor actor = GameManager.Instance.GetSystem<CharacterManager>().GetActorByName(actorName);
         if (actor == null)
         {
             Debug.LogWarningFormat("Cannot find actor named {0}!", actorName);
@@ -343,7 +348,7 @@ public class YarnCommands : MonoBehaviour
     public static void EnterState(string actorName, string stateName)
     {
         // Find the actor by name
-        Actor actor = GameManager.Instance.GetSystem<ActorRegistry>().GetActorByName(actorName);
+        Actor actor = GameManager.Instance.GetSystem<CharacterManager>().GetActorByName(actorName);
         if (actor == null)
         {
             Debug.LogWarningFormat("Cannot find actor named {0}!", actorName);
@@ -358,7 +363,7 @@ public class YarnCommands : MonoBehaviour
     public static void ExitState(string actorName, string stateName)
     {
         // Find the actor by name
-        Actor actor = GameManager.Instance.GetSystem<ActorRegistry>().GetActorByName(actorName);
+        Actor actor = GameManager.Instance.GetSystem<CharacterManager>().GetActorByName(actorName);
         if (actor == null)
         {
             Debug.LogWarningFormat("Cannot find actor named {0}!", actorName);

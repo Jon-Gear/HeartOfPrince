@@ -85,7 +85,7 @@ public class CharacterBrain : MonoBehaviour
     
     public Actor Actor()
     {
-        return GameManager.Instance.GetSystem<ActorRegistry>().GetActorByName(Dialogue().characterName);
+        return GameManager.Instance.GetSystem<CharacterManager>().GetActorByName(Dialogue().characterName);
     }
 
 
@@ -119,39 +119,4 @@ public class CharacterBrain : MonoBehaviour
             Destroy(actor.gameObject);
         }
     }
-
-
-
-
-    #region hidden
-
-    // I don't think it is supposed to be doing this.
-    public void MoveCharacterToMarkerID(string markerID)
-    {
-        var actorRegistry = GameManager.Instance.GetSystem<ActorRegistry>();
-
-        Actor actor = actorRegistry.GetActorByName(Dialogue().characterName);
-
-        if (actor == null)
-        {
-            Debug.LogWarning($"{Dialogue().characterName} character not found");
-            return;
-        }
-
-        Marker targetMarker = Marker.GetMarkerByID(markerID);
-
-        if (targetMarker == null)
-        {
-            Debug.LogWarning($"SpawnCharacter: No Marker found with ID '{markerID}'.");
-            return;
-        }
-
-        actor.Character().Motion.MoveToMarker(targetMarker, 0.1f, OnMarkerReached);
-    }
-
-    private void OnMarkerReached(Character character, bool foo)
-    {
-        Debug.Log($"{character.name} reached marker {foo}");
-    }
-    #endregion
 }

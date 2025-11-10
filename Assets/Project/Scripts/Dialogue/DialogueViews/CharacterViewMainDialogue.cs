@@ -44,10 +44,10 @@ public class CharacterViewMainDialogue
     public override YarnTask<DialogueOption> RunOptionsAsync(DialogueOption[] dialogueOptions, CancellationToken cancellationToken)
     {
         base.RunOptions(dialogueOptions, onOptionSelected);
-        var actorRegistry = GameManager.Instance.GetSystem<ActorRegistry>();
+        var CharacterManager = GameManager.Instance.GetSystem<CharacterManager>();
 
 
-        GameManager.Instance.GetSystem<DialogueManager>().main.SetSpeaker(actorRegistry.playerActor.actorName);
+        GameManager.Instance.GetSystem<DialogueManager>().main.SetSpeaker(CharacterManager.playerActor.actorName);
 
         return YarnTask<DialogueOption>.FromResult(null);
 

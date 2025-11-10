@@ -10,8 +10,9 @@ public class CharacterManager : GameSystem
 {
     private PlayerCharacterBrain playerCharacter;
     private CharacterBrain[] characters;
-
-
+    [SerializeField] private Actor playerActor;
+    [SerializeField] private List<Actor> actors = new List<Actor>();
+    
     public override void Init()
     {
         characters = GetComponentsInChildren<CharacterBrain>();
@@ -41,36 +42,61 @@ public class CharacterManager : GameSystem
         return null;
     }
 
-
-    public void AddTopicPlayerToCharacter(TopicPlayerToCharacter topic, List<string> characterNames)
+    public void RegisterPlayerActor(Actor actor)
     {
-        foreach (string characterName in characterNames)
+        if(playerActor != null)
         {
-            CharacterBrain character = GetCharacter(characterName);
-            if (character != null)
-            {
-                //character.Dialogue().AddPlayerToCharacterTopic(topic);
-            }
-            else
-            {
-                Debug.LogWarning($"Character '{characterName}' not found. Cannot add topic.");
-            }
+            Debug.LogError("Actor Registry Error: There cannot be two player actors");
+            return;
+        }
+        playerActor = actor;
+    }
+    public Actor GetPlayerActor()
+    {
+        return playerActor;
+    }
+
+    public void UnregisterPlayerActor()
+    {
+        playerActor = null;
+    }
+
+
+    public void RegisterActor(Actor actor)
+    {
+        if (!actors.Contains(actor))
+        {
+            actors.Add(actor);
         }
     }
 
-    public void RemoveTopicPlayerToCharacter(TopicPlayerToCharacter topic, List<string> characterNames)
+    
+    public Actor GetActorByName(string actorName)
     {
-        foreach (string characterName in characterNames)
+        foreach (var actor in actors)
         {
-            CharacterBrain character = GetCharacter(characterName);
-            if (character != null)
+            if (actor.actorName == actorName)
             {
-                //character.Dialogue().RemovePlayerToCharacterTopic(topic);
-            }
-            else
-            {
-                Debug.LogWarning($"Character '{characterName}' not found. Cannot remove topic.");
+                return actor;
             }
         }
+        Debug.LogWarningFormat("Cannot find actor named {0}!", actorName);
+        return null;
+    }
+
+    public void UnregisterActor(Actor actor)
+    {
+        if (actors.Contains(actor))
+        {
+            actors.Remove(actor);
+        }
+    }
+
+
+
+    protected override void OnActiveSceneChanged(Scene oldScene, Scene newScene)
+    {
+        playerActor = null;
+        actors.Clear();
     }
 }

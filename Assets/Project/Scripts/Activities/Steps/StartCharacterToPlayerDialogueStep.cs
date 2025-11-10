@@ -4,22 +4,27 @@ public class StartCharacterToPlayerDialogueStep : ActivityStep
 {
     public override void Start(CharacterBrain brain)
     {
-        brain.Dialogue().TriggerCharacterDialogueWithPlayer(OnFinish);
+        var dialogueManager = GameManager.Instance.GetSystem<DialogueManager>();
+
+        dialogueManager.Primary().onDialogueComplete.AddListener(OnDialogueComplete);
+        dialogueManager.Primary().StartDialogue(brain.Dialogue().ChooseCharacterToPlayerTopic());
 
         Debug.Log("Starting dialogue");
     }
-
-    private void OnFinish()
-    {
-        IsComplete = true;
-        Debug.Log("Finished dialogue");
-    }
-
     public override void Tick(CharacterBrain brain)
     {
     }
 
     public override void Finish(CharacterBrain brain)
     {
+        var dialogueManager = GameManager.Instance.GetSystem<DialogueManager>();
+        dialogueManager.Primary().onDialogueComplete.RemoveListener(OnDialogueComplete);
     }
+
+    private void OnDialogueComplete()
+    {
+        IsComplete = true;
+        Debug.Log("Finished dialogue");
+    }
+
 }

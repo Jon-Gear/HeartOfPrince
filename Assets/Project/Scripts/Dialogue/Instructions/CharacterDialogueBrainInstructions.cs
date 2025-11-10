@@ -44,7 +44,7 @@ public class InstructionCharacterTalkToYou : Instruction
 
         if (character == null) return DefaultResult;
 
-        character.Dialogue().TriggerCharacterDialogueWithPlayer();
+        //character.Dialogue().TriggerCharacterDialogueWithPlayer();
         return DefaultResult;
     }
 }

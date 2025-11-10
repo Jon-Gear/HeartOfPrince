@@ -25,7 +25,7 @@ public class TopicZone : MonoBehaviour
         }
         CharacterBrain brain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(otherActor.actorName);
 
-        brain.Dialogue().AddCharacterMonologueTopic(topic);
+        //brain.Dialogue().AddCharacterMonologueTopic(topic);
 
 
     }
@@ -38,6 +38,6 @@ public class TopicZone : MonoBehaviour
         }
         CharacterBrain brain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(otherActor.actorName);
 
-        brain.Dialogue().RemoveCharacterMonologueTopic(topic);
+        //brain.Dialogue().RemoveCharacterMonologueTopic(topic);
     }
 }

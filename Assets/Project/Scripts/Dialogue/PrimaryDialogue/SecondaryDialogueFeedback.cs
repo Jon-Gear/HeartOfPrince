@@ -6,11 +6,10 @@ using Yarn.Unity;
 
 #nullable enable
 
-public class PrimaryDialogueFeedback : DialoguePresenterBase
+public class SecondaryDialogueFeedback : DialoguePresenterBase
 {
     public override async YarnTask OnDialogueStartedAsync()
     {
-
         // Called by the Dialogue Runner to signal that dialogue has just
         // started up.
         //
