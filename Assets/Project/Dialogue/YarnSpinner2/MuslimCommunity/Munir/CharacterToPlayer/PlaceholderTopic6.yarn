@@ -1,0 +1,16 @@
+﻿title: PlaceholderTopic6
+when: CurrentActor("Munir")
+---
+<<SetShot "CloseUp_B">>
+Munir: You never stay long.
+<<SetShot "OTS_B">>
+
+Prince: Long enough.
+Munir: For what?
+Prince: For things to settle.
+Munir: Do they?
+Prince: Not really.
+Munir: Then why come back?
+Prince: Because they almost do.
+<<RemoveCharacterToPlayerTopic {GetCurrentActor()} PlaceholderTopic6>>
+===

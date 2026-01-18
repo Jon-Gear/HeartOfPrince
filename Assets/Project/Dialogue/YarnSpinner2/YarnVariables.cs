@@ -20,4 +20,10 @@ public partial class YarnVariables : Yarn.Unity.InMemoryVariableStorage, Yarn.Un
         set => this.SetValue<string>("$topic3", value);
     }
 
+    // Accessor for String $topicNPC
+    public string TopicNPC {
+        get => this.GetValueOrDefault<string>("$topicNPC");
+        set => this.SetValue<string>("$topicNPC", value);
+    }
+
 }

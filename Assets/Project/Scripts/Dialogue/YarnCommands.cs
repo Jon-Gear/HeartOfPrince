@@ -95,57 +95,7 @@ public class YarnCommands : MonoBehaviour
 
 
 
-    // -------------------
-    // Player -> Character
-    // -------------------
-
-    [YarnCommand("AddPlayerToCharacterTopic")]
-    public static void AddPlayerToCharacterTopic(string characterToAsk, string topicName)
-    {
-        CharacterBrain characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterToAsk);
-
-        if (!characterBrain.Dialogue().PlayerToCharacterTopics().Contains(topicName))
-        {
-            characterBrain.Dialogue().PlayerToCharacterTopics().Add(topicName);
-        }
-    }
-
-    [YarnCommand("RemovePlayerToCharacterTopic")]
-    public static void RemovePlayerToCharacterTopic(string characterToAsk, string topicName)
-    {
-        CharacterBrain characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterToAsk);
-
-        if(characterBrain.Dialogue().PlayerToCharacterTopics().Contains(topicName))
-        {
-            characterBrain.Dialogue().PlayerToCharacterTopics().Remove(topicName);
-        }
-    }
-
-    // -------------------
-    // Character -> Player
-    // -------------------
-
-    [YarnCommand("AddCharacterToPlayerTopic")]
-    public static void AddToCharacterTopicToAskPlayer(string characterName, string topicName)
-    {
-        CharacterBrain characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
-
-        if (!characterBrain.Dialogue().CharacterToPlayerTopics().Contains(topicName))
-        {
-            characterBrain.Dialogue().CharacterToPlayerTopics().Add(topicName);
-        }
-    }
-
-    [YarnCommand("RemoveCharacterToPlayerTopic")]
-    public static void RemoveCharacterTopicToAskPlayer(string characterName, string topicName)
-    {
-        CharacterBrain characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
-
-        if (characterBrain.Dialogue().CharacterToPlayerTopics().Contains(topicName))
-        {
-            characterBrain.Dialogue().CharacterToPlayerTopics().Remove(topicName);
-        }
-    }
+    
 
     // -------------------
     // Character Monologue

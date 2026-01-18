@@ -2,14 +2,17 @@
 when: CurrentActor("Munir")
 when: always
 ---
+<<SetShot "Wide">>
+
+<<wait 1.5>>
+
 <<detour Greet>>
 <<detour TopicHub>>
 ===
 
-
-title: Start
-when: CurrentActor("Munir")
-when: once
----
-<<detour FirstContact>>
-===
+// title: Start
+// when: CurrentActor("Munir")
+// when: once
+// ---
+// <<detour FirstContact>>
+// ===

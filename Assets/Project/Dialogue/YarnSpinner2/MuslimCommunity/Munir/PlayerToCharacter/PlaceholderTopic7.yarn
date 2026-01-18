@@ -1,0 +1,17 @@
+﻿title: PlaceholderTopic7
+when: CurrentActor("Munir")
+---
+<<SetShot "CloseUp_A">>
+Prince: You’re here every day.
+<<SetShot "OTS_A">>
+
+Munir: This place needs it.
+Prince: Places don’t talk.
+Munir: They still wear down.
+Prince: You fixing cracks or watching them?
+Munir: Both, when I can.
+Prince: Sounds like work that never ends.
+Munir: Some work shouldn’t.
+
+<<RemovePlayerToCharacterTopic {GetCurrentActor()} PlaceholderTopic7>>
+===

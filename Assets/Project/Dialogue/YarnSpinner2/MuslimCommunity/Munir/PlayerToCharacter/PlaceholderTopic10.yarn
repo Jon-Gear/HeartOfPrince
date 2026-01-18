@@ -1,0 +1,16 @@
+﻿title: PlaceholderTopic10
+when: CurrentActor("Munir")
+---
+<<SetShot "CloseUp_A">>
+Prince: You ever regret staying in one place?
+<<SetShot "OTS_A">>
+
+Munir: I regret leaving some.
+Prince: That’s not an answer.
+Munir: It’s the only one I have.
+Prince: Doesn’t that bother you?
+Munir: Not anymore.
+Prince: Must be nice.
+Munir: It took time.
+<<RemovePlayerToCharacterTopic {GetCurrentActor()} PlaceholderTopic10>>
+===

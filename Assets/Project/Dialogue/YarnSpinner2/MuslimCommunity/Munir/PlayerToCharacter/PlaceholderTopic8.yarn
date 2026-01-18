@@ -1,0 +1,16 @@
+﻿title: PlaceholderTopic8
+when: CurrentActor("Munir")
+---
+<<SetShot "CloseUp_A">>
+Prince: You move slow for someone your size.
+<<SetShot "OTS_A">>
+
+Munir: Slow keeps things intact.
+Prince: Ever want to move fast?
+Munir: I used to.
+Prince: What stopped you?
+Munir: Learning where fast leads.
+Prince: And you liked the view?
+Munir: Enough to stay.
+<<RemovePlayerToCharacterTopic {GetCurrentActor()} PlaceholderTopic8>>
+===

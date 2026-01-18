@@ -1,0 +1,17 @@
+﻿title: PlaceholderTopic3
+when: CurrentActor("Munir")
+---
+<<SetShot "CloseUp_B">>
+Munir: Do you come here to think?
+<<SetShot "OTS_B">>
+
+Prince: No.
+Munir: To wait, then?
+Prince: Maybe.
+Munir: Waiting for what?
+Prince: Something to end.
+Munir: Endings are noisy.
+Prince: Better than dragging.
+Munir: That depends on what’s being dragged.
+<<RemoveCharacterToPlayerTopic {GetCurrentActor()} PlaceholderTopic3>>
+===

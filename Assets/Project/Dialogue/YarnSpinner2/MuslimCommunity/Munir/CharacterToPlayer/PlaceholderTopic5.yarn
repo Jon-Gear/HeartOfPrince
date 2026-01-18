@@ -1,0 +1,18 @@
+﻿title: PlaceholderTopic5
+when: CurrentActor("Munir")
+---
+<<SetShot "CloseUp_B">>
+Munir: People usually come here with questions.
+<<SetShot "OTS_B">>
+
+
+Prince: I don’t have any.
+Munir: Or answers.
+Prince: Especially not those.
+Munir: You sound certain.
+Prince: Certainty’s cheaper than hope.
+Munir: Depends who’s paying.
+Prince: Someone always is.
+Munir: That’s true.
+<<RemoveCharacterToPlayerTopic {GetCurrentActor()} PlaceholderTopic5>>
+===

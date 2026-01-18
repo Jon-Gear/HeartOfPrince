@@ -1,17 +1,32 @@
 title: TopicHub
 ---
+<<SetShot "TwoShot">>
+
 <<declare $topic1 = "...">>
 <<declare $topic2 = "...">>
 <<declare $topic3 = "...">>
+
+<<ShufflePlayerToCharacterTopics {GetCurrentActor()}>>
 
 <<set $topic1 = GetPlayerToCharacterTopic(GetCurrentActor(), 0)>>
 <<set $topic2 = GetPlayerToCharacterTopic(GetCurrentActor(), 1)>>
 <<set $topic3 = GetPlayerToCharacterTopic(GetCurrentActor(), 2)>>
 
--> Talk about {$topic1} <<if $topic1 != "...">>
+-> Talk about {$topic1} <<if $topic1 != "..." >>
     <<detour {$topic1}>>
 -> Talk about {$topic2} <<if $topic2 != "...">>
     <<detour {$topic2}>>
 -> Talk about {$topic3} <<if $topic3 != "...">>
     <<detour {$topic3}>>
+-> Reshuffle topics <<if GetPlayerToCharacterTopicAmount(GetCurrentActor()) > 3>>
+    Prince: Let me think again
+    <<jump TopicHub>>
+-> Give word to {GetCurrentActor()} <<if GetCharacterToPlayerTopicAmount(GetCurrentActor()) > 0>>
+    Prince: You got something to say?
+    <<jump TopicHubNPC>>
+-> Finish conversation
+    Prince: I think that's all for now.
+    <<stop>>
+
+<<jump TopicHubNPC>>
 ===

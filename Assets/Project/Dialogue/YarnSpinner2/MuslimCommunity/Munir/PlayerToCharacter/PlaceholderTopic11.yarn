@@ -1,0 +1,16 @@
+﻿title: PlaceholderTopic11
+when: CurrentActor("Munir")
+---
+<<SetShot "CloseUp_A">>
+Prince: People listen to you.
+<<SetShot "OTS_A">>
+
+Munir: Only if they want to.
+Prince: They still stop when you talk.
+Munir: Stopping is a choice.
+Prince: You like that?
+Munir: I respect it.
+Prince: That’s different.
+Munir: Very.
+<<RemovePlayerToCharacterTopic {GetCurrentActor()} PlaceholderTopic11>>
+===

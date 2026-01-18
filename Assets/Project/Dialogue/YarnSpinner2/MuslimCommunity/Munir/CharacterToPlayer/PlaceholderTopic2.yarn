@@ -1,0 +1,16 @@
+﻿title: PlaceholderTopic2
+when: CurrentActor("Munir")
+---
+<<SetShot "CloseUp_B">>
+Munir: You arrive quiet, but not tired.
+<<SetShot "OTS_B">>
+
+Prince: I don’t get tired like that.
+Munir: Everyone does, eventually.
+Prince: Then they rest.
+Munir: Or they keep moving.
+Prince: Moving keeps things simple.
+Munir: Simple doesn’t mean light.
+Prince: Never said it did.
+<<RemoveCharacterToPlayerTopic {GetCurrentActor()} PlaceholderTopic2>>
+===

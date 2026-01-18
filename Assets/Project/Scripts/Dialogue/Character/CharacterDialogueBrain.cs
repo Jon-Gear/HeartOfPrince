@@ -62,11 +62,27 @@ public class CharacterDialogueBrain : MonoBehaviour
         return monologueTopics[Random.Range(0, monologueTopics.Count)];
     }
 
+
     public string ChooseCharacterToPlayerTopic()
     {
         return characterToPlayerTopics[Random.Range(0, characterToPlayerTopics.Count)];
     }
 
+
+
+    [YarnFunction("GetCharacterToPlayerTopic")]
+    public static string ChooseCharacterToPlayerTopic(string characterName)
+    {
+        CharacterBrain character = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
+        return character.Dialogue().ChooseCharacterToPlayerTopic();
+    }
+
+    [YarnFunction("GetCharacterToPlayerTopicAmount")]
+    public static int GetCharacterToPlayerTopicAmount(string characterName)
+    {
+        CharacterBrain character = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
+        return character.Dialogue().characterToPlayerTopics.Count;
+    }
 
 
 
@@ -129,8 +145,8 @@ public class CharacterDialogueBrain : MonoBehaviour
         dialogueManager.Primary().StartDialogue("Start");
     }
 
-    [YarnFunction("PlayerToCharacterTopicCount")]
-    public static int PlayerToCharacterTopicCount(string characterName)
+    [YarnFunction("GetPlayerToCharacterTopicAmount")]
+    public static int PlayerToCharacterTopicAmount(string characterName)
     {
         CharacterBrain character = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
         return character.Dialogue().playerToCharacterTopics.Count;
@@ -139,6 +155,7 @@ public class CharacterDialogueBrain : MonoBehaviour
     [YarnCommand("ShufflePlayerToCharacterTopics")]
     public static void ShufflePlayerToCharacterTopics(string characterName)
     {
+        Debug.Log($"Shuffling Player to Character topics for {characterName}");
         CharacterBrain character = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
 
         character.Dialogue().PlayerToCharacterTopics().Shuffle();
@@ -157,6 +174,58 @@ public class CharacterDialogueBrain : MonoBehaviour
         }
         return character.Dialogue().playerToCharacterTopics[index];
     
+    }
+
+    // -------------------
+    // Player -> Character
+    // -------------------
+
+    [YarnCommand("AddPlayerToCharacterTopic")]
+    public static void AddPlayerToCharacterTopic(string characterToAsk, string topicName)
+    {
+        CharacterBrain characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterToAsk);
+
+        if (!characterBrain.Dialogue().PlayerToCharacterTopics().Contains(topicName))
+        {
+            characterBrain.Dialogue().PlayerToCharacterTopics().Add(topicName);
+        }
+    }
+
+    [YarnCommand("RemovePlayerToCharacterTopic")]
+    public static void RemovePlayerToCharacterTopic(string characterToAsk, string topicName)
+    {
+        CharacterBrain characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterToAsk);
+
+        if (characterBrain.Dialogue().PlayerToCharacterTopics().Contains(topicName))
+        {
+            characterBrain.Dialogue().PlayerToCharacterTopics().Remove(topicName);
+        }
+    }
+
+    // -------------------
+    // Character -> Player
+    // -------------------
+
+    [YarnCommand("AddCharacterToPlayerTopic")]
+    public static void AddToCharacterTopicToAskPlayer(string characterName, string topicName)
+    {
+        CharacterBrain characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
+
+        if (!characterBrain.Dialogue().CharacterToPlayerTopics().Contains(topicName))
+        {
+            characterBrain.Dialogue().CharacterToPlayerTopics().Add(topicName);
+        }
+    }
+
+    [YarnCommand("RemoveCharacterToPlayerTopic")]
+    public static void RemoveCharacterTopicToAskPlayer(string characterName, string topicName)
+    {
+        CharacterBrain characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
+
+        if (characterBrain.Dialogue().CharacterToPlayerTopics().Contains(topicName))
+        {
+            characterBrain.Dialogue().CharacterToPlayerTopics().Remove(topicName);
+        }
     }
 
     // -------------------

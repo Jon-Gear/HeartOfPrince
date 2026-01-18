@@ -1,0 +1,16 @@
+﻿title: PlaceholderTopic9
+when: CurrentActor("Munir")
+---
+<<SetShot "CloseUp_A">>
+Prince: You trust people here?
+<<SetShot "OTS_A">>
+
+Munir: I give them room.
+Prince: That’s not the same.
+Munir: No. It’s safer.
+Prince: Safer for who?
+Munir: Everyone involved.
+Prince: Sounds lonely.
+Munir: Sometimes.
+<<RemovePlayerToCharacterTopic {GetCurrentActor()} PlaceholderTopic9>>
+===
