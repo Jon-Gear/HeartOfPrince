@@ -10,7 +10,7 @@ public class GameplayState : GameState
         gameManager.ActivateSystem<TimeManager>();
         gameManager.ActivateSystem<LightingManager>();
 
-        gameManager.ActivateSystem<QuestManager>();
+        //gameManager.ActivateSystem<QuestManager>();
         gameManager.ActivateSystem<DialogueManager>();
         gameManager.ActivateSystem<CharacterManager>();
         gameManager.ActivateSystem<CharacterManager>();
@@ -21,7 +21,7 @@ public class GameplayState : GameState
         var gameManager = GameManager.Instance;
 
         gameManager.DeactivateSystem<TimeManager>();
-        gameManager.DeactivateSystem<QuestManager>();
+        //gameManager.DeactivateSystem<QuestManager>();
         gameManager.DeactivateSystem<DialogueManager>();
         gameManager.DeactivateSystem<CharacterManager>();
         gameManager.DeactivateSystem<CharacterManager>();

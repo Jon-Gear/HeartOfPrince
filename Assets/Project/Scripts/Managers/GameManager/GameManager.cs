@@ -35,10 +35,7 @@ public class GameManager : MonoBehaviour
     }
 
 
-    public Level GetLevel()
-    {
-        return FindFirstObjectByType<Level>();
-    }
+    
 
 
     /// <summary>

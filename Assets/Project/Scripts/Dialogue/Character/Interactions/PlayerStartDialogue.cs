@@ -1,5 +1,3 @@
-using GameCreator.Runtime.Dialogue;
-using GameCreator.Runtime.Stats;
 using UnityEngine;
 
 public class PlayerStartDialogue : MonoBehaviour

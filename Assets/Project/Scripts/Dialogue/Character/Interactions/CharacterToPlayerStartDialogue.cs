@@ -10,20 +10,20 @@ public class CharacterToPlayerStartDialogue : MonoBehaviour
     [SerializeField] private TriggerCollider detectionCollider;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        detectionCollider.TriggerEntered += OnPlayerInRange;
-        detectionCollider.TriggerExited += OnPlayerOutOfRange;
-    }
+    //void Start()
+    //{
+    //    detectionCollider.TriggerEntered += OnPlayerInRange;
+    //    detectionCollider.TriggerExited += OnPlayerOutOfRange;
+    //}
 
 
-    void OnPlayerInRange(Collider other)
-    {
-        characterActor.Brain().Activity().AddActivity<ActivityCharacterToPlayerDialogue>();
-    }
+    //void OnPlayerInRange(Collider other)
+    //{
+    //    //characterActor.Brain().Activity().AddActivity<ActivityCharacterToPlayerDialogue>();
+    //}
 
-    void OnPlayerOutOfRange(Collider other)
-    {
-        characterActor.Brain().Activity().RemoveActivity<ActivityCharacterToPlayerDialogue>();
-    }
+    //void OnPlayerOutOfRange(Collider other)
+    //{
+    //    characterActor.Brain().Activity().RemoveActivity<ActivityCharacterToPlayerDialogue>();
+    //}
 }

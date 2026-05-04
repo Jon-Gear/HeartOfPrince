@@ -61,37 +61,37 @@ public class YarnCommands : MonoBehaviour
 
 
 
-    [YarnFunction("GetPlayerStat")]
-    public static float GetPlayerStat(string statID)
-    {
-        var characterManager = GameManager.Instance.GetSystem<CharacterManager>();
-        var playerCharacter = characterManager.GetPlayerCharacter();
-        return playerCharacter.Traits().GetStat(statID);
-    }
+    //[YarnFunction("GetPlayerStat")]
+    //public static float GetPlayerStat(string statID)
+    //{
+    //    var characterManager = GameManager.Instance.GetSystem<CharacterManager>();
+    //    var playerCharacter = characterManager.GetPlayerCharacter();
+    //    return playerCharacter.Traits().GetStat(statID);
+    //}
 
-    [YarnFunction("GetPlayerAttribute")]
-    public static float GetPlayerAttribute(string attributeID)
-    {
-        var characterManager = GameManager.Instance.GetSystem<CharacterManager>();
-        var playerCharacter = characterManager.GetPlayerCharacter();
-        return playerCharacter.Traits().GetAttribute(attributeID);
-    }
+    //[YarnFunction("GetPlayerAttribute")]
+    //public static float GetPlayerAttribute(string attributeID)
+    //{
+    //    var characterManager = GameManager.Instance.GetSystem<CharacterManager>();
+    //    var playerCharacter = characterManager.GetPlayerCharacter();
+    //    return playerCharacter.Traits().GetAttribute(attributeID);
+    //}
 
-    [YarnCommand("PlayerAttributeAdd")]
-    public static void PlayerAttributeAdd(string attributeID, float value)
-    {
-        var characterManager = GameManager.Instance.GetSystem<CharacterManager>();
-        var playerCharacter = characterManager.GetPlayerCharacter();
-        playerCharacter.Traits().AttributeAdd(attributeID, value);
-    }
+    //[YarnCommand("PlayerAttributeAdd")]
+    //public static void PlayerAttributeAdd(string attributeID, float value)
+    //{
+    //    var characterManager = GameManager.Instance.GetSystem<CharacterManager>();
+    //    var playerCharacter = characterManager.GetPlayerCharacter();
+    //    playerCharacter.Traits().AttributeAdd(attributeID, value);
+    //}
 
-    [YarnCommand("PlayerAttributeSubtract")]
-    public static void PlayerAttributeSubtract(string attributeID, float value)
-    {
-        var characterManager = GameManager.Instance.GetSystem<CharacterManager>();
-        var playerCharacter = characterManager.GetPlayerCharacter();
-        playerCharacter.Traits().AttributeSubtract(attributeID, value);
-    }
+    //[YarnCommand("PlayerAttributeSubtract")]
+    //public static void PlayerAttributeSubtract(string attributeID, float value)
+    //{
+    //    var characterManager = GameManager.Instance.GetSystem<CharacterManager>();
+    //    var playerCharacter = characterManager.GetPlayerCharacter();
+    //    playerCharacter.Traits().AttributeSubtract(attributeID, value);
+    //}
 
 
 
@@ -251,31 +251,31 @@ public class YarnCommands : MonoBehaviour
 
 
 
-    // Quest Management
+    //// Quest Management
 
-    [YarnCommand("activateQuest")]
-    public static void ActivateQuest(string questName)
-    {
-        GameManager.Instance.GetSystem<QuestManager>().ActivateQuest(questName);
-    }
+    //[YarnCommand("activateQuest")]
+    //public static void ActivateQuest(string questName)
+    //{
+    //    GameManager.Instance.GetSystem<QuestManager>().ActivateQuest(questName);
+    //}
 
-    [YarnCommand("trackQuest")]
-    public static void TrackQuest(string questName)
-    {
-        GameManager.Instance.GetSystem<QuestManager>().TrackQuest(questName);
-    }
+    //[YarnCommand("trackQuest")]
+    //public static void TrackQuest(string questName)
+    //{
+    //    GameManager.Instance.GetSystem<QuestManager>().TrackQuest(questName);
+    //}
 
-    [YarnCommand("completeTask")]
-    public static void CompleteTask(string questName, string taskName)
-    {
-        GameManager.Instance.GetSystem<QuestManager>().CompleteTask(questName, taskName);
-    }
+    //[YarnCommand("completeTask")]
+    //public static void CompleteTask(string questName, string taskName)
+    //{
+    //    GameManager.Instance.GetSystem<QuestManager>().CompleteTask(questName, taskName);
+    //}
 
-    [YarnCommand("updateTaskProgressBy")]
-    public static void UpdateTaskProgressBy(string questName, string taskName, float progress)
-    {
-        GameManager.Instance.GetSystem<QuestManager>().UpdateTaskProgressBy(questName, taskName, progress);
-    }
+    //[YarnCommand("updateTaskProgressBy")]
+    //public static void UpdateTaskProgressBy(string questName, string taskName, float progress)
+    //{
+    //    GameManager.Instance.GetSystem<QuestManager>().UpdateTaskProgressBy(questName, taskName, progress);
+    //}
 
     // Actor Expressions
 

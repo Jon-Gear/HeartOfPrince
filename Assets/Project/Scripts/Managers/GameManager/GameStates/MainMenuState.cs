@@ -8,7 +8,7 @@ public class MainMenuState : GameState
         var gameManager = GameManager.Instance;
 
         gameManager.DeactivateSystem<TimeManager>();
-        gameManager.DeactivateSystem<QuestManager>();
+        //gameManager.DeactivateSystem<QuestManager>();
         gameManager.DeactivateSystem<DialogueManager>();
         gameManager.DeactivateSystem<CinemachineManager>();
     }

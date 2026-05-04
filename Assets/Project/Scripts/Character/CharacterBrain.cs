@@ -1,8 +1,5 @@
-using GameCreator.Runtime.Characters;
 using GameCreator.Runtime.Common;
-using GameCreator.Runtime.Dialogue;
-using GameCreator.Runtime.Melee;
-using GameCreator.Runtime.Stats;
+
 using Tools;
 using UnityEngine;
 
@@ -72,16 +69,13 @@ public class CharacterBrain : MonoBehaviour
     [SerializeField] private PropertyGetGameObject characterPrefab = GetGameObjectInstance.Create();
 
 
-    private TraitsOperator traits;
     private CharacterActivityBrain activityBrain;
     private CharacterDialogueBrain characterDialogueBrain;
-    private CharacterScheduleBrain characterScheduleBrain;
+
 
     public GameObject Prefab() => characterPrefab.Get(gameObject);
     public CharacterActivityBrain Activity() => activityBrain;
-    public TraitsOperator Traits() => traits;
     public CharacterDialogueBrain Dialogue() => characterDialogueBrain;
-    public CharacterScheduleBrain Schedule() => characterScheduleBrain;
     
     public Actor Actor()
     {
@@ -92,9 +86,8 @@ public class CharacterBrain : MonoBehaviour
     void Start()
     {
         activityBrain = GetComponent<CharacterActivityBrain>();
-        traits = GetComponent<TraitsOperator>();
+
         characterDialogueBrain = GetComponent<CharacterDialogueBrain>();
-        characterScheduleBrain = GetComponent<CharacterScheduleBrain>();
     }
 
     public void SpawnActor(Marker spawnMarker)

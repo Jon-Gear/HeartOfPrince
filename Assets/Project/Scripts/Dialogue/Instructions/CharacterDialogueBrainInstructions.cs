@@ -1,5 +1,4 @@
 ﻿using GameCreator.Runtime.Common;
-using GameCreator.Runtime.Dialogue;
 using GameCreator.Runtime.VisualScripting;
 using System;
 using System.Threading.Tasks;
@@ -8,7 +7,7 @@ using UnityEngine;
 
 [Title("Talk To Character")]
 [Description("This will return a weighted YarnSpinner dialogue based from CharacterDialogueBrain")]
-[Image(typeof(IconNodeText), ColorTheme.Type.Green)]
+//[Image(typeof(IconNodeText), ColorTheme.Type.Green)]
 [Category("YarnSpinner/Dialogue/Talk To Character")]
 [Serializable]
 public class InstructionTalkToCharacter : Instruction
@@ -31,7 +30,7 @@ public class InstructionTalkToCharacter : Instruction
 
 [Title("Character Talk To You")]
 [Description("This will return a topic the NPC wants to ask the player CharacterDialogueBrain")]
-[Image(typeof(IconNodeText), ColorTheme.Type.Green)]
+//[Image(typeof(IconNodeText), ColorTheme.Type.Green)]
 [Category("YarnSpinner/Dialogue/Character Talk To You")]
 [Serializable]
 public class InstructionCharacterTalkToYou : Instruction
@@ -52,7 +51,7 @@ public class InstructionCharacterTalkToYou : Instruction
 
 [Title("Start Background Dialogue Loop")]
 [Description("This will return a YarnSpinner background dialogue based from CharacterDialogueBrain")]
-[Image(typeof(IconNodeText), ColorTheme.Type.Green)]
+//[Image(typeof(IconNodeText), ColorTheme.Type.Green)]
 [Category("YarnSpinner/Dialogue/Have Character Speak")]
 [Serializable]
 public class InstructionRunBackgroundDialogue : Instruction
@@ -72,7 +71,7 @@ public class InstructionRunBackgroundDialogue : Instruction
 
 [Title("Stop Background Dialogue Loop")]
 [Description("This will stop the background dilaogue loop from CharacterDialogueBrain")]
-[Image(typeof(IconNodeText), ColorTheme.Type.Green)]
+//[Image(typeof(IconNodeText), ColorTheme.Type.Green)]
 [Category("YarnSpinner/Dialogue/Have Character Stop Speaking")]
 [Serializable]
 public class InstructionStopBackgroundDialogue : Instruction
@@ -92,7 +91,7 @@ public class InstructionStopBackgroundDialogue : Instruction
 
 [Title("Add Background Dialogue Topic")]
 [Description("This will add a background dialogue topic to the CharacterDialogueBrain")]
-[Image(typeof(IconPlus), ColorTheme.Type.Green)]
+//[Image(typeof(IconPlus), ColorTheme.Type.Green)]
 [Category("YarnSpinner/Misc/Add Background Dialogue Topic")]
 [Serializable]
 public class InstructionAddBackgroundDialogueTopic : Instruction
@@ -125,7 +124,7 @@ public class InstructionAddBackgroundDialogueTopic : Instruction
 
 [Title("Remove Background Dialogue Topic")]
 [Description("This will remove a background dialogue topic to the CharacterDialogueBrain")]
-[Image(typeof(IconMinus), ColorTheme.Type.Red)]
+//[Image(typeof(IconMinus), ColorTheme.Type.Red)]
 [Category("YarnSpinner/Misc/Remove Background Dialogue Topic")]
 [Serializable]
 public class InstructionRemoveBackgroundDialogueTopic : Instruction
