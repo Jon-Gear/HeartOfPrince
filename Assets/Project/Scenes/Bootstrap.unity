@@ -3777,9 +3777,6 @@ GameObject:
   - component: {fileID: 3182753725303371980}
   - component: {fileID: 6688653415107646769}
   - component: {fileID: 831296107196560547}
-  - component: {fileID: 7975221337830918374}
-  - component: {fileID: 7193594604038164929}
-  - component: {fileID: 1774465578862629145}
   - component: {fileID: 5528636734341730673}
   m_Layer: 0
   m_Name: Nacho
@@ -3843,47 +3840,6 @@ MonoBehaviour:
       type: {class: GetGameObjectInstance, ns: GameCreator.Runtime.Common, asm: GameCreator.Runtime.Core}
       data:
         m_GameObject: {fileID: 0}
---- !u!114 &1774465578862629145
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 783943239382135121}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3404d77a1847be546938ab894e9303ea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &2288073313789035631
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7531265091486707908}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3c924eacff884626a5aa4c90cf311c23, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Class: {fileID: 11400000, guid: 704e068e2d7a64affb0c931116aa7aad, type: 2}
-  m_OverrideAttributes:
-    m_Keys:
-    - m_String: attribute-energy
-    m_Values:
-    - m_IsExpanded: 0
-      m_ChangeStartPercent:
-        m_IsEnabled: 0
-        m_Value: 1
-  m_OverrideStats:
-    m_Keys:
-    - m_String: stat-max-energy
-    m_Values:
-    - m_IsExpanded: 0
-      m_ChangeBase:
-        m_IsEnabled: 0
-        m_Value: 1
 --- !u!114 &2371936697228775593
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3908,25 +3864,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3404d77a1847be546938ab894e9303ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &2595844994936766134
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8780986244256324655}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3c924eacff884626a5aa4c90cf311c23, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Class: {fileID: 11400000, guid: 31ab55d5d7cf04341b0fb16947b59397, type: 2}
-  m_OverrideAttributes:
-    m_Keys: []
-    m_Values: []
-  m_OverrideStats:
-    m_Keys: []
-    m_Values: []
 --- !u!114 &3047599448548844832
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4203,18 +4140,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3404d77a1847be546938ab894e9303ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &5302770428146445363
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8780986244256324655}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3404d77a1847be546938ab894e9303ea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &5528636734341730673
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4271,18 +4196,6 @@ MonoBehaviour:
   playerToCharacterTopics: []
   monologueTopics: []
   characterToCharacterTopics: []
---- !u!114 &6562709682342298937
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7531265091486707908}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3404d77a1847be546938ab894e9303ea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &6642628082582103748
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4386,25 +4299,6 @@ MonoBehaviour:
   playerToCharacterTopics: []
   monologueTopics: []
   characterToCharacterTopics: []
---- !u!114 &7193594604038164929
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 783943239382135121}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3c924eacff884626a5aa4c90cf311c23, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Class: {fileID: 11400000, guid: 31ab55d5d7cf04341b0fb16947b59397, type: 2}
-  m_OverrideAttributes:
-    m_Keys: []
-    m_Values: []
-  m_OverrideStats:
-    m_Keys: []
-    m_Values: []
 --- !u!4 &7206074852910368386
 Transform:
   m_ObjectHideFlags: 0
@@ -4463,8 +4357,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8170503322091011833}
   - component: {fileID: 6739181862496839997}
-  - component: {fileID: 2288073313789035631}
-  - component: {fileID: 6562709682342298937}
   m_Layer: 0
   m_Name: Prince
   m_TagString: Untagged
@@ -4504,23 +4396,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 6777921619261644388}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7975221337830918374
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 783943239382135121}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 816dd8847e02f164c80a6ee73daeb789, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  routine: {fileID: 0}
-  currentEntry:
-    TimePeriod: 00:00-24:00
-    sceneName: 
-    markerID: 
 --- !u!114 &8153603859243680448
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4555,23 +4430,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 6777921619261644388}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8202277156598172824
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8780986244256324655}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 816dd8847e02f164c80a6ee73daeb789, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  routine: {fileID: 11400000, guid: 2d27e1a645de6c245939b514b3dc2612, type: 2}
-  currentEntry:
-    TimePeriod: 00:00-24:00
-    sceneName: 
-    markerID: 
 --- !u!4 &8601187936895630755
 Transform:
   m_ObjectHideFlags: 0
@@ -4650,10 +4508,7 @@ GameObject:
   - component: {fileID: 7206074852910368386}
   - component: {fileID: 5197890051966360387}
   - component: {fileID: 2371936697228775593}
-  - component: {fileID: 2595844994936766134}
   - component: {fileID: 8626648283821260977}
-  - component: {fileID: 8202277156598172824}
-  - component: {fileID: 5302770428146445363}
   - component: {fileID: 1005981243883241224}
   m_Layer: 0
   m_Name: Munir

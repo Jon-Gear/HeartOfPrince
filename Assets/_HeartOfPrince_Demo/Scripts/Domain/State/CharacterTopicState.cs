@@ -19,8 +19,52 @@ namespace HeartOfPrince.Domain
             CharacterId = characterId;
         }
 
+        
+        public bool HasTopic(TopicName topicName)
+        {
+            return HasCharacterToPlayerTopic(topicName) || HasPlayerToCharacterTopic(topicName);
+        }
+
+        public bool HasTopic(TopicName topicName, ConversationTopicDirection direction)
+        {
+            return direction switch
+            {
+                ConversationTopicDirection.CharacterToPlayer => HasCharacterToPlayerTopic(topicName),
+                ConversationTopicDirection.PlayerToCharacter => HasPlayerToCharacterTopic(topicName),
+                _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
+            };
+        }
+
+        public void AddTopic(TopicName topicName, ConversationTopicDirection direction)
+        {
+            switch (direction)
+            {
+                case ConversationTopicDirection.CharacterToPlayer:
+                    AddCharacterToPlayerTopic(topicName);
+                    break;
+                case ConversationTopicDirection.PlayerToCharacter:
+                    AddPlayerToCharacterTopic(topicName);
+                    break;
+            }
+        }
+
+        public void RemoveTopic(TopicName topicName, ConversationTopicDirection direction)
+        {
+            switch (direction)
+            {
+                case ConversationTopicDirection.CharacterToPlayer:
+                    RemoveCharacterToPlayerTopic(topicName);
+                    break;
+                case ConversationTopicDirection.PlayerToCharacter:
+                    RemovePlayerToCharacterTopic(topicName);
+                    break;
+            }
+        }
+
         public bool HasPlayerToCharacterTopic(TopicName topicName) => _playerToCharacterTopics.Contains(topicName);
         public bool HasCharacterToPlayerTopic(TopicName topicName) => _characterToPlayerTopics.Contains(topicName);
+
+
 
         public void AddPlayerToCharacterTopic(TopicName topicName)
         {
