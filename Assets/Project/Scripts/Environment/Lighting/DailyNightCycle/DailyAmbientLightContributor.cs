@@ -12,7 +12,7 @@ public class DailyAmbientLightContributor : MonoBehaviour
     void Update()
     {
         CalculateIntensity();
-        GameManager.Instance.GetSystem<LightingManager>().AddToAmbientLight(ambientColor.Evaluate(intensity));
+        //GameManager.Instance.GetSystem<LightingManager>().AddToAmbientLight(ambientColor.Evaluate(intensity));
     }
 
     private void CalculateIntensity()

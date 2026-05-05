@@ -14,6 +14,6 @@ public class AmbientLightDarkener : MonoBehaviour
         Color darkening = (-1.0f) * inverted * weight;
 
         // Subtract this from the ambient light instead of adding
-        GameManager.Instance.GetSystem<LightingManager>().AddToAmbientLight(darkening);
+        //GameManager.Instance.GetSystem<LightingManager>().AddToAmbientLight(darkening);
     }
 }

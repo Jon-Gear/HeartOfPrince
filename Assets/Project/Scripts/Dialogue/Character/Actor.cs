@@ -20,17 +20,17 @@ public class Actor : MonoBehaviour
 	// Start is called once before the first execution of Update after the MonoBehaviour is created
 	private void Start()
 	{
-		character = GetComponent<Character>();
-		var characterManager = GameManager.Instance.GetSystem<CharacterManager>();
-
-		characterBrain = characterManager.GetCharacter(actorName);
-
-		characterManager.RegisterActor(this);
-		
-		if (character.IsPlayer)
-		{
-			characterManager.RegisterPlayerActor(this);
-		}
+		// character = GetComponent<Character>();
+		// var characterManager = GameManager.Instance.GetSystem<CharacterManager>();
+		//
+		// characterBrain = characterManager.GetCharacter(actorName);
+		//
+		// characterManager.RegisterActor(this);
+		//
+		// if (character.IsPlayer)
+		// {
+		// 	characterManager.RegisterPlayerActor(this);
+		// }
 	}
 
 
@@ -38,6 +38,6 @@ public class Actor : MonoBehaviour
 
 	private void OnDestroy()
 	{
-		GameManager.Instance.GetSystem<CharacterManager>().UnregisterActor(this);
+		//GameManager.Instance.GetSystem<CharacterManager>().UnregisterActor(this);
 	}
 }

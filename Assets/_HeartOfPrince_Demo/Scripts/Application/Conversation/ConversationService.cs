@@ -2,6 +2,7 @@ using HeartOfPrince.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using Random = System.Random;
 
@@ -13,6 +14,7 @@ namespace HeartOfPrince.Application
         private readonly Random _random = new();
 
         private readonly List<TopicName> _preparedTopics = new();
+        private bool _canRefreshPreparedTopics;
 
 
         public ConversationService(GameState gameState) 
@@ -36,11 +38,15 @@ namespace HeartOfPrince.Application
             return _gameState.ConversationState.CurrentCharacterID != null;
         }
 
-        public bool CurrentCharacter(string characterID)
+        public bool IsCurrentCharacter(string characterID)
         {
             return _gameState.ConversationState.CurrentCharacterID == characterID;
         }
 
+        public void SetCurrentCharacter(CharacterID characterID)
+        {
+            _gameState.ConversationState.SetCurrentCharacter(characterID);
+        }
         public string GetCurrentCharacter()
         {
             return _gameState.ConversationState.CurrentCharacterID;
@@ -74,6 +80,8 @@ namespace HeartOfPrince.Application
 
             _gameState.ConversationState.SetCurrentCharacter(characterID);
             _gameState.ConversationState.SetTopicDirection(direction);
+
+            _canRefreshPreparedTopics = selectedTopics.Count > amount;
         }
         public bool HasPreparedTopic(int index)
         {
@@ -95,7 +103,9 @@ namespace HeartOfPrince.Application
 
         public string GetPreparedDisplayName(int index)
         {
-            return _preparedTopics[index].Value;
+            string raw = _preparedTopics[index].Value;
+    
+            return Regex.Replace(raw, @"([a-z])([A-Z0-9])", "$1 $2");
         }
 
         public bool HasAnyTopic(ConversationTopicDirection direction)
@@ -108,6 +118,11 @@ namespace HeartOfPrince.Application
             CharacterID currentCharacterID = (CharacterID)_gameState.ConversationState.CurrentCharacterID;
 
             return _gameState.CharactersTopics[currentCharacterID].GetTopics(direction).Count > 0;
+        }
+
+        public bool CanRefreshPreparedTopics()
+        {
+            return _canRefreshPreparedTopics;
         }
 
 

@@ -1,10 +1,11 @@
 ﻿title: Start
-when: CurrentCharacter("Munir")
+when: CurrentActor("Munir")
 when: always
 ---
 <<SetShot "Wide">>
 
 <<wait 1.5>>
+
 
 <<detour Greet>>
 <<detour TopicHub>>

@@ -6,6 +6,6 @@ public class AmbientLightContributor : MonoBehaviour
     [SerializeField] private float weight = 1.0f;
     void Update()
     {
-        GameManager.Instance.GetSystem<LightingManager>().AddToAmbientLight(ambientColor * weight);
+        //GameManager.Instance.GetSystem<LightingManager>().AddToAmbientLight(ambientColor * weight);
     }
 }

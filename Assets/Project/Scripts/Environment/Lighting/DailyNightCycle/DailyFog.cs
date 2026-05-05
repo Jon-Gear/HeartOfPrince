@@ -24,7 +24,7 @@ public class DailyFog : MonoBehaviour
     private void CalculateFog()
     {
         RenderSettings.fogColor = fogColor.Evaluate(intensity);
-        GameManager.Instance.GetSystem<LightingManager>().AddToFogDensity(fogDensityCurve.Evaluate(intensity));
+        //GameManager.Instance.GetSystem<LightingManager>().AddToFogDensity(fogDensityCurve.Evaluate(intensity));
 
         //Debug.Log("Fog Color: " + RenderSettings.fogColor + " | Fog Density Contribution: " + fogDensityCurve.Evaluate(intensity) + " | Intensity: " + intensity);
     }

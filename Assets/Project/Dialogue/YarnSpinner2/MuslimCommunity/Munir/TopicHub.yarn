@@ -5,25 +5,20 @@ title: TopicHub
 <<PrepareTopicChoices {GetCurrentActor()} "PlayerToCharacter" 3>>
 
 -> Talk about {GetPreparedTopicDisplayName(0)} <<if HasPreparedTopic(0)>>
-    <<PlayPreparedTopic 0>>
+    <<jump {GetPreparedTopicName(0)}>>
     <<jump TopicHub>>
-
 -> Talk about {GetPreparedTopicDisplayName(1)} <<if HasPreparedTopic(1)>>
-    <<PlayPreparedTopic 1>>
+    <<jump {GetPreparedTopicName(1)}>>
     <<jump TopicHub>>
-
 -> Talk about {GetPreparedTopicDisplayName(2)} <<if HasPreparedTopic(2)>>
-    <<PlayPreparedTopic 2>>
+    <<jump {GetPreparedTopicName(2)}>>
     <<jump TopicHub>>
-
 -> Think of something else <<if CanRefreshPreparedTopics()>>
     Prince: Let me think again.
     <<jump TopicHub>>
-
 -> Give word to {GetCurrentActor()} <<if HasTopicsForCurrentActor("CharacterToPlayer")>>
     Prince: You got something to say?
     <<jump TopicHubNPC>>
-
 -> Finish conversation
     Prince: I think that's all for now.
     <<FinishConversation>>

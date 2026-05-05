@@ -68,19 +68,19 @@ public class CharacterDialogueBrain : MonoBehaviour
 
 
 
-    [YarnFunction("GetCharacterToPlayerTopic")]
-    public static string ChooseCharacterToPlayerTopic(string characterName)
-    {
-        CharacterBrain character = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
-        return character.Dialogue().ChooseCharacterToPlayerTopic();
-    }
-
-    [YarnFunction("GetCharacterToPlayerTopicAmount")]
-    public static int GetCharacterToPlayerTopicAmount(string characterName)
-    {
-        CharacterBrain character = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
-        return character.Dialogue().characterToPlayerTopics.Count;
-    }
+    // [YarnFunction("GetCharacterToPlayerTopic")]
+    // public static string ChooseCharacterToPlayerTopic(string characterName)
+    // {
+    //     CharacterBrain character = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
+    //     return character.Dialogue().ChooseCharacterToPlayerTopic();
+    // }
+    //
+    // [YarnFunction("GetCharacterToPlayerTopicAmount")]
+    // public static int GetCharacterToPlayerTopicAmount(string characterName)
+    // {
+    //     CharacterBrain character = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
+    //     return character.Dialogue().characterToPlayerTopics.Count;
+    // }
 
 
 
@@ -119,9 +119,10 @@ public class CharacterDialogueBrain : MonoBehaviour
 
     public bool CanStartCharacterMonologue()
     {
-        var dialogueManager = GameManager.Instance.GetSystem<DialogueManager>();
-        return 
-            IsFree;
+        return false;
+        // var dialogueManager = GameManager.Instance.GetSystem<DialogueManager>();
+        // return 
+        //     IsFree;
     }
 
     public bool CanStartCharacterToCharacterDialogue()
@@ -134,94 +135,94 @@ public class CharacterDialogueBrain : MonoBehaviour
     // Player -> Character
     // -------------------
 
-    public void StartPlayerToCharacterDialogue()
-    {
-        var dialogueManager = GameManager.Instance.GetSystem<DialogueManager>();
-        //dialogueManager.Primary().StartDialogue("Start");
-    }
-
-    [YarnFunction("GetPlayerToCharacterTopicAmount")]
-    public static int PlayerToCharacterTopicAmount(string characterName)
-    {
-        CharacterBrain character = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
-        return character.Dialogue().playerToCharacterTopics.Count;
-    }
-
-    [YarnCommand("ShufflePlayerToCharacterTopics")]
-    public static void ShufflePlayerToCharacterTopics(string characterName)
-    {
-        Debug.Log($"Shuffling Player to Character topics for {characterName}");
-        CharacterBrain character = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
-
-        character.Dialogue().PlayerToCharacterTopics().Shuffle();
-    }
-
-    [YarnFunction("GetPlayerToCharacterTopic")]
-    public static string GetPlayerToCharacterTopic(string characterName, int index)
-    {
-        var character = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
-
-        if (character.Dialogue().playerToCharacterTopics.Count == 0 || 
-            index >= character.Dialogue().playerToCharacterTopics.Count || 
-            index < 0)
-        {
-            return "...";
-        }
-        return character.Dialogue().playerToCharacterTopics[index];
-    
-    }
+    // public void StartPlayerToCharacterDialogue()
+    // {
+    //     var dialogueManager = GameManager.Instance.GetSystem<DialogueManager>();
+    //     //dialogueManager.Primary().StartDialogue("Start");
+    // }
+    //
+    // [YarnFunction("GetPlayerToCharacterTopicAmount")]
+    // public static int PlayerToCharacterTopicAmount(string characterName)
+    // {
+    //     CharacterBrain character = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
+    //     return character.Dialogue().playerToCharacterTopics.Count;
+    // }
+    //
+    // [YarnCommand("ShufflePlayerToCharacterTopics")]
+    // public static void ShufflePlayerToCharacterTopics(string characterName)
+    // {
+    //     Debug.Log($"Shuffling Player to Character topics for {characterName}");
+    //     CharacterBrain character = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
+    //
+    //     character.Dialogue().PlayerToCharacterTopics().Shuffle();
+    // }
+    //
+    // [YarnFunction("GetPlayerToCharacterTopic")]
+    // public static string GetPlayerToCharacterTopic(string characterName, int index)
+    // {
+    //     var character = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
+    //
+    //     if (character.Dialogue().playerToCharacterTopics.Count == 0 || 
+    //         index >= character.Dialogue().playerToCharacterTopics.Count || 
+    //         index < 0)
+    //     {
+    //         return "...";
+    //     }
+    //     return character.Dialogue().playerToCharacterTopics[index];
+    //
+    // }
 
     // -------------------
     // Player -> Character
     // -------------------
 
-    [YarnCommand("AddPlayerToCharacterTopic")]
-    public static void AddPlayerToCharacterTopic(string characterToAsk, string topicName)
-    {
-        CharacterBrain characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterToAsk);
-
-        if (!characterBrain.Dialogue().PlayerToCharacterTopics().Contains(topicName))
-        {
-            characterBrain.Dialogue().PlayerToCharacterTopics().Add(topicName);
-        }
-    }
-
-    [YarnCommand("RemovePlayerToCharacterTopic")]
-    public static void RemovePlayerToCharacterTopic(string characterToAsk, string topicName)
-    {
-        CharacterBrain characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterToAsk);
-
-        if (characterBrain.Dialogue().PlayerToCharacterTopics().Contains(topicName))
-        {
-            characterBrain.Dialogue().PlayerToCharacterTopics().Remove(topicName);
-        }
-    }
+    // [YarnCommand("AddPlayerToCharacterTopic")]
+    // public static void AddPlayerToCharacterTopic(string characterToAsk, string topicName)
+    // {
+    //     CharacterBrain characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterToAsk);
+    //
+    //     if (!characterBrain.Dialogue().PlayerToCharacterTopics().Contains(topicName))
+    //     {
+    //         characterBrain.Dialogue().PlayerToCharacterTopics().Add(topicName);
+    //     }
+    // }
+    //
+    // [YarnCommand("RemovePlayerToCharacterTopic")]
+    // public static void RemovePlayerToCharacterTopic(string characterToAsk, string topicName)
+    // {
+    //     CharacterBrain characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterToAsk);
+    //
+    //     if (characterBrain.Dialogue().PlayerToCharacterTopics().Contains(topicName))
+    //     {
+    //         characterBrain.Dialogue().PlayerToCharacterTopics().Remove(topicName);
+    //     }
+    // }
 
     // -------------------
     // Character -> Player
     // -------------------
 
-    [YarnCommand("AddCharacterToPlayerTopic")]
-    public static void AddToCharacterTopicToAskPlayer(string characterName, string topicName)
-    {
-        CharacterBrain characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
+    // [YarnCommand("AddCharacterToPlayerTopic")]
+    // public static void AddToCharacterTopicToAskPlayer(string characterName, string topicName)
+    // {
+    //     CharacterBrain characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
+    //
+    //     if (!characterBrain.Dialogue().CharacterToPlayerTopics().Contains(topicName))
+    //     {
+    //         characterBrain.Dialogue().CharacterToPlayerTopics().Add(topicName);
+    //     }
+    // }
 
-        if (!characterBrain.Dialogue().CharacterToPlayerTopics().Contains(topicName))
-        {
-            characterBrain.Dialogue().CharacterToPlayerTopics().Add(topicName);
-        }
-    }
-
-    [YarnCommand("RemoveCharacterToPlayerTopic")]
-    public static void RemoveCharacterTopicToAskPlayer(string characterName, string topicName)
-    {
-        CharacterBrain characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
-
-        if (characterBrain.Dialogue().CharacterToPlayerTopics().Contains(topicName))
-        {
-            characterBrain.Dialogue().CharacterToPlayerTopics().Remove(topicName);
-        }
-    }
+    // [YarnCommand("RemoveCharacterToPlayerTopic")]
+    // public static void RemoveCharacterTopicToAskPlayer(string characterName, string topicName)
+    // {
+    //     CharacterBrain characterBrain = GameManager.Instance.GetSystem<CharacterManager>().GetCharacter(characterName);
+    //
+    //     if (characterBrain.Dialogue().CharacterToPlayerTopics().Contains(topicName))
+    //     {
+    //         characterBrain.Dialogue().CharacterToPlayerTopics().Remove(topicName);
+    //     }
+    // }
 
     // -------------------
     // Character -> Character
@@ -298,7 +299,7 @@ Location -> inside hideout vs on the street vs mosque.
 
 Current Activity -> scavenging, eating, resting.
 
-Who’s Nearby -> group chatter vs private whispers.
+Whoï¿½s Nearby -> group chatter vs private whispers.
 
 Player Progress -> what missions/quests Prince has done.
 
@@ -306,7 +307,7 @@ Player Progress -> what missions/quests Prince has done.
 
 How Nacho (or any kid) feels about Prince / others.
 
-Trust Level -> “Boss, I’ll do it right away” vs “I dunno about this, man…”
+Trust Level -> ï¿½Boss, Iï¿½ll do it right awayï¿½ vs ï¿½I dunno about this, manï¿½ï¿½
 
 Mood / Emotion -> bored, cheerful, tired, scared.
 
@@ -318,9 +319,9 @@ Avoid repetition fatigue.
 
 Variant Lines (you already have maxVariants).
 
-Probability Weighting (rare “golden” lines).
+Probability Weighting (rare ï¿½goldenï¿½ lines).
 
-Cooldowns (don’t let same topic repeat too soon).
+Cooldowns (donï¿½t let same topic repeat too soon).
 
 Chained Dialogue -> background mutter -> Prince can comment -> leads into real conversation.
 
@@ -332,15 +333,15 @@ Foreground (active) -> player talks to Nacho.
 
 Background (passive) -> Nacho mutters to himself, sings, jokes with another kid.
 
-Reactive Comments -> player actions trigger remarks (“Whoa, boss stole that smooth!”).
+Reactive Comments -> player actions trigger remarks (ï¿½Whoa, boss stole that smooth!ï¿½).
 
 Ambient Flavor -> jokes, stories, kids teasing each other.
 
-Philosophical / Reflective -> Nacho thinking about life, streets, or Prince’s health.
+Philosophical / Reflective -> Nacho thinking about life, streets, or Princeï¿½s health.
 
 5. Design Patterns for Dialogue
 
-Topic Pools (like “food,” “weather,” “plans,” “other gang kids”).
+Topic Pools (like ï¿½food,ï¿½ ï¿½weather,ï¿½ ï¿½plans,ï¿½ ï¿½other gang kidsï¿½).
 
 State-Based Nodes -> e.g., nacho_dialogue_trust_high_1.
 

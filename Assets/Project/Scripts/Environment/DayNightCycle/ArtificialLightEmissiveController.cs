@@ -21,14 +21,14 @@ public class ArtificialLightEmissiveController : MonoBehaviour
 
     private void UpdateLight()
     {
-        if (GameManager.Instance.GetSystem<TimeManager>().GetSunIntensity() < sunIntensityThreshold)
-        {
-            TurnOnLight();
-        }
-        else if (GameManager.Instance.GetSystem<TimeManager>().GetSunIntensity() >= sunIntensityThreshold)
-        {
-            TurnOffLight();
-        }
+        // if (GameManager.Instance.GetSystem<TimeManager>().GetSunIntensity() < sunIntensityThreshold)
+        // {
+        //     TurnOnLight();
+        // }
+        // else if (GameManager.Instance.GetSystem<TimeManager>().GetSunIntensity() >= sunIntensityThreshold)
+        // {
+        //     TurnOffLight();
+        // }
     }
     private void Start()
     {

@@ -9,7 +9,8 @@ namespace HeartOfPrince.Presentation
     {
         public static GameSession Instance { get; private set; }
 
-        [SerializeField] public YarnProject yarnProject;
+        [Header("Game State")]
+        [SerializeField] private GameStateDebugPreset initialStatePreset;
         public GameState State { get; private set; }
 
         public ConversationService Conversation { get; private set; }
@@ -46,18 +47,22 @@ namespace HeartOfPrince.Presentation
 
         private void BuildStateRuntime()
         {
-            State = new GameState();
-
-            CharacterID munir = new CharacterID("Munir");
-
-            CharacterTopicState munirTopicState = new CharacterTopicState(munir);
-
-            munirTopicState.AddCharacterToPlayerTopic(new TopicName("PlaceholderTopic1"));
-            munirTopicState.AddPlayerToCharacterTopic(new TopicName("PlaceholderTopic2"));
-
-            State.ConversationState = new ConversationState();
-            State.CharactersTopics.Add(munir, new CharacterTopicState(munir));
-
+            State = initialStatePreset != null
+                ? initialStatePreset.CreateGameState()
+                : new GameState();
         }
+        
+#if UNITY_EDITOR
+        public void Editor_ApplyPreset(GameStateDebugPreset preset)
+        {
+            if (preset == null)
+            {
+                Debug.LogWarning("Cannot apply null GameStateDebugPreset.");
+                return;
+            }
+
+            State = preset.CreateGameState();
+        }
+#endif
     }
 }

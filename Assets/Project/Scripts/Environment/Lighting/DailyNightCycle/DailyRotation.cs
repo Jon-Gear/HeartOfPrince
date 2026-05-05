@@ -12,7 +12,7 @@ public class DailyRotation : MonoBehaviour
 
     private void RotateSun()
     {
-        float _sunAngle = GameManager.Instance.GetSystem<TimeManager>().GetSunAngle();
-        transform.localRotation = Quaternion.Euler(new Vector3(_sunAngle, yRotationOffset, 0f));
+        // float _sunAngle = GameManager.Instance.GetSystem<TimeManager>().GetSunAngle();
+        // transform.localRotation = Quaternion.Euler(new Vector3(_sunAngle, yRotationOffset, 0f));
     }
 }

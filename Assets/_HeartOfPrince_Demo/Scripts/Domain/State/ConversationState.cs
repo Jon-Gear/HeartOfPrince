@@ -14,6 +14,13 @@ namespace HeartOfPrince.Domain
 
         public bool ConversationActive = false;
 
+        public ConversationState()
+        {
+            CurrentCharacterID = new CharacterID("None");
+            CurrentTopic = new TopicName("None");
+            ConversationTopicDirection = Domain.ConversationTopicDirection.None;
+        }
+
         public void SetCurrentCharacter(CharacterID characterID)
         {
             CurrentCharacterID = characterID;

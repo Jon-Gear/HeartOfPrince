@@ -43,16 +43,16 @@ public class DayNightCycle : MonoBehaviour
     private void CalculateAmbience()
     {
         RenderSettings.fogColor = fogColor.Evaluate(intensity);
-        GameManager.Instance.GetSystem<LightingManager>().AddToFogDensity(fogDensityCurve.Evaluate(intensity));
+        //GameManager.Instance.GetSystem<LightingManager>().AddToFogDensity(fogDensityCurve.Evaluate(intensity));
     }
 
 
 
     private void RotateSun()
     {
-        float _sunAngle = GameManager.Instance.GetSystem<TimeManager>().GetSunAngle();
-
-        dailyRotation.transform.localRotation = Quaternion.Euler(new Vector3(_sunAngle, 0f, 0f));
+        // float _sunAngle = GameManager.Instance.GetSystem<TimeManager>().GetSunAngle();
+        //
+        // dailyRotation.transform.localRotation = Quaternion.Euler(new Vector3(_sunAngle, 0f, 0f));
     }
 
     private void SetIntensity()

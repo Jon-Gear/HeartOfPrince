@@ -63,7 +63,7 @@ public class WeekDayPhaseChangedArgs
 }
 
 
-public class TimeManager : GameSystem
+public class TimeManager : MonoBehaviour
 {
     // Methods
     public void ToggleTime()
@@ -435,14 +435,7 @@ public class TimeManager : GameSystem
         onWeekDayChanged?.Invoke(args);
     }
 
-    public override void Init()
-    {
-        prayerTimes.SetDayTimes();
-    }
-
-    public override void Shutdown()
-    {
-    }
+    
 
 
     // Update is called once per frame
@@ -532,10 +525,4 @@ public static class TimeUtils
             default: return "Unknown";
         }
     }
-}
-
-
-public class EditorTimeManager : EditorSingleton<TimeManager>
-{
-
 }

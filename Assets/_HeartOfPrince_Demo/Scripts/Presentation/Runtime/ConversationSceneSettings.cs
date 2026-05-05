@@ -16,9 +16,11 @@ namespace HeartOfPrince.Presentation
         void Start()
         {
             CurrentCharacter = (CharacterID) characterID;
-            
+            GameSession.Instance.Conversation.SetCurrentCharacter(CurrentCharacter);
 
-            GameSession.Instance.Conversation.StartConversation(CurrentCharacter);
+            Debug.Log("Current Character from start"+ GameSession.Instance.Conversation.GetCurrentCharacter());
+            
+            dialogueRunner.StartDialogue("Start");
         }
 
         // Update is called once per frame

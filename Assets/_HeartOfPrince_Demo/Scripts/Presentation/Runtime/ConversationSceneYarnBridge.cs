@@ -7,14 +7,15 @@ using static Codice.CM.WorkspaceServer.WorkspaceTreeDataStore;
 
 namespace HeartOfPrince.Presentation
 {
-    public static class ConversationSceneYarnBridge
+    public class ConversationSceneYarnBridge : MonoBehaviour
     {
         
 
         [YarnFunction("CurrentActor")]
-        public static bool CurrentCharacter(string actorId)
+        public static bool IsCurrentCharacter(string actorId)
         {
-            return GameSession.Instance.Conversation.CurrentCharacter(actorId);
+            Debug.Log("CurrentCharacter: " + actorId + "Current Character: " + GameSession.Instance.Conversation.GetCurrentCharacter());
+            return GameSession.Instance.Conversation.IsCurrentCharacter(actorId);
         }
 
         [YarnFunction("GetCurrentActor")]
@@ -56,7 +57,7 @@ namespace HeartOfPrince.Presentation
         [YarnFunction("GetPreparedTopicName")]
         public static string GetPreparedTopicName(int index)
         {
-            return GameSession.Instance.Conversation.GetPreparedTopicName(index) ?? string.Empty;
+            return GameSession.Instance.Conversation.GetPreparedTopicName(index) ?? "None";
         }
 
         [YarnFunction("GetPreparedTopicDisplayName")]
@@ -65,7 +66,7 @@ namespace HeartOfPrince.Presentation
             return GameSession.Instance.Conversation.GetPreparedDisplayName(index) ?? "...";
         }
 
-        [YarnFunction("HasTopicsForCurrentCharacter")]
+        [YarnFunction("HasTopicsForCurrentActor")]
         public static bool HasTopicsForCurrentCharacter(string direction)
         {
             if (!GameSession.Instance.Conversation.HasCharacter())
@@ -77,17 +78,23 @@ namespace HeartOfPrince.Presentation
             return GameSession.Instance.Conversation.HasAnyTopic(parsedDirection);
         }
 
-        //[YarnCommand("PlayPreparedTopic")]
-        //public static void PlayPreparedTopic(int index)
-        //{
-            
-        //    if (!GameSession.Instance.Conversation.HasPreparedTopic(index))
-        //        return;
-
-        //    TopicName topic = GameSession.Instance.Conversation.GetPreparedTopic(index);
-        //    GameSession.Instance.Conversation.SetCurrentTopic(topic);
-        //    _nodePlayer.PlayNode(topic.TopicName.Value);
-        //}
+        [YarnFunction("CanRefreshPreparedTopics")]
+        public static bool CanRefreshPreparedTopics()
+        {
+            return GameSession.Instance.Conversation.CanRefreshPreparedTopics();
+        }
+        
+        // [YarnCommand("PlayPreparedTopic")]
+        // public static void PlayPreparedTopic(int index)
+        // {
+        //     
+        //     if (!GameSession.Instance.Conversation.HasPreparedTopic(index))
+        //         return;
+        //
+        //     TopicName topic = GameSession.Instance.Conversation.GetPreparedTopic(index);
+        //     GameSession.Instance.Conversation.SetCurrentTopic(topic);
+        //     _nodePlayer.PlayNode(topic.TopicName.Value);
+        // }
 
         private static bool TryParseDirection(string raw, out ConversationTopicDirection direction)
         {

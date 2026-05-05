@@ -7,6 +7,6 @@ public class FogContributor : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        GameManager.Instance.GetSystem<LightingManager>().AddToFogDensity(fogDensity);
+        //GameManager.Instance.GetSystem<LightingManager>().AddToFogDensity(fogDensity);
     }
 }

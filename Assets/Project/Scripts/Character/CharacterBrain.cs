@@ -75,10 +75,10 @@ public class CharacterBrain : MonoBehaviour
     public GameObject Prefab() => characterPrefab.Get(gameObject);
     public CharacterDialogueBrain Dialogue() => characterDialogueBrain;
     
-    public Actor Actor()
-    {
-        return GameManager.Instance.GetSystem<CharacterManager>().GetActorByName(Dialogue().characterName);
-    }
+    // public Actor Actor()
+    // {
+    //     return GameManager.Instance.GetSystem<CharacterManager>().GetActorByName(Dialogue().characterName);
+    // }
 
 
     void Start()
@@ -102,10 +102,10 @@ public class CharacterBrain : MonoBehaviour
 
     public void DespawnActor()
     {
-        Actor actor = Actor();
-        if(actor != null) 
-        {
-            Destroy(actor.gameObject);
-        }
+        // Actor actor = Actor();
+        // if(actor != null) 
+        // {
+        //     Destroy(actor.gameObject);
+        // }
     }
 }

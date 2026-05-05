@@ -40,10 +40,10 @@ public class TimeUI : MonoBehaviour
 
     private void Start()
     {
-        clockText.text = GameManager.Instance.GetSystem<TimeManager>().GetTimeString();
-        weekDayText.text = TimeUtils.WeekDayToString(GameManager.Instance.GetSystem<TimeManager>().GetWeekDay());
-
-        dayTimeText.text = TimeUtils.DayTimeToString(GameManager.Instance.GetSystem<TimeManager>().GetDayTime());
+        // clockText.text = GameManager.Instance.GetSystem<TimeManager>().GetTimeString();
+        // weekDayText.text = TimeUtils.WeekDayToString(GameManager.Instance.GetSystem<TimeManager>().GetWeekDay());
+        //
+        // dayTimeText.text = TimeUtils.DayTimeToString(GameManager.Instance.GetSystem<TimeManager>().GetDayTime());
         UpdateIcon();
     }
 
@@ -122,28 +122,28 @@ public class TimeUI : MonoBehaviour
     
     void UpdateIcon()
     {
-        var dayTime = GameManager.Instance.GetSystem<TimeManager>().GetDayTime();
-        switch (dayTime)
-        {
-            case DAYTIME.Morning:
-                DayIcon.sprite = morningIcon;
-                break;
-            case DAYTIME.Sunrise:
-                DayIcon.sprite = sunriseIcon;
-                break;
-            case DAYTIME.Noon:
-                DayIcon.sprite = noonIcon;
-                break;
-            case DAYTIME.Afternoon:
-                DayIcon.sprite = afternoonIcon;
-                break;
-            case DAYTIME.Evening:
-                DayIcon.sprite = eveningIcon;
-                break;
-            case DAYTIME.Night:
-                DayIcon.sprite = nightIcon;
-                break;
-        }
+        // var dayTime = GameManager.Instance.GetSystem<TimeManager>().GetDayTime();
+        // switch (dayTime)
+        // {
+        //     case DAYTIME.Morning:
+        //         DayIcon.sprite = morningIcon;
+        //         break;
+        //     case DAYTIME.Sunrise:
+        //         DayIcon.sprite = sunriseIcon;
+        //         break;
+        //     case DAYTIME.Noon:
+        //         DayIcon.sprite = noonIcon;
+        //         break;
+        //     case DAYTIME.Afternoon:
+        //         DayIcon.sprite = afternoonIcon;
+        //         break;
+        //     case DAYTIME.Evening:
+        //         DayIcon.sprite = eveningIcon;
+        //         break;
+        //     case DAYTIME.Night:
+        //         DayIcon.sprite = nightIcon;
+        //         break;
+        // }
     }
     
 }

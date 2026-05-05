@@ -2,7 +2,7 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LightingManager : GameSystem
+public class LightingManager : MonoBehaviour
 {
     private Color finalAmbientColor = Color.black;
     private int ambientLightContributorsCount = 0;
@@ -63,12 +63,5 @@ public class LightingManager : GameSystem
         fogContributorCount += 1;
     }
 
-
-    public override void Init()
-    {
-    }
-
-    public override void Shutdown()
-    {
-    }
+    
 }
