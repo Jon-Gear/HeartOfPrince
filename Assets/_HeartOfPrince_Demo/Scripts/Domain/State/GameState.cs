@@ -5,11 +5,9 @@ namespace HeartOfPrince.Domain
 {
     public sealed class GameState
     {
+        public ConversationState ConversationState { get; set; }
+        public Dictionary<CharacterID, CharacterTopicState> CharactersTopics = new();
 
-
-        private readonly Dictionary<CharacterID, CharacterTopicState> _charactersTopics = new();
-
-        public IReadOnlyDictionary<CharacterID, CharacterTopicState> CharactersTopics => _charactersTopics;
 
     }
 }

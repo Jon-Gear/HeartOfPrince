@@ -19,6 +19,17 @@ namespace HeartOfPrince.Domain
             CharacterId = characterId;
         }
 
+
+        public IReadOnlyList<TopicName> GetTopics(ConversationTopicDirection direction)
+        {
+            return direction switch
+            {
+                ConversationTopicDirection.CharacterToPlayer => CharacterToPlayerTopics,
+                ConversationTopicDirection.PlayerToCharacter => PlayerToCharacterTopics,
+                _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
+            };
+        }
+
         
         public bool HasTopic(TopicName topicName)
         {

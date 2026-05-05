@@ -121,10 +121,7 @@ public class CharacterDialogueBrain : MonoBehaviour
     {
         var dialogueManager = GameManager.Instance.GetSystem<DialogueManager>();
         return 
-            IsFree && 
-            !dialogueManager.Primary().IsDialogueRunning && 
-            !dialogueManager.Secondary().IsDialogueRunning && 
-            monologueTopics.Count > 0;
+            IsFree;
     }
 
     public bool CanStartCharacterToCharacterDialogue()
@@ -140,7 +137,7 @@ public class CharacterDialogueBrain : MonoBehaviour
     public void StartPlayerToCharacterDialogue()
     {
         var dialogueManager = GameManager.Instance.GetSystem<DialogueManager>();
-        dialogueManager.Primary().StartDialogue("Start");
+        //dialogueManager.Primary().StartDialogue("Start");
     }
 
     [YarnFunction("GetPlayerToCharacterTopicAmount")]

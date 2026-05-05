@@ -11,7 +11,7 @@ public abstract class GameSystem : MonoBehaviour
     protected virtual void Awake()
     {
         DontDestroyOnLoad(gameObject);
-        gameObject.SetActive(false);
+        //gameObject.SetActive(false);
     }
 
     protected virtual void OnEnable()

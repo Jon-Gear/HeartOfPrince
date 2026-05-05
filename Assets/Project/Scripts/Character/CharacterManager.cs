@@ -8,7 +8,6 @@ using UnityEngine.SceneManagement;
 
 public class CharacterManager : GameSystem
 {
-    private PlayerCharacterBrain playerCharacter;
     private CharacterBrain[] characters;
     [SerializeField] private Actor playerActor;
     [SerializeField] private List<Actor> actors = new List<Actor>();
@@ -16,7 +15,6 @@ public class CharacterManager : GameSystem
     public override void Init()
     {
         characters = GetComponentsInChildren<CharacterBrain>();
-        playerCharacter = GetComponentInChildren<PlayerCharacterBrain>();
     }
 
     public override void Shutdown()
@@ -24,10 +22,6 @@ public class CharacterManager : GameSystem
     
     }
 
-    public PlayerCharacterBrain GetPlayerCharacter()
-    {
-        return playerCharacter;
-    }
 
     public CharacterBrain GetCharacter(string characterName)
     {

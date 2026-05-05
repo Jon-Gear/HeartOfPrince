@@ -69,12 +69,10 @@ public class CharacterBrain : MonoBehaviour
     [SerializeField] private PropertyGetGameObject characterPrefab = GetGameObjectInstance.Create();
 
 
-    private CharacterActivityBrain activityBrain;
     private CharacterDialogueBrain characterDialogueBrain;
 
 
     public GameObject Prefab() => characterPrefab.Get(gameObject);
-    public CharacterActivityBrain Activity() => activityBrain;
     public CharacterDialogueBrain Dialogue() => characterDialogueBrain;
     
     public Actor Actor()
@@ -85,7 +83,6 @@ public class CharacterBrain : MonoBehaviour
 
     void Start()
     {
-        activityBrain = GetComponent<CharacterActivityBrain>();
 
         characterDialogueBrain = GetComponent<CharacterDialogueBrain>();
     }
@@ -108,7 +105,6 @@ public class CharacterBrain : MonoBehaviour
         Actor actor = Actor();
         if(actor != null) 
         {
-            Activity().ClearAllActivities();
             Destroy(actor.gameObject);
         }
     }
