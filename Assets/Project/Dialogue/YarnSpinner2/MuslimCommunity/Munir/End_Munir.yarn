@@ -1,0 +1,67 @@
+title: End
+when: AmountOfPlayerTurns() > 0
+when: AmountOfCurrentActorTurns() > 0
+when: IsCurrentActor("Munir")
+---
+<<wait 2.5>>
+<<SetShot "Closeup_B">>
+Munir: It's been very nice to talk to you, Prince.
+<<SetShot "Closeup_A">>
+Prince: Thank you, it means a lot to me.
+<<EndConversation>>
+===
+
+title: End
+when: AmountOfPlayerTurns() == 0
+when: AmountOfCurrentActorTurns() > 0
+when: IsCurrentActor("Munir")
+---
+<<wait 2.5>>
+<<SetShot "Closeup_B">>
+Munir: I feel like I've done most of the talking today.
+Munir: Still... you listened. That matters more than people think.
+<<SetShot "Closeup_A">>
+Prince: I wanted to understand you better.
+<<SetShot "Closeup_B">>
+Munir: Then next time, bring me something from your side too.
+<<SetShot "Closeup_A">>
+Prince: I will.
+<<EndConversation>>
+===
+
+title: End
+when: AmountOfPlayerTurns() > 0
+when: AmountOfCurrentActorTurns() == 0
+when: IsCurrentActor("Munir")
+---
+<<wait 2.5>>
+<<SetShot "Closeup_B">>
+Munir: You came with a lot on your mind, Prince.
+Munir: I didn't say much, but I was listening.
+<<SetShot "Closeup_A">>
+Prince: I hope I didn't speak too much.
+<<SetShot "Closeup_B">>
+Munir: No. Sometimes a man needs room to lay his thoughts out.
+Munir: Just remember, conversation is a door, not a speech.
+<<SetShot "Closeup_A">>
+Prince: I'll remember that.
+<<EndConversation>>
+===
+
+title: End
+when: AmountOfPlayerTurns() == 0
+when: AmountOfCurrentActorTurns() == 0
+when: IsCurrentActor("Munir")
+---
+<<wait 2.5>>
+<<SetShot "Closeup_B">>
+Munir: Quiet day, huh?
+<<SetShot "Closeup_A">>
+Prince: Yeah. I guess neither of us really knew where to start.
+<<SetShot "Closeup_B">>
+Munir: That's alright. Not every silence is empty.
+Munir: But if you want trust to grow, you have to bring something into the room.
+<<SetShot "Closeup_A">>
+Prince: Next time, I won't come empty-handed.
+<<EndConversation>>
+===

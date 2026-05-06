@@ -1,0 +1,18 @@
+﻿title: Start_Munir
+when: always
+---
+<<StartConversation "Munir">>
+
+<<SetShot "Wide">>
+<<wait 1.5>>
+
+<<detour Greet>>
+<<jump TopicHub>>
+===
+
+// title: Start
+// when: CurrentActor("Munir")
+// when: once
+// ---
+// <<detour FirstContact>>
+// ===

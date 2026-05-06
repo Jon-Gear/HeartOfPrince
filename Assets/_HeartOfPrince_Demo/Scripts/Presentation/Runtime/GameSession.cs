@@ -14,8 +14,8 @@ namespace HeartOfPrince.Presentation
         public GameState State { get; private set; }
 
         public ConversationService Conversation { get; private set; }
-
-
+        public ExplorationService Exploration { get; private set; }
+        
         private void Awake()
         {
             if(Instance != null && Instance != this)
@@ -42,7 +42,7 @@ namespace HeartOfPrince.Presentation
         {
             BuildStateRuntime();
             Conversation = new ConversationService(State);
-            Debug.Log("Built");
+            Exploration = new ExplorationService(State);
         }
 
         private void BuildStateRuntime()

@@ -46770,7 +46770,6 @@ GameObject:
   - component: {fileID: 7985477255943452662}
   - component: {fileID: 8309902628425502197}
   - component: {fileID: 8635081094973328866}
-  - component: {fileID: 8635081094973328868}
   m_Layer: 0
   m_Name: Dialogue System
   m_TagString: Untagged
@@ -47564,18 +47563,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   showDebug: 1
   debugTextView: {fileID: 0}
---- !u!114 &8635081094973328868
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7262066351816918408}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 72ca23817c208d24c9bb40436b7f7a4b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: HeartOfPrince.Presentation::HeartOfPrince.Presentation.ConversationSceneYarnBridge
 --- !u!1 &8790380584338807475
 GameObject:
   m_ObjectHideFlags: 0

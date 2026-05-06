@@ -412,17 +412,6 @@ public sealed class GameStateEditorWindow : EditorWindow
         return names;
     }
 
-    private static string[] GetNodeNames(YarnProject yarnProject)
-    {
-        if (yarnProject == null)
-            return System.Array.Empty<string>();
-
-        return yarnProject.NodeNames
-            .Where(nodeName => !string.IsNullOrWhiteSpace(nodeName))
-            .OrderBy(nodeName => nodeName)
-            .ToArray();
-    }
-
     private void CreateNewPreset()
     {
         var path = EditorUtility.SaveFilePanelInProject(
