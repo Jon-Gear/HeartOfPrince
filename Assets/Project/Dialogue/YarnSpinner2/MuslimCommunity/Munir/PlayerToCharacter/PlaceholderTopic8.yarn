@@ -1,5 +1,5 @@
 ﻿title: PlaceholderTopic8
-when: CurrentActor("Munir")
+when: IsCurrentActor("Munir")
 ---
 <<SetShot "CloseUp_A">>
 Prince: You move slow for someone your size.
@@ -12,5 +12,4 @@ Prince: What stopped you?
 Munir: Learning where fast leads.
 Prince: And you liked the view?
 Munir: Enough to stay.
-<<RemovePlayerToCharacterTopic {GetCurrentActor()} PlaceholderTopic8>>
 ===

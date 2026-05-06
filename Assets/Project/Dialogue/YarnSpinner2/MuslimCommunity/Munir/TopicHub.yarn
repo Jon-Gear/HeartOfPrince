@@ -2,57 +2,32 @@ title: TopicHub
 ---
 <<SetShot "TwoShot">>
 
-<<PrepareTopicChoices {GetCurrentActor()} "PlayerToCharacter" 3>>
+<<if TurnsLeft() == 0>>
+    <<jump End>>
+<<endif>>
 
--> Talk about {GetPreparedTopicDisplayName(0)} <<if HasPreparedTopic(0)>>
-    <<jump {GetPreparedTopicName(0)}>>
-    <<jump TopicHub>>
--> Talk about {GetPreparedTopicDisplayName(1)} <<if HasPreparedTopic(1)>>
-    <<jump {GetPreparedTopicName(1)}>>
-    <<jump TopicHub>>
--> Talk about {GetPreparedTopicDisplayName(2)} <<if HasPreparedTopic(2)>>
-    <<jump {GetPreparedTopicName(2)}>>
-    <<jump TopicHub>>
+<<PrepareTopics {GetCurrentActor()} "PlayerToCharacter" 3>>
+
+-> Talk about {TopicDisplayName(0)} <<if HasPreparedTopic(0)>>
+    <<detour {SelectTopic(0)}>>
+    <<CountPlayerTurn>>
+-> Talk about {TopicDisplayName(1)} <<if HasPreparedTopic(1)>>
+    <<detour {SelectTopic(1)}>>
+    <<CountPlayerTurn>>
+-> Talk about {TopicDisplayName(2)} <<if HasPreparedTopic(2)>>
+    <<detour {SelectTopic(2)}>>
+    <<CountPlayerTurn>>
 -> Think of something else <<if CanRefreshPreparedTopics()>>
     Prince: Let me think again.
+    <<TakeTurn>>
     <<jump TopicHub>>
--> Give word to {GetCurrentActor()} <<if HasTopicsForCurrentActor("CharacterToPlayer")>>
+-> Give word to {GetCurrentActor()}
     Prince: You got something to say?
-    <<jump TopicHubNPC>>
+    <<jump PrepareTopicHubNPC>>
 -> Finish conversation
     Prince: I think that's all for now.
-    <<FinishConversation>>
-    <<stop>>
-
-
-// <<SetShot "TwoShot">>
-
-// <<declare $topic1 = "...">>
-// <<declare $topic2 = "...">>
-// <<declare $topic3 = "...">>
-
-// <<ShufflePlayerToCharacterTopics {GetCurrentActor()}>>
-
-// <<set $topic1 = GetPlayerToCharacterTopic(GetCurrentActor(), 0)>>
-// <<set $topic2 = GetPlayerToCharacterTopic(GetCurrentActor(), 1)>>
-// <<set $topic3 = GetPlayerToCharacterTopic(GetCurrentActor(), 2)>>
-
-// -> Talk about {$topic1} <<if $topic1 != "..." >>
-//     <<detour {$topic1}>>
-// -> Talk about {$topic2} <<if $topic2 != "...">>
-//     <<detour {$topic2}>>
-// -> Talk about {$topic3} <<if $topic3 != "...">>
-//     <<detour {$topic3}>>
-// -> Reshuffle topics <<if GetPlayerToCharacterTopicAmount(GetCurrentActor()) > 3>>
-//     Prince: Let me think again
-//     <<jump TopicHub>>
-// -> Give word to {GetCurrentActor()} <<if GetCharacterToPlayerTopicAmount(GetCurrentActor()) > 0>>
-//     Prince: You got something to say?
-//     <<jump TopicHubNPC>>
-// -> Finish conversation
-//     Prince: I think that's all for now.
-//     <<stop>>
-
-// <<jump TopicHubNPC>>
+    <<jump End>>
+    
+<<jump PrepareTopicHubNPC>>
 ===
 

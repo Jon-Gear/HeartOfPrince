@@ -13,61 +13,84 @@ namespace HeartOfPrince.Application
         private readonly GameState _gameState;
         private readonly Random _random = new();
 
+        private const int AMOUNT_OF_TURNS = 3;
+        
+        // Current Actor
+        private CharacterID? _currentCharacterID;
+        public bool HasActor() => _currentCharacterID != null;
+        public bool IsCurrentActor(CharacterID characterID) => _currentCharacterID == characterID;
+        public bool IsCurrentActor(string  characterID) => _currentCharacterID == characterID;
+        public void SetCurrentActor(CharacterID characterID) => _currentCharacterID = characterID;
+        public CharacterID GetCurrentActor() => _currentCharacterID ?? throw new InvalidOperationException("No current character is set.");
+        
+        
+        // Current Topic
+        private TopicName? _currentTopic;
+        private ConversationTopicDirection _currentConversationTopicDirection;
+
+        private int _turnsLeft;
+        public int TurnsLeft => _turnsLeft;
+        public void TakeTurn() => _turnsLeft--;
+        
         private readonly List<TopicName> _preparedTopics = new();
         private bool _canRefreshPreparedTopics;
-
-
+        public bool HasPreparedTopic(int index) => index >= 0 && index < _preparedTopics.Count;
+        
+        // Miscellaneous Variables
+        private int _amountOfTurnsPlayerUsed = 0;
+        public  int AmountOfTurnsPlayerUsed => _amountOfTurnsPlayerUsed;
+        public void CountPlayerTurn() => _amountOfTurnsPlayerUsed++;
+        
+        private int _amountOfTurnsCurrentActorUsed = 0;
+        public int AmountOfTurnsCurrentActorUsed => _amountOfTurnsCurrentActorUsed;
+        public void CountCurrentActorTurn() => _amountOfTurnsCurrentActorUsed++;
+        
         public ConversationService(GameState gameState) 
         { 
             _gameState = gameState;
         }
-
-        public void StartConversation(CharacterID characterID)
+        
+        public void StartConversation(CharacterID characterId)
         {
-            _gameState.ConversationState.StartConversation(characterID);
+            _currentCharacterID = characterId;
+            _currentTopic = null;
+            _currentConversationTopicDirection = ConversationTopicDirection.None;
+
+            _preparedTopics.Clear();
+            _canRefreshPreparedTopics = false;
+            
+            _turnsLeft = AMOUNT_OF_TURNS;
         }
 
         public void EndConversation()
         {
-            _gameState.ConversationState.EndConversation();
+            _currentCharacterID = null;
+            _currentTopic = null;
+            _currentConversationTopicDirection = ConversationTopicDirection.None;
+
+            _preparedTopics.Clear();
+            _canRefreshPreparedTopics = false;
         }
 
-
-        public bool HasCharacter()
+        public bool HasTopicsForCurrentActor(ConversationTopicDirection direction)
         {
-            return _gameState.ConversationState.CurrentCharacterID != null;
+            if (!HasActor())
+            {
+                return false;
+            }
+            else
+            {
+                return _gameState.CharactersTopics[GetCurrentActor()].GetTopics(direction).Count > 0;
+            }
         }
-
-        public bool IsCurrentCharacter(string characterID)
-        {
-            return _gameState.ConversationState.CurrentCharacterID == characterID;
-        }
-
-        public void SetCurrentCharacter(CharacterID characterID)
-        {
-            _gameState.ConversationState.SetCurrentCharacter(characterID);
-        }
-        public string GetCurrentCharacter()
-        {
-            return _gameState.ConversationState.CurrentCharacterID;
-        }
-
-        public string GetCurrentTopic()
-        {
-            return _gameState.ConversationState.CurrentTopic;
-        }
-
-        public void SetCurrentTopic(TopicName topicName)
-        {
-            _gameState.ConversationState.SetTopicName(topicName);
-        }
-
-        public void Prepare(CharacterID characterID, ConversationTopicDirection direction, int amount)
+        
+        public void PrepareTopics(CharacterID characterID, ConversationTopicDirection direction, int amount)
         {
             if(amount <= 0)
             {
                 amount = 3;
             }
+            
 
             IReadOnlyList<TopicName> availableTopics = _gameState.CharactersTopics[characterID].GetTopics(direction);
 
@@ -77,29 +100,34 @@ namespace HeartOfPrince.Application
 
             _preparedTopics.Clear();
             _preparedTopics.AddRange(selectedTopics.Take(amount));
-
-            _gameState.ConversationState.SetCurrentCharacter(characterID);
-            _gameState.ConversationState.SetTopicDirection(direction);
-
             _canRefreshPreparedTopics = selectedTopics.Count > amount;
-        }
-        public bool HasPreparedTopic(int index)
-        {
-            return index >= 0 && index < _preparedTopics.Count;
+            _currentConversationTopicDirection = direction;
         }
 
-        public TopicName GetPreparedTopic(int index)
+        public string SelectTopic(int index)
         {
-            if (!HasPreparedTopic(index))
-                throw new ArgumentOutOfRangeException(nameof(index));
-
-            return _preparedTopics[index];
+            if (!HasPreparedTopic(index)) return string.Empty;
+            ConsumeTopic(index);
+            return  _currentTopic.Value;
         }
 
-        public string GetPreparedTopicName(int index)
+        public string SelectRandomTopic()
         {
-            return HasPreparedTopic(index) ? _preparedTopics[index].Value : string.Empty;
+           int randomIndex = _random.Next(0, _preparedTopics.Count);
+           ConsumeTopic(randomIndex);
+           return _currentTopic.Value;
         }
+
+        private void ConsumeTopic(int index)
+        {
+            _currentTopic = _preparedTopics[index];
+            _gameState.CharactersTopics[GetCurrentActor()].RemoveTopic(_currentTopic.Value, _currentConversationTopicDirection);
+            _turnsLeft--;
+        }
+
+        
+        
+        
 
         public string GetPreparedDisplayName(int index)
         {
@@ -108,17 +136,7 @@ namespace HeartOfPrince.Application
             return Regex.Replace(raw, @"([a-z])([A-Z0-9])", "$1 $2");
         }
 
-        public bool HasAnyTopic(ConversationTopicDirection direction)
-        {
-            if(_gameState.ConversationState.CurrentCharacterID == null)
-            {
-                return false;
-            }
-
-            CharacterID currentCharacterID = (CharacterID)_gameState.ConversationState.CurrentCharacterID;
-
-            return _gameState.CharactersTopics[currentCharacterID].GetTopics(direction).Count > 0;
-        }
+        
 
         public bool CanRefreshPreparedTopics()
         {

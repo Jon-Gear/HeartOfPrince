@@ -1,5 +1,5 @@
 title: Greet
-when: CurrentActor("Munir")
+when: IsCurrentActor("Munir")
 ---
 <<SetShot "Closeup_A">>
 Prince: Hello Munir, it's good to see you.

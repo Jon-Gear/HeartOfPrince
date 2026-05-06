@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b359b1ac46797c647be03441574da3c8, type: 3}
+  m_Name: GameStatePreset
+  m_EditorClassIdentifier: HeartOfPrince.Domain::HeartOfPrince.Domain.GameStateDebugPreset
+  characters:
+  - characterId: Munir
+    topicState:
+      playerToCharacterTopics:
+      - PlaceholderTopic7
+      - PlaceholderTopic8
+      - PlaceholderTopic9
+      - PlaceholderTopic10
+      - PlaceholderTopic11
+      - PlaceholderTopic12
+      characterToPlayerTopics:
+      - PlaceholderTopic1
+      - PlaceholderTopic2
+      - PlaceholderTopic3
+      - PlaceholderTopic4
+      - PlaceholderTopic5
+      - PlaceholderTopic6

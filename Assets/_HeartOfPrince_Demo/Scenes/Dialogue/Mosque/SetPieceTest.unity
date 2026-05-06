@@ -46768,7 +46768,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7985477255943452662}
-  - component: {fileID: 8635081094973328867}
   - component: {fileID: 8309902628425502197}
   - component: {fileID: 8635081094973328866}
   - component: {fileID: 8635081094973328868}
@@ -47481,8 +47480,8 @@ MonoBehaviour:
   - {fileID: 2958262985747904939}
   - {fileID: 8020628925401451599}
   - {fileID: 3859336324023085518}
-  autoStart: 0
-  startNode: Start
+  autoStart: 1
+  startNode: Start_Munir
   runSelectedOptionAsLine: 0
   onNodeStart:
     m_PersistentCalls:
@@ -47565,20 +47564,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   showDebug: 1
   debugTextView: {fileID: 0}
---- !u!114 &8635081094973328867
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7262066351816918408}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 92d57af7ba7585545a859090e1811031, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: HeartOfPrince.Presentation::HeartOfPrince.Presentation.ConversationSceneSettings
-  dialogueRunner: {fileID: 8309902628425502197}
-  characterID: Munir
 --- !u!114 &8635081094973328868
 MonoBehaviour:
   m_ObjectHideFlags: 0

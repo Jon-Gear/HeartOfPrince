@@ -1,5 +1,5 @@
 ﻿title: PlaceholderTopic1
-when: CurrentActor("Munir")
+when: IsCurrentActor("Munir")
 ---
 <<SetShot "CloseUp_B">>
 Munir: You’ve been here a few times now.
@@ -13,5 +13,4 @@ Prince: Depends what you call a choice.
 Munir: I call it a pause.
 Prince: Pauses don’t last.
 Munir: Not if you don’t let them.
-<<RemoveCharacterToPlayerTopic {GetCurrentActor()} PlaceholderTopic1>>
 ===

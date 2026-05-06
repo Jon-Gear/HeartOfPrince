@@ -1,5 +1,5 @@
 ﻿title: PlaceholderTopic2
-when: CurrentActor("Munir")
+when: IsCurrentActor("Munir")
 ---
 <<SetShot "CloseUp_B">>
 Munir: You arrive quiet, but not tired.
@@ -12,5 +12,4 @@ Munir: Or they keep moving.
 Prince: Moving keeps things simple.
 Munir: Simple doesn’t mean light.
 Prince: Never said it did.
-<<RemoveCharacterToPlayerTopic {GetCurrentActor()} PlaceholderTopic2>>
 ===
