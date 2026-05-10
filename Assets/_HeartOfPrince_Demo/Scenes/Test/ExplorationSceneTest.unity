@@ -190,8 +190,29 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3359914660197392479, guid: 54517c1fc65d7994a8ea6a659d367624, type: 3}
+      insertIndex: 1
+      addedObject: {fileID: 251756998}
   m_SourcePrefab: {fileID: 100100000, guid: 54517c1fc65d7994a8ea6a659d367624, type: 3}
+--- !u!1 &251756997 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3359914660197392479, guid: 54517c1fc65d7994a8ea6a659d367624, type: 3}
+  m_PrefabInstance: {fileID: 251756996}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &251756998
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 251756997}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c151d22150c01694e887be34de3064d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: HeartOfPrince.Presentation::HeartOfPrince.Presentation.Inspectable
+  inspectable: 
 --- !u!1 &481087555
 GameObject:
   m_ObjectHideFlags: 0
