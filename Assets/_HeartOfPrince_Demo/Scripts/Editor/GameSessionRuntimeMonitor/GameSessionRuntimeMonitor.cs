@@ -42,7 +42,7 @@ namespace HeartOfPrince.Editor
 
         private void OnEditorUpdate()
         {
-            if (!Application.isPlaying)
+            if (!UnityEngine.Application.isPlaying)
                 return;
 
             if (EditorApplication.timeSinceStartup - lastRepaintTime < RepaintInterval)
@@ -59,7 +59,7 @@ namespace HeartOfPrince.Editor
 
             EditorGUILayout.Space(8);
 
-            if (!Application.isPlaying)
+            if (!UnityEngine.Application.isPlaying)
             {
                 EditorGUILayout.HelpBox(
                     "Enter Play Mode to monitor the live GameSession.",
@@ -104,7 +104,7 @@ namespace HeartOfPrince.Editor
 
                 using (new EditorGUILayout.HorizontalScope())
                 {
-                    GUI.enabled = Application.isPlaying && GameSession.Instance != null;
+                    GUI.enabled = UnityEngine.Application.isPlaying && GameSession.Instance != null;
 
                     if (GUILayout.Button("Use GameSession.Instance"))
                     {
@@ -112,7 +112,7 @@ namespace HeartOfPrince.Editor
                         Selection.activeObject = targetSession;
                     }
 
-                    GUI.enabled = Application.isPlaying;
+                    GUI.enabled = UnityEngine.Application.isPlaying;
 
                     if (GUILayout.Button("Find In Scene"))
                     {
