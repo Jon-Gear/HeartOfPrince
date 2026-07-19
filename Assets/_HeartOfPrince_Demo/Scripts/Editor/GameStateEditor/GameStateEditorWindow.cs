@@ -18,7 +18,7 @@ public sealed class GameStateEditorWindow : EditorWindow
     private GameSession targetSession;
 
     private SerializedObject serializedPreset;
-    private SerializedProperty yarnProjectProperty;
+    private SerializedProperty ponderTopicsProperty;
     private SerializedProperty charactersProperty;
 
     private int selectedCharacterIndex;
@@ -26,6 +26,7 @@ public sealed class GameStateEditorWindow : EditorWindow
 
     private string newCharacterId = "";
     
+    private bool ponderTopicsFoldout = true;
     private bool playerToCharacterTopicsFoldout = true;
     private bool characterToPlayerTopicsFoldout = true;
 
@@ -50,6 +51,10 @@ public sealed class GameStateEditorWindow : EditorWindow
         serializedPreset.Update();
 
         DrawApplyButtons();
+
+        EditorGUILayout.Space(8);
+
+        DrawPonderArea();
 
         EditorGUILayout.Space(8);
 
@@ -96,7 +101,7 @@ public sealed class GameStateEditorWindow : EditorWindow
             return;
 
         serializedPreset = new SerializedObject(preset);
-        yarnProjectProperty = serializedPreset.FindProperty("yarnProject");
+        ponderTopicsProperty = serializedPreset.FindProperty("ponderTopics");
         charactersProperty = serializedPreset.FindProperty("characters");
 
         selectedCharacterIndex = Mathf.Clamp(
@@ -128,6 +133,22 @@ public sealed class GameStateEditorWindow : EditorWindow
                 EditorUtility.SetDirty(preset);
                 AssetDatabase.SaveAssets();
             }
+        }
+    }
+
+    private void DrawPonderArea()
+    {
+        using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+        {
+            EditorGUILayout.LabelField("Ponder", EditorStyles.boldLabel);
+            EditorGUILayout.HelpBox(
+                "Prince-only topics used by PonderService.",
+                MessageType.None);
+
+            DrawTopicList(
+                "Ponder Topics",
+                ponderTopicsProperty,
+                ref ponderTopicsFoldout);
         }
     }
 

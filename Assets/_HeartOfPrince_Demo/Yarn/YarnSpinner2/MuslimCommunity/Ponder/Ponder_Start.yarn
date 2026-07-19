@@ -1,6 +1,10 @@
-﻿title: Ponder_Start
+title: Ponder_Start
 when: always
 ---
+<<StartPonder>>
 <<SetShot "Wide">>
 <<wait 1.5>>
+
+Prince: I should take a moment to think.
+<<jump Ponder_TopicHub>>
 ===

@@ -1,0 +1,33 @@
+title: Ponder_TopicHub
+---
+<<SetShot "Wide">>
+
+<<if PonderTurnsLeft() == 0>>
+    <<jump Ponder_End>>
+<<endif>>
+
+<<if HasPonderTopics() == false>>
+    <<jump Ponder_End>>
+<<endif>>
+
+<<PreparePonderTopics 3>>
+
+-> Ponder {PonderTopicDisplayName(0)} <<if HasPreparedPonderTopic(0)>>
+    <<detour {SelectPonderTopic(0)}>>
+    <<CountPonderTurn>>
+-> Ponder {PonderTopicDisplayName(1)} <<if HasPreparedPonderTopic(1)>>
+    <<detour {SelectPonderTopic(1)}>>
+    <<CountPonderTurn>>
+-> Ponder {PonderTopicDisplayName(2)} <<if HasPreparedPonderTopic(2)>>
+    <<detour {SelectPonderTopic(2)}>>
+    <<CountPonderTurn>>
+-> Think of something else <<if CanRefreshPonderTopics()>>
+    Prince: No. There is something else on my mind.
+    <<TakePonderTurn>>
+    <<jump Ponder_TopicHub>>
+-> Stop pondering
+    Prince: I have thought enough for now.
+    <<jump Ponder_End>>
+
+<<jump Ponder_TopicHub>>
+===

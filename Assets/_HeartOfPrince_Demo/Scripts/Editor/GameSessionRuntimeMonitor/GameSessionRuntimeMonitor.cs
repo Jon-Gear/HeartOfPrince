@@ -16,6 +16,7 @@ namespace HeartOfPrince.Editor
         private Vector2 scroll;
 
         private bool gameStateFoldout = true;
+        private bool ponderTopicsFoldout = true;
         private bool playerToCharacterTopicsFoldout = true;
         private bool characterToPlayerTopicsFoldout = true;
 
@@ -187,7 +188,33 @@ namespace HeartOfPrince.Editor
 
                 EditorGUILayout.Space(6);
 
+                DrawPonderArea(state);
+
+                EditorGUILayout.Space(8);
+
                 DrawCharacterArea(state);
+            }
+        }
+
+        private void DrawPonderArea(GameState state)
+        {
+            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            {
+                EditorGUILayout.LabelField("Ponder", EditorStyles.boldLabel);
+
+                if (state.Ponder == null)
+                {
+                    EditorGUILayout.HelpBox(
+                        "PonderTopicState is null.",
+                        MessageType.Warning);
+
+                    return;
+                }
+
+                DrawTopicList(
+                    "Prince Ponder Topics",
+                    state.Ponder.Topics,
+                    ref ponderTopicsFoldout);
             }
         }
 

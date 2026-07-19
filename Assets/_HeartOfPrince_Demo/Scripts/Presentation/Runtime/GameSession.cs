@@ -1,7 +1,6 @@
 using HeartOfPrince.Application;
 using HeartOfPrince.Domain;
 using UnityEngine;
-using Yarn.Unity;
 
 namespace HeartOfPrince.Presentation
 {
@@ -14,11 +13,12 @@ namespace HeartOfPrince.Presentation
         public GameState State { get; private set; }
 
         public ConversationService Conversation { get; private set; }
+        public PonderService Ponder { get; private set; }
         public ExplorationService Exploration { get; private set; }
-        
+
         private void Awake()
         {
-            if(Instance != null && Instance != this)
+            if (Instance != null && Instance != this)
             {
                 Destroy(gameObject);
                 return;
@@ -27,12 +27,11 @@ namespace HeartOfPrince.Presentation
             Instance = this;
             DontDestroyOnLoad(gameObject);
             BuildRuntime();
-
         }
 
         private void OnDestroy()
         {
-            if(Instance == this)
+            if (Instance == this)
             {
                 Instance = null;
             }
@@ -41,8 +40,7 @@ namespace HeartOfPrince.Presentation
         private void BuildRuntime()
         {
             BuildStateRuntime();
-            Conversation = new ConversationService(State);
-            Exploration = new ExplorationService(State);
+            BuildServices();
         }
 
         private void BuildStateRuntime()
@@ -51,7 +49,14 @@ namespace HeartOfPrince.Presentation
                 ? initialStatePreset.CreateGameState()
                 : new GameState();
         }
-        
+
+        private void BuildServices()
+        {
+            Conversation = new ConversationService(State);
+            Ponder = new PonderService(State);
+            Exploration = new ExplorationService(State);
+        }
+
 #if UNITY_EDITOR
         public void Editor_ApplyPreset(GameStateDebugPreset preset)
         {
@@ -62,6 +67,7 @@ namespace HeartOfPrince.Presentation
             }
 
             State = preset.CreateGameState();
+            BuildServices();
         }
 #endif
     }

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Yarn.Unity;
 
 namespace HeartOfPrince.Domain
 {
@@ -10,19 +9,36 @@ namespace HeartOfPrince.Domain
         menuName = "Heart of Prince/Debug/Game State Debug Preset")]
     public sealed class GameStateDebugPreset : ScriptableObject
     {
+        [Header("Ponder")]
+        [SerializeField] private List<string> ponderTopics = new();
+
         [Header("Characters")]
         [SerializeField] private List<CharacterDebugState> characters = new();
 
+        public IReadOnlyList<string> PonderTopics => ponderTopics;
         public IReadOnlyList<CharacterDebugState> Characters => characters;
 
         public GameState CreateGameState()
         {
             var gameState = new GameState();
 
+            foreach (var topicNode in ponderTopics)
+            {
+                if (string.IsNullOrWhiteSpace(topicNode))
+                {
+                    continue;
+                }
+
+                gameState.Ponder.AddTopic(
+                    GameStateDebugConversion.ToTopicName(topicNode));
+            }
+
             foreach (var character in characters)
             {
                 if (string.IsNullOrWhiteSpace(character.CharacterId))
+                {
                     continue;
+                }
 
                 var characterId = GameStateDebugConversion.ToCharacterId(character.CharacterId);
                 var topicState = new CharacterTopicState(characterId);
@@ -30,7 +46,9 @@ namespace HeartOfPrince.Domain
                 foreach (var topicNode in character.TopicState.PlayerToCharacterTopics)
                 {
                     if (string.IsNullOrWhiteSpace(topicNode))
+                    {
                         continue;
+                    }
 
                     topicState.AddTopic(
                         GameStateDebugConversion.ToTopicName(topicNode),
@@ -40,7 +58,9 @@ namespace HeartOfPrince.Domain
                 foreach (var topicNode in character.TopicState.CharacterToPlayerTopics)
                 {
                     if (string.IsNullOrWhiteSpace(topicNode))
+                    {
                         continue;
+                    }
 
                     topicState.AddTopic(
                         GameStateDebugConversion.ToTopicName(topicNode),
@@ -53,9 +73,10 @@ namespace HeartOfPrince.Domain
             return gameState;
         }
 
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
+        public List<string> Editor_PonderTopics => ponderTopics;
         public List<CharacterDebugState> Editor_Characters => characters;
-    #endif
+#endif
     }
 
     [Serializable]
@@ -63,13 +84,6 @@ namespace HeartOfPrince.Domain
     {
         [SerializeField] private string characterId;
         [SerializeField] private CharacterTopicDebugState topicState = new();
-
-        // Future data can go here later:
-        //
-        // [SerializeField] private int relationshipPoints;
-        // [SerializeField] private int relationshipLevel;
-        // [SerializeField] private bool hasMet;
-        // [SerializeField] private List<string> flags = new();
 
         public string CharacterId
         {
