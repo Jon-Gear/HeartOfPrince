@@ -129,6 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1665364218}
   - component: {fileID: 1665364217}
+  - component: {fileID: 1665364219}
   m_Layer: 0
   m_Name: GameSession
   m_TagString: Untagged
@@ -148,7 +149,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ae5dc7176e9cf346afbb292a7ef702a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: HeartOfPrince.Presentation::HeartOfPrince.Presentation.GameSession
-  yarnProject: {fileID: 7545569452688597077, guid: 0618df8367086994687dff68346763fd, type: 3}
   initialStatePreset: {fileID: 11400000, guid: 39d662f9a2212e643885eb33b1b0eefc, type: 2}
 --- !u!4 &1665364218
 Transform:
@@ -165,6 +165,34 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1665364219
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1665364216}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64efca84875c4968a936c02ab4ac30b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: HeartOfPrince.Presentation::HeartOfPrince.Presentation.GameLoopService
+  decisionsPerDay: 2
+  daysPerAct: 2
+  actsInDemo: 2
+  startAutomatically: 1
+  talkRoutes:
+  - characterId: Munir
+    sceneName: Conversation_Munir_Morning
+    yarnNode: Start_Munir
+  logTransitions: 1
+  inspectorPhase: 0
+  inspectorCurrentAct: 0
+  inspectorCurrentDay: 0
+  inspectorDecisionIndex: 0
+  inspectorActionRunning: 0
+  inspectorDayEnding: 0
+  inspectorGameComplete: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

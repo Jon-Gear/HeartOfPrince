@@ -1,0 +1,219 @@
+title: Loop_DayOpening
+---
+Narrator: A new day begins. Prince has a little time before evening.
+Narrator: Today contains {LoopDecisionsPerDay()} decision opportunities.
+<<loop_sequence_complete>>
+===
+
+title: Loop_DayOpening_A1_D1
+---
+Narrator: Act One, Day One.
+Prince: Munir said I could return. Maybe I should hear him out.
+Narrator: Prince has {LoopDecisionsPerDay()} choices to make today.
+<<loop_sequence_complete>>
+===
+
+title: Loop_DayOpening_A1_D2
+---
+Narrator: Act One, Day Two.
+Prince: Yesterday gave me more to think about than I expected.
+<<loop_sequence_complete>>
+===
+
+title: Loop_DayOpening_A2_D1
+---
+Narrator: Act Two, Day One.
+Prince: Asking a question is easy. Living with the answer is harder.
+<<loop_sequence_complete>>
+===
+
+title: Loop_DayOpening_A2_D2
+---
+Narrator: Act Two, Day Two.
+Prince: One more day. I should decide what I will carry forward.
+<<loop_sequence_complete>>
+===
+
+title: Loop_Decision
+---
+Narrator: Decision {loop_decision_number()} of {LoopDecisionsPerDay()}.
+What should Prince do?
+-> Talk to Munir
+    <<loop_choose_talk "Munir">>
+-> Ponder
+    <<loop_choose_action "Ponder">>
+===
+
+title: Loop_Talk_Munir
+---
+<<StartConversation "Munir">>
+<<SetShot "Wide">>
+Prince: Peace be upon you, Munir.
+Munir: And upon you peace, Prince. What is on your mind?
+
+-> Ask how to carry responsibility <<if HasConversationTopic("Munir", "PlayerToCharacter", "PrototypeAskAboutResponsibility")>>
+    <<SetShot "CloseUp_A">>
+    Prince: How do you carry people who depend on you without crushing yourself?
+    <<SetShot "CloseUp_B">>
+    Munir: First, notice that responsibility is not the same as control.
+    Munir: Sit with that difference before you promise everyone an answer.
+    <<MarkConversationTopicDiscussed "Munir" "PlayerToCharacter" "PrototypeAskAboutResponsibility">>
+    <<UnlockPonderTopic "PrototypePonderResponsibility">>
+    <<ChangeRelationship "Munir" 1>>
+-> Ask the deeper question <<if HasConversationTopic("Munir", "PlayerToCharacter", "PrototypeAskAboutLeadership")>>
+    <<SetShot "CloseUp_A">>
+    Prince: Maybe leading them means admitting I cannot choose for them.
+    <<SetShot "CloseUp_B">>
+    Munir: That is a harder kind of courage. Guidance leaves room for another person to walk.
+    <<MarkConversationTopicDiscussed "Munir" "PlayerToCharacter" "PrototypeAskAboutLeadership">>
+    <<ChangeRelationship "Munir" 2>>
+-> Let Munir ask something <<if HasConversationTopic("Munir", "CharacterToPlayer", "PrototypeMunirQuestion")>>
+    <<SetShot "CloseUp_B">>
+    Munir: When you imagine failing them, what are you truly afraid they will see?
+    <<SetShot "CloseUp_A">>
+    Prince: That I was never strong enough to keep the promises I made.
+    <<MarkConversationTopicDiscussed "Munir" "CharacterToPlayer" "PrototypeMunirQuestion">>
+    <<UnlockPonderTopic "PrototypePonderPromises">>
+    <<ChangeRelationship "Munir" 1>>
+-> Browse other available topics <<if HasTopicsForCurrentActor("PlayerToCharacter")>>
+    <<jump TopicHub>>
+-> Invite Munir to choose another topic <<if HasTopicsForCurrentActor("CharacterToPlayer")>>
+    <<jump PrepareTopicHubNPC>>
+-> Finish the conversation
+    Prince: That is enough for today.
+
+<<SetShot "TwoShot">>
+Munir: Return when the next question becomes honest.
+<<EndConversation>>
+<<loop_action_complete>>
+===
+
+title: Loop_Ponder
+---
+<<StartPonder>>
+<<SetShot "Wide">>
+Prince: I should make room for one thought before I move again.
+
+-> Sit with Munir's distinction <<if HasPonderTopic("PrototypePonderResponsibility")>>
+    Prince: Responsibility asks me to act. Control asks everyone else to obey.
+    Prince: Maybe I have been treating fear like proof that I must decide everything.
+    <<MarkPonderTopicDiscussed "PrototypePonderResponsibility">>
+    <<UnlockConversationTopic "Munir" "PlayerToCharacter" "PrototypeAskAboutLeadership">>
+    <<UnlockConversationTopic "Munir" "CharacterToPlayer" "PrototypeMunirQuestion">>
+-> Think about promises <<if HasPonderTopic("PrototypePonderPromises")>>
+    Prince: A promise can guide me without becoming a chain around everyone I love.
+    <<MarkPonderTopicDiscussed "PrototypePonderPromises">>
+-> Take a quiet moment <<if HasPonderTopic("PrototypeQuietMoment")>>
+    Prince: Silence does not solve anything, but it lets me hear which thought is shouting.
+    <<MarkPonderTopicDiscussed "PrototypeQuietMoment">>
+-> Browse other available thoughts <<if HasPonderTopics()>>
+    <<jump Ponder_TopicHub>>
+-> Stop pondering
+    Prince: I have enough to carry back into the day.
+
+<<EndPonder>>
+<<loop_action_complete>>
+===
+
+
+title: PrototypeAskAboutResponsibility
+---
+<<SetShot "CloseUp_A">>
+Prince: How do you carry people who depend on you without crushing yourself?
+<<SetShot "CloseUp_B">>
+Munir: Responsibility is not the same as control. Sit with that difference.
+<<UnlockPonderTopic "PrototypePonderResponsibility">>
+<<ChangeRelationship "Munir" 1>>
+===
+
+title: PrototypeAskAboutLeadership
+---
+<<SetShot "CloseUp_A">>
+Prince: Maybe leading them means admitting I cannot choose for them.
+<<SetShot "CloseUp_B">>
+Munir: Guidance leaves room for another person to walk.
+<<ChangeRelationship "Munir" 2>>
+===
+
+title: PrototypeMunirQuestion
+---
+<<SetShot "CloseUp_B">>
+Munir: When you imagine failing them, what are you truly afraid they will see?
+<<SetShot "CloseUp_A">>
+Prince: That I was never strong enough to keep the promises I made.
+<<UnlockPonderTopic "PrototypePonderPromises">>
+<<ChangeRelationship "Munir" 1>>
+===
+
+title: PrototypeQuietMoment
+---
+Prince: Silence does not solve anything, but it lets me hear which thought is shouting.
+===
+
+title: PrototypePonderResponsibility
+---
+Prince: Responsibility asks me to act. Control asks everyone else to obey.
+Prince: Maybe I have been treating fear like proof that I must decide everything.
+<<UnlockConversationTopic "Munir" "PlayerToCharacter" "PrototypeAskAboutLeadership">>
+<<UnlockConversationTopic "Munir" "CharacterToPlayer" "PrototypeMunirQuestion">>
+===
+
+title: PrototypePonderPromises
+---
+Prince: A promise can guide me without becoming a chain around everyone I love.
+===
+
+title: Loop_DayEnding
+---
+Narrator: The day closes. Prince carries today's conversations and insights into tomorrow.
+<<loop_sequence_complete>>
+===
+
+title: Loop_DayEnding_A1_D1
+---
+Narrator: Night settles over the city.
+Prince: I made choices today. Tomorrow I will find out which ones stayed with me.
+<<loop_sequence_complete>>
+===
+
+title: Loop_DayEnding_A1_D2
+---
+Narrator: The first act closes.
+Prince: I thought answers would make me lighter. They mostly made the questions clearer.
+<<loop_sequence_complete>>
+===
+
+title: Loop_DayEnding_A2_D1
+---
+Narrator: Another day ends.
+Prince: Munir cannot live my life for me. That may be why his words matter.
+<<loop_sequence_complete>>
+===
+
+title: Loop_DayEnding_A2_D2
+---
+Narrator: Prince reaches the end of the final day.
+Prince: I am not finished. But I am no longer standing where I began.
+<<loop_sequence_complete>>
+===
+
+title: Loop_ActTransition
+---
+Narrator: Time passes, and a new act begins.
+<<loop_sequence_complete>>
+===
+
+title: Loop_ActTransition_A2
+---
+Narrator: Act Two begins.
+Narrator: Prince returns with questions shaped by what he chose, what he avoided, and what he learned.
+<<loop_sequence_complete>>
+===
+
+title: Loop_DemoEnding
+---
+Narrator: The demo is complete.
+Narrator: Prince's available topics, discussed topics, relationship with Munir, act, day, and decision state all remained in the persistent GameSession.
+Prince: I still have a road ahead of me. At least now I know how to take the next step.
+<<loop_sequence_complete>>
+===

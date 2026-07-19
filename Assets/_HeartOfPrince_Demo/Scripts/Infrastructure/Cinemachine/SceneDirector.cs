@@ -81,11 +81,25 @@ public class SceneDirector : MonoBehaviour
             return;
         }
 
+        if (SceneDirector.Instance == null)
+        {
+            Debug.LogWarning($"Cannot set shot '{shotName}': no SceneDirector is active.");
+            return;
+        }
+
         SceneDirector.Instance.SetShot(shot);
     }
 
     public void SetShot(Shot shot)
     {
+        if (WideShot == null || TwoShot == null ||
+            OverTheShoulderShotA == null || OverTheShoulderShotB == null ||
+            CloseUpShotA == null || CloseUpShotB == null)
+        {
+            Debug.LogWarning($"SceneDirector '{name}' is missing one or more camera bindings.");
+            return;
+        }
+
         WideShot.Priority = (shot == Shot.Wide) ? 1 : 0;
         TwoShot.Priority = (shot == Shot.TwoShot) ? 1 : 0;
         OverTheShoulderShotA.Priority = (shot == Shot.OTS_A) ? 1 : 0;

@@ -58,7 +58,8 @@ namespace HeartOfPrince.Application
 
             _preparedTopics.Clear();
             _canRefreshPreparedTopics = false;
-            
+            _amountOfTurnsPlayerUsed = 0;
+            _amountOfTurnsCurrentActorUsed = 0;
             _turnsLeft = AMOUNT_OF_TURNS;
         }
 
@@ -121,7 +122,7 @@ namespace HeartOfPrince.Application
         private void ConsumeTopic(int index)
         {
             _currentTopic = _preparedTopics[index];
-            _gameState.CharactersTopics[GetCurrentActor()].RemoveTopic(_currentTopic.Value, _currentConversationTopicDirection);
+            _gameState.CharactersTopics[GetCurrentActor()].MarkDiscussed(_currentTopic.Value, _currentConversationTopicDirection);
             _turnsLeft--;
         }
 

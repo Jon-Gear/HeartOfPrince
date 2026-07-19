@@ -4,17 +4,23 @@ using UnityEngine;
 
 namespace HeartOfPrince.Presentation
 {
+    /// <summary>
+    /// The single persistent runtime composition root for Heart of Prince.
+    /// Game state and application services are rebuilt here for new games and debug resets.
+    /// </summary>
+    [DefaultExecutionOrder(-1000)]
     public sealed class GameSession : MonoBehaviour
     {
         public static GameSession Instance { get; private set; }
 
         [Header("Game State")]
         [SerializeField] private GameStateDebugPreset initialStatePreset;
-        public GameState State { get; private set; }
 
+        public GameState State { get; private set; }
         public ConversationService Conversation { get; private set; }
         public PonderService Ponder { get; private set; }
         public ExplorationService Exploration { get; private set; }
+        public GameLoopService GameLoop { get; private set; }
 
         private void Awake()
         {
@@ -26,7 +32,9 @@ namespace HeartOfPrince.Presentation
 
             Instance = this;
             DontDestroyOnLoad(gameObject);
+
             BuildRuntime();
+            EnsureGameLoopService();
         }
 
         private void OnDestroy()
@@ -37,24 +45,31 @@ namespace HeartOfPrince.Presentation
             }
         }
 
-        private void BuildRuntime()
+        public void ResetRuntimeState()
         {
-            BuildStateRuntime();
-            BuildServices();
+            BuildRuntime();
+            GameLoop?.BindToCurrentState();
         }
 
-        private void BuildStateRuntime()
+        private void BuildRuntime()
         {
             State = initialStatePreset != null
                 ? initialStatePreset.CreateGameState()
                 : new GameState();
-        }
 
-        private void BuildServices()
-        {
             Conversation = new ConversationService(State);
             Ponder = new PonderService(State);
             Exploration = new ExplorationService(State);
+        }
+
+        private void EnsureGameLoopService()
+        {
+            GameLoop = GetComponent<GameLoopService>();
+
+            if (GameLoop == null)
+            {
+                GameLoop = gameObject.AddComponent<GameLoopService>();
+            }
         }
 
 #if UNITY_EDITOR
@@ -67,7 +82,10 @@ namespace HeartOfPrince.Presentation
             }
 
             State = preset.CreateGameState();
-            BuildServices();
+            Conversation = new ConversationService(State);
+            Ponder = new PonderService(State);
+            Exploration = new ExplorationService(State);
+            GameLoop?.BindToCurrentState();
         }
 #endif
     }

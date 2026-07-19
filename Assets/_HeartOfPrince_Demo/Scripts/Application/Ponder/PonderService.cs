@@ -1,7 +1,6 @@
 using HeartOfPrince.Domain;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Random = System.Random;
@@ -138,7 +137,7 @@ namespace HeartOfPrince.Application
         private void ConsumeTopic(int index)
         {
             _currentTopic = _preparedTopics[index];
-            _gameState.Ponder.RemoveTopic(_currentTopic.Value);
+            _gameState.Ponder.MarkDiscussed(_currentTopic.Value);
 
             if (_turnsLeft > 0)
             {

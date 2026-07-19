@@ -9,6 +9,7 @@ Munir: It's been very nice to talk to you, Prince.
 <<SetShot "Closeup_A">>
 Prince: Thank you, it means a lot to me.
 <<EndConversation>>
+<<loop_action_complete>>
 ===
 
 title: End
@@ -27,6 +28,7 @@ Munir: Then next time, bring me something from your side too.
 <<SetShot "Closeup_A">>
 Prince: I will.
 <<EndConversation>>
+<<loop_action_complete>>
 ===
 
 title: End
@@ -46,6 +48,7 @@ Munir: Just remember, conversation is a door, not a speech.
 <<SetShot "Closeup_A">>
 Prince: I'll remember that.
 <<EndConversation>>
+<<loop_action_complete>>
 ===
 
 title: End
@@ -64,4 +67,5 @@ Munir: But if you want trust to grow, you have to bring something into the room.
 <<SetShot "Closeup_A">>
 Prince: Next time, I won't come empty-handed.
 <<EndConversation>>
+<<loop_action_complete>>
 ===
