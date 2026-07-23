@@ -39,16 +39,16 @@ namespace HeartOfPrince.Editor
             serializedObject.ApplyModifiedProperties();
 
             var service = (GameLoopService)target;
-            var chapter = service.CurrentChapterDefinition;
-            var firstAct = chapter.GetAct(0);
+            //var chapter = service.CurrentChapterDefinition;
+            //var firstAct = chapter.GetAct(0);
 
-            EditorGUILayout.Space(8);
-            EditorGUILayout.LabelField("Narrative Definition", EditorStyles.boldLabel);
-            EditorGUILayout.HelpBox(
-                $"{chapter.DisplayName}: {chapter.ActCount} act(s). " +
-                $"{firstAct.DisplayName}: {firstAct.DecisionsPerDay} decisions per day. " +
-                "Edit DemoChapterDefinition.cs to change the code-authored demo structure.",
-                MessageType.None);
+            //EditorGUILayout.Space(8);
+            //EditorGUILayout.LabelField("Narrative Definition", EditorStyles.boldLabel);
+            //EditorGUILayout.HelpBox(
+            //    $"{chapter.DisplayName}: {chapter.ActCount} act(s). " +
+            //    $"{firstAct.DisplayName}: {firstAct.DecisionsPerDay} decisions per day. " +
+            //    "Edit DemoChapterDefinition.cs to change the code-authored demo structure.",
+            //    MessageType.None);
 
             EditorGUILayout.Space(8);
             EditorGUILayout.LabelField("Debug Controls", EditorStyles.boldLabel);

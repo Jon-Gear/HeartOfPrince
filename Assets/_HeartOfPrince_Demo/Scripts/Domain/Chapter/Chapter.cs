@@ -3,55 +3,48 @@ using UnityEngine;
 
 namespace HeartOfPrince.Domain
 {
-    /// <summary>
-    /// Immutable-at-runtime narrative configuration for one chapter.
-    /// </summary>
-    [Serializable]
-    public sealed class Chapter
+    [CreateAssetMenu(
+        fileName = "New Chapter",
+        menuName = "Heart of Prince/Narrative/Chapter")]
+    public sealed class Chapter : ScriptableObject
     {
         [Header("Identity")]
-        [SerializeField] private string id;
-        [SerializeField] private string displayName;
+        [SerializeField]
+        private string id;
+
+        [SerializeField]
+        private string displayName;
+
+        [TextArea]
+        [SerializeField]
+        private string description;
 
         [Header("Chapter Scenes")]
-        [SerializeField] private string startScene;
-        [SerializeField] private string endScene;
+        [SerializeField]
+        private string startScene;
+
+        [SerializeField]
+        private string endScene;
 
         [Header("Acts")]
-        [SerializeField] private Act[] acts = Array.Empty<Act>();
+        [SerializeField]
+        private Act[] acts = Array.Empty<Act>();
 
         [Header("Completion")]
-        [SerializeReference]
-        private CompletionCondition completionCondition =
-            new AllActsCompletedCondition();
+        [SerializeField]
+        private CompletionCondition completionCondition;
 
         public string Id => id;
         public string DisplayName => displayName;
+        public string Description => description;
+
         public string StartScene => startScene;
         public string EndScene => endScene;
+
         public int ActCount => acts?.Length ?? 0;
-        public CompletionCondition CompletionCondition => completionCondition;
 
-        public Chapter()
-        {
-        }
-
-        public Chapter(
-            string id,
-            string displayName,
-            string startScene,
-            string endScene,
-            Act[] acts,
-            CompletionCondition completionCondition)
-        {
-            this.id = id;
-            this.displayName = displayName;
-            this.startScene = startScene;
-            this.endScene = endScene;
-            this.acts = acts ?? Array.Empty<Act>();
-            this.completionCondition = completionCondition ??
-                throw new ArgumentNullException(nameof(completionCondition));
-        }
+        public CompletionCondition CompletionCondition =>
+            completionCondition;
 
         public Act GetAct(int zeroBasedActIndex)
         {
@@ -61,16 +54,45 @@ namespace HeartOfPrince.Domain
             {
                 throw new ArgumentOutOfRangeException(
                     nameof(zeroBasedActIndex),
-                    $"Chapter '{id}' does not contain act index {zeroBasedActIndex}.");
+                    $"Chapter '{id}' does not contain act index " +
+                    $"{zeroBasedActIndex}.");
             }
 
-            return acts[zeroBasedActIndex];
+            Act act = acts[zeroBasedActIndex];
+
+            if (act == null)
+            {
+                throw new InvalidOperationException(
+                    $"Chapter '{id}' has an empty act reference at " +
+                    $"index {zeroBasedActIndex}.");
+            }
+
+            return act;
         }
 
         public bool IsComplete(NarrativeProgress progress)
         {
-            return completionCondition != null &&
-                   completionCondition.IsMet(progress);
+            if (completionCondition == null)
+            {
+                Debug.LogError(
+                    $"Chapter '{name}' has no completion condition.",
+                    this);
+
+                return false;
+            }
+
+            return completionCondition.IsMet(progress);
+        }
+
+        private void OnValidate()
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                id = name
+                    .Trim()
+                    .ToLowerInvariant()
+                    .Replace(" ", "-");
+            }
         }
     }
 }

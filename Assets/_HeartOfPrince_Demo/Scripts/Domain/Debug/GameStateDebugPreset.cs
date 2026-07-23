@@ -9,20 +9,57 @@ namespace HeartOfPrince.Domain
         menuName = "Heart of Prince/Debug/Game State Debug Preset")]
     public sealed class GameStateDebugPreset : ScriptableObject
     {
+        [Header("Narrative")]
+        [SerializeField]
+        private Chapter startingChapter;
+
+        [SerializeField, Min(1)]
+        private int startingAct = 1;
+
+        [SerializeField, Min(1)]
+        private int startingDay = 1;
+
+        [SerializeField, Min(0)]
+        private int startingDecisionIndex;
+
         [Header("Ponder")]
-        [SerializeField] private List<string> ponderTopics = new();
+        [SerializeField]
+        private List<string> ponderTopics = new();
+
+        [SerializeField]
+        private List<string> discussedPonderTopics = new();
 
         [Header("Characters")]
-        [SerializeField] private List<CharacterDebugState> characters = new();
+        [SerializeField]
+        private List<CharacterDebugState> characters = new();
+
+        public Chapter StartingChapter => startingChapter;
+        public int StartingAct => Mathf.Max(1, startingAct);
+        public int StartingDay => Mathf.Max(1, startingDay);
+        public int StartingDecisionIndex =>
+            Mathf.Max(0, startingDecisionIndex);
 
         public IReadOnlyList<string> PonderTopics => ponderTopics;
-        public IReadOnlyList<CharacterDebugState> Characters => characters;
+        public IReadOnlyList<string> DiscussedPonderTopics =>
+            discussedPonderTopics;
+
+        public IReadOnlyList<CharacterDebugState> Characters =>
+            characters;
 
         public GameState CreateGameState()
         {
             var gameState = new GameState();
 
-            foreach (var topicNode in ponderTopics)
+            PopulatePonderState(gameState);
+            PopulateCharacterState(gameState);
+            PopulateLoopState(gameState);
+
+            return gameState;
+        }
+
+        private void PopulatePonderState(GameState gameState)
+        {
+            foreach (string topicNode in ponderTopics)
             {
                 if (string.IsNullOrWhiteSpace(topicNode))
                 {
@@ -33,62 +70,148 @@ namespace HeartOfPrince.Domain
                     GameStateDebugConversion.ToTopicName(topicNode));
             }
 
-            foreach (var character in characters)
+            foreach (string topicNode in discussedPonderTopics)
             {
-                if (string.IsNullOrWhiteSpace(character.CharacterId))
+                if (string.IsNullOrWhiteSpace(topicNode))
                 {
                     continue;
                 }
 
-                var characterId = GameStateDebugConversion.ToCharacterId(character.CharacterId);
-                var topicState = new CharacterTopicState(characterId);
+                TopicName topic =
+                    GameStateDebugConversion.ToTopicName(topicNode);
 
-                foreach (var topicNode in character.TopicState.PlayerToCharacterTopics)
-                {
-                    if (string.IsNullOrWhiteSpace(topicNode))
-                    {
-                        continue;
-                    }
-
-                    topicState.AddTopic(
-                        GameStateDebugConversion.ToTopicName(topicNode),
-                        ConversationTopicDirection.PlayerToCharacter);
-                }
-
-                foreach (var topicNode in character.TopicState.CharacterToPlayerTopics)
-                {
-                    if (string.IsNullOrWhiteSpace(topicNode))
-                    {
-                        continue;
-                    }
-
-                    topicState.AddTopic(
-                        GameStateDebugConversion.ToTopicName(topicNode),
-                        ConversationTopicDirection.CharacterToPlayer);
-                }
-
-                gameState.CharactersTopics[characterId] = topicState;
+                gameState.Ponder.AddTopic(topic);
+                gameState.Ponder.MarkDiscussed(topic);
             }
-
-            return gameState;
         }
 
-#if UNITY_EDITOR
-        public List<string> Editor_PonderTopics => ponderTopics;
-        public List<CharacterDebugState> Editor_Characters => characters;
-#endif
+        private void PopulateCharacterState(GameState gameState)
+        {
+            foreach (CharacterDebugState character in characters)
+            {
+                if (character == null ||
+                    string.IsNullOrWhiteSpace(character.CharacterId))
+                {
+                    continue;
+                }
+
+                CharacterID characterId =
+                    GameStateDebugConversion.ToCharacterId(
+                        character.CharacterId);
+
+                var topicState =
+                    new CharacterTopicState(characterId);
+
+                AddTopics(
+                    topicState,
+                    character.TopicState.PlayerToCharacterTopics,
+                    ConversationTopicDirection.PlayerToCharacter);
+
+                AddTopics(
+                    topicState,
+                    character.TopicState.CharacterToPlayerTopics,
+                    ConversationTopicDirection.CharacterToPlayer);
+
+                AddDiscussedTopics(
+                    topicState,
+                    character.TopicState
+                        .DiscussedPlayerToCharacterTopics,
+                    ConversationTopicDirection.PlayerToCharacter);
+
+                AddDiscussedTopics(
+                    topicState,
+                    character.TopicState
+                        .DiscussedCharacterToPlayerTopics,
+                    ConversationTopicDirection.CharacterToPlayer);
+
+                gameState.CharactersTopics[characterId] = topicState;
+
+                CharacterRelationshipState relationship =
+                    gameState.GetOrCreateRelationship(characterId);
+
+                relationship.ChangeTrust(character.Trust);
+            }
+        }
+
+        private void PopulateLoopState(GameState gameState)
+        {
+            gameState.Loop.Chapter = 1;
+            gameState.Loop.CurrentAct = StartingAct;
+            gameState.Loop.CurrentDay = StartingDay;
+            gameState.Loop.CurrentDecisionIndex =
+                StartingDecisionIndex;
+
+            if (startingChapter != null &&
+                startingChapter.ActCount >= StartingAct)
+            {
+                Act act = startingChapter.GetAct(StartingAct - 1);
+
+                gameState.Loop.DecisionsAllowedPerDay =
+                    act.DecisionsPerDay;
+            }
+        }
+
+        private static void AddTopics(
+            CharacterTopicState state,
+            IEnumerable<string> topics,
+            ConversationTopicDirection direction)
+        {
+            foreach (string topicNode in topics)
+            {
+                if (string.IsNullOrWhiteSpace(topicNode))
+                {
+                    continue;
+                }
+
+                state.AddTopic(
+                    GameStateDebugConversion.ToTopicName(topicNode),
+                    direction);
+            }
+        }
+
+        private static void AddDiscussedTopics(
+            CharacterTopicState state,
+            IEnumerable<string> topics,
+            ConversationTopicDirection direction)
+        {
+            foreach (string topicNode in topics)
+            {
+                if (string.IsNullOrWhiteSpace(topicNode))
+                {
+                    continue;
+                }
+
+                TopicName topic =
+                    GameStateDebugConversion.ToTopicName(topicNode);
+
+                state.AddTopic(topic, direction);
+                state.MarkDiscussed(topic, direction);
+            }
+        }
     }
 
     [Serializable]
     public sealed class CharacterDebugState
     {
-        [SerializeField] private string characterId;
-        [SerializeField] private CharacterTopicDebugState topicState = new();
+        [SerializeField]
+        private string characterId;
+
+        [SerializeField]
+        private int trust;
+
+        [SerializeField]
+        private CharacterTopicDebugState topicState = new();
 
         public string CharacterId
         {
             get => characterId;
             set => characterId = value;
+        }
+
+        public int Trust
+        {
+            get => trust;
+            set => trust = value;
         }
 
         public CharacterTopicDebugState TopicState => topicState;
@@ -97,10 +220,28 @@ namespace HeartOfPrince.Domain
     [Serializable]
     public sealed class CharacterTopicDebugState
     {
-        [SerializeField] private List<string> playerToCharacterTopics = new();
-        [SerializeField] private List<string> characterToPlayerTopics = new();
+        [SerializeField]
+        private List<string> playerToCharacterTopics = new();
 
-        public List<string> PlayerToCharacterTopics => playerToCharacterTopics;
-        public List<string> CharacterToPlayerTopics => characterToPlayerTopics;
+        [SerializeField]
+        private List<string> characterToPlayerTopics = new();
+
+        [SerializeField]
+        private List<string> discussedPlayerToCharacterTopics = new();
+
+        [SerializeField]
+        private List<string> discussedCharacterToPlayerTopics = new();
+
+        public List<string> PlayerToCharacterTopics =>
+            playerToCharacterTopics;
+
+        public List<string> CharacterToPlayerTopics =>
+            characterToPlayerTopics;
+
+        public List<string> DiscussedPlayerToCharacterTopics =>
+            discussedPlayerToCharacterTopics;
+
+        public List<string> DiscussedCharacterToPlayerTopics =>
+            discussedCharacterToPlayerTopics;
     }
 }

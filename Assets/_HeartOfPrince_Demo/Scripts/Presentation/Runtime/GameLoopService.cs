@@ -60,35 +60,10 @@ namespace HeartOfPrince.Presentation
         private const string MunirMorningScene = "Conversation_Munir_Morning";
         private const string MunirEveningScene = "Conversation_Munir_Evening";
 
-        private static readonly string[] StandalonePlayerTopics =
-        {
-            "PlaceholderTopic7",
-            "PlaceholderTopic8",
-            "PlaceholderTopic9",
-            "PlaceholderTopic10",
-            "PlaceholderTopic11",
-            "PlaceholderTopic12"
-        };
+        [Header("Narrative")]
+        [SerializeField]
+        private Chapter startingChapter;
 
-        private static readonly string[] StandaloneNpcTopics =
-        {
-            "PlaceholderTopic1",
-            "PlaceholderTopic2",
-            "PlaceholderTopic3",
-            "PlaceholderTopic4",
-            "PlaceholderTopic5",
-            "PlaceholderTopic6"
-        };
-
-        private static readonly string[] StandalonePonderTopics =
-        {
-            "ReflectOnDuty",
-            "ReflectOnFamily",
-            "ReflectOnFaith",
-            "ReflectOnFuture",
-            "ReflectOnFear",
-            "ReflectOnMercy"
-        };
 
         [Header("Demo Configuration")]
         [SerializeField] private bool startAutomatically = true;
@@ -120,7 +95,7 @@ namespace HeartOfPrince.Presentation
         {
             get
             {
-                EnsureChapterDefinition();
+                //EnsureChapterDefinition();
                 return currentChapter;
             }
         }
@@ -129,7 +104,7 @@ namespace HeartOfPrince.Presentation
         {
             get
             {
-                EnsureChapterDefinition();
+                //EnsureChapterDefinition();
 
                 int actIndex = Math.Max(0, CurrentAct - 1);
                 actIndex = Math.Min(actIndex, currentChapter.ActCount - 1);
@@ -163,7 +138,7 @@ namespace HeartOfPrince.Presentation
             }
 
             Instance = this;
-            EnsureChapterDefinition();
+            //EnsureChapterDefinition();
             SceneManager.sceneLoaded += OnSceneLoaded;
             BindToCurrentState();
         }
@@ -511,9 +486,9 @@ namespace HeartOfPrince.Presentation
             GameSession.Instance.ResetRuntimeState();
             BindToCurrentState();
 
-            EnsureChapterDefinition();
+            //EnsureChapterDefinition();
             loopState.Reset(currentChapter.GetAct(0).DecisionsPerDay);
-            SeedPrototypeProgression();
+            //SeedPrototypeProgression();
 
             SetPhase(GameLoopPhase.StartingGame);
             Log($"Starting {currentChapter.DisplayName}.");
@@ -545,10 +520,10 @@ namespace HeartOfPrince.Presentation
                 BindToCurrentState();
             }
 
-            EnsureChapterDefinition();
+            //EnsureChapterDefinition();
             loopState.Reset(currentChapter.GetAct(0).DecisionsPerDay);
-            SeedPrototypeProgression();
-            SeedStandaloneDebugTopics();
+            //SeedPrototypeProgression();
+            //SeedStandaloneDebugTopics();
 
             if (standaloneUsesEveningVariant && DecisionsAllowedPerDay > 1)
             {
@@ -874,12 +849,18 @@ namespace HeartOfPrince.Presentation
                 return;
             }
 
-            currentChapter = DemoChapterDefinition.Create();
+            currentChapter = startingChapter;
 
-            if (currentChapter == null || currentChapter.ActCount == 0)
+            if (currentChapter == null)
             {
                 throw new InvalidOperationException(
-                    "The demo chapter definition must contain at least one act.");
+                    "GameLoopService has no Starting Chapter assigned.");
+            }
+
+            if (currentChapter.ActCount == 0)
+            {
+                throw new InvalidOperationException(
+                    $"Chapter '{currentChapter.name}' contains no acts.");
             }
         }
 
@@ -939,45 +920,45 @@ namespace HeartOfPrince.Presentation
             return separator > 0 ? remainder.Substring(0, separator) : remainder;
         }
 
-        private void SeedPrototypeProgression()
-        {
-            var munir = (CharacterID)"Munir";
-            var topics = GameSession.Instance.State.GetOrCreateCharacterTopics(munir);
+        //private void SeedPrototypeProgression()
+        //{
+        //    var munir = (CharacterID)"Munir";
+        //    var topics = GameSession.Instance.State.GetOrCreateCharacterTopics(munir);
 
-            topics.AddTopic(
-                (TopicName)"PrototypeAskAboutResponsibility",
-                ConversationTopicDirection.PlayerToCharacter);
+        //    topics.AddTopic(
+        //        (TopicName)"PrototypeAskAboutResponsibility",
+        //        ConversationTopicDirection.PlayerToCharacter);
 
-            GameSession.Instance.State.Ponder.AddTopic(
-                (TopicName)"PrototypeQuietMoment");
+        //    GameSession.Instance.State.Ponder.AddTopic(
+        //        (TopicName)"PrototypeQuietMoment");
 
-            GameSession.Instance.State.GetOrCreateRelationship(munir);
-        }
+        //    GameSession.Instance.State.GetOrCreateRelationship(munir);
+        //}
 
-        private void SeedStandaloneDebugTopics()
-        {
-            var munir = (CharacterID)"Munir";
-            var topics = GameSession.Instance.State.GetOrCreateCharacterTopics(munir);
+        //private void SeedStandaloneDebugTopics()
+        //{
+        //    var munir = (CharacterID)"Munir";
+        //    var topics = GameSession.Instance.State.GetOrCreateCharacterTopics(munir);
 
-            foreach (var topic in StandalonePlayerTopics)
-            {
-                topics.AddTopic(
-                    (TopicName)topic,
-                    ConversationTopicDirection.PlayerToCharacter);
-            }
+        //    foreach (var topic in StandalonePlayerTopics)
+        //    {
+        //        topics.AddTopic(
+        //            (TopicName)topic,
+        //            ConversationTopicDirection.PlayerToCharacter);
+        //    }
 
-            foreach (var topic in StandaloneNpcTopics)
-            {
-                topics.AddTopic(
-                    (TopicName)topic,
-                    ConversationTopicDirection.CharacterToPlayer);
-            }
+        //    foreach (var topic in StandaloneNpcTopics)
+        //    {
+        //        topics.AddTopic(
+        //            (TopicName)topic,
+        //            ConversationTopicDirection.CharacterToPlayer);
+        //    }
 
-            foreach (var topic in StandalonePonderTopics)
-            {
-                GameSession.Instance.State.Ponder.AddTopic((TopicName)topic);
-            }
-        }
+        //    foreach (var topic in StandalonePonderTopics)
+        //    {
+        //        GameSession.Instance.State.Ponder.AddTopic((TopicName)topic);
+        //    }
+        //}
 
         private void ReplaceTransition(IEnumerator routine)
         {
