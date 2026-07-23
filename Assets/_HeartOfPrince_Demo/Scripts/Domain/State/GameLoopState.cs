@@ -6,17 +6,27 @@ namespace HeartOfPrince.Domain
     {
         None,
         StartingGame,
+        
         StartingAct,
+        
         StartingDay,
+
         PlayingDayOpening,
         AwaitingDecision,
+        
         LoadingAction,
         PerformingTalk,
         PerformingPonder,
         ResolvingAction,
+        
         EndingDay,
+        
         TransitioningAct,
+        
         PlayingEnding,
+        
+        StandaloneScene,
+        StandaloneComplete,
         Completed
     }
 
@@ -30,6 +40,7 @@ namespace HeartOfPrince.Domain
     [Serializable]
     public sealed class GameLoopState
     {
+        public int Chapter = 1;
         public int CurrentAct = 1;
         public int CurrentDay = 1;
         public int CurrentDecisionIndex;

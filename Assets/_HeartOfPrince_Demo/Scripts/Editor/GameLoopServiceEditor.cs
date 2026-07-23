@@ -35,6 +35,8 @@ namespace HeartOfPrince.Editor
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("inspectorActionRunning"));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("inspectorDayEnding"));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("inspectorGameComplete"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("inspectorStandaloneSceneMode"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("inspectorActiveScene"));
             }
 
             serializedObject.ApplyModifiedProperties();
@@ -65,7 +67,8 @@ namespace HeartOfPrince.Editor
             {
                 EditorGUILayout.HelpBox(
                     "Debug controls become available in Play Mode. " +
-                    "The GameLoopService is created automatically on the persistent GameSession.",
+                    "The GameLoopService is created automatically on the persistent GameSession. " +
+                    "Playing a non-Bootstrap scene enters standalone-scene mode instead of redirecting.",
                     MessageType.Info);
             }
         }

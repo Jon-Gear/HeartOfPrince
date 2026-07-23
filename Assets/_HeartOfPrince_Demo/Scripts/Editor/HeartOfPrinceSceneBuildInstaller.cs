@@ -69,6 +69,33 @@ namespace HeartOfPrince.Editor
             }
         }
 
+
+        [MenuItem("Heart of Prince/Debug/Play Current Open Scene")]
+        public static void UseCurrentSceneForPlayMode()
+        {
+            EditorSceneManager.playModeStartScene = null;
+            Debug.Log(
+                "[Heart of Prince] Play Mode will now start from the currently open scene. " +
+                "Non-Bootstrap demo scenes enter standalone-scene mode.");
+        }
+
+        [MenuItem("Heart of Prince/Debug/Play Full Game From Bootstrap")]
+        public static void UseBootstrapForPlayMode()
+        {
+            var path = FindScenePath("Bootstrap");
+            if (string.IsNullOrEmpty(path))
+            {
+                Debug.LogError("[Heart of Prince] Could not find Bootstrap.unity.");
+                return;
+            }
+
+            var sceneAsset = AssetDatabase.LoadAssetAtPath<SceneAsset>(path);
+            EditorSceneManager.playModeStartScene = sceneAsset;
+            Debug.Log(
+                "[Heart of Prince] Play Mode will start from Bootstrap until " +
+                "'Play Current Open Scene' is selected.");
+        }
+
         [MenuItem("Heart of Prince/Open Starting Scene")]
         public static void OpenStartingScene()
         {

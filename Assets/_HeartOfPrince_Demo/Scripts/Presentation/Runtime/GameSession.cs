@@ -1,6 +1,7 @@
 using HeartOfPrince.Application;
 using HeartOfPrince.Domain;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace HeartOfPrince.Presentation
 {
@@ -19,8 +20,68 @@ namespace HeartOfPrince.Presentation
         public GameState State { get; private set; }
         public ConversationService Conversation { get; private set; }
         public PonderService Ponder { get; private set; }
-        public ExplorationService Exploration { get; private set; }
         public GameLoopService GameLoop { get; private set; }
+
+        /// <summary>
+        /// Makes every demo scene directly playable in the editor.
+        ///
+        /// Bootstrap already contains a configured GameSession, so this method does
+        /// nothing there. When another scene is entered directly, it creates the same
+        /// single persistent composition root without redirecting to Bootstrap.
+        /// </summary>
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void RegisterDirectSceneBootstrap()
+        {
+            SceneManager.sceneLoaded -= EnsureSessionAfterSceneLoad;
+            SceneManager.sceneLoaded += EnsureSessionAfterSceneLoad;
+        }
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        private static void EnsureSessionAfterInitialSceneLoad()
+        {
+            EnsureSessionForDirectScenePlay();
+        }
+
+        private static void EnsureSessionAfterSceneLoad(
+            Scene scene,
+            LoadSceneMode mode)
+        {
+            EnsureSessionForDirectScenePlay();
+        }
+
+        private static void EnsureSessionForDirectScenePlay()
+        {
+            if (Instance != null)
+            {
+                return;
+            }
+
+            var sceneName = SceneManager.GetActiveScene().name;
+            if (!IsHeartOfPrinceRuntimeScene(sceneName))
+            {
+                return;
+            }
+
+            var sceneSession = UnityEngine.Object.FindObjectOfType<GameSession>();
+            if (sceneSession != null)
+            {
+                // Its Awake normally ran before this callback; avoid creating
+                // a competing persistent session.
+                return;
+            }
+
+            var runtimeObject = new GameObject("GameSession [Direct Scene Debug]");
+            runtimeObject.AddComponent<GameSession>();
+        }
+
+        private static bool IsHeartOfPrinceRuntimeScene(string sceneName)
+        {
+            return string.Equals(sceneName, "Bootstrap", System.StringComparison.OrdinalIgnoreCase) ||
+                   sceneName.StartsWith("Day_", System.StringComparison.OrdinalIgnoreCase) ||
+                   sceneName.StartsWith("Decision_", System.StringComparison.OrdinalIgnoreCase) ||
+                   sceneName.StartsWith("Conversation_", System.StringComparison.OrdinalIgnoreCase) ||
+                   sceneName.StartsWith("Ponder_", System.StringComparison.OrdinalIgnoreCase);
+        }
 
         private void Awake()
         {
@@ -59,7 +120,6 @@ namespace HeartOfPrince.Presentation
 
             Conversation = new ConversationService(State);
             Ponder = new PonderService(State);
-            Exploration = new ExplorationService(State);
         }
 
         private void EnsureGameLoopService()
@@ -84,7 +144,6 @@ namespace HeartOfPrince.Presentation
             State = preset.CreateGameState();
             Conversation = new ConversationService(State);
             Ponder = new PonderService(State);
-            Exploration = new ExplorationService(State);
             GameLoop?.BindToCurrentState();
         }
 #endif

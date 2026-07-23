@@ -1,69 +1,85 @@
-# Game Loop Service Implementation Summary
+# Game Loop Service — Revision Summary
 
-## Added
+## Revised architecture
 
-- `Scripts/Domain/State/GameLoopState.cs`
-  - `GameLoopPhase`, `GameLoopAction`, and persistent loop values.
-- `Scripts/Domain/State/CharacterRelationshipState.cs`
-  - Persistent per-character relationship trust.
+- Removed the persistent Dialogue Runner and persistent EventSystem design.
+- `GameLoopService` now coordinates scene loading and loop state only.
+- Every scene retains its own Dialogue Runner, Auto Start setting, Starting Node, dialogue UI, and EventSystem.
+- The service waits for the active scene's runner to finish before transitioning.
+- Talk routes now select morning/evening scenes; they no longer specify a Yarn node.
+
+## Standalone scene debugging
+
+- `GameSession` registers a runtime scene bootstrap.
+- If a non-Bootstrap scene is played directly and no session exists, one debug session is created.
+- The loop detects the active scene and enters standalone-scene mode.
+- It does not redirect to Bootstrap.
+- Directly launched Talk and Ponder scenes seed temporary topics and run their own starting nodes.
+- Directly launched Decision scenes can route into an action, then stop after the action completes.
+- Reset All Progression reloads the current standalone scene.
+- Start New Game exits standalone mode and starts the full loop.
+- Editor menu commands switch between playing the current open scene and forcing Bootstrap as the Play Mode start scene.
+
+## Existing hub integration
+
+- Munir Talk actions now enter through `Start_Munir`.
+- `Start_Munir` uses the existing `TopicHub`.
+- `TopicHub` uses `PrepareTopicHubNPC` and `TopicHubNPC`.
+- Ponder actions enter through `Ponder_Start`.
+- `Ponder_Start` uses the existing `Ponder_TopicHub`.
+- The previous custom Talk/Ponder Yarn loops are retained only as backwards-compatible aliases.
+
+## Topic chain
+
+- `PrototypeAskAboutResponsibility`
+  - unlocks `PrototypePonderResponsibility`
+- `PrototypePonderResponsibility`
+  - unlocks `PrototypeAskAboutLeadership`
+  - unlocks `PrototypeMunirQuestion`
+- `PrototypeAskAboutLeadership`
+  - unlocks `PrototypePonderPromises`
+
+Prototype topics are prioritized in prepared topic menus so the test chain is visible without removing existing placeholder content.
+
+## Scene changes
+
+- `Day_Start` starts `Loop_DayOpening`.
+- `Decision_Morning` and `Decision_Evening` start `Loop_Decision`.
+- Munir conversation scenes again Auto Start `Start_Munir`.
+- Ponder scenes continue to Auto Start `Ponder_Start`.
+- `Day_End` starts `Loop_DayEnding`.
+- Ponder scenes contain no duplicate `GameSession`.
+
+## Files modified in this revision
+
 - `Scripts/Presentation/Runtime/GameLoopService.cs`
-  - Centralized game/day/decision state machine, scene coordinator, persistent Yarn host, and debug controls.
-- `Scripts/Presentation/Runtime/GameLoopYarnBridge.cs`
-  - Yarn commands and functions for loop transitions and loop state.
-- `Scripts/Presentation/Runtime/TopicProgressionYarnBridge.cs`
-  - Yarn commands and functions for available/discussed topics and relationships.
-- `Scripts/Editor/GameLoopServiceEditor.cs`
-  - Runtime loop monitor and debug buttons.
-- `Scripts/Editor/HeartOfPrinceSceneBuildInstaller.cs`
-  - Automatic Build Settings integration and starting-scene menu command.
-- `Yarn/YarnSpinner2/GameLoop/PrototypeGameLoop.yarn`
-  - Day openings, decision menu, Talk, Ponder, day endings, act transition, and demo ending.
-- `README_GameLoopService.md`
-  - Setup, architecture, commands, debugging, and run instructions.
-
-## Modified
-
 - `Scripts/Presentation/Runtime/GameSession.cs`
-  - Retained as the single persistent service container.
-  - Creates or binds the loop service and supports full runtime-state resets.
-- `Scripts/Infrastructure/Cinemachine/SceneDirector.cs`
-  - Added safe handling when a narrative scene has no active director or an incomplete camera binding.
-- `Scripts/Presentation/Runtime/ConversationSceneYarnBridge.cs`
-  - Removed an unused Plastic SCM editor-only dependency.
-- `Scripts/Domain/State/GameState.cs`
-  - Added loop and relationship state plus safe get-or-create helpers.
-- `Scripts/Domain/State/CharacterTopicState.cs`
-  - Added discussed-topic history and mark-discussed behavior.
-- `Scripts/Domain/State/PonderTopicState.cs`
-  - Added discussed-topic history and mark-discussed behavior.
+- `Scripts/Presentation/Runtime/GameLoopYarnBridge.cs`
+- `Scripts/Editor/GameLoopServiceEditor.cs`
+- `Scripts/Editor/HeartOfPrinceSceneBuildInstaller.cs`
+- `Scripts/Domain/State/GameLoopState.cs`
 - `Scripts/Application/Conversation/ConversationService.cs`
-  - Topic consumption now records discussed topics.
 - `Scripts/Application/Ponder/PonderService.cs`
-  - Topic consumption now records discussed topics.
+- `Yarn/YarnSpinner2/GameLoop/PrototypeGameLoop.yarn`
 - `Scenes/Bootstrap/Bootstrap.unity`
-  - Added the configurable `GameLoopService` component.
-- `Scenes/Dialogue/Mosque/Conversation_Munir_Evening.unity`
-  - Disabled DialogueRunner auto-start so the central service chooses nodes.
+- `Scenes/DayLoop/Day_Start.unity`
+- `Scenes/DayLoop/Day_End.unity`
+- `Scenes/Decision/Decision_Morning.unity`
+- `Scenes/Decision/Decision_Evening.unity`
 - `Scenes/Dialogue/Mosque/Conversation_Munir_Morning.unity`
-  - Disabled DialogueRunner auto-start for consistent centralized control.
-- `Scenes/Pondering/Ponder_Morning.unity`
-  - Removed the duplicate `GameSession`; the Bootstrap session persists into this scene.
-- `Scenes/Pondering/Ponder_Evening.unity`
-  - Removed the duplicate `GameSession`; the Bootstrap session persists into this scene.
-- `Yarn/YarnSpinner2/MuslimCommunity/Munir/TopicHubNPC.yarn`
-  - Corrected an extra closing command delimiter.
-- `Yarn/YarnSpinner2/MuslimCommunity/Munir/End_Munir.yarn`
-  - Reports completion of the existing conversation flow to `GameLoopService`.
-- `Yarn/YarnSpinner2/MuslimCommunity/Ponder/Ponder_End.yarn`
-  - Reports completion of the existing Ponder flow to `GameLoopService`.
+- `Scenes/Dialogue/Mosque/Conversation_Munir_Evening.unity`
+- `README_GameLoopService.md`
+- `IMPLEMENTATION_SUMMARY.md`
 
-## Validation performed
+## Static validation performed
 
-- Verified every scene name referenced by `GameLoopService` exists in the supplied package.
-- Verified every loop Yarn node referenced by C# exists in the Yarn project.
-- Verified all seeded and unlocked topic node names resolve to Yarn nodes.
-- Verified the modified Bootstrap and Ponder scene YAML has no missing local component or root references.
-- Verified all added Unity assets have `.meta` files with unique GUIDs.
-- Performed delimiter and structural checks across the C# and Yarn source.
+- Verified every runtime scene name exists.
+- Verified active scene Starting Nodes resolve to Yarn nodes.
+- Verified all narrative scenes have Auto Start enabled.
+- Verified no Dialogue Runner is marked persistent by runtime code.
+- Verified only `GameSession` uses `DontDestroyOnLoad`.
+- Verified all key TopicHub, TopicHubNPC, PonderHub, completion, and progression nodes exist.
+- Verified all added or modified C# files have balanced braces.
+- Verified Unity asset GUIDs and scene component references remain structurally valid.
 
-A Unity editor executable and the host project's package manifest were not included in the uploaded archive, so an actual Unity compilation and Play Mode run could not be executed in this environment. The README identifies the exact starting scene and test path for the host project.
+Unity compilation and Play Mode execution still require the host Unity project and its installed packages.

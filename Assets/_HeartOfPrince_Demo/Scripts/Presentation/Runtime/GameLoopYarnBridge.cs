@@ -11,42 +11,54 @@ namespace HeartOfPrince.Presentation
     /// </summary>
     public static class GameLoopYarnBridge
     {
-        [YarnCommand("loop_choose_action")]
-        public static void ChooseAction(string actionName)
-        {
-            if (!Enum.TryParse(actionName, true, out GameLoopAction action) ||
-                action == GameLoopAction.None)
-            {
-                Debug.LogError($"[GameLoop] Unknown action '{actionName}'. Expected Talk or Ponder.");
-                return;
-            }
 
-            GameLoopService.Instance?.RequestAction(action);
-        }
-
-        [YarnCommand("loop_choose_talk")]
-        public static void ChooseTalkTarget(string characterId)
+        #region Gameplay Verbs
+        [YarnCommand("TalkTo")]
+        public static void TalkTo(string characterId)
         {
             GameLoopService.Instance?.RequestTalk(characterId);
         }
 
-        [YarnCommand("loop_action_complete")]
+        [YarnCommand("Ponder")]
+        public static void Ponder()
+        {
+            GameLoopService.Instance?.RequestPonder();
+        }
+
+        [YarnCommand("ActionComplete")]
         public static void ActionComplete()
         {
             GameLoopService.Instance?.NotifyActionCompleted();
         }
+        #endregion
 
-        [YarnCommand("loop_sequence_complete")]
-        public static void SequenceComplete()
+        #region Sequences
+        [YarnCommand("DecisionLoop")]
+        public static void DecisionLoop()
         {
-            GameLoopService.Instance?.NotifySequenceCompleted();
+            GameLoopService.Instance?.DecisionLoop();
         }
 
-        [YarnCommand("loop_new_game")]
-        public static void NewGame()
+        [YarnCommand("CompleteDay")]
+        public static void CompleteDay()
         {
-            GameLoopService.Instance?.StartNewGame();
+            GameLoopService.Instance?.CompleteDay();
         }
+
+        [YarnCommand("CompleteAct")]
+        public static void CompleteAct()
+        {
+            GameLoopService.Instance?.CompleteAct();
+        }
+
+
+        [YarnCommand("CompleteChapter")]
+        public static void CompleteChapter()
+        {
+            GameLoopService.Instance?.CompleteChapter();
+        }
+
+        #endregion
 
         [YarnFunction("loop_current_act")]
         public static int CurrentAct()
@@ -60,22 +72,18 @@ namespace HeartOfPrince.Presentation
             return GameLoopService.Instance?.CurrentDay ?? 0;
         }
 
-        [YarnFunction("loop_decision_number")]
-        public static int DecisionNumber()
+        [YarnFunction("DecisionIndex")]
+        public static int DecisionIndex()
         {
             return (GameLoopService.Instance?.CurrentDecisionIndex ?? 0) + 1;
         }
 
-        [YarnFunction("LoopDecisionsPerDay")]
+        [YarnFunction("DecisionsPerDay")]
         public static int DecisionsPerDay()
         {
             return GameLoopService.Instance?.DecisionsAllowedPerDay ?? 0;
         }
 
-        [YarnFunction("loop_is_complete")]
-        public static bool IsComplete()
-        {
-            return GameLoopService.Instance?.IsGameComplete ?? false;
-        }
+        
     }
 }

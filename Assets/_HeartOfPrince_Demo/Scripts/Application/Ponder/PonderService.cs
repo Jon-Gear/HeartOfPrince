@@ -67,10 +67,20 @@ namespace HeartOfPrince.Application
                 amount = 3;
             }
 
-            var selectedTopics = _gameState.Ponder.Topics.ToList();
-            Shuffle(selectedTopics);
+            var prototypeTopics = _gameState.Ponder.Topics
+                .Where(topic => topic.Value.StartsWith("Prototype", StringComparison.Ordinal))
+                .ToList();
 
-            
+            var regularTopics = _gameState.Ponder.Topics
+                .Where(topic => !topic.Value.StartsWith("Prototype", StringComparison.Ordinal))
+                .ToList();
+
+            Shuffle(prototypeTopics);
+            Shuffle(regularTopics);
+
+            var selectedTopics = prototypeTopics
+                .Concat(regularTopics)
+                .ToList();
 
             _preparedTopics.Clear();
             _preparedTopics.AddRange(selectedTopics.Take(amount));

@@ -30,7 +30,13 @@ namespace HeartOfPrince.Application
 
         private int _turnsLeft;
         public int TurnsLeft => _turnsLeft;
-        public void TakeTurn() => _turnsLeft--;
+        public void TakeTurn()
+        {
+            if (_turnsLeft > 0)
+            {
+                _turnsLeft--;
+            }
+        }
         
         private readonly List<TopicName> _preparedTopics = new();
         private bool _canRefreshPreparedTopics;
@@ -81,7 +87,9 @@ namespace HeartOfPrince.Application
             }
             else
             {
-                return _gameState.CharactersTopics[GetCurrentActor()].GetTopics(direction).Count > 0;
+                return _gameState.GetOrCreateCharacterTopics(GetCurrentActor())
+                    .GetTopics(direction)
+                    .Count > 0;
             }
         }
         
@@ -93,11 +101,24 @@ namespace HeartOfPrince.Application
             }
             
 
-            IReadOnlyList<TopicName> availableTopics = _gameState.CharactersTopics[characterID].GetTopics(direction);
+            IReadOnlyList<TopicName> availableTopics = _gameState
+                .GetOrCreateCharacterTopics(characterID)
+                .GetTopics(direction);
 
-            List<TopicName> selectedTopics = availableTopics.ToList();
+            List<TopicName> prototypeTopics = availableTopics
+                .Where(topic => topic.Value.StartsWith("Prototype", StringComparison.Ordinal))
+                .ToList();
 
-            Shuffle(selectedTopics);
+            List<TopicName> regularTopics = availableTopics
+                .Where(topic => !topic.Value.StartsWith("Prototype", StringComparison.Ordinal))
+                .ToList();
+
+            Shuffle(prototypeTopics);
+            Shuffle(regularTopics);
+
+            List<TopicName> selectedTopics = prototypeTopics
+                .Concat(regularTopics)
+                .ToList();
 
             _preparedTopics.Clear();
             _preparedTopics.AddRange(selectedTopics.Take(amount));
@@ -114,16 +135,32 @@ namespace HeartOfPrince.Application
 
         public string SelectRandomTopic()
         {
-           int randomIndex = _random.Next(0, _preparedTopics.Count);
-           ConsumeTopic(randomIndex);
+           if (_preparedTopics.Count == 0)
+           {
+               return string.Empty;
+           }
+
+           int prototypeIndex = _preparedTopics.FindIndex(
+               topic => topic.Value.StartsWith("Prototype", StringComparison.Ordinal));
+
+           int selectedIndex = prototypeIndex >= 0
+               ? prototypeIndex
+               : _random.Next(0, _preparedTopics.Count);
+
+           ConsumeTopic(selectedIndex);
            return _currentTopic.Value;
         }
 
         private void ConsumeTopic(int index)
         {
             _currentTopic = _preparedTopics[index];
-            _gameState.CharactersTopics[GetCurrentActor()].MarkDiscussed(_currentTopic.Value, _currentConversationTopicDirection);
-            _turnsLeft--;
+            _gameState.GetOrCreateCharacterTopics(GetCurrentActor())
+                .MarkDiscussed(_currentTopic.Value, _currentConversationTopicDirection);
+
+            if (_turnsLeft > 0)
+            {
+                _turnsLeft--;
+            }
         }
 
         
@@ -132,8 +169,12 @@ namespace HeartOfPrince.Application
 
         public string GetPreparedDisplayName(int index)
         {
+            if (!HasPreparedTopic(index))
+            {
+                return string.Empty;
+            }
+
             string raw = _preparedTopics[index].Value;
-    
             return Regex.Replace(raw, @"([a-z])([A-Z0-9])", "$1 $2");
         }
 
