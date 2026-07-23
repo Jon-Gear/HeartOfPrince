@@ -55,12 +55,8 @@ namespace HeartOfPrince.Presentation
         public static GameLoopService Instance { get; private set; }
 
         private const string BootstrapScene = "Bootstrap";
-        private const string DayStartScene = "Day_Start";
-        private const string DayEndScene = "Day_End";
         private const string PonderMorningScene = "Ponder_Morning";
         private const string PonderEveningScene = "Ponder_Evening";
-        private const string DecisionMorningScene = "Decision_Morning";
-        private const string DecisionEveningScene = "Decision_Evening";
         private const string MunirMorningScene = "Conversation_Munir_Morning";
         private const string MunirEveningScene = "Conversation_Munir_Evening";
 
@@ -95,9 +91,6 @@ namespace HeartOfPrince.Presentation
         };
 
         [Header("Demo Configuration")]
-        [SerializeField, Min(1)] private int decisionsPerDay = 2;
-        [SerializeField, Min(1)] private int daysPerAct = 2;
-        [SerializeField, Min(1)] private int actsInDemo = 2;
         [SerializeField] private bool startAutomatically = true;
         [SerializeField] private List<TalkActionRoute> talkRoutes = new()
         {
@@ -118,15 +111,38 @@ namespace HeartOfPrince.Presentation
 
         private Coroutine activeTransition;
         private GameLoopState loopState;
+        private Chapter currentChapter;
         private bool isSceneLoadInProgress;
         private bool standaloneSceneMode;
         private bool standaloneUsesEveningVariant;
+
+        public Chapter CurrentChapterDefinition
+        {
+            get
+            {
+                EnsureChapterDefinition();
+                return currentChapter;
+            }
+        }
+
+        private Act CurrentActDefinition
+        {
+            get
+            {
+                EnsureChapterDefinition();
+
+                int actIndex = Math.Max(0, CurrentAct - 1);
+                actIndex = Math.Min(actIndex, currentChapter.ActCount - 1);
+                return currentChapter.GetAct(actIndex);
+            }
+        }
 
         public GameLoopPhase Phase => loopState?.Phase ?? GameLoopPhase.None;
         public int CurrentAct => loopState?.CurrentAct ?? 0;
         public int CurrentDay => loopState?.CurrentDay ?? 0;
         public int CurrentDecisionIndex => loopState?.CurrentDecisionIndex ?? 0;
-        public int DecisionsAllowedPerDay => loopState?.DecisionsAllowedPerDay ?? decisionsPerDay;
+        public int DecisionsAllowedPerDay =>
+            loopState?.DecisionsAllowedPerDay ?? CurrentActDefinition.DecisionsPerDay;
         public bool IsActionRunning => loopState?.IsActionRunning ?? false;
         public bool IsDayEnding => loopState?.IsDayEnding ?? false;
         public bool IsGameComplete => loopState?.IsGameComplete ?? false;
@@ -147,6 +163,7 @@ namespace HeartOfPrince.Presentation
             }
 
             Instance = this;
+            EnsureChapterDefinition();
             SceneManager.sceneLoaded += OnSceneLoaded;
             BindToCurrentState();
         }
@@ -344,9 +361,10 @@ namespace HeartOfPrince.Presentation
             loopState.CurrentAction = GameLoopAction.None;
             loopState.CurrentTalkCharacterId = null;
             loopState.CurrentDecisionIndex = 0;
+            loopState.DecisionsAllowedPerDay = CurrentActDefinition.DecisionsPerDay;
 
             SetPhase(GameLoopPhase.PlayingDayOpening);
-            yield return LoadSceneRoutine(DayStartScene);
+            yield return LoadSceneRoutine(CurrentActDefinition.DayStartScene);
         }
 
         private IEnumerator BeginDecisionRoutine()
@@ -358,8 +376,8 @@ namespace HeartOfPrince.Presentation
             }
 
             SetPhase(GameLoopPhase.AwaitingDecision);
-            var scene = IsMorningSlot ? DecisionMorningScene : DecisionEveningScene;
-            yield return LoadSceneRoutine(scene);
+            yield return LoadSceneRoutine(
+                CurrentActDefinition.GetDecisionScene(CurrentDecisionIndex));
         }
 
         private IEnumerator BeginEndOfDayRoutine()
@@ -370,7 +388,7 @@ namespace HeartOfPrince.Presentation
             loopState.CurrentTalkCharacterId = null;
 
             SetPhase(GameLoopPhase.EndingDay);
-            yield return LoadSceneRoutine(DayEndScene);
+            yield return LoadSceneRoutine(CurrentActDefinition.DayEndScene);
         }
 
         public void DecisionLoop()
@@ -383,13 +401,47 @@ namespace HeartOfPrince.Presentation
             ReplaceTransition(ContinueAfterDialogueRoutine(AdvanceAfterDayRoutine()));
         }
 
+        public void CompleteChapterStart()
+        {
+            if (standaloneSceneMode)
+            {
+                ReplaceTransition(CompleteStandaloneSequenceAfterDialogueRoutine());
+                return;
+            }
+
+            ReplaceTransition(ContinueAfterDialogueRoutine(BeginActRoutine()));
+        }
+
+        public void CompleteActStart()
+        {
+            if (standaloneSceneMode)
+            {
+                ReplaceTransition(CompleteStandaloneSequenceAfterDialogueRoutine());
+                return;
+            }
+
+            ReplaceTransition(ContinueAfterDialogueRoutine(BeginDayRoutine()));
+        }
+
         public void CompleteAct()
         {
-            Debug.Log("Completing act");
+            if (standaloneSceneMode)
+            {
+                ReplaceTransition(CompleteStandaloneSequenceAfterDialogueRoutine());
+                return;
+            }
+
+            ReplaceTransition(ContinueAfterDialogueRoutine(AdvanceAfterActRoutine()));
         }
 
         public void CompleteChapter()
         {
+            if (standaloneSceneMode)
+            {
+                ReplaceTransition(CompleteStandaloneSequenceAfterDialogueRoutine());
+                return;
+            }
+
             ReplaceTransition(ContinueAfterDialogueRoutine(CompleteGameRoutine()));
         }
 
@@ -406,6 +458,16 @@ namespace HeartOfPrince.Presentation
 
             switch (Phase)
             {
+                case GameLoopPhase.StartingGame:
+                    ReplaceTransition(
+                        ContinueAfterDialogueRoutine(BeginActRoutine()));
+                    break;
+
+                case GameLoopPhase.StartingAct:
+                    ReplaceTransition(
+                        ContinueAfterDialogueRoutine(BeginDayRoutine()));
+                    break;
+
                 case GameLoopPhase.PlayingDayOpening:
                     ReplaceTransition(
                         ContinueAfterDialogueRoutine(BeginDecisionRoutine()));
@@ -417,10 +479,8 @@ namespace HeartOfPrince.Presentation
                     break;
 
                 case GameLoopPhase.TransitioningAct:
-                    // The Day_Start scene's own start node presents both the act
-                    // transition and the new day's opening in one scene-local run.
                     ReplaceTransition(
-                        ContinueAfterDialogueRoutine(BeginDecisionRoutine()));
+                        ContinueAfterDialogueRoutine(AdvanceAfterActRoutine()));
                     break;
 
                 case GameLoopPhase.PlayingEnding:
@@ -451,14 +511,13 @@ namespace HeartOfPrince.Presentation
             GameSession.Instance.ResetRuntimeState();
             BindToCurrentState();
 
-            loopState.Reset(decisionsPerDay);
+            EnsureChapterDefinition();
+            loopState.Reset(currentChapter.GetAct(0).DecisionsPerDay);
             SeedPrototypeProgression();
 
             SetPhase(GameLoopPhase.StartingGame);
-            Log("Starting a new game.");
-
-            SetPhase(GameLoopPhase.StartingAct);
-            yield return BeginDayRoutine();
+            Log($"Starting {currentChapter.DisplayName}.");
+            yield return LoadSceneRoutine(currentChapter.StartScene);
         }
 
         private void StartStandaloneScene(string sceneName)
@@ -486,28 +545,62 @@ namespace HeartOfPrince.Presentation
                 BindToCurrentState();
             }
 
-            loopState.Reset(decisionsPerDay);
+            EnsureChapterDefinition();
+            loopState.Reset(currentChapter.GetAct(0).DecisionsPerDay);
             SeedPrototypeProgression();
             SeedStandaloneDebugTopics();
 
-            if (standaloneUsesEveningVariant && decisionsPerDay > 1)
+            if (standaloneUsesEveningVariant && DecisionsAllowedPerDay > 1)
             {
-                loopState.CurrentDecisionIndex = decisionsPerDay - 1;
+                loopState.CurrentDecisionIndex = DecisionsAllowedPerDay - 1;
             }
 
-            if (string.Equals(sceneName, DayStartScene, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(
+                    sceneName,
+                    currentChapter.StartScene,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                SetPhase(GameLoopPhase.StartingGame);
+            }
+            else if (string.Equals(
+                         sceneName,
+                         CurrentActDefinition.StartScene,
+                         StringComparison.OrdinalIgnoreCase))
+            {
+                SetPhase(GameLoopPhase.StartingAct);
+            }
+            else if (string.Equals(
+                         sceneName,
+                         CurrentActDefinition.DayStartScene,
+                         StringComparison.OrdinalIgnoreCase))
             {
                 SetPhase(GameLoopPhase.PlayingDayOpening);
             }
-            else if (string.Equals(sceneName, DayEndScene, StringComparison.OrdinalIgnoreCase))
+            else if (string.Equals(
+                         sceneName,
+                         CurrentActDefinition.DayEndScene,
+                         StringComparison.OrdinalIgnoreCase))
             {
                 loopState.IsDayEnding = true;
                 SetPhase(GameLoopPhase.EndingDay);
             }
-            else if (string.Equals(sceneName, DecisionMorningScene, StringComparison.OrdinalIgnoreCase) ||
-                     string.Equals(sceneName, DecisionEveningScene, StringComparison.OrdinalIgnoreCase))
+            else if (IsDecisionScene(sceneName))
             {
                 SetPhase(GameLoopPhase.AwaitingDecision);
+            }
+            else if (string.Equals(
+                         sceneName,
+                         CurrentActDefinition.EndScene,
+                         StringComparison.OrdinalIgnoreCase))
+            {
+                SetPhase(GameLoopPhase.TransitioningAct);
+            }
+            else if (string.Equals(
+                         sceneName,
+                         currentChapter.EndScene,
+                         StringComparison.OrdinalIgnoreCase))
+            {
+                SetPhase(GameLoopPhase.PlayingEnding);
             }
             else if (sceneName.StartsWith("Conversation_", StringComparison.OrdinalIgnoreCase))
             {
@@ -578,26 +671,55 @@ namespace HeartOfPrince.Presentation
             loopState.IsDayEnding = false;
             loopState.CurrentDecisionIndex = 0;
 
-            var finishedFinalDay =
-                CurrentAct >= actsInDemo && CurrentDay >= daysPerAct;
+            var progress = CreateNarrativeProgress(
+                completedActsInChapter: CurrentAct - 1);
 
-            if (finishedFinalDay)
+            if (CurrentActDefinition.IsComplete(progress))
             {
-                yield return BeginEndingRoutine();
-                yield break;
-            }
-
-            if (CurrentDay >= daysPerAct)
-            {
-                loopState.CurrentAct++;
-                loopState.CurrentDay = 1;
                 SetPhase(GameLoopPhase.TransitioningAct);
-                yield return LoadSceneRoutine(DayStartScene);
+                yield return LoadSceneRoutine(CurrentActDefinition.EndScene);
                 yield break;
             }
 
             loopState.CurrentDay++;
             yield return BeginDayRoutine();
+        }
+
+        private IEnumerator BeginActRoutine()
+        {
+            loopState.CurrentDay = 1;
+            loopState.CurrentDecisionIndex = 0;
+            loopState.DecisionsAllowedPerDay = CurrentActDefinition.DecisionsPerDay;
+            loopState.IsActionRunning = false;
+            loopState.IsDayEnding = false;
+            loopState.CurrentAction = GameLoopAction.None;
+            loopState.CurrentTalkCharacterId = null;
+
+            SetPhase(GameLoopPhase.StartingAct);
+            yield return LoadSceneRoutine(CurrentActDefinition.StartScene);
+        }
+
+        private IEnumerator AdvanceAfterActRoutine()
+        {
+            var chapterProgress = CreateNarrativeProgress(
+                completedActsInChapter: CurrentAct);
+
+            if (currentChapter.IsComplete(chapterProgress))
+            {
+                yield return BeginEndingRoutine();
+                yield break;
+            }
+
+            if (CurrentAct >= currentChapter.ActCount)
+            {
+                Debug.LogError(
+                    $"[GameLoop] Chapter '{currentChapter.Id}' has no next act, " +
+                    "but its completion condition is not met.");
+                yield break;
+            }
+
+            loopState.CurrentAct++;
+            yield return BeginActRoutine();
         }
 
         private IEnumerator BeginEndingRoutine()
@@ -609,10 +731,7 @@ namespace HeartOfPrince.Presentation
             loopState.CurrentTalkCharacterId = null;
 
             SetPhase(GameLoopPhase.PlayingEnding);
-
-            // Reloading gives Day_End a fresh scene-local DialogueRunner. Its fixed
-            // start node branches on PlayingEnding and presents the demo ending.
-            yield return LoadSceneRoutine(DayEndScene);
+            yield return LoadSceneRoutine(currentChapter.EndScene);
         }
 
         private IEnumerator CompleteGameRoutine()
@@ -638,24 +757,7 @@ namespace HeartOfPrince.Presentation
             loopState.CurrentTalkCharacterId = null;
             loopState.CurrentDecisionIndex = 0;
 
-            if (CurrentAct >= actsInDemo && CurrentDay >= daysPerAct)
-            {
-                yield return BeginEndingRoutine();
-                yield break;
-            }
-
-            if (CurrentDay >= daysPerAct)
-            {
-                loopState.CurrentAct++;
-                loopState.CurrentDay = 1;
-                SetPhase(GameLoopPhase.TransitioningAct);
-                yield return LoadSceneRoutine(DayStartScene);
-            }
-            else
-            {
-                loopState.CurrentDay++;
-                yield return BeginDayRoutine();
-            }
+            yield return AdvanceAfterDayRoutine();
         }
 
         private IEnumerator ContinueAfterDialogueRoutine(IEnumerator continuation)
@@ -692,6 +794,12 @@ namespace HeartOfPrince.Presentation
 
         private IEnumerator LoadSceneRoutine(string sceneName)
         {
+            if (string.IsNullOrWhiteSpace(sceneName))
+            {
+                Debug.LogError("[GameLoop] Cannot load an empty narrative scene name.");
+                yield break;
+            }
+
             isSceneLoadInProgress = true;
             SyncInspector();
             Log($"Loading scene '{sceneName}'.");
@@ -757,6 +865,48 @@ namespace HeartOfPrince.Presentation
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
             SyncInspector();
+        }
+
+        private void EnsureChapterDefinition()
+        {
+            if (currentChapter != null)
+            {
+                return;
+            }
+
+            currentChapter = DemoChapterDefinition.Create();
+
+            if (currentChapter == null || currentChapter.ActCount == 0)
+            {
+                throw new InvalidOperationException(
+                    "The demo chapter definition must contain at least one act.");
+            }
+        }
+
+        private NarrativeProgress CreateNarrativeProgress(
+            int completedActsInChapter)
+        {
+            return new NarrativeProgress(
+                state: GameSession.Instance?.State,
+                completedDaysInAct: CurrentDay,
+                completedActsInChapter: completedActsInChapter,
+                totalActsInChapter: currentChapter.ActCount);
+        }
+
+        private bool IsDecisionScene(string sceneName)
+        {
+            for (int i = 0; i < CurrentActDefinition.DecisionsPerDay; i++)
+            {
+                if (string.Equals(
+                        sceneName,
+                        CurrentActDefinition.GetDecisionScene(i),
+                        StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private TalkActionRoute ResolveTalkRoute(string characterId)

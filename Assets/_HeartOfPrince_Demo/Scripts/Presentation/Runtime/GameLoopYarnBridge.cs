@@ -45,12 +45,23 @@ namespace HeartOfPrince.Presentation
             GameLoopService.Instance?.CompleteDay();
         }
 
+        [YarnCommand("CompleteChapterStart")]
+        public static void CompleteChapterStart()
+        {
+            GameLoopService.Instance?.CompleteChapterStart();
+        }
+
+        [YarnCommand("CompleteActStart")]
+        public static void CompleteActStart()
+        {
+            GameLoopService.Instance?.CompleteActStart();
+        }
+
         [YarnCommand("CompleteAct")]
         public static void CompleteAct()
         {
             GameLoopService.Instance?.CompleteAct();
         }
-
 
         [YarnCommand("CompleteChapter")]
         public static void CompleteChapter()

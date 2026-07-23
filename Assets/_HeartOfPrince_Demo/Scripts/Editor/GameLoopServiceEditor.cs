@@ -14,9 +14,6 @@ namespace HeartOfPrince.Editor
             serializedObject.Update();
 
             EditorGUILayout.LabelField("Game Loop Configuration", EditorStyles.boldLabel);
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("decisionsPerDay"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("daysPerAct"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("actsInDemo"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("startAutomatically"));
             EditorGUILayout.PropertyField(
                 serializedObject.FindProperty("talkRoutes"),
@@ -41,10 +38,21 @@ namespace HeartOfPrince.Editor
 
             serializedObject.ApplyModifiedProperties();
 
+            var service = (GameLoopService)target;
+            var chapter = service.CurrentChapterDefinition;
+            var firstAct = chapter.GetAct(0);
+
+            EditorGUILayout.Space(8);
+            EditorGUILayout.LabelField("Narrative Definition", EditorStyles.boldLabel);
+            EditorGUILayout.HelpBox(
+                $"{chapter.DisplayName}: {chapter.ActCount} act(s). " +
+                $"{firstAct.DisplayName}: {firstAct.DecisionsPerDay} decisions per day. " +
+                "Edit DemoChapterDefinition.cs to change the code-authored demo structure.",
+                MessageType.None);
+
             EditorGUILayout.Space(8);
             EditorGUILayout.LabelField("Debug Controls", EditorStyles.boldLabel);
 
-            var service = (GameLoopService)target;
             using (new EditorGUI.DisabledScope(!UnityEngine.Application.isPlaying))
             {
                 if (GUILayout.Button("Start New Game"))

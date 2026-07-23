@@ -54,6 +54,7 @@ namespace HeartOfPrince.Domain
 
         public void Reset(int decisionsAllowedPerDay)
         {
+            Chapter = 1;
             CurrentAct = 1;
             CurrentDay = 1;
             CurrentDecisionIndex = 0;

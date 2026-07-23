@@ -9,7 +9,7 @@
 
 `HeartOfPrinceSceneBuildInstaller` adds all demo scenes to Build Settings. You can also run **Heart of Prince > Rebuild Demo Scene List** manually.
 
-The default prototype contains two acts, two days per act, and two decisions per day. These values are configurable on the `GameLoopService` component in the Bootstrap scene.
+The demo contains one chapter with one act. The act completes after two days and provides two decisions per day. This structure is defined in `Scripts/Domain/Chapter/DemoChapterDefinition.cs`; mutable progress remains in `GameLoopState`.
 
 ## Scene-local Dialogue Runners
 
@@ -107,7 +107,8 @@ Only state and services persist. Scene presentation objects do not.
 `GameLoopService` owns:
 
 - Current act, day, and decision index
-- Configurable decisions per day
+- The active `Chapter` and `Act` narrative definitions
+- Decisions per day supplied by the active act
 - Current loop phase
 - Action-running, day-ending, and completion flags
 - Scene selection and scene transitions
@@ -119,14 +120,17 @@ Only state and services persist. Scene presentation objects do not.
 
 ```text
 Bootstrap
+  -> Chapter_1_Start / Loop_ChapterOpening
+  -> Act_1_Start / Loop_ActOpening
   -> Day_Start / Loop_DayOpening
   -> Decision scene / Loop_Decision
       -> Munir scene / Start_Munir / TopicHub
       -> or Ponder scene / Ponder_Start / Ponder_TopicHub
   -> next Decision scene
   -> Day_End / Loop_DayEnding
-  -> next day or act
-  -> Day_End / Loop_DayEnding in ending phase
+  -> repeat until the act completion condition succeeds
+  -> Act_1_End / Loop_ActEnding
+  -> Chapter_1_End / Loop_ChapterEnding
   -> Completed
 ```
 
@@ -136,6 +140,10 @@ Bootstrap
 - `<<loop_choose_action "Ponder">>`
 - `<<loop_action_complete>>`
 - `<<loop_sequence_complete>>`
+- `<<CompleteChapterStart>>`
+- `<<CompleteActStart>>`
+- `<<CompleteAct>>`
+- `<<CompleteChapter>>`
 - `<<loop_new_game>>`
 
 `End_Munir.yarn` calls `loop_action_complete` after `EndConversation`.

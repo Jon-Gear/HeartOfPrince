@@ -77,6 +77,8 @@ namespace HeartOfPrince.Presentation
         private static bool IsHeartOfPrinceRuntimeScene(string sceneName)
         {
             return string.Equals(sceneName, "Bootstrap", System.StringComparison.OrdinalIgnoreCase) ||
+                   sceneName.StartsWith("Chapter_", System.StringComparison.OrdinalIgnoreCase) ||
+                   sceneName.StartsWith("Act_", System.StringComparison.OrdinalIgnoreCase) ||
                    sceneName.StartsWith("Day_", System.StringComparison.OrdinalIgnoreCase) ||
                    sceneName.StartsWith("Decision_", System.StringComparison.OrdinalIgnoreCase) ||
                    sceneName.StartsWith("Conversation_", System.StringComparison.OrdinalIgnoreCase) ||

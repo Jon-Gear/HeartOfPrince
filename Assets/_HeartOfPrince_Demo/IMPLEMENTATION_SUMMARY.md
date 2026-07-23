@@ -83,3 +83,14 @@ Prototype topics are prioritized in prepared topic menus so the test chain is vi
 - Verified Unity asset GUIDs and scene component references remain structurally valid.
 
 Unity compilation and Play Mode execution still require the host Unity project and its installed packages.
+
+## Chapter and act narrative definitions
+
+- Implemented serializable `Chapter` and `Act` configuration classes.
+- Added polymorphic `CompletionCondition` rules with demo implementations for completed days and all acts completed.
+- Added `DemoChapterDefinition`, which defines one chapter containing one two-day act with two decisions per day.
+- Updated `GameLoopService` to read scene routing, decision counts, act count, and completion behavior from the active definitions.
+- Added the chapter and act start/end scenes to the full runtime flow and Build Settings installer.
+- Added dedicated Yarn sequence nodes and commands for chapter start, act start, act end, and chapter end.
+- Kept mutable progression in `GameLoopState`.
+

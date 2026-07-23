@@ -1,4 +1,29 @@
-﻿title: Loop_DayOpening
+﻿title: Loop_ChapterOpening
+---
+Narrator: Chapter One begins.
+<<CompleteChapterStart>>
+===
+
+title: Loop_ActOpening
+---
+Narrator: Act {loop_current_act()} begins.
+<<CompleteActStart>>
+===
+
+title: Loop_ActEnding
+---
+Narrator: Act {loop_current_act()} comes to an end.
+<<CompleteAct>>
+===
+
+title: Loop_ChapterEnding
+---
+Narrator: The demo is complete.
+Prince: I still have a road ahead of me. At least now I know how to take the next step.
+<<CompleteChapter>>
+===
+
+title: Loop_DayOpening
 ---
 Narrator: Today contains {DecisionsPerDay()} decision opportunities.
 <<DecisionLoop>>

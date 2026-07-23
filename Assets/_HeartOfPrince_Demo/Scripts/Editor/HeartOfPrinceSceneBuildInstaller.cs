@@ -15,6 +15,8 @@ namespace HeartOfPrince.Editor
         private static readonly string[] DemoSceneNames =
         {
             "Bootstrap",
+            "Chapter_1_Start",
+            "Act_1_Start",
             "Conversation_Munir_Evening",
             "Day_Start",
             "Decision_Morning",
@@ -22,7 +24,9 @@ namespace HeartOfPrince.Editor
             "Decision_Evening",
             "Ponder_Evening",
             "Day_End",
-            "Conversation_Munir_Morning"
+            "Conversation_Munir_Morning",
+            "Act_1_End",
+            "Chapter_1_End"
         };
 
         static HeartOfPrinceSceneBuildInstaller()
