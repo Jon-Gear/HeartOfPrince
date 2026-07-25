@@ -1,133 +1,139 @@
-using HeartOfPrince.Domain;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using HeartOfPrince.Application;
+using HeartOfPrince.Domain;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.TextCore.Text;
 using Yarn.Unity;
 
 namespace HeartOfPrince.Presentation
 {
-    /// <summary>
-    /// Central state machine for the complete game, day, and decision loops.
-    ///
-    /// Every narrative scene owns its own DialogueRunner. The runner's configured
-    /// starting node begins that scene's dialogue and is destroyed with the scene.
-    /// This service persists only loop state and coordinates scene transitions.
-    /// </summary>
     [DefaultExecutionOrder(-900)]
     [DisallowMultipleComponent]
     public sealed class GameLoopService : MonoBehaviour
     {
-        [Serializable]
-        private sealed class TalkActionRoute
-        {
-            [SerializeField] private string characterId;
-            [SerializeField] private string morningSceneName;
-            [SerializeField] private string eveningSceneName;
-
-            public string CharacterId => characterId;
-
-            public TalkActionRoute()
-            {
-            }
-
-            public TalkActionRoute(
-                string characterId,
-                string morningSceneName,
-                string eveningSceneName)
-            {
-                this.characterId = characterId;
-                this.morningSceneName = morningSceneName;
-                this.eveningSceneName = eveningSceneName;
-            }
-
-            public string GetSceneName(bool useMorningVariant)
-            {
-                var preferred = useMorningVariant ? morningSceneName : eveningSceneName;
-                var fallback = useMorningVariant ? eveningSceneName : morningSceneName;
-                return !string.IsNullOrWhiteSpace(preferred) ? preferred : fallback;
-            }
-        }
-
         public static GameLoopService Instance { get; private set; }
 
-        private const string BootstrapScene = "Bootstrap";
-        private const string PonderMorningScene = "Ponder_Morning";
-        private const string PonderEveningScene = "Ponder_Evening";
-        private const string MunirMorningScene = "Conversation_Munir_Morning";
-        private const string MunirEveningScene = "Conversation_Munir_Evening";
-
-        [Header("Narrative")]
-        [SerializeField]
-        private Chapter startingChapter;
-
-
-        [Header("Demo Configuration")]
+        [Header("Flow")]
         [SerializeField] private bool startAutomatically = true;
-        [SerializeField] private List<TalkActionRoute> talkRoutes = new()
-        {
-            new TalkActionRoute("Munir", MunirMorningScene, MunirEveningScene)
-        };
 
         [Header("Diagnostics")]
         [SerializeField] private bool logTransitions = true;
         [SerializeField] private GameLoopPhase inspectorPhase;
         [SerializeField] private int inspectorCurrentAct;
         [SerializeField] private int inspectorCurrentDay;
-        [SerializeField] private int inspectorDecisionIndex;
-        [SerializeField] private bool inspectorActionRunning;
+        [SerializeField] private int inspectorMinuteOfDay;
+        [SerializeField] private int inspectorActionsCompleted;
+        [SerializeField] private string inspectorCurrentActivity;
         [SerializeField] private bool inspectorDayEnding;
         [SerializeField] private bool inspectorGameComplete;
         [SerializeField] private bool inspectorStandaloneSceneMode;
         [SerializeField] private string inspectorActiveScene;
 
+        private readonly SceneTransitionService sceneTransitions = new();
+
         private Coroutine activeTransition;
+        private GameState state;
         private GameLoopState loopState;
         private Chapter currentChapter;
-        private bool isSceneLoadInProgress;
         private bool standaloneSceneMode;
-        private bool standaloneUsesEveningVariant;
+        private bool isSceneLoadInProgress;
 
-        public Chapter CurrentChapterDefinition
+        public GameLoopPhase Phase =>
+            loopState?.Phase ?? GameLoopPhase.None;
+
+        public int CurrentAct =>
+            loopState?.CurrentAct ?? 0;
+
+        public int CurrentDay =>
+            state?.Clock?.Day ?? 0;
+
+        public int ActionsCompletedToday =>
+            state?.Day?.ActionsCompleted ?? 0;
+
+        public int MaximumActionsPerDay =>
+            CurrentDayRules?.MaximumActions ?? 0;
+
+        public int ActionsRemainingToday
         {
             get
             {
-                //EnsureChapterDefinition();
-                return currentChapter;
+                int maximum = MaximumActionsPerDay;
+
+                return maximum <= 0
+                    ? -1
+                    : Mathf.Max(
+                        0,
+                        maximum - ActionsCompletedToday);
             }
         }
+
+        public bool IsActionRunning =>
+            state?.Day?.HasRunningActivity ?? false;
+
+        public bool IsDayEnding =>
+            loopState?.IsDayEnding ?? false;
+
+        public bool IsGameComplete =>
+            loopState?.IsGameComplete ?? false;
+
+        public bool IsStandaloneSceneMode =>
+            standaloneSceneMode;
+
+        public string CurrentTimeDisplay
+        {
+            get
+            {
+                int minute =
+                    state?.Clock?.NormalizedMinuteOfDay ?? 0;
+                int hour = minute / 60;
+                int minutes = minute % 60;
+                return $"{hour:00}:{minutes:00}";
+            }
+        }
+
+        public Chapter CurrentChapterDefinition =>
+            currentChapter;
 
         private Act CurrentActDefinition
         {
             get
             {
-                //EnsureChapterDefinition();
+                EnsureConfiguration();
 
-                int actIndex = Math.Max(0, CurrentAct - 1);
-                actIndex = Math.Min(actIndex, currentChapter.ActCount - 1);
-                return currentChapter.GetAct(actIndex);
+                int index = Mathf.Clamp(
+                    CurrentAct - 1,
+                    0,
+                    currentChapter.ActCount - 1);
+
+                return currentChapter.GetAct(index);
             }
         }
 
-        public GameLoopPhase Phase => loopState?.Phase ?? GameLoopPhase.None;
-        public int CurrentAct => loopState?.CurrentAct ?? 0;
-        public int CurrentDay => loopState?.CurrentDay ?? 0;
-        public int CurrentDecisionIndex => loopState?.CurrentDecisionIndex ?? 0;
-        public int DecisionsAllowedPerDay =>
-            loopState?.DecisionsAllowedPerDay ?? CurrentActDefinition.DecisionsPerDay;
-        public bool IsActionRunning => loopState?.IsActionRunning ?? false;
-        public bool IsDayEnding => loopState?.IsDayEnding ?? false;
-        public bool IsGameComplete => loopState?.IsGameComplete ?? false;
-        public bool IsStandaloneSceneMode => standaloneSceneMode;
+        private DayRules CurrentDayRules
+        {
+            get
+            {
+                if (currentChapter == null ||
+                    currentChapter.ActCount == 0)
+                {
+                    return GameSession.Instance?
+                        .Configuration?
+                        .ActivityCatalog?
+                        .DayRules;
+                }
 
-        private bool UseMorningVariant =>
-            standaloneSceneMode ? !standaloneUsesEveningVariant : IsMorningSlot;
+                DayRules actRules =
+                    CurrentActDefinition.DayRules;
 
-        private bool IsMorningSlot =>
-            CurrentDecisionIndex < Mathf.CeilToInt(DecisionsAllowedPerDay * 0.5f);
+                return actRules != null
+                    ? actRules
+                    : GameSession.Instance.Configuration
+                        .ActivityCatalog.DayRules;
+            }
+        }
 
         private void Awake()
         {
@@ -138,26 +144,31 @@ namespace HeartOfPrince.Presentation
             }
 
             Instance = this;
-            //EnsureChapterDefinition();
             SceneManager.sceneLoaded += OnSceneLoaded;
             BindToCurrentState();
         }
 
         private void Start()
         {
-            if (!startAutomatically || Phase != GameLoopPhase.None)
+            if (!startAutomatically ||
+                Phase != GameLoopPhase.None)
             {
                 return;
             }
 
-            var activeSceneName = SceneManager.GetActiveScene().name;
-            if (string.Equals(activeSceneName, BootstrapScene, StringComparison.OrdinalIgnoreCase))
+            string sceneName =
+                SceneManager.GetActiveScene().name;
+
+            if (string.Equals(
+                    sceneName,
+                    GameSession.Instance.Configuration.BootstrapScene,
+                    StringComparison.OrdinalIgnoreCase))
             {
                 StartNewGame();
             }
             else
             {
-                StartStandaloneScene(activeSceneName);
+                StartStandaloneScene(sceneName);
             }
         }
 
@@ -173,7 +184,20 @@ namespace HeartOfPrince.Presentation
 
         public void BindToCurrentState()
         {
-            loopState = GameSession.Instance?.State?.Loop;
+            GameSession session = GameSession.Instance;
+
+            state = session?.State;
+            loopState = state?.Loop;
+            currentChapter =
+                session?.Configuration?.StartingChapter;
+
+            if (CurrentDayRules != null &&
+                session?.Activities != null)
+            {
+                session.Activities.SetDayRules(
+                    CurrentDayRules);
+            }
+
             SyncInspector();
         }
 
@@ -181,7 +205,6 @@ namespace HeartOfPrince.Presentation
         public void StartNewGame()
         {
             standaloneSceneMode = false;
-            standaloneUsesEveningVariant = false;
             ReplaceTransition(StartNewGameRoutine());
         }
 
@@ -190,7 +213,8 @@ namespace HeartOfPrince.Presentation
         {
             if (standaloneSceneMode)
             {
-                ReplaceTransition(ResetStandaloneSceneRoutine());
+                ReplaceTransition(
+                    ResetStandaloneSceneRoutine());
                 return;
             }
 
@@ -200,283 +224,219 @@ namespace HeartOfPrince.Presentation
         [ContextMenu("Skip To Next Day")]
         public void DebugSkipToNextDay()
         {
-            if (standaloneSceneMode)
+            if (standaloneSceneMode ||
+                Phase == GameLoopPhase.Completed)
+            {
+                return;
+            }
+
+            ReplaceTransition(
+                DebugSkipToNextDayRoutine());
+        }
+
+        public void RequestActivity(ActivityOption option)
+        {
+            if (option == null)
             {
                 Debug.LogWarning(
-                    "[GameLoop] Skip To Next Day is disabled in standalone-scene mode. " +
-                    "Use Start New Game to enter the complete loop.");
+                    "[GameLoop] The requested activity option " +
+                    "could not be found.");
                 return;
             }
 
-            if (Phase == GameLoopPhase.Completed)
+            if (!option.IsAvailable)
             {
-                Debug.LogWarning("[GameLoop] Cannot skip: the demo is already complete.");
+                Debug.LogWarning(
+                    $"[GameLoop] '{option.DisplayName}' is unavailable: " +
+                    option.UnavailableReason);
                 return;
             }
 
-            ReplaceTransition(DebugSkipToNextDayRoutine());
+            RequestActivity(option.Request);
         }
 
-
-        #region Gameplay Verbs
-        public void RequestPonder()
+        public void RequestActivity(IActivityRequest request)
         {
-            loopState.CurrentAction = GameLoopAction.Ponder;
-            loopState.IsActionRunning = true;
-            SetPhase(GameLoopPhase.LoadingAction);
-            ReplaceTransition(BeginPonder());
-        }
-
-        private IEnumerator BeginPonder()
-        {
-            yield return WaitForActiveSceneDialogueToFinish();
-            
-            SetPhase(GameLoopPhase.PerformingPonder);
-            yield return LoadSceneRoutine(UseMorningVariant ? PonderMorningScene : PonderEveningScene);
-        }
-
-
-
-        public void RequestTalk(string characterId)
-        {
-            if (string.IsNullOrWhiteSpace(characterId))
+            if (request == null)
             {
-                Debug.LogWarning("[GameLoop] Ignored Talk request with an empty character ID.");
+                Debug.LogWarning(
+                    "[GameLoop] Ignored a null activity request.");
                 return;
             }
 
-            loopState.CurrentAction = GameLoopAction.Talk;
-            loopState.CurrentTalkCharacterId = characterId.Trim();
-            loopState.IsActionRunning = true;
-            SetPhase(GameLoopPhase.LoadingAction);
-            ReplaceTransition(BeginTalk());
-        }
-
-        private IEnumerator BeginTalk()
-        {
-            yield return WaitForActiveSceneDialogueToFinish();
-
-            var route = ResolveTalkRoute(loopState.CurrentTalkCharacterId);
-            if (route == null)
+            if (Phase != GameLoopPhase.AwaitingDecision &&
+                Phase != GameLoopPhase.StandaloneScene)
             {
-                loopState.IsActionRunning = false;
-                loopState.CurrentAction = GameLoopAction.None;
-                loopState.CurrentTalkCharacterId = null;
-                yield return BeginDecisionRoutine();
-                yield break;
-            }
-
-            var sceneName = route.GetSceneName(UseMorningVariant);
-            if (string.IsNullOrWhiteSpace(sceneName))
-            {
-                Debug.LogError(
-                    $"[GameLoop] Talk route for '{route.CharacterId}' has no scene.");
-                loopState.IsActionRunning = false;
-                loopState.CurrentAction = GameLoopAction.None;
-                loopState.CurrentTalkCharacterId = null;
-                yield return BeginDecisionRoutine();
-                yield break;
-            }
-
-            SetPhase(GameLoopPhase.PerformingTalk);
-            yield return LoadSceneRoutine(sceneName);
-        }
-
-        public void NotifyActionCompleted()
-        {
-            if (Phase != GameLoopPhase.PerformingTalk &&
-                Phase != GameLoopPhase.PerformingPonder)
-            {
-                Debug.LogWarning($"[GameLoop] Ignored action completion while in {Phase}.");
+                Debug.LogWarning(
+                    $"[GameLoop] Cannot start an activity while in {Phase}.");
                 return;
             }
 
-            SetPhase(GameLoopPhase.ResolvingAction);
-            ReplaceTransition(ResolveAction());
+            SetPhase(GameLoopPhase.LoadingActivity);
+            ReplaceTransition(
+                BeginActivityRoutine(request));
         }
 
-        private IEnumerator ResolveAction()
+        public void RequestActivity<TInput>(
+            ActivityDefinition activity,
+            TInput input)
+            where TInput : class, IActivityInput
         {
-            yield return WaitForActiveSceneDialogueToFinish();
+            RequestActivity(
+                new ActivityRequest<TInput>(
+                    activity,
+                    input));
+        }
 
-            loopState.IsActionRunning = false;
-            loopState.CurrentAction = GameLoopAction.None;
-            loopState.CurrentTalkCharacterId = null;
+        public void RequestActivity(
+            string activityId,
+            IActivityInput input)
+        {
+            ActivityOption option =
+                GameSession.Instance.ActivityQuery.FindOption(
+                    activityId,
+                    input);
 
-            if (standaloneSceneMode)
+            RequestActivity(option);
+        }
+
+        public void RequestActivity(
+            string activityId,
+            string selectionKey)
+        {
+            ActivityOption option =
+                GameSession.Instance.ActivityQuery.FindOption(
+                    activityId,
+                    selectionKey);
+
+            RequestActivity(option);
+        }
+
+        public void NotifyActivityCompleted(
+            ActivityResult result = null)
+        {
+            if (state?.Day?.CurrentActivity == null)
             {
-                SetPhase(GameLoopPhase.StandaloneComplete);
-                Log("Standalone action completed. No automatic return to Bootstrap.");
-                yield break;
+                Debug.LogWarning(
+                    $"[GameLoop] Ignored activity completion " +
+                    $"while in {Phase}; no activity is running.");
+                return;
             }
 
-            loopState.CurrentDecisionIndex++;
-            SyncInspector();
-
-            Log($"Resolved decision {CurrentDecisionIndex}/{DecisionsAllowedPerDay}.");
-
-            if (CurrentDecisionIndex >= DecisionsAllowedPerDay)
-            {
-                yield return BeginEndOfDayRoutine();
-            }
-            else
-            {
-                yield return BeginDecisionRoutine();
-            }
+            SetPhase(GameLoopPhase.ResolvingActivity);
+            ReplaceTransition(
+                ResolveActivityRoutine(
+                    result ?? ActivityResult.Success()));
         }
 
-
-        #endregion
-
-        #region Day Loop
-        private IEnumerator BeginDayRoutine()
+        public void CompleteDayOpening()
         {
-            loopState.IsDayEnding = false;
-            loopState.IsActionRunning = false;
-            loopState.CurrentAction = GameLoopAction.None;
-            loopState.CurrentTalkCharacterId = null;
-            loopState.CurrentDecisionIndex = 0;
-            loopState.DecisionsAllowedPerDay = CurrentActDefinition.DecisionsPerDay;
-
-            SetPhase(GameLoopPhase.PlayingDayOpening);
-            yield return LoadSceneRoutine(CurrentActDefinition.DayStartScene);
-        }
-
-        private IEnumerator BeginDecisionRoutine()
-        {
-            if (CurrentDecisionIndex >= DecisionsAllowedPerDay)
-            {
-                yield return BeginEndOfDayRoutine();
-                yield break;
-            }
-
-            SetPhase(GameLoopPhase.AwaitingDecision);
-            yield return LoadSceneRoutine(
-                CurrentActDefinition.GetDecisionScene(CurrentDecisionIndex));
-        }
-
-        private IEnumerator BeginEndOfDayRoutine()
-        {
-            loopState.IsDayEnding = true;
-            loopState.IsActionRunning = false;
-            loopState.CurrentAction = GameLoopAction.None;
-            loopState.CurrentTalkCharacterId = null;
-
-            SetPhase(GameLoopPhase.EndingDay);
-            yield return LoadSceneRoutine(CurrentActDefinition.DayEndScene);
-        }
-
-        public void DecisionLoop()
-        {
-            ReplaceTransition(ContinueAfterDialogueRoutine(BeginDecisionRoutine()));
+            ReplaceTransition(
+                ContinueAfterDialogueRoutine(
+                    BeginDecisionRoutine()));
         }
 
         public void CompleteDay()
         {
-            ReplaceTransition(ContinueAfterDialogueRoutine(AdvanceAfterDayRoutine()));
+            ReplaceTransition(
+                ContinueAfterDialogueRoutine(
+                    AdvanceAfterDayRoutine()));
         }
 
         public void CompleteChapterStart()
         {
             if (standaloneSceneMode)
             {
-                ReplaceTransition(CompleteStandaloneSequenceAfterDialogueRoutine());
+                ReplaceTransition(
+                    CompleteStandaloneSequenceAfterDialogueRoutine());
                 return;
             }
 
-            ReplaceTransition(ContinueAfterDialogueRoutine(BeginActRoutine()));
+            ReplaceTransition(
+                ContinueAfterDialogueRoutine(
+                    BeginActRoutine()));
         }
 
         public void CompleteActStart()
         {
             if (standaloneSceneMode)
             {
-                ReplaceTransition(CompleteStandaloneSequenceAfterDialogueRoutine());
+                ReplaceTransition(
+                    CompleteStandaloneSequenceAfterDialogueRoutine());
                 return;
             }
 
-            ReplaceTransition(ContinueAfterDialogueRoutine(BeginDayRoutine()));
+            ReplaceTransition(
+                ContinueAfterDialogueRoutine(
+                    BeginDayRoutine(1)));
         }
 
         public void CompleteAct()
         {
             if (standaloneSceneMode)
             {
-                ReplaceTransition(CompleteStandaloneSequenceAfterDialogueRoutine());
+                ReplaceTransition(
+                    CompleteStandaloneSequenceAfterDialogueRoutine());
                 return;
             }
 
-            ReplaceTransition(ContinueAfterDialogueRoutine(AdvanceAfterActRoutine()));
+            ReplaceTransition(
+                ContinueAfterDialogueRoutine(
+                    AdvanceAfterActRoutine()));
         }
 
         public void CompleteChapter()
         {
             if (standaloneSceneMode)
             {
-                ReplaceTransition(CompleteStandaloneSequenceAfterDialogueRoutine());
+                ReplaceTransition(
+                    CompleteStandaloneSequenceAfterDialogueRoutine());
                 return;
             }
 
-            ReplaceTransition(ContinueAfterDialogueRoutine(CompleteGameRoutine()));
+            ReplaceTransition(
+                ContinueAfterDialogueRoutine(
+                    CompleteGameRoutine()));
         }
-
-
-
 
         public void NotifySequenceCompleted()
         {
             if (standaloneSceneMode)
             {
-                ReplaceTransition(CompleteStandaloneSequenceAfterDialogueRoutine());
+                ReplaceTransition(
+                    CompleteStandaloneSequenceAfterDialogueRoutine());
                 return;
             }
 
-            switch (Phase)
+            IEnumerator continuation = Phase switch
             {
-                case GameLoopPhase.StartingGame:
-                    ReplaceTransition(
-                        ContinueAfterDialogueRoutine(BeginActRoutine()));
-                    break;
+                GameLoopPhase.StartingGame =>
+                    BeginActRoutine(),
+                GameLoopPhase.StartingAct =>
+                    BeginDayRoutine(1),
+                GameLoopPhase.PlayingDayOpening =>
+                    BeginDecisionRoutine(),
+                GameLoopPhase.EndingDay =>
+                    AdvanceAfterDayRoutine(),
+                GameLoopPhase.TransitioningAct =>
+                    AdvanceAfterActRoutine(),
+                GameLoopPhase.PlayingEnding =>
+                    CompleteGameRoutine(),
+                _ => null
+            };
 
-                case GameLoopPhase.StartingAct:
-                    ReplaceTransition(
-                        ContinueAfterDialogueRoutine(BeginDayRoutine()));
-                    break;
-
-                case GameLoopPhase.PlayingDayOpening:
-                    ReplaceTransition(
-                        ContinueAfterDialogueRoutine(BeginDecisionRoutine()));
-                    break;
-
-                case GameLoopPhase.EndingDay:
-                    ReplaceTransition(
-                        ContinueAfterDialogueRoutine(AdvanceAfterDayRoutine()));
-                    break;
-
-                case GameLoopPhase.TransitioningAct:
-                    ReplaceTransition(
-                        ContinueAfterDialogueRoutine(AdvanceAfterActRoutine()));
-                    break;
-
-                case GameLoopPhase.PlayingEnding:
-                    ReplaceTransition(
-                        ContinueAfterDialogueRoutine(CompleteGameRoutine()));
-                    break;
-
-                default:
-                    Debug.LogWarning(
-                        $"[GameLoop] Ignored sequence completion while in {Phase}.");
-                    break;
+            if (continuation == null)
+            {
+                Debug.LogWarning(
+                    $"[GameLoop] Ignored sequence completion " +
+                    $"while in {Phase}.");
+                return;
             }
+
+            ReplaceTransition(
+                ContinueAfterDialogueRoutine(
+                    continuation));
         }
-
-        #endregion
-
-
-
-
-
-
 
         private IEnumerator StartNewGameRoutine()
         {
@@ -486,198 +446,172 @@ namespace HeartOfPrince.Presentation
             GameSession.Instance.ResetRuntimeState();
             BindToCurrentState();
 
-            //EnsureChapterDefinition();
-            loopState.Reset(currentChapter.GetAct(0).DecisionsPerDay);
-            //SeedPrototypeProgression();
+            loopState.Reset();
+            state.Day.History.Clear();
+            state.Day.BeginDay();
 
             SetPhase(GameLoopPhase.StartingGame);
             Log($"Starting {currentChapter.DisplayName}.");
-            yield return LoadSceneRoutine(currentChapter.StartScene);
+
+            yield return LoadSceneRoutine(
+                currentChapter.StartScene);
         }
 
-        private void StartStandaloneScene(string sceneName)
+        private IEnumerator BeginActivityRoutine(
+            IActivityRequest request)
         {
-            ConfigureStandaloneSceneState(sceneName, resetRuntime: true);
+            yield return WaitForActiveSceneDialogueToFinish();
+
+            bool started =
+                GameSession.Instance.Activities.TryStartActivity(
+                    request,
+                    out ActivityRunState run,
+                    out string failureReason);
+
+            if (!started)
+            {
+                Debug.LogWarning(
+                    $"[GameLoop] Activity could not start: " +
+                    failureReason);
+
+                SetPhase(GameLoopPhase.AwaitingDecision);
+                EnsureDecisionPresenter();
+                yield break;
+            }
+
+            SetPhase(GameLoopPhase.PerformingActivity);
+            Log(
+                $"Starting activity '{run.ActivityId}' in " +
+                $"scene '{run.SceneName}' at {CurrentTimeDisplay}.");
+
+            yield return LoadSceneRoutine(run.SceneName);
+        }
+
+        private IEnumerator ResolveActivityRoutine(
+            ActivityResult result)
+        {
+            yield return WaitForActiveSceneDialogueToFinish();
+
+            ActivityCompletion completion =
+                GameSession.Instance.Activities
+                    .CompleteCurrentActivity(result);
 
             Log(
-                $"Standalone-scene mode: '{sceneName}'. " +
-                "The scene-local DialogueRunner will start its configured node.");
+                $"Completed '{completion.CompletedRun.ActivityId}'. " +
+                $"Advanced {completion.DurationMinutes} minutes to " +
+                $"{CurrentTimeDisplay}.");
 
-            StartCoroutine(ValidateActiveSceneRunnerRoutine(sceneName));
-        }
-
-        private void ConfigureStandaloneSceneState(
-            string sceneName,
-            bool resetRuntime)
-        {
-            standaloneSceneMode = true;
-            standaloneUsesEveningVariant =
-                sceneName.IndexOf("Evening", StringComparison.OrdinalIgnoreCase) >= 0;
-
-            if (resetRuntime)
+            if (standaloneSceneMode)
             {
-                GameSession.Instance.ResetRuntimeState();
-                BindToCurrentState();
+                SetPhase(GameLoopPhase.StandaloneComplete);
+                yield break;
             }
 
-            //EnsureChapterDefinition();
-            loopState.Reset(currentChapter.GetAct(0).DecisionsPerDay);
-            //SeedPrototypeProgression();
-            //SeedStandaloneDebugTopics();
-
-            if (standaloneUsesEveningVariant && DecisionsAllowedPerDay > 1)
+            if (completion.ShouldEndDay)
             {
-                loopState.CurrentDecisionIndex = DecisionsAllowedPerDay - 1;
-            }
-
-            if (string.Equals(
-                    sceneName,
-                    currentChapter.StartScene,
-                    StringComparison.OrdinalIgnoreCase))
-            {
-                SetPhase(GameLoopPhase.StartingGame);
-            }
-            else if (string.Equals(
-                         sceneName,
-                         CurrentActDefinition.StartScene,
-                         StringComparison.OrdinalIgnoreCase))
-            {
-                SetPhase(GameLoopPhase.StartingAct);
-            }
-            else if (string.Equals(
-                         sceneName,
-                         CurrentActDefinition.DayStartScene,
-                         StringComparison.OrdinalIgnoreCase))
-            {
-                SetPhase(GameLoopPhase.PlayingDayOpening);
-            }
-            else if (string.Equals(
-                         sceneName,
-                         CurrentActDefinition.DayEndScene,
-                         StringComparison.OrdinalIgnoreCase))
-            {
-                loopState.IsDayEnding = true;
-                SetPhase(GameLoopPhase.EndingDay);
-            }
-            else if (IsDecisionScene(sceneName))
-            {
-                SetPhase(GameLoopPhase.AwaitingDecision);
-            }
-            else if (string.Equals(
-                         sceneName,
-                         CurrentActDefinition.EndScene,
-                         StringComparison.OrdinalIgnoreCase))
-            {
-                SetPhase(GameLoopPhase.TransitioningAct);
-            }
-            else if (string.Equals(
-                         sceneName,
-                         currentChapter.EndScene,
-                         StringComparison.OrdinalIgnoreCase))
-            {
-                SetPhase(GameLoopPhase.PlayingEnding);
-            }
-            else if (sceneName.StartsWith("Conversation_", StringComparison.OrdinalIgnoreCase))
-            {
-                loopState.IsActionRunning = true;
-                loopState.CurrentAction = GameLoopAction.Talk;
-                loopState.CurrentTalkCharacterId = InferTalkCharacter(sceneName);
-                SetPhase(GameLoopPhase.PerformingTalk);
-            }
-            else if (sceneName.StartsWith("Ponder_", StringComparison.OrdinalIgnoreCase))
-            {
-                loopState.IsActionRunning = true;
-                loopState.CurrentAction = GameLoopAction.Ponder;
-                SetPhase(GameLoopPhase.PerformingPonder);
+                yield return BeginEndOfDayRoutine();
             }
             else
             {
-                SetPhase(GameLoopPhase.StandaloneScene);
+                yield return BeginDecisionRoutine();
             }
-        }
-
-        private IEnumerator ResetStandaloneSceneRoutine()
-        {
-            var sceneName = SceneManager.GetActiveScene().name;
-            StopActiveSceneDialogue();
-            yield return WaitForActiveSceneDialogueToFinish();
-
-            GameSession.Instance.ResetRuntimeState();
-            BindToCurrentState();
-            ConfigureStandaloneSceneState(sceneName, resetRuntime: false);
-
-            isSceneLoadInProgress = true;
-            var operation = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
-            if (operation == null)
-            {
-                isSceneLoadInProgress = false;
-                Debug.LogError($"[GameLoop] Could not reload standalone scene '{sceneName}'.");
-                yield break;
-            }
-
-            while (!operation.isDone)
-            {
-                yield return null;
-            }
-
-            isSceneLoadInProgress = false;
-            SyncInspector();
-            yield return ValidateActiveSceneRunnerRoutine(sceneName);
-        }
-
-        
-
-
-
-
-        private IEnumerator CompleteStandaloneSequenceAfterDialogueRoutine()
-        {
-            yield return WaitForActiveSceneDialogueToFinish();
-            loopState.IsActionRunning = false;
-            loopState.IsDayEnding = false;
-            SetPhase(GameLoopPhase.StandaloneComplete);
-            Log("Standalone scene sequence completed. The current scene remains loaded.");
-        }
-
-        
-
-        private IEnumerator AdvanceAfterDayRoutine()
-        {
-            loopState.IsDayEnding = false;
-            loopState.CurrentDecisionIndex = 0;
-
-            var progress = CreateNarrativeProgress(
-                completedActsInChapter: CurrentAct - 1);
-
-            if (CurrentActDefinition.IsComplete(progress))
-            {
-                SetPhase(GameLoopPhase.TransitioningAct);
-                yield return LoadSceneRoutine(CurrentActDefinition.EndScene);
-                yield break;
-            }
-
-            loopState.CurrentDay++;
-            yield return BeginDayRoutine();
         }
 
         private IEnumerator BeginActRoutine()
         {
-            loopState.CurrentDay = 1;
-            loopState.CurrentDecisionIndex = 0;
-            loopState.DecisionsAllowedPerDay = CurrentActDefinition.DecisionsPerDay;
-            loopState.IsActionRunning = false;
+            state.Clock.BeginDay(
+                1,
+                CurrentDayRules.WakeMinute);
+
+            state.Day.BeginDay();
             loopState.IsDayEnding = false;
-            loopState.CurrentAction = GameLoopAction.None;
-            loopState.CurrentTalkCharacterId = null;
+
+            GameSession.Instance.Activities.SetDayRules(
+                CurrentDayRules);
 
             SetPhase(GameLoopPhase.StartingAct);
-            yield return LoadSceneRoutine(CurrentActDefinition.StartScene);
+            yield return LoadSceneRoutine(
+                CurrentActDefinition.StartScene);
+        }
+
+        private IEnumerator BeginDayRoutine(int day)
+        {
+            state.Clock.BeginDay(
+                day,
+                CurrentDayRules.WakeMinute);
+
+            state.Day.BeginDay();
+            loopState.IsDayEnding = false;
+
+            GameSession.Instance.Activities.SetDayRules(
+                CurrentDayRules);
+
+            SetPhase(GameLoopPhase.PlayingDayOpening);
+            yield return LoadSceneRoutine(
+                CurrentActDefinition.DayStartScene);
+        }
+
+        private IEnumerator BeginDecisionRoutine()
+        {
+            if (CurrentDayRules.ShouldEndDay(state))
+            {
+                yield return BeginEndOfDayRoutine();
+                yield break;
+            }
+
+            IReadOnlyList<ActivityOption> options =
+                GameSession.Instance.ActivityQuery.GetOptions();
+
+            if (options.Count == 0 ||
+                !options.Any(option => option.IsAvailable))
+            {
+                Log(
+                    "No activities are available; ending the day.");
+                yield return BeginEndOfDayRoutine();
+                yield break;
+            }
+
+            SetPhase(GameLoopPhase.AwaitingDecision);
+            yield return LoadSceneRoutine(
+                CurrentActDefinition.DecisionScene);
+        }
+
+        private IEnumerator BeginEndOfDayRoutine()
+        {
+            loopState.IsDayEnding = true;
+            SetPhase(GameLoopPhase.EndingDay);
+
+            yield return LoadSceneRoutine(
+                CurrentActDefinition.DayEndScene);
+        }
+
+        private IEnumerator AdvanceAfterDayRoutine()
+        {
+            loopState.IsDayEnding = false;
+
+            NarrativeProgress progress =
+                CreateNarrativeProgress(
+                    completedActsInChapter:
+                        CurrentAct - 1);
+
+            if (CurrentActDefinition.IsComplete(progress))
+            {
+                SetPhase(GameLoopPhase.TransitioningAct);
+                yield return LoadSceneRoutine(
+                    CurrentActDefinition.EndScene);
+                yield break;
+            }
+
+            yield return BeginDayRoutine(
+                CurrentDay + 1);
         }
 
         private IEnumerator AdvanceAfterActRoutine()
         {
-            var chapterProgress = CreateNarrativeProgress(
-                completedActsInChapter: CurrentAct);
+            NarrativeProgress chapterProgress =
+                CreateNarrativeProgress(
+                    completedActsInChapter:
+                        CurrentAct);
 
             if (currentChapter.IsComplete(chapterProgress))
             {
@@ -688,8 +622,9 @@ namespace HeartOfPrince.Presentation
             if (CurrentAct >= currentChapter.ActCount)
             {
                 Debug.LogError(
-                    $"[GameLoop] Chapter '{currentChapter.Id}' has no next act, " +
-                    "but its completion condition is not met.");
+                    $"[GameLoop] Chapter '{currentChapter.Id}' " +
+                    "has no next act, but its completion " +
+                    "condition is not met.");
                 yield break;
             }
 
@@ -700,22 +635,18 @@ namespace HeartOfPrince.Presentation
         private IEnumerator BeginEndingRoutine()
         {
             loopState.IsGameComplete = false;
-            loopState.IsActionRunning = false;
             loopState.IsDayEnding = false;
-            loopState.CurrentAction = GameLoopAction.None;
-            loopState.CurrentTalkCharacterId = null;
 
             SetPhase(GameLoopPhase.PlayingEnding);
-            yield return LoadSceneRoutine(currentChapter.EndScene);
+            yield return LoadSceneRoutine(
+                currentChapter.EndScene);
         }
 
         private IEnumerator CompleteGameRoutine()
         {
             loopState.IsGameComplete = true;
-            loopState.IsActionRunning = false;
             loopState.IsDayEnding = false;
-            loopState.CurrentAction = GameLoopAction.None;
-            loopState.CurrentTalkCharacterId = null;
+
             SetPhase(GameLoopPhase.Completed);
             Log("Demo completed.");
             yield break;
@@ -726,16 +657,233 @@ namespace HeartOfPrince.Presentation
             StopActiveSceneDialogue();
             yield return WaitForActiveSceneDialogueToFinish();
 
-            loopState.IsActionRunning = false;
+            state.Day.CurrentActivity = null;
             loopState.IsDayEnding = false;
-            loopState.CurrentAction = GameLoopAction.None;
-            loopState.CurrentTalkCharacterId = null;
-            loopState.CurrentDecisionIndex = 0;
 
             yield return AdvanceAfterDayRoutine();
         }
 
-        private IEnumerator ContinueAfterDialogueRoutine(IEnumerator continuation)
+        private void StartStandaloneScene(string sceneName)
+        {
+            ConfigureStandaloneSceneState(
+                sceneName,
+                resetRuntime: true);
+
+            Log(
+                $"Standalone-scene mode: '{sceneName}'.");
+            StartCoroutine(
+                ValidateActiveSceneRunnerRoutine(sceneName));
+
+            if (IsDecisionScene(sceneName))
+            {
+                EnsureDecisionPresenter();
+            }
+
+            if (state?.Day?.CurrentActivity != null)
+            {
+                EnsureActivitySceneController();
+            }
+        }
+
+        private void ConfigureStandaloneSceneState(
+            string sceneName,
+            bool resetRuntime)
+        {
+            standaloneSceneMode = true;
+
+            if (resetRuntime)
+            {
+                GameSession.Instance.ResetRuntimeState();
+                BindToCurrentState();
+            }
+
+            loopState.Reset();
+
+            int actIndex =
+                currentChapter.FindActIndexForScene(
+                    sceneName);
+
+            if (actIndex >= 0)
+            {
+                loopState.CurrentAct = actIndex + 1;
+            }
+
+            int startMinute =
+                CurrentDayRules.WakeMinute;
+
+            ActivityDefinition standaloneActivity =
+                GameSession.Instance.Configuration
+                    .ActivityCatalog
+                    .FindActivityForScene(sceneName);
+
+            if (standaloneActivity != null)
+            {
+                standaloneActivity.TryGetStandaloneMinuteForScene(
+                    sceneName,
+                    startMinute,
+                    out startMinute);
+            }
+
+            state.Clock.BeginDay(1, startMinute);
+            state.Day.BeginDay();
+
+            GameSession.Instance.Activities.SetDayRules(
+                CurrentDayRules);
+
+            if (string.Equals(
+                    sceneName,
+                    currentChapter.StartScene,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                SetPhase(GameLoopPhase.StartingGame);
+                return;
+            }
+
+            if (string.Equals(
+                    sceneName,
+                    CurrentActDefinition.StartScene,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                SetPhase(GameLoopPhase.StartingAct);
+                return;
+            }
+
+            if (string.Equals(
+                    sceneName,
+                    CurrentActDefinition.DayStartScene,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                SetPhase(GameLoopPhase.PlayingDayOpening);
+                return;
+            }
+
+            if (string.Equals(
+                    sceneName,
+                    CurrentActDefinition.DayEndScene,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                loopState.IsDayEnding = true;
+                SetPhase(GameLoopPhase.EndingDay);
+                return;
+            }
+
+            if (IsDecisionScene(sceneName))
+            {
+                SetPhase(GameLoopPhase.AwaitingDecision);
+                return;
+            }
+
+            if (string.Equals(
+                    sceneName,
+                    CurrentActDefinition.EndScene,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                SetPhase(GameLoopPhase.TransitioningAct);
+                return;
+            }
+
+            if (string.Equals(
+                    sceneName,
+                    currentChapter.EndScene,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                SetPhase(GameLoopPhase.PlayingEnding);
+                return;
+            }
+
+            if (TryPrepareStandaloneActivity(sceneName))
+            {
+                SetPhase(GameLoopPhase.PerformingActivity);
+                return;
+            }
+
+            SetPhase(GameLoopPhase.StandaloneScene);
+        }
+
+        private bool TryPrepareStandaloneActivity(
+            string sceneName)
+        {
+            ActivityCatalog catalog =
+                GameSession.Instance.Configuration
+                    .ActivityCatalog;
+
+            ActivityDefinition activity =
+                catalog.FindActivityForScene(sceneName);
+
+            if (activity == null)
+            {
+                return false;
+            }
+
+            if (!GameSession.Instance.ActivityModules
+                    .TryCreateRequestForScene(
+                        activity,
+                        catalog,
+                        sceneName,
+                        out IActivityRequest request))
+            {
+                Debug.LogError(
+                    $"[GameLoop] Activity '{activity.Id}' could not " +
+                    $"create a standalone request for scene " +
+                    $"'{sceneName}'.");
+                return false;
+            }
+
+            bool started =
+                GameSession.Instance.Activities.TryStartActivity(
+                    request,
+                    out ActivityRunState run,
+                    out string failureReason);
+
+            if (!started)
+            {
+                Debug.LogError(
+                    $"[GameLoop] Standalone activity could not " +
+                    $"start: {failureReason}");
+                return false;
+            }
+
+            if (!string.Equals(
+                    run.SceneName,
+                    sceneName,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                Debug.LogWarning(
+                    $"[GameLoop] Standalone scene '{sceneName}' " +
+                    $"resolved to '{run.SceneName}'. The current " +
+                    "scene remains active for debugging.");
+            }
+
+            return true;
+        }
+
+        private IEnumerator ResetStandaloneSceneRoutine()
+        {
+            string sceneName =
+                SceneManager.GetActiveScene().name;
+
+            StopActiveSceneDialogue();
+            yield return WaitForActiveSceneDialogueToFinish();
+
+            GameSession.Instance.ResetRuntimeState();
+            BindToCurrentState();
+
+            ConfigureStandaloneSceneState(
+                sceneName,
+                resetRuntime: false);
+
+            yield return LoadSceneRoutine(sceneName);
+        }
+
+        private IEnumerator CompleteStandaloneSequenceAfterDialogueRoutine()
+        {
+            yield return WaitForActiveSceneDialogueToFinish();
+            loopState.IsDayEnding = false;
+            SetPhase(GameLoopPhase.StandaloneComplete);
+        }
+
+        private IEnumerator ContinueAfterDialogueRoutine(
+            IEnumerator continuation)
         {
             yield return WaitForActiveSceneDialogueToFinish();
 
@@ -747,8 +895,11 @@ namespace HeartOfPrince.Presentation
 
         private void StopActiveSceneDialogue()
         {
-            var runner = FindActiveSceneDialogueRunner();
-            if (runner != null && runner.IsDialogueRunning)
+            DialogueRunner runner =
+                FindActiveSceneDialogueRunner();
+
+            if (runner != null &&
+                runner.IsDialogueRunning)
             {
                 runner.Stop();
             }
@@ -756,22 +907,25 @@ namespace HeartOfPrince.Presentation
 
         private IEnumerator WaitForActiveSceneDialogueToFinish()
         {
-            var runner = FindActiveSceneDialogueRunner();
+            DialogueRunner runner =
+                FindActiveSceneDialogueRunner();
 
-            // Yarn commands run before the node itself has completely unwound.
             yield return null;
 
-            while (runner != null && runner.IsDialogueRunning)
+            while (runner != null &&
+                   runner.IsDialogueRunning)
             {
                 yield return null;
             }
         }
 
-        private IEnumerator LoadSceneRoutine(string sceneName)
+        private IEnumerator LoadSceneRoutine(
+            string sceneName)
         {
             if (string.IsNullOrWhiteSpace(sceneName))
             {
-                Debug.LogError("[GameLoop] Cannot load an empty narrative scene name.");
+                Debug.LogError(
+                    "[GameLoop] Cannot load an empty scene name.");
                 yield break;
             }
 
@@ -779,198 +933,163 @@ namespace HeartOfPrince.Presentation
             SyncInspector();
             Log($"Loading scene '{sceneName}'.");
 
-            var operation = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
-            if (operation == null)
-            {
-                isSceneLoadInProgress = false;
-                Debug.LogError(
-                    $"[GameLoop] Could not load scene '{sceneName}'. " +
-                    "Use Heart of Prince > Rebuild Demo Scene List or add the scene to Build Settings.");
-                yield break;
-            }
-
-            while (!operation.isDone)
-            {
-                yield return null;
-            }
+            yield return sceneTransitions.LoadSingle(sceneName);
 
             isSceneLoadInProgress = false;
             SyncInspector();
 
-            yield return ValidateActiveSceneRunnerRoutine(sceneName);
+            yield return ValidateActiveSceneRunnerRoutine(
+                sceneName);
         }
 
-        private IEnumerator ValidateActiveSceneRunnerRoutine(string sceneName)
+        private IEnumerator ValidateActiveSceneRunnerRoutine(
+            string sceneName)
         {
-            // Let scene Awake/Start complete so the local runner can auto-start.
             yield return null;
 
-            var runner = FindActiveSceneDialogueRunner();
+            DialogueRunner runner =
+                FindActiveSceneDialogueRunner();
+
             if (runner == null)
             {
-                Debug.LogError(
-                    $"[GameLoop] Scene '{sceneName}' has no active scene-local DialogueRunner.");
+                Debug.LogWarning(
+                    $"[GameLoop] Scene '{sceneName}' has no " +
+                    "active scene-local DialogueRunner.");
                 yield break;
             }
 
             if (!runner.autoStart)
             {
                 Debug.LogWarning(
-                    $"[GameLoop] DialogueRunner in '{sceneName}' has Auto Start disabled. " +
-                    "This architecture expects the scene runner's Starting Node to begin dialogue.");
+                    $"[GameLoop] DialogueRunner in '{sceneName}' " +
+                    "has Auto Start disabled.");
             }
-
-            Log(
-                $"Scene-local Yarn runner '{runner.gameObject.name}' owns '{sceneName}'. " +
-                "Its configured Starting Node controls scene dialogue.");
         }
 
         private DialogueRunner FindActiveSceneDialogueRunner()
         {
-            var activeScene = SceneManager.GetActiveScene();
+            Scene activeScene =
+                SceneManager.GetActiveScene();
 
             return FindObjectsOfType<DialogueRunner>(true)
-                .FirstOrDefault(runner =>
-                    runner != null &&
-                    runner.gameObject.scene == activeScene &&
-                    runner.gameObject.activeInHierarchy &&
-                    runner.enabled);
+                .FirstOrDefault(
+                    runner =>
+                        runner != null &&
+                        runner.gameObject.scene == activeScene &&
+                        runner.gameObject.activeInHierarchy &&
+                        runner.enabled);
         }
 
-        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        private void OnSceneLoaded(
+            Scene scene,
+            LoadSceneMode mode)
         {
             SyncInspector();
+
+            if (IsDecisionScene(scene.name))
+            {
+                EnsureDecisionPresenter();
+            }
+
+            if (state?.Day?.CurrentActivity != null &&
+                string.Equals(
+                    state.Day.CurrentActivity.SceneName,
+                    scene.name,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                EnsureActivitySceneController();
+            }
         }
 
-        private void EnsureChapterDefinition()
+        private void EnsureActivitySceneController()
         {
-            if (currentChapter != null)
+            if (FindObjectOfType<ActivitySceneController>() != null)
             {
                 return;
             }
 
-            currentChapter = startingChapter;
+            var controllerObject =
+                new GameObject("Activity Scene Controller");
 
-            if (currentChapter == null)
+            controllerObject.AddComponent<ActivitySceneController>();
+        }
+
+        private void EnsureDecisionPresenter()
+        {
+            if (FindObjectOfType<DecisionScenePresenter>() != null)
             {
-                throw new InvalidOperationException(
-                    "GameLoopService has no Starting Chapter assigned.");
+                return;
             }
 
-            if (currentChapter.ActCount == 0)
+            var presenterObject =
+                new GameObject("Activity Decision Presenter");
+
+            presenterObject.AddComponent<
+                DecisionScenePresenter>();
+        }
+
+        private bool IsDecisionScene(string sceneName)
+        {
+            if (string.IsNullOrWhiteSpace(sceneName))
             {
-                throw new InvalidOperationException(
-                    $"Chapter '{currentChapter.name}' contains no acts.");
+                return false;
             }
+
+            if (currentChapter != null &&
+                currentChapter.ActCount > 0 &&
+                string.Equals(
+                    sceneName,
+                    CurrentActDefinition.DecisionScene,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         private NarrativeProgress CreateNarrativeProgress(
             int completedActsInChapter)
         {
             return new NarrativeProgress(
-                state: GameSession.Instance?.State,
+                state,
                 completedDaysInAct: CurrentDay,
-                completedActsInChapter: completedActsInChapter,
-                totalActsInChapter: currentChapter.ActCount);
+                completedActsInChapter:
+                    completedActsInChapter,
+                totalActsInChapter:
+                    currentChapter.ActCount);
         }
 
-        private bool IsDecisionScene(string sceneName)
+        private void EnsureConfiguration()
         {
-            for (int i = 0; i < CurrentActDefinition.DecisionsPerDay; i++)
+            if (currentChapter == null)
             {
-                if (string.Equals(
-                        sceneName,
-                        CurrentActDefinition.GetDecisionScene(i),
-                        StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
+                throw new InvalidOperationException(
+                    "GameLoopService has no Starting Chapter.");
             }
 
-            return false;
-        }
-
-        private TalkActionRoute ResolveTalkRoute(string characterId)
-        {
-            var route = talkRoutes?.FirstOrDefault(
-                item => item != null &&
-                        string.Equals(
-                            item.CharacterId,
-                            characterId,
-                            StringComparison.OrdinalIgnoreCase));
-
-            if (route == null)
+            if (currentChapter.ActCount == 0)
             {
-                Debug.LogError(
-                    $"[GameLoop] No Talk route is configured for character '{characterId}'. " +
-                    "Add morning/evening scene names to the GameLoopService route list.");
+                throw new InvalidOperationException(
+                    $"Chapter '{currentChapter.name}' contains " +
+                    "no acts.");
             }
-
-            return route;
         }
 
-        private static string InferTalkCharacter(string sceneName)
-        {
-            const string prefix = "Conversation_";
-            var remainder = sceneName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)
-                ? sceneName.Substring(prefix.Length)
-                : sceneName;
-
-            var separator = remainder.IndexOf('_');
-            return separator > 0 ? remainder.Substring(0, separator) : remainder;
-        }
-
-        //private void SeedPrototypeProgression()
-        //{
-        //    var munir = (CharacterID)"Munir";
-        //    var topics = GameSession.Instance.State.GetOrCreateCharacterTopics(munir);
-
-        //    topics.AddTopic(
-        //        (TopicName)"PrototypeAskAboutResponsibility",
-        //        ConversationTopicDirection.PlayerToCharacter);
-
-        //    GameSession.Instance.State.Ponder.AddTopic(
-        //        (TopicName)"PrototypeQuietMoment");
-
-        //    GameSession.Instance.State.GetOrCreateRelationship(munir);
-        //}
-
-        //private void SeedStandaloneDebugTopics()
-        //{
-        //    var munir = (CharacterID)"Munir";
-        //    var topics = GameSession.Instance.State.GetOrCreateCharacterTopics(munir);
-
-        //    foreach (var topic in StandalonePlayerTopics)
-        //    {
-        //        topics.AddTopic(
-        //            (TopicName)topic,
-        //            ConversationTopicDirection.PlayerToCharacter);
-        //    }
-
-        //    foreach (var topic in StandaloneNpcTopics)
-        //    {
-        //        topics.AddTopic(
-        //            (TopicName)topic,
-        //            ConversationTopicDirection.CharacterToPlayer);
-        //    }
-
-        //    foreach (var topic in StandalonePonderTopics)
-        //    {
-        //        GameSession.Instance.State.Ponder.AddTopic((TopicName)topic);
-        //    }
-        //}
-
-        private void ReplaceTransition(IEnumerator routine)
+        private void ReplaceTransition(
+            IEnumerator routine)
         {
             if (activeTransition != null)
             {
                 StopCoroutine(activeTransition);
             }
 
-            activeTransition = StartCoroutine(RunTransition(routine));
+            activeTransition =
+                StartCoroutine(RunTransition(routine));
         }
 
-        private IEnumerator RunTransition(IEnumerator routine)
+        private IEnumerator RunTransition(
+            IEnumerator routine)
         {
             while (routine.MoveNext())
             {
@@ -980,14 +1099,17 @@ namespace HeartOfPrince.Presentation
             activeTransition = null;
         }
 
-        private void SetPhase(GameLoopPhase nextPhase)
+        private void SetPhase(
+            GameLoopPhase nextPhase)
         {
             if (loopState == null)
             {
                 BindToCurrentState();
             }
 
-            var previous = loopState.Phase;
+            GameLoopPhase previous =
+                loopState.Phase;
+
             loopState.Phase = nextPhase;
             SyncInspector();
 
@@ -996,7 +1118,8 @@ namespace HeartOfPrince.Presentation
                 Log(
                     $"Phase: {previous} -> {nextPhase} " +
                     $"(Act {CurrentAct}, Day {CurrentDay}, " +
-                    $"Decision {CurrentDecisionIndex}/{DecisionsAllowedPerDay}).");
+                    $"Time {CurrentTimeDisplay}, " +
+                    $"Actions {ActionsCompletedToday}).");
             }
         }
 
@@ -1005,19 +1128,27 @@ namespace HeartOfPrince.Presentation
             inspectorPhase = Phase;
             inspectorCurrentAct = CurrentAct;
             inspectorCurrentDay = CurrentDay;
-            inspectorDecisionIndex = CurrentDecisionIndex;
-            inspectorActionRunning = IsActionRunning;
+            inspectorMinuteOfDay =
+                state?.Clock?.MinuteOfDay ?? 0;
+            inspectorActionsCompleted =
+                state?.Day?.ActionsCompleted ?? 0;
+            inspectorCurrentActivity =
+                state?.Day?.CurrentActivity?.ActivityId;
             inspectorDayEnding = IsDayEnding;
             inspectorGameComplete = IsGameComplete;
-            inspectorStandaloneSceneMode = standaloneSceneMode;
-            inspectorActiveScene = SceneManager.GetActiveScene().name;
+            inspectorStandaloneSceneMode =
+                standaloneSceneMode;
+            inspectorActiveScene =
+                SceneManager.GetActiveScene().name;
         }
 
         private void Log(string message)
         {
             if (logTransitions)
             {
-                Debug.Log($"[GameLoop] {message}", this);
+                Debug.Log(
+                    $"[GameLoop] {message}",
+                    this);
             }
         }
     }

@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace HeartOfPrince.Domain
@@ -9,74 +8,61 @@ namespace HeartOfPrince.Domain
     public sealed class Act : ScriptableObject
     {
         [Header("Identity")]
-        [SerializeField]
-        private string id;
-
-        [SerializeField]
-        private string displayName;
-
-        [TextArea]
-        [SerializeField]
-        private string description;
+        [SerializeField] private string id;
+        [SerializeField] private string displayName;
+        [TextArea, SerializeField] private string description;
 
         [Header("Act Scenes")]
-        [SerializeField]
-        private string startScene;
+        [SerializeField] private string startScene;
+        [SerializeField] private string endScene;
 
-        [SerializeField]
-        private string endScene;
-
-        [Header("Day Loop Scenes")]
-        [SerializeField]
-        private string dayStartScene;
-
-        [SerializeField]
-        private string dayEndScene;
-
-        [Header("Decisions")]
-        [SerializeField, Min(1)]
-        private int decisionsPerDay = 2;
-
-        [Tooltip("Decision scenes in chronological order.")]
-        [SerializeField]
-        private string[] decisionScenes = Array.Empty<string>();
+        [Header("Day Loop")]
+        [SerializeField] private string dayStartScene;
+        [SerializeField] private string decisionScene;
+        [SerializeField] private string dayEndScene;
+        [SerializeField] private DayRules dayRules;
 
         [Header("Completion")]
-        [SerializeField]
-        private CompletionCondition completionCondition;
+        [SerializeField] private CompletionCondition completionCondition;
 
         public string Id => id;
         public string DisplayName => displayName;
         public string Description => description;
-
         public string StartScene => startScene;
         public string EndScene => endScene;
         public string DayStartScene => dayStartScene;
+        public string DecisionScene => decisionScene;
         public string DayEndScene => dayEndScene;
+        public DayRules DayRules => dayRules;
+        public CompletionCondition CompletionCondition => completionCondition;
 
-        public int DecisionsPerDay => Mathf.Max(1, decisionsPerDay);
-        public CompletionCondition CompletionCondition =>
-            completionCondition;
-
-        public string GetDecisionScene(int zeroBasedDecisionIndex)
+        public bool ContainsScene(string sceneName)
         {
-            if (decisionScenes == null || decisionScenes.Length == 0)
+            if (string.IsNullOrWhiteSpace(sceneName))
             {
-                throw new InvalidOperationException(
-                    $"Act '{id}' has no decision scenes configured.");
+                return false;
             }
 
-            if (decisionScenes.Length == 1)
-            {
-                return decisionScenes[0];
-            }
-
-            int sceneIndex = Mathf.Clamp(
-                zeroBasedDecisionIndex,
-                0,
-                decisionScenes.Length - 1);
-
-            return decisionScenes[sceneIndex];
+            return string.Equals(
+                       sceneName,
+                       startScene,
+                       System.StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(
+                       sceneName,
+                       endScene,
+                       System.StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(
+                       sceneName,
+                       dayStartScene,
+                       System.StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(
+                       sceneName,
+                       decisionScene,
+                       System.StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(
+                       sceneName,
+                       dayEndScene,
+                       System.StringComparison.OrdinalIgnoreCase);
         }
 
         public bool IsComplete(NarrativeProgress progress)
@@ -86,7 +72,6 @@ namespace HeartOfPrince.Domain
                 Debug.LogError(
                     $"Act '{name}' has no completion condition.",
                     this);
-
                 return false;
             }
 
@@ -95,14 +80,9 @@ namespace HeartOfPrince.Domain
 
         private void OnValidate()
         {
-            decisionsPerDay = Mathf.Max(1, decisionsPerDay);
-
             if (string.IsNullOrWhiteSpace(id))
             {
-                id = name
-                    .Trim()
-                    .ToLowerInvariant()
-                    .Replace(" ", "-");
+                id = name.Trim().ToLowerInvariant().Replace(" ", "-");
             }
         }
     }

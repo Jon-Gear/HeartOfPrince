@@ -70,6 +70,39 @@ namespace HeartOfPrince.Domain
             return act;
         }
 
+        public int FindActIndexForScene(string sceneName)
+        {
+            if (string.IsNullOrWhiteSpace(sceneName) ||
+                acts == null)
+            {
+                return -1;
+            }
+
+            for (int i = 0; i < acts.Length; i++)
+            {
+                if (acts[i] != null &&
+                    acts[i].ContainsScene(sceneName))
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        public bool ContainsScene(string sceneName)
+        {
+            return string.Equals(
+                       sceneName,
+                       startScene,
+                       StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(
+                       sceneName,
+                       endScene,
+                       StringComparison.OrdinalIgnoreCase) ||
+                   FindActIndexForScene(sceneName) >= 0;
+        }
+
         public bool IsComplete(NarrativeProgress progress)
         {
             if (completionCondition == null)

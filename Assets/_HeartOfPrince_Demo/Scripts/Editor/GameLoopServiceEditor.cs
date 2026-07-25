@@ -13,47 +13,46 @@ namespace HeartOfPrince.Editor
         {
             serializedObject.Update();
 
-            EditorGUILayout.LabelField("Game Loop Configuration", EditorStyles.boldLabel);
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("startAutomatically"));
+            EditorGUILayout.LabelField(
+                "Game Loop Configuration",
+                EditorStyles.boldLabel);
+
             EditorGUILayout.PropertyField(
-                serializedObject.FindProperty("talkRoutes"),
-                includeChildren: true);
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("logTransitions"));
+                serializedObject.FindProperty("startAutomatically"));
+
+            EditorGUILayout.PropertyField(
+                serializedObject.FindProperty("logTransitions"));
 
             EditorGUILayout.Space(8);
-            EditorGUILayout.LabelField("Live State", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField(
+                "Live State",
+                EditorStyles.boldLabel);
 
             using (new EditorGUI.DisabledScope(true))
             {
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("inspectorPhase"));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("inspectorCurrentAct"));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("inspectorCurrentDay"));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("inspectorDecisionIndex"));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("inspectorActionRunning"));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("inspectorDayEnding"));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("inspectorGameComplete"));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("inspectorStandaloneSceneMode"));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("inspectorActiveScene"));
+                Draw("inspectorPhase");
+                Draw("inspectorCurrentAct");
+                Draw("inspectorCurrentDay");
+                Draw("inspectorMinuteOfDay");
+                Draw("inspectorActionsCompleted");
+                Draw("inspectorCurrentActivity");
+                Draw("inspectorDayEnding");
+                Draw("inspectorGameComplete");
+                Draw("inspectorStandaloneSceneMode");
+                Draw("inspectorActiveScene");
             }
 
             serializedObject.ApplyModifiedProperties();
 
             var service = (GameLoopService)target;
-            //var chapter = service.CurrentChapterDefinition;
-            //var firstAct = chapter.GetAct(0);
-
-            //EditorGUILayout.Space(8);
-            //EditorGUILayout.LabelField("Narrative Definition", EditorStyles.boldLabel);
-            //EditorGUILayout.HelpBox(
-            //    $"{chapter.DisplayName}: {chapter.ActCount} act(s). " +
-            //    $"{firstAct.DisplayName}: {firstAct.DecisionsPerDay} decisions per day. " +
-            //    "Edit DemoChapterDefinition.cs to change the code-authored demo structure.",
-            //    MessageType.None);
 
             EditorGUILayout.Space(8);
-            EditorGUILayout.LabelField("Debug Controls", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField(
+                "Debug Controls",
+                EditorStyles.boldLabel);
 
-            using (new EditorGUI.DisabledScope(!UnityEngine.Application.isPlaying))
+            using (new EditorGUI.DisabledScope(
+                       !UnityEngine.Application.isPlaying))
             {
                 if (GUILayout.Button("Start New Game"))
                 {
@@ -74,10 +73,21 @@ namespace HeartOfPrince.Editor
             if (!UnityEngine.Application.isPlaying)
             {
                 EditorGUILayout.HelpBox(
-                    "Debug controls become available in Play Mode. " +
-                    "The GameLoopService is created automatically on the persistent GameSession. " +
-                    "Playing a non-Bootstrap scene enters standalone-scene mode instead of redirecting.",
+                    "Activity definitions, scene variants, characters, " +
+                    "and day rules are configured through the " +
+                    "GameConfiguration asset in Resources/HeartOfPrince.",
                     MessageType.Info);
+            }
+        }
+
+        private void Draw(string propertyName)
+        {
+            SerializedProperty property =
+                serializedObject.FindProperty(propertyName);
+
+            if (property != null)
+            {
+                EditorGUILayout.PropertyField(property);
             }
         }
     }

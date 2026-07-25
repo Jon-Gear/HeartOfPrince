@@ -13,12 +13,12 @@ MonoBehaviour:
   m_Name: Chapter_1_Act_1
   m_EditorClassIdentifier: HeartOfPrince.Domain::HeartOfPrince.Domain.Act
   id: chapter_1_act_1
-  displayName: 
-  description: 
-  startScene: 
-  endScene: 
-  dayStartScene: 
-  dayEndScene: 
-  decisionsPerDay: 2
-  decisionScenes: []
+  displayName: Act 1
+  description: The playable demo act.
+  startScene: Act_1_Start
+  endScene: Act_1_End
+  dayStartScene: Day_Start
+  decisionScene: Decision
+  dayEndScene: Day_End
+  dayRules: {fileID: 11400000, guid: ed70c0282de5449ba55a199182a82ac4, type: 2}
   completionCondition: {fileID: 11400000, guid: bf73e0d9c39deb848a50acf538d9c057, type: 2}

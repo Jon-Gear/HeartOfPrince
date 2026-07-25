@@ -149,6 +149,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ae5dc7176e9cf346afbb292a7ef702a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: HeartOfPrince.Presentation::HeartOfPrince.Presentation.GameSession
+  configuration: {fileID: 11400000, guid: 3ceffdd71253470ea578f3103cac3f11, type: 2}
   initialStatePreset: {fileID: 11400000, guid: 39d662f9a2212e643885eb33b1b0eefc, type: 2}
 --- !u!4 &1665364218
 Transform:
@@ -178,16 +179,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: HeartOfPrince.Presentation::HeartOfPrince.Presentation.GameLoopService
   startAutomatically: 1
-  talkRoutes:
-  - characterId: Munir
-    morningSceneName: Conversation_Munir_Morning
-    eveningSceneName: Conversation_Munir_Evening
   logTransitions: 1
   inspectorPhase: 0
   inspectorCurrentAct: 0
   inspectorCurrentDay: 0
-  inspectorDecisionIndex: 0
-  inspectorActionRunning: 0
+  inspectorMinuteOfDay: 0
+  inspectorActionsCompleted: 0
+  inspectorCurrentActivity: 
   inspectorDayEnding: 0
   inspectorGameComplete: 0
   inspectorStandaloneSceneMode: 0

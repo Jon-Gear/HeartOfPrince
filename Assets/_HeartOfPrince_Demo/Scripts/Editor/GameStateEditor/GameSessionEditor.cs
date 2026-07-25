@@ -11,6 +11,7 @@ namespace HeartOfPrince.Editor
     public sealed class GameSessionEditor :
         UnityEditor.Editor
     {
+        private SerializedProperty configurationProperty;
         private SerializedProperty initialStatePresetProperty;
 
         private UnityEditor.Editor presetEditor;
@@ -18,6 +19,10 @@ namespace HeartOfPrince.Editor
 
         private void OnEnable()
         {
+            configurationProperty =
+                serializedObject.FindProperty(
+                    "configuration");
+
             initialStatePresetProperty =
                 serializedObject.FindProperty(
                     "initialStatePreset");
@@ -34,6 +39,9 @@ namespace HeartOfPrince.Editor
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
+
+            EditorGUILayout.PropertyField(
+                configurationProperty);
 
             EditorGUILayout.PropertyField(
                 initialStatePresetProperty);

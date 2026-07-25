@@ -1,3 +1,4 @@
+using System;
 using HeartOfPrince.Application;
 using HeartOfPrince.Domain;
 using UnityEngine;
@@ -5,38 +6,42 @@ using UnityEngine.SceneManagement;
 
 namespace HeartOfPrince.Presentation
 {
-    /// <summary>
-    /// The single persistent runtime composition root for Heart of Prince.
-    /// Game state and application services are rebuilt here for new games and debug resets.
-    /// </summary>
     [DefaultExecutionOrder(-1000)]
     public sealed class GameSession : MonoBehaviour
     {
+        private const string DefaultConfigurationResource =
+            "HeartOfPrince/GameConfiguration";
+
+        private const string DefaultActivityModulesResource =
+            "HeartOfPrince/ActivityModules";
+
         public static GameSession Instance { get; private set; }
 
-        [Header("Game State")]
+        [Header("Configuration")]
+        [SerializeField] private GameConfiguration configuration;
+
+        [Header("Initial State")]
         [SerializeField] private GameStateDebugPreset initialStatePreset;
 
+        public GameConfiguration Configuration { get; private set; }
         public GameState State { get; private set; }
         public ConversationService Conversation { get; private set; }
         public PonderService Ponder { get; private set; }
+        public ActivityService Activities { get; private set; }
+        public ActivityQueryService ActivityQuery { get; private set; }
+        public ActivityModuleRegistry ActivityModules { get; private set; }
         public GameLoopService GameLoop { get; private set; }
 
-        /// <summary>
-        /// Makes every demo scene directly playable in the editor.
-        ///
-        /// Bootstrap already contains a configured GameSession, so this method does
-        /// nothing there. When another scene is entered directly, it creates the same
-        /// single persistent composition root without redirecting to Bootstrap.
-        /// </summary>
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        [RuntimeInitializeOnLoadMethod(
+            RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void RegisterDirectSceneBootstrap()
         {
             SceneManager.sceneLoaded -= EnsureSessionAfterSceneLoad;
             SceneManager.sceneLoaded += EnsureSessionAfterSceneLoad;
         }
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        [RuntimeInitializeOnLoadMethod(
+            RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void EnsureSessionAfterInitialSceneLoad()
         {
             EnsureSessionForDirectScenePlay();
@@ -56,33 +61,62 @@ namespace HeartOfPrince.Presentation
                 return;
             }
 
-            var sceneName = SceneManager.GetActiveScene().name;
+            string sceneName = SceneManager.GetActiveScene().name;
+
             if (!IsHeartOfPrinceRuntimeScene(sceneName))
             {
                 return;
             }
 
-            var sceneSession = UnityEngine.Object.FindObjectOfType<GameSession>();
+            GameSession sceneSession =
+                UnityEngine.Object.FindObjectOfType<GameSession>();
+
             if (sceneSession != null)
             {
-                // Its Awake normally ran before this callback; avoid creating
-                // a competing persistent session.
                 return;
             }
 
-            var runtimeObject = new GameObject("GameSession [Direct Scene Debug]");
+            var runtimeObject =
+                new GameObject("GameSession [Direct Scene Debug]");
+
             runtimeObject.AddComponent<GameSession>();
         }
 
-        private static bool IsHeartOfPrinceRuntimeScene(string sceneName)
+        private static bool IsHeartOfPrinceRuntimeScene(
+            string sceneName)
         {
-            return string.Equals(sceneName, "Bootstrap", System.StringComparison.OrdinalIgnoreCase) ||
-                   sceneName.StartsWith("Chapter_", System.StringComparison.OrdinalIgnoreCase) ||
-                   sceneName.StartsWith("Act_", System.StringComparison.OrdinalIgnoreCase) ||
-                   sceneName.StartsWith("Day_", System.StringComparison.OrdinalIgnoreCase) ||
-                   sceneName.StartsWith("Decision_", System.StringComparison.OrdinalIgnoreCase) ||
-                   sceneName.StartsWith("Conversation_", System.StringComparison.OrdinalIgnoreCase) ||
-                   sceneName.StartsWith("Ponder_", System.StringComparison.OrdinalIgnoreCase);
+            if (string.IsNullOrWhiteSpace(sceneName))
+            {
+                return false;
+            }
+
+            GameConfiguration gameConfiguration =
+                Resources.Load<GameConfiguration>(
+                    DefaultConfigurationResource);
+
+            if (gameConfiguration == null)
+            {
+                return false;
+            }
+
+            bool isBootstrap = string.Equals(
+                sceneName,
+                gameConfiguration.BootstrapScene,
+                StringComparison.OrdinalIgnoreCase);
+
+            bool isNarrativeScene =
+                gameConfiguration.StartingChapter != null &&
+                gameConfiguration.StartingChapter
+                    .ContainsScene(sceneName);
+
+            bool isActivityScene =
+                gameConfiguration.ActivityCatalog != null &&
+                gameConfiguration.ActivityCatalog
+                    .FindActivityForScene(sceneName) != null;
+
+            return isBootstrap ||
+                   isNarrativeScene ||
+                   isActivityScene;
         }
 
         private void Awake()
@@ -96,6 +130,7 @@ namespace HeartOfPrince.Presentation
             Instance = this;
             DontDestroyOnLoad(gameObject);
 
+            ResolveConfiguration();
             BuildRuntime();
             EnsureGameLoopService();
         }
@@ -114,14 +149,71 @@ namespace HeartOfPrince.Presentation
             GameLoop?.BindToCurrentState();
         }
 
+        private void ResolveConfiguration()
+        {
+            Configuration = configuration != null
+                ? configuration
+                : Resources.Load<GameConfiguration>(
+                    DefaultConfigurationResource);
+
+            if (Configuration == null)
+            {
+                throw new InvalidOperationException(
+                    "No Heart of Prince GameConfiguration is assigned " +
+                    "and Resources/HeartOfPrince/GameConfiguration.asset " +
+                    "could not be loaded.");
+            }
+
+            if (Configuration.StartingChapter == null)
+            {
+                throw new InvalidOperationException(
+                    "GameConfiguration has no Starting Chapter.");
+            }
+
+            if (Configuration.ActivityCatalog == null ||
+                Configuration.ActivityCatalog.DayRules == null)
+            {
+                throw new InvalidOperationException(
+                    "GameConfiguration has no valid Activity Catalog " +
+                    "and Day Rules.");
+            }
+        }
+
         private void BuildRuntime()
         {
-            State = initialStatePreset != null
-                ? initialStatePreset.CreateGameState()
+            GameStateDebugPreset preset =
+                initialStatePreset != null
+                    ? initialStatePreset
+                    : Configuration.InitialStatePreset;
+
+            State = preset != null
+                ? preset.CreateGameState()
                 : new GameState();
 
             Conversation = new ConversationService(State);
             Ponder = new PonderService(State);
+
+            ActivityCatalog catalog =
+                Configuration.ActivityCatalog;
+
+            Activities = new ActivityService(
+                State,
+                catalog.DayRules);
+
+            ActivityQuery =
+                new ActivityQueryService(Activities);
+
+            ActivityRuntimeModule[] modules =
+                Resources.LoadAll<ActivityRuntimeModule>(
+                    DefaultActivityModulesResource);
+
+            ActivityModules =
+                new ActivityModuleRegistry(modules);
+
+            ActivityModules.Configure(
+                catalog,
+                Activities,
+                ActivityQuery);
         }
 
         private void EnsureGameLoopService()
@@ -130,22 +222,24 @@ namespace HeartOfPrince.Presentation
 
             if (GameLoop == null)
             {
-                GameLoop = gameObject.AddComponent<GameLoopService>();
+                GameLoop =
+                    gameObject.AddComponent<GameLoopService>();
             }
         }
 
 #if UNITY_EDITOR
-        public void Editor_ApplyPreset(GameStateDebugPreset preset)
+        public void Editor_ApplyPreset(
+            GameStateDebugPreset preset)
         {
             if (preset == null)
             {
-                Debug.LogWarning("Cannot apply null GameStateDebugPreset.");
+                Debug.LogWarning(
+                    "Cannot apply null GameStateDebugPreset.");
                 return;
             }
 
-            State = preset.CreateGameState();
-            Conversation = new ConversationService(State);
-            Ponder = new PonderService(State);
+            initialStatePreset = preset;
+            BuildRuntime();
             GameLoop?.BindToCurrentState();
         }
 #endif

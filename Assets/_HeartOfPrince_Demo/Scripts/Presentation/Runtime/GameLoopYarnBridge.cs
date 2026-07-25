@@ -1,42 +1,32 @@
-using System;
-using HeartOfPrince.Domain;
-using UnityEngine;
+using HeartOfPrince.Application;
 using Yarn.Unity;
 
 namespace HeartOfPrince.Presentation
 {
-    /// <summary>
-    /// Yarn commands and functions that expose only the transitions needed by the loop.
-    /// Yarn requests transitions; GameLoopService validates and performs them.
-    /// </summary>
     public static class GameLoopYarnBridge
     {
-
-        #region Gameplay Verbs
-        [YarnCommand("TalkTo")]
-        public static void TalkTo(string characterId)
+        [YarnCommand("StartActivity")]
+        public static void StartActivity(
+            string activityId,
+            string selectionKey)
         {
-            GameLoopService.Instance?.RequestTalk(characterId);
+            GameLoopService.Instance?.RequestActivity(
+                activityId,
+                selectionKey);
         }
 
-        [YarnCommand("Ponder")]
-        public static void Ponder()
+        [YarnCommand("CompleteActivity")]
+        public static void CompleteActivity()
         {
-            GameLoopService.Instance?.RequestPonder();
+            GameLoopService.Instance?
+                .NotifyActivityCompleted(
+                    ActivityResult.Success());
         }
 
-        [YarnCommand("ActionComplete")]
-        public static void ActionComplete()
+        [YarnCommand("CompleteDayOpening")]
+        public static void CompleteDayOpening()
         {
-            GameLoopService.Instance?.NotifyActionCompleted();
-        }
-        #endregion
-
-        #region Sequences
-        [YarnCommand("DecisionLoop")]
-        public static void DecisionLoop()
-        {
-            GameLoopService.Instance?.DecisionLoop();
+            GameLoopService.Instance?.CompleteDayOpening();
         }
 
         [YarnCommand("CompleteDay")]
@@ -48,13 +38,15 @@ namespace HeartOfPrince.Presentation
         [YarnCommand("CompleteChapterStart")]
         public static void CompleteChapterStart()
         {
-            GameLoopService.Instance?.CompleteChapterStart();
+            GameLoopService.Instance?
+                .CompleteChapterStart();
         }
 
         [YarnCommand("CompleteActStart")]
         public static void CompleteActStart()
         {
-            GameLoopService.Instance?.CompleteActStart();
+            GameLoopService.Instance?
+                .CompleteActStart();
         }
 
         [YarnCommand("CompleteAct")]
@@ -66,35 +58,50 @@ namespace HeartOfPrince.Presentation
         [YarnCommand("CompleteChapter")]
         public static void CompleteChapter()
         {
-            GameLoopService.Instance?.CompleteChapter();
+            GameLoopService.Instance?
+                .CompleteChapter();
         }
-
-        #endregion
 
         [YarnFunction("loop_current_act")]
         public static int CurrentAct()
         {
-            return GameLoopService.Instance?.CurrentAct ?? 0;
+            return GameLoopService.Instance?
+                .CurrentAct ?? 0;
         }
 
         [YarnFunction("loop_current_day")]
         public static int CurrentDay()
         {
-            return GameLoopService.Instance?.CurrentDay ?? 0;
+            return GameLoopService.Instance?
+                .CurrentDay ?? 0;
         }
 
-        [YarnFunction("DecisionIndex")]
-        public static int DecisionIndex()
+        [YarnFunction("CurrentTime")]
+        public static string CurrentTime()
         {
-            return (GameLoopService.Instance?.CurrentDecisionIndex ?? 0) + 1;
+            return GameLoopService.Instance?
+                .CurrentTimeDisplay ?? "00:00";
         }
 
-        [YarnFunction("DecisionsPerDay")]
-        public static int DecisionsPerDay()
+        [YarnFunction("ActionsCompletedToday")]
+        public static int ActionsCompletedToday()
         {
-            return GameLoopService.Instance?.DecisionsAllowedPerDay ?? 0;
+            return GameLoopService.Instance?
+                .ActionsCompletedToday ?? 0;
         }
 
-        
+        [YarnFunction("ActionsRemainingToday")]
+        public static int ActionsRemainingToday()
+        {
+            return GameLoopService.Instance?
+                .ActionsRemainingToday ?? 0;
+        }
+
+        [YarnFunction("MaximumActionsPerDay")]
+        public static int MaximumActionsPerDay()
+        {
+            return GameLoopService.Instance?
+                .MaximumActionsPerDay ?? 0;
+        }
     }
 }

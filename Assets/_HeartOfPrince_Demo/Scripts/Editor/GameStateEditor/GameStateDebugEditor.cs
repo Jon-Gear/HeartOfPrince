@@ -13,7 +13,8 @@ namespace HeartOfPrince.Editor
         private SerializedProperty startingChapterProperty;
         private SerializedProperty startingActProperty;
         private SerializedProperty startingDayProperty;
-        private SerializedProperty startingDecisionIndexProperty;
+        private SerializedProperty startingActionsCompletedProperty;
+        private SerializedProperty startingMinuteProperty;
 
         private SerializedProperty ponderTopicsProperty;
         private SerializedProperty discussedPonderTopicsProperty;
@@ -36,9 +37,13 @@ namespace HeartOfPrince.Editor
             startingDayProperty =
                 serializedObject.FindProperty("startingDay");
 
-            startingDecisionIndexProperty =
+            startingActionsCompletedProperty =
                 serializedObject.FindProperty(
-                    "startingDecisionIndex");
+                    "startingActionsCompleted");
+
+            startingMinuteProperty =
+                serializedObject.FindProperty(
+                    "startingMinute");
 
             ponderTopicsProperty =
                 serializedObject.FindProperty("ponderTopics");
@@ -109,7 +114,10 @@ namespace HeartOfPrince.Editor
                 startingDayProperty);
 
             EditorGUILayout.PropertyField(
-                startingDecisionIndexProperty);
+                startingActionsCompletedProperty);
+
+            EditorGUILayout.PropertyField(
+                startingMinuteProperty);
 
             DrawChapterInline();
         }

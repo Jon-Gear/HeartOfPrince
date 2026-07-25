@@ -1,188 +1,167 @@
-# Heart of Prince — Game Loop Service Prototype
+# Heart of Prince — Scalable Activity and Day Loop
 
-## Running the complete prototype
+## Import and run
 
-1. Import the `_HeartOfPrince_Demo` folder into the Unity project's `Assets` folder.
-2. Allow Unity and Yarn Spinner to recompile the scripts and Yarn project.
-3. Open `Scenes/Bootstrap/Bootstrap.unity`.
-4. Enter Play Mode.
+1. Import `_HeartOfPrince_Demo` into the Unity project's `Assets` folder.
+2. Allow Unity and Yarn Spinner to recompile.
+3. Add the supplied scenes to Build Settings, or run the included editor build installer.
+4. Open `Scenes/Bootstrap/Bootstrap.unity`.
+5. Enter Play Mode.
 
-`HeartOfPrinceSceneBuildInstaller` adds all demo scenes to Build Settings. You can also run **Heart of Prince > Rebuild Demo Scene List** manually.
+The supplied archive is an Assets subfolder rather than a complete Unity project. Final compilation and Play Mode validation therefore occur in the host project with its installed Yarn Spinner, Cinemachine, and other package dependencies.
 
-The demo contains one chapter with one act. The act completes after two days and provides two decisions per day. This structure is defined in `Scripts/Domain/Chapter/DemoChapterDefinition.cs`; mutable progress remains in `GameLoopState`.
-
-## Scene-local Dialogue Runners
-
-Dialogue Runners are deliberately **not persistent**.
-
-Each narrative scene owns its Dialogue Runner, dialogue UI, EventSystem, Yarn Project reference, Auto Start setting, and Starting Node. The runner is destroyed when its scene unloads.
-
-Configured scene entry nodes:
-
-| Scene | Starting Node |
-|---|---|
-| `Day_Start` | `Loop_DayOpening` |
-| `Decision_Morning` | `Loop_Decision` |
-| `Decision_Evening` | `Loop_Decision` |
-| `Conversation_Munir_Morning` | `Start_Munir` |
-| `Conversation_Munir_Evening` | `Start_Munir` |
-| `Ponder_Morning` | `Ponder_Start` |
-| `Ponder_Evening` | `Ponder_Start` |
-| `Day_End` | `Loop_DayEnding` |
-
-`GameLoopService` sets the loop phase before loading a scene and waits for that scene's runner to report completion. It does not call `StartDialogue` and does not preserve or replace a scene's runner.
-
-## Existing Talk and Ponder hubs
-
-Talk uses the existing flow:
+## Runtime flow
 
 ```text
-Start_Munir
-  -> TopicHub
-  -> PrepareTopicHubNPC / TopicHubNPC
-  -> End
+Start day
+  -> set explicit clock time
+  -> query activity option providers
+  -> show the reusable decision scene
+  -> choose a typed ActivityRequest<TInput>
+  -> validate day, activity, character, and scene rules
+  -> create serializable ActivityRunState
+  -> load the isolated activity scene
+  -> complete the activity
+  -> apply results and advance time
+  -> return to the decision scene or end the day
 ```
 
-Ponder uses the existing flow:
+The demo permits two activities per day. Talk and Ponder each take six hours. Prince wakes at 08:00, so the first selection uses a morning activity scene and the second uses an evening activity scene.
+
+## Configuration assets
+
+The default runtime configuration is loaded from:
+
+- `Resources/HeartOfPrince/GameConfiguration.asset`
+- `Resources/HeartOfPrince/DemoActivityCatalog.asset`
+- `Resources/HeartOfPrince/Time/DemoDayRules.asset`
+- `Resources/HeartOfPrince/Activities/Talk.asset`
+- `Resources/HeartOfPrince/Activities/Ponder.asset`
+- `Resources/HeartOfPrince/Characters/Munir.asset`
+- `Resources/HeartOfPrince/ActivityModules/TalkActivityModule.asset`
+- `Resources/HeartOfPrince/ActivityModules/NoInputActivityModule.asset`
+
+`GameConfiguration` points to the bootstrap scene, starting chapter, and activity catalog. The catalog contains day rules, activity definitions, and character definitions.
+
+## Typed activity inputs
+
+Every activity request carries its own strongly typed payload:
+
+```csharp
+var input = new TalkActivityInput(characterId);
+
+ActivityOption option =
+    GameSession.Instance.ActivityQuery.FindOption(
+        "talk",
+        input);
+
+GameLoopService.Instance.RequestActivity(option);
+```
+
+You can also construct a request directly when you already have the definition:
+
+```csharp
+GameLoopService.Instance.RequestActivity(
+    talkActivity,
+    new TalkActivityInput(characterId));
+```
+
+The generic request type is:
+
+```csharp
+ActivityRequest<TInput>
+    where TInput : class, IActivityInput
+```
+
+Activities without parameters use `NoActivityInput.Instance`. A future activity can define a dedicated input class containing any fields it needs.
+
+## Request and run-state boundary
 
 ```text
-Ponder_Start
-  -> Ponder_TopicHub
-  -> Ponder_End
+ActivityRequest<TInput>
+  -> availability and handler validation
+  -> ActivityRunState
+  -> isolated Unity scene
+  -> ActivityResult
+  -> clock/history/day progression
 ```
 
-The loop service only loads the correct scene and records when the complete action ends.
+Request input describes what the caller wants. Run data is the finalized, serializable snapshot that the activity scene reads. Talk uses `TalkActivityRunData`, which stores the resolved character ID.
 
-## Topic progression demonstration
+## Runtime modules
 
-Prototype topics are presented before placeholder topics so the chain is easy to test, while the existing placeholder topics remain available.
+Each `ActivityDefinition` contains a stable `runtimeModuleId`. At startup, `ActivityModuleRegistry` loads module assets from `Resources/HeartOfPrince/ActivityModules` and wires every configured activity into `ActivityService` and `ActivityQueryService`.
 
-```text
-Talk: PrototypeAskAboutResponsibility
-  -> unlocks PrototypePonderResponsibility
+The central `GameSession` and `GameLoopService` contain no Talk or Ponder registration branches.
 
-Ponder: PrototypePonderResponsibility
-  -> unlocks PrototypeAskAboutLeadership
-  -> unlocks PrototypeMunirQuestion
+The supplied modules are:
 
-Talk again:
-  -> PrototypeAskAboutLeadership appears in TopicHub
-  -> PrototypeMunirQuestion is available through TopicHubNPC
-```
+- `TalkActivityRuntimeModule`, which owns `TalkActivityInput`, the Talk handler, and one option per configured character.
+- `NoInputActivityRuntimeModule`, which can serve Ponder and any future activity that needs no input payload.
 
-Selecting a Talk or Ponder topic moves it from available topics to discussed-topic history. The history, available topics, and Munir relationship state live in the persistent `GameSession`.
+## Adding a new activity with custom input
 
-## Playing an individual scene directly
+1. Create an `IActivityInput` implementation.
+2. Create an optional `IActivityRunData` implementation for serializable resolved state.
+3. Create an `ActivityHandler<TInput>`.
+4. Create an `IActivityOptionProvider`.
+5. Create an `ActivityRuntimeModule` subclass that registers the handler/provider and can reconstruct a request for standalone scene debugging.
+6. Create one module asset in `Resources/HeartOfPrince/ActivityModules`.
+7. Set the activity asset's `runtimeModuleId` to that module asset's ID.
+8. Add the activity definition to the catalog and author its isolated scenes.
 
-Open any demo scene other than Bootstrap and enter Play Mode.
+No central scheduler or session switch statement needs to change.
 
-If the Unity project has a global Play Mode Start Scene configured, select **Heart of Prince > Debug > Play Current Open Scene** first. **Play Full Game From Bootstrap** restores the explicit Bootstrap launch option.
+## Decision UI
 
-A single `GameSession [Direct Scene Debug]` object is created automatically only when no scene or persistent session already exists. The loop enters standalone-scene mode instead of starting a new game or redirecting to Bootstrap.
+`DecisionScenePresenter` queries `ActivityQueryService` and renders the current options. It has no Talk, Ponder, or character-specific branches. The current implementation uses a minimal IMGUI panel so the architecture remains prefab-independent; it can be replaced by UI Toolkit or uGUI without changing the application layer.
 
-Standalone behavior:
+`Loop_Decision` provides narrative text only. It no longer owns a hard-coded Yarn choice list.
 
-- Day opening and day ending scenes play their own starting node and remain loaded afterward.
-- Conversation scenes start `Start_Munir` and use `TopicHub`/`TopicHubNPC`.
-- Ponder scenes start `Ponder_Start` and use `Ponder_TopicHub`.
-- Decision scenes show the normal decision menu and may load the selected Talk or Ponder scene.
-- Completing a standalone action stops progression in that action scene instead of returning to Bootstrap.
-- **Start New Game** exits standalone mode and begins the complete game loop.
-- **Reset All Progression** resets and reloads the currently tested standalone scene.
+## Scene variants and availability
 
-Standalone mode seeds temporary Munir and Ponder topics so the hubs can be exercised without first playing Bootstrap.
+`ActivityDefinition` resolves scenes from authored variants using:
 
-## Persistent architecture
+- target ID, when applicable;
+- earliest minute;
+- latest minute.
 
-`GameSession` is the only persistent runtime composition root. It owns:
+Availability can be extended with reusable `AvailabilityRule` assets. Supplied rules include time windows, once-per-day restrictions, and required story flags. Character definitions can also have separate talk-availability rules.
 
-- `GameState`
-- `ConversationService`
-- `PonderService`
-- `ExplorationService`
-- `GameLoopService`
+Standalone activity scenes derive their debug start time and target from the authored scene variant. Scene names are no longer parsed for “morning,” “evening,” or character names.
 
-Only state and services persist. Scene presentation objects do not.
+## Persistent state
 
-`GameLoopService` owns:
+`GameState` owns:
 
-- Current act, day, and decision index
-- The active `Chapter` and `Act` narrative definitions
-- Decisions per day supplied by the active act
-- Current loop phase
-- Action-running, day-ending, and completion flags
-- Scene selection and scene transitions
-- Day and act progression
-- Talk routes for future characters
-- Full-game versus standalone-scene launch mode
+- `WorldClockState`;
+- `DayActivityState`;
+- activity history;
+- the active `ActivityRunState`;
+- story flags;
+- existing topic and relationship state;
+- narrative loop state.
 
-## Default full-game flow
+The loop no longer stores a Talk/Ponder enum, a current Talk character field, morning/evening booleans, decision-index time assumptions, or activity-specific scene routes.
 
-```text
-Bootstrap
-  -> Chapter_1_Start / Loop_ChapterOpening
-  -> Act_1_Start / Loop_ActOpening
-  -> Day_Start / Loop_DayOpening
-  -> Decision scene / Loop_Decision
-      -> Munir scene / Start_Munir / TopicHub
-      -> or Ponder scene / Ponder_Start / Ponder_TopicHub
-  -> next Decision scene
-  -> Day_End / Loop_DayEnding
-  -> repeat until the act completion condition succeeds
-  -> Act_1_End / Loop_ActEnding
-  -> Chapter_1_End / Loop_ChapterEnding
-  -> Completed
-```
+## Yarn commands
 
-## Yarn completion commands
-
-- `<<loop_choose_talk "Munir">>`
-- `<<loop_choose_action "Ponder">>`
-- `<<loop_action_complete>>`
-- `<<loop_sequence_complete>>`
+- `<<CompleteActivity>>`
+- `<<CompleteDayOpening>>`
+- `<<CompleteDay>>`
 - `<<CompleteChapterStart>>`
 - `<<CompleteActStart>>`
 - `<<CompleteAct>>`
 - `<<CompleteChapter>>`
-- `<<loop_new_game>>`
 
-`End_Munir.yarn` calls `loop_action_complete` after `EndConversation`.
+A generic command remains available for authored direct requests:
 
-`Ponder_End.yarn` calls `loop_action_complete` after `EndPonder`.
+```text
+<<StartActivity "activity-id" "selection-key">>
+```
 
-Day opening and ending nodes call `loop_sequence_complete`.
+Normal decision choices use `DecisionScenePresenter` and typed runtime requests.
 
-## Topic and relationship commands
+## Standalone scene debugging
 
-- `<<UnlockPonderTopic "NodeName">>`
-- `<<UnlockConversationTopic "Munir" "PlayerToCharacter" "NodeName">>`
-- `<<UnlockConversationTopic "Munir" "CharacterToPlayer" "NodeName">>`
-- `<<MarkPonderTopicDiscussed "NodeName">>`
-- `<<MarkConversationTopicDiscussed "Munir" "PlayerToCharacter" "NodeName">>`
-- `<<ChangeRelationship "Munir" 1>>`
-
-Existing compatibility commands such as `AddPlayerToCharacterTopic`, `AddCharacterToPlayerTopic`, and the remove-topic commands remain available.
-
-## Debugging
-
-Select the persistent `GameSession` object during Play Mode. The custom `GameLoopService` Inspector shows:
-
-- Active scene
-- Full-game or standalone mode
-- Current phase
-- Act
-- Day
-- Decision index
-- Action, day-ending, and completion flags
-
-Debug buttons:
-
-- **Start New Game**
-- **Reset All Progression**
-- **Skip To Next Day** — full-game mode only
-
-Important transitions are logged with `[GameLoop]`, `[Topics]`, and `[Relationship]` prefixes.
-
-## Validation note
-
-The supplied archive is an Assets subfolder, not a complete Unity project. The host Unity executable and package manifest were not included, so final compilation and Play Mode validation must be performed in the host project with its installed Yarn Spinner and Cinemachine packages.
+Playing a configured narrative or activity scene directly creates a temporary `GameSession` and loads the default Resources configuration. Activity scenes reconstruct typed requests through their runtime modules, and decision scenes generate their options dynamically.

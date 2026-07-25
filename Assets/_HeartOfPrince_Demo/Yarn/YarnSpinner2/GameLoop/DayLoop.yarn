@@ -1,4 +1,4 @@
-﻿title: Loop_ChapterOpening
+title: Loop_ChapterOpening
 ---
 Narrator: Chapter One begins.
 <<CompleteChapterStart>>
@@ -25,18 +25,15 @@ Prince: I still have a road ahead of me. At least now I know how to take the nex
 
 title: Loop_DayOpening
 ---
-Narrator: Today contains {DecisionsPerDay()} decision opportunities.
-<<DecisionLoop>>
+Narrator: Prince wakes at {CurrentTime()}.
+Narrator: Today allows {MaximumActionsPerDay()} activities.
+<<CompleteDayOpening>>
 ===
 
 title: Loop_Decision
 ---
-Narrator: Decision {DecisionIndex()} of {DecisionsPerDay()}.
-What should Prince do?
--> Talk to Munir
-    <<TalkTo "Munir">>
--> Ponder
-    <<Ponder>>
+Narrator: It is {CurrentTime()}.
+Narrator: Prince considers what to do next.
 ===
 
 

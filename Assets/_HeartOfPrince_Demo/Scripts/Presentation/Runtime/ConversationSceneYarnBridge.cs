@@ -9,9 +9,37 @@ namespace HeartOfPrince.Presentation
     public class ConversationSceneYarnBridge : MonoBehaviour
     {
         [YarnCommand("StartConversation")]
-        public static void StartConversation(string actorId)
+        public static void StartConversation()
         {
-            GameSession.Instance.Conversation.StartConversation((CharacterID)actorId);
+            TalkActivityRunData runData =
+                GameSession.Instance.State.Day.CurrentActivity?
+                    .GetData<TalkActivityRunData>();
+
+            if (runData == null ||
+                string.IsNullOrWhiteSpace(runData.CharacterId))
+            {
+                Debug.LogError(
+                    "StartConversation requires an active " +
+                    "TalkActivityRunData payload.");
+                return;
+            }
+
+            GameSession.Instance.Conversation.StartConversation(
+                (CharacterID)runData.CharacterId);
+        }
+
+        [YarnCommand("StartConversationWithActor")]
+        public static void StartConversationWithActor(string actorId)
+        {
+            if (string.IsNullOrWhiteSpace(actorId))
+            {
+                Debug.LogError(
+                    "StartConversationWithActor requires a character ID.");
+                return;
+            }
+
+            GameSession.Instance.Conversation.StartConversation(
+                (CharacterID)actorId);
         }
 
         [YarnCommand("EndConversation")]
