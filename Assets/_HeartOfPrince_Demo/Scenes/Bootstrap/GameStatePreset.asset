@@ -12,6 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b359b1ac46797c647be03441574da3c8, type: 3}
   m_Name: GameStatePreset
   m_EditorClassIdentifier: HeartOfPrince.Domain::HeartOfPrince.Domain.GameStateDebugPreset
+  startingChapter: {fileID: 11400000, guid: c0f6ccd0855913d4da60eafc7aa434e4, type: 2}
+  startingAct: 1
+  startingDay: 1
+  startingDecisionIndex: 0
   ponderTopics:
   - ReflectOnDuty
   - ReflectOnFamily
@@ -19,8 +23,10 @@ MonoBehaviour:
   - ReflectOnFuture
   - ReflectOnFear
   - ReflectOnMercy
+  discussedPonderTopics: []
   characters:
   - characterId: Munir
+    trust: 0
     topicState:
       playerToCharacterTopics:
       - PlaceholderTopic7
@@ -36,3 +42,5 @@ MonoBehaviour:
       - PlaceholderTopic4
       - PlaceholderTopic5
       - PlaceholderTopic6
+      discussedPlayerToCharacterTopics: []
+      discussedCharacterToPlayerTopics: []

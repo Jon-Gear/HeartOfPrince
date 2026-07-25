@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9bd279a6b39b4543b75d01dcf0c0529, type: 3}
   m_Name: Chapter_1_Act_1
   m_EditorClassIdentifier: HeartOfPrince.Domain::HeartOfPrince.Domain.Act
-  id: 
+  id: chapter_1_act_1
   displayName: 
   description: 
   startScene: 
@@ -21,4 +21,4 @@ MonoBehaviour:
   dayEndScene: 
   decisionsPerDay: 2
   decisionScenes: []
-  completionCondition: {fileID: 0}
+  completionCondition: {fileID: 11400000, guid: bf73e0d9c39deb848a50acf538d9c057, type: 2}
