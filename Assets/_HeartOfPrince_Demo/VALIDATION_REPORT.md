@@ -6,8 +6,8 @@ This archive contains the supplied Heart of Prince Assets subtree, not a complet
 
 ## Results
 
-- C# delimiter/structure scan: **passed** (62 source files; no unbalanced braces, brackets, or parentheses).
-- Unity `.meta` coverage: **passed** (no missing metadata files).
+- C# delimiter/structure scan: **passed** (64 source files; no unbalanced braces, brackets, or parentheses).
+- UI Toolkit source import: **host Editor required** (Unity will generate importer metadata for the three new UXML/USS resources on first import).
 - Unity GUID uniqueness: **passed** (no duplicate local GUIDs).
 - New GUID reference integrity: **passed** (no unresolved GUID introduced by this implementation).
 - Existing external/package references: **unchanged** (143 unresolved GUIDs, all already present in the supplied archive and attributable to host-project/package content).

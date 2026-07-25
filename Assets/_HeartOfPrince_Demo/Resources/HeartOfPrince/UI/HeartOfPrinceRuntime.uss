@@ -1,0 +1,226 @@
+:root {
+    flex-grow: 1;
+}
+
+.hop-overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    color: rgb(255, 255, 255);
+}
+
+.hop-dialogue-overlay {
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: stretch;
+}
+
+.hop-dialogue-spacer {
+    flex-grow: 1;
+}
+
+.hop-decision-overlay {
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.20);
+}
+
+.hop-card {
+    background-color: rgba(0, 0, 0, 0.835);
+    border-left-width: 0;
+    border-right-width: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    padding-left: 40px;
+    padding-right: 40px;
+    padding-top: 24px;
+    padding-bottom: 32px;
+}
+
+.hop-dialogue-card {
+    align-self: stretch;
+    margin-left: 200px;
+    margin-right: 200px;
+    margin-bottom: 80px;
+    min-height: 0;
+}
+
+.hop-decision-card {
+    width: 620px;
+    max-width: 88%;
+    padding-left: 40px;
+    padding-right: 40px;
+    padding-top: 28px;
+    padding-bottom: 32px;
+}
+
+.hop-kicker {
+    color: rgba(255, 255, 255, 0.68);
+    font-size: 12px;
+    letter-spacing: 3px;
+    -unity-font-style: bold;
+    margin-bottom: 8px;
+}
+
+.hop-eyebrow {
+    color: rgb(255, 255, 255);
+    font-size: 32px;
+    -unity-font-style: bold-and-italic;
+    white-space: normal;
+    margin-bottom: 14px;
+}
+
+.hop-title {
+    color: rgb(255, 255, 255);
+    font-size: 34px;
+    -unity-font-style: bold;
+    white-space: normal;
+    margin-bottom: 8px;
+}
+
+.hop-subtitle {
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 18px;
+    white-space: normal;
+    margin-bottom: 20px;
+}
+
+.hop-dialogue-text {
+    color: rgb(255, 255, 255);
+    font-size: 40px;
+    white-space: normal;
+    min-height: 0;
+    margin-bottom: 8px;
+}
+
+.hop-divider {
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.30);
+    margin-bottom: 18px;
+}
+
+.hop-options {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+}
+
+.hop-activity-list {
+    margin-top: 2px;
+}
+
+.hop-button {
+    min-height: 54px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding-left: 18px;
+    padding-right: 18px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: rgba(0, 0, 0, 0.78);
+    color: rgb(255, 255, 255);
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-left-color: rgba(255, 255, 255, 0.75);
+    border-right-color: rgba(255, 255, 255, 0.75);
+    border-top-color: rgba(255, 255, 255, 0.75);
+    border-bottom-color: rgba(255, 255, 255, 0.75);
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    font-size: 32px;
+    white-space: normal;
+    -unity-text-align: middle-center;
+    transition-property: background-color, color;
+    transition-duration: 0.1s;
+}
+
+.hop-button:hover,
+.hop-button:focus {
+    background-color: rgba(96, 96, 96, 0.95);
+    color: rgb(255, 255, 255);
+}
+
+.hop-button:active {
+    background-color: rgb(255, 255, 255);
+    color: rgb(0, 0, 0);
+}
+
+.hop-button:disabled {
+    opacity: 0.42;
+}
+
+.hop-continue {
+    align-self: flex-end;
+    width: 40px;
+    min-width: 40px;
+    height: 24px;
+    min-height: 24px;
+    margin-top: 8px;
+    margin-bottom: 0;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    background-color: rgba(0, 0, 0, 0);
+    border-left-width: 0;
+    border-right-width: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
+    font-size: 18px;
+    -unity-text-align: middle-center;
+}
+
+.hop-continue:hover,
+.hop-continue:focus {
+    background-color: rgba(255, 255, 255, 0.20);
+}
+
+.hop-continue:active {
+    background-color: rgb(255, 255, 255);
+    color: rgb(0, 0, 0);
+}
+
+.hop-option-button {
+    width: 100%;
+}
+
+.hop-activity-row {
+    flex-direction: column;
+    margin-bottom: 7px;
+}
+
+.hop-unavailable-reason {
+    color: rgba(255, 255, 255, 0.56);
+    font-size: 13px;
+    white-space: normal;
+    margin-left: 12px;
+    margin-right: 12px;
+    margin-bottom: 6px;
+}
+
+.hop-empty-message {
+    display: none;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 16px;
+    white-space: normal;
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+
+.hop-feedback {
+    display: none;
+    color: rgb(255, 255, 255);
+    font-size: 15px;
+    white-space: normal;
+    margin-top: 12px;
+}

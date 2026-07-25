@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="dialogue-overlay" class="hop-overlay hop-dialogue-overlay">
+        <ui:VisualElement class="hop-dialogue-spacer" />
+        <ui:VisualElement name="dialogue-card" class="hop-card hop-dialogue-card">
+            <ui:Label name="speaker" class="hop-eyebrow" />
+            <ui:Label name="line" class="hop-dialogue-text" />
+            <ui:VisualElement name="options" class="hop-options" />
+            <ui:Button name="continue" text="▼" class="hop-button hop-continue" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

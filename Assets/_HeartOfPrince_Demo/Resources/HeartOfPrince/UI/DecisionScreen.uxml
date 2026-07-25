@@ -1,0 +1,14 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="decision-overlay" class="hop-overlay hop-decision-overlay">
+        <ui:VisualElement name="decision-card" class="hop-card hop-decision-card">
+            <ui:Label text="DAILY RHYTHM" class="hop-kicker" />
+            <ui:Label name="day-time" class="hop-eyebrow" />
+            <ui:Label text="What should Prince do?" class="hop-title" />
+            <ui:Label text="Choose how to spend the next part of the day." class="hop-subtitle" />
+            <ui:VisualElement class="hop-divider" />
+            <ui:VisualElement name="activities" class="hop-options hop-activity-list" />
+            <ui:Label name="empty-message" class="hop-empty-message" />
+            <ui:Label name="feedback" class="hop-feedback" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
