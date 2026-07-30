@@ -1,0 +1,19 @@
+title: BottomDialogueUITest
+---
+Prince: The new bottom dialogue box stays low so the scene can still breathe.
+Prince: It can hold longer text without taking over the whole screen. The safe area and compact height should keep it usable on mobile.
+Munir: Now choose a response from the focused carousel.
+-> Ask about conversation topics
+    Prince: Can we talk about the topics Prince still needs to understand?
+    Munir: Yes. The carousel can be reused for topic selection later.
+-> Ask about activities
+    Prince: Could this same option picker choose activities?
+    Munir: It can. After this Yarn node ends, the test scene opens standalone activity-style options.
+-> Say nothing for now
+    Prince: I will keep listening for now.
+    Munir: Silence can be a decision too.
+-> Give a careful answer
+    Prince: I want to answer carefully without making the option label carry the whole sentence.
+    Munir: Good. Long option lists should scroll without growing taller.
+Prince: Yarn options are complete. Next, the same carousel will open without dialogue text.
+===

@@ -19,9 +19,6 @@ namespace HeartOfPrince.Presentation
         internal const string DialogueTreePath =
             "HeartOfPrince/UI/DialogueSystem";
 
-        internal const string DecisionTreePath =
-            "HeartOfPrince/UI/DecisionScreen";
-
         internal static UIDocument CreateDocument(
             GameObject owner,
             int sortingOrder,

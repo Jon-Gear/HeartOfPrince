@@ -1,40 +1,36 @@
+#nullable enable
 using System.Collections.Generic;
 using HeartOfPrince.Application;
+using HeartOfPrince.Domain;
+using System.Collections;
 using UnityEngine;
-using UnityEngine.UIElements;
+using UnityEngine.SceneManagement;
+using Yarn.Unity;
 
 namespace HeartOfPrince.Presentation
 {
     /// <summary>
-    /// Data-driven activity decision screen implemented with UI Toolkit.
-    /// It intentionally remains independent of specific activity types.
+    /// Activity decision bridge that feeds the shared bottom option carousel.
+    /// It owns no separate decision UI.
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class DecisionScenePresenter : MonoBehaviour
     {
-        private IReadOnlyList<ActivityOption> options;
-
-        private UIDocument document;
-        private PanelSettings ownedPanelSettings;
-        private VisualElement overlay;
-        private VisualElement activitiesContainer;
-        private Label dayTimeLabel;
-        private Label emptyMessageLabel;
-        private Label feedbackLabel;
-
+        private IReadOnlyList<ActivityOption>? options;
+        private BottomDialogueView view = null!;
         private bool wasVisible;
         private int displayedDay = -1;
-        private string displayedTime;
+        private string? displayedTime;
+        private bool selectionInProgress;
+        private Coroutine? showOptionsRoutine;
 
         private void Awake()
         {
-            document =
-                HeartOfPrinceUIToolkit.CreateDocument(
-                    gameObject,
-                    sortingOrder: 90,
-                    out ownedPanelSettings);
-
-            BuildVisualTree();
+            view = Object.FindFirstObjectByType<BottomDialogueView>();
+            if (view == null)
+            {
+                view = gameObject.AddComponent<BottomDialogueView>();
+            }
         }
 
         private void OnEnable()
@@ -50,336 +46,215 @@ namespace HeartOfPrince.Presentation
 
         private void OnDisable()
         {
-            if (overlay != null)
-            {
-                overlay.style.display =
-                    DisplayStyle.None;
-            }
-
             wasVisible = false;
-        }
+            selectionInProgress = false;
+            StopPendingShowOptions();
 
-        private void OnDestroy()
-        {
-            HeartOfPrinceUIToolkit.DestroyPanelSettings(
-                ownedPanelSettings);
+            if (view != null)
+            {
+                view.HideAll();
+            }
         }
 
         public void Refresh()
         {
-            options =
-                GameSession.Instance?
-                    .ActivityQuery?
-                    .GetOptions();
-
-            RebuildOptions();
-        }
-
-        private void BuildVisualTree()
-        {
-            VisualElement root =
-                document.rootVisualElement;
-
-            root.Clear();
-            root.style.flexGrow = 1f;
-            HeartOfPrinceUIToolkit.ApplySharedStyle(root);
-
-            bool loaded =
-                HeartOfPrinceUIToolkit.CloneTree(
-                    root,
-                    HeartOfPrinceUIToolkit.DecisionTreePath);
-
-            if (!loaded)
-            {
-                BuildFallbackTree(root);
-            }
-
-            overlay =
-                root.Q<VisualElement>("decision-overlay");
-
-            activitiesContainer =
-                root.Q<VisualElement>("activities");
-
-            dayTimeLabel =
-                root.Q<Label>("day-time");
-
-            emptyMessageLabel =
-                root.Q<Label>("empty-message");
-
-            feedbackLabel =
-                root.Q<Label>("feedback");
-
-            if (overlay == null ||
-                activitiesContainer == null ||
-                dayTimeLabel == null ||
-                emptyMessageLabel == null ||
-                feedbackLabel == null)
-            {
-                Debug.LogError(
-                    "[Decision UI] DecisionScreen.uxml is " +
-                    "missing required named elements.");
-
-                enabled = false;
-                return;
-            }
-
-            overlay.style.display =
-                DisplayStyle.None;
-        }
-
-        private static void BuildFallbackTree(
-            VisualElement root)
-        {
-            var fallbackOverlay = new VisualElement
-            {
-                name = "decision-overlay"
-            };
-            fallbackOverlay.AddToClassList("hop-overlay");
-            fallbackOverlay.AddToClassList(
-                "hop-decision-overlay");
-
-            var card = new VisualElement();
-            card.AddToClassList("hop-card");
-            card.AddToClassList("hop-decision-card");
-
-            var kicker = new Label("DAILY RHYTHM");
-            kicker.AddToClassList("hop-kicker");
-
-            var dayTime = new Label
-            {
-                name = "day-time"
-            };
-            dayTime.AddToClassList("hop-eyebrow");
-
-            var title = new Label(
-                "What should Prince do?");
-            title.AddToClassList("hop-title");
-
-            var subtitle = new Label(
-                "Choose how to spend the next part of the day.");
-            subtitle.AddToClassList("hop-subtitle");
-
-            var divider = new VisualElement();
-            divider.AddToClassList("hop-divider");
-
-            var activities = new VisualElement
-            {
-                name = "activities"
-            };
-            activities.AddToClassList("hop-options");
-            activities.AddToClassList(
-                "hop-activity-list");
-
-            var emptyMessage = new Label
-            {
-                name = "empty-message"
-            };
-            emptyMessage.AddToClassList(
-                "hop-empty-message");
-
-            var feedback = new Label
-            {
-                name = "feedback"
-            };
-            feedback.AddToClassList("hop-feedback");
-
-            card.Add(kicker);
-            card.Add(dayTime);
-            card.Add(title);
-            card.Add(subtitle);
-            card.Add(divider);
-            card.Add(activities);
-            card.Add(emptyMessage);
-            card.Add(feedback);
-            fallbackOverlay.Add(card);
-            root.Add(fallbackOverlay);
+            options = GameSession.Instance?
+                .ActivityQuery?
+                .GetOptions();
         }
 
         private void UpdateVisibility(bool force)
         {
-            GameLoopService loop =
-                GameLoopService.Instance;
+            GameLoopService loop = GameLoopService.Instance;
 
             bool shouldBeVisible =
                 loop != null &&
-                loop.Phase ==
-                    HeartOfPrince.Domain
-                        .GameLoopPhase
-                        .AwaitingDecision;
+                loop.Phase == GameLoopPhase.AwaitingDecision;
 
-            if (force ||
-                shouldBeVisible != wasVisible)
+            if (force || shouldBeVisible != wasVisible)
             {
-                overlay.style.display =
-                    shouldBeVisible
-                        ? DisplayStyle.Flex
-                        : DisplayStyle.None;
-
                 wasVisible = shouldBeVisible;
 
-                if (shouldBeVisible)
+                if (shouldBeVisible && loop != null)
                 {
                     Refresh();
+                    ScheduleShowOptionsAfterDialogue();
                 }
+                else if (view != null)
+                {
+                    StopPendingShowOptions();
+                    view.HideAll();
+                    selectionInProgress = false;
+                }
+
+                return;
             }
 
-            if (!shouldBeVisible)
+            if (!shouldBeVisible || loop == null)
             {
                 return;
             }
 
-            string currentTime =
-                loop.CurrentTimeDisplay;
-
+            string currentTime = loop.CurrentTimeDisplay;
             if (force ||
                 displayedDay != loop.CurrentDay ||
                 displayedTime != currentTime)
             {
                 displayedDay = loop.CurrentDay;
                 displayedTime = currentTime;
-
-                dayTimeLabel.text =
-                    $"Day {displayedDay} — " +
-                    displayedTime;
+                ScheduleShowOptionsAfterDialogue();
             }
         }
 
-        private void RebuildOptions()
+        private void ScheduleShowOptionsAfterDialogue()
         {
-            if (activitiesContainer == null)
+            StopPendingShowOptions();
+            showOptionsRoutine = StartCoroutine(
+                ShowOptionsAfterDialogueRoutine());
+        }
+
+        private void StopPendingShowOptions()
+        {
+            if (showOptionsRoutine == null)
             {
                 return;
             }
 
-            activitiesContainer.Clear();
+            StopCoroutine(showOptionsRoutine);
+            showOptionsRoutine = null;
+        }
 
-            bool hasOptions =
-                options != null &&
-                options.Count > 0;
+        private IEnumerator ShowOptionsAfterDialogueRoutine()
+        {
+            // Let the scene-local DialogueRunner run Start() before checking
+            // IsDialogueRunning; otherwise options can appear before dialogue.
+            yield return null;
 
-            activitiesContainer.style.display =
-                hasOptions
-                    ? DisplayStyle.Flex
-                    : DisplayStyle.None;
+            DialogueRunner? runner = FindSceneDialogueRunner();
+            while (runner != null && runner.IsDialogueRunning)
+            {
+                yield return null;
+            }
 
-            emptyMessageLabel.style.display =
-                hasOptions
-                    ? DisplayStyle.None
-                    : DisplayStyle.Flex;
+            showOptionsRoutine = null;
 
-            emptyMessageLabel.text =
-                hasOptions
-                    ? string.Empty
-                    : "No activities are currently available.";
+            GameLoopService loop = GameLoopService.Instance;
+            if (loop == null ||
+                loop.Phase != GameLoopPhase.AwaitingDecision ||
+                selectionInProgress)
+            {
+                yield break;
+            }
 
-            feedbackLabel.style.display =
-                DisplayStyle.None;
+            Refresh();
+            ShowOptions(loop);
+        }
 
-            if (!hasOptions)
+        private static DialogueRunner? FindSceneDialogueRunner()
+        {
+            Scene activeScene = SceneManager.GetActiveScene();
+
+            foreach (DialogueRunner runner in
+                     Object.FindObjectsByType<DialogueRunner>(
+                         FindObjectsInactive.Include,
+                         FindObjectsSortMode.None))
+            {
+                if (runner != null &&
+                    runner.gameObject.scene == activeScene &&
+                    runner.gameObject.activeInHierarchy &&
+                    runner.enabled)
+                {
+                    return runner;
+                }
+            }
+
+            return null;
+        }
+
+        private void ShowOptions(GameLoopService loop)
+        {
+            if (view == null || loop == null)
             {
                 return;
             }
 
-            Button firstAvailableButton = null;
+            IReadOnlyList<ActivityOption> currentOptions =
+                options ?? System.Array.Empty<ActivityOption>();
 
-            foreach (ActivityOption option in options)
+            var items = new List<OptionSelectionItem>();
+            for (int index = 0; index < currentOptions.Count; index++)
             {
+                ActivityOption option = currentOptions[index];
                 ActivityOption capturedOption = option;
 
-                var row = new VisualElement();
-                row.AddToClassList(
-                    "hop-activity-row");
-
-                var button =
-                    new Button(
-                        () => SelectActivity(
-                            capturedOption))
-                    {
-                        text = option.DisplayName
-                    };
-
-                button.AddToClassList("hop-button");
-                button.AddToClassList(
-                    "hop-option-button");
-
-                button.userData = capturedOption;
-                button.SetEnabled(option.IsAvailable);
-
-                if (option.IsAvailable &&
-                    firstAvailableButton == null)
-                {
-                    firstAvailableButton = button;
-                }
-
-                row.Add(button);
-
-                if (!option.IsAvailable &&
-                    !string.IsNullOrWhiteSpace(
-                        option.UnavailableReason))
-                {
-                    var reason = new Label(
-                        option.UnavailableReason);
-
-                    reason.AddToClassList(
-                        "hop-unavailable-reason");
-
-                    row.Add(reason);
-                }
-
-                activitiesContainer.Add(row);
+                items.Add(new OptionSelectionItem(
+                    id: BuildOptionId(option, index),
+                    displayText: option.DisplayName,
+                    category: "Activity",
+                    isEnabled: option.IsAvailable,
+                    requirementLabel: option.IsAvailable
+                        ? null
+                        : option.UnavailableReason,
+                    payload: option,
+                    onSelected: _ => SelectActivity(capturedOption)));
             }
 
-            firstAvailableButton?.Focus();
+            string title =
+                $"Day {loop.CurrentDay} - {loop.CurrentTimeDisplay}";
+
+            var request = new OptionSelectionRequest(
+                items,
+                title,
+                emptyMessage: "No activities are currently available.",
+                closeOnSelection: false);
+
+            view.ClearDialogue();
+            view.OpenOptions(request, keepDialogueVisible: false);
         }
 
-        private void SelectActivity(
-            ActivityOption option)
+        private static string BuildOptionId(
+            ActivityOption option,
+            int index)
         {
-            if (option == null ||
+            string activityId =
+                option.Request?.Activity?.Id ??
+                option.DisplayName ??
+                "activity";
+
+            string selectionKey =
+                option.Request?.Input?.SelectionKey ??
+                index.ToString();
+
+            return $"{activityId}:{selectionKey}";
+        }
+
+        private void SelectActivity(ActivityOption option)
+        {
+            if (selectionInProgress ||
+                option == null ||
                 !option.IsAvailable)
             {
                 return;
             }
 
-            SetButtonsEnabled(false);
+            selectionInProgress = true;
+            view.CloseOptions();
+            view.ShowDialogue(
+                "Activity",
+                $"Starting {option.DisplayName}...",
+                hint: null);
 
-            feedbackLabel.text =
-                $"Starting {option.DisplayName}…";
-
-            feedbackLabel.style.display =
-                DisplayStyle.Flex;
-
-            GameLoopService loop =
-                GameLoopService.Instance;
-
+            GameLoopService loop = GameLoopService.Instance;
             if (loop == null)
             {
-                feedbackLabel.text =
-                    "The game loop is not available.";
-
-                SetButtonsEnabled(true);
+                selectionInProgress = false;
+                view.ShowDialogue(
+                    "Activity",
+                    "The game loop is not available.");
                 return;
             }
 
             loop.RequestActivity(option);
-        }
-
-        private void SetButtonsEnabled(
-            bool enabledState)
-        {
-            foreach (Button button in
-                     activitiesContainer
-                         .Query<Button>()
-                         .ToList())
-            {
-                ActivityOption option =
-                    button.userData as ActivityOption;
-
-                button.SetEnabled(
-                    enabledState &&
-                    option != null &&
-                    option.IsAvailable);
-            }
         }
     }
 }

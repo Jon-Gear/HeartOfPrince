@@ -11,9 +11,10 @@ GameObject:
   - component: {fileID: 7985477256237130417}
   - component: {fileID: 8309902628685535410}
   - component: {fileID: 8635081094973328866}
+  - component: {fileID: 9140000000000000002}
   - component: {fileID: 9140000000000000001}
   m_Layer: 0
-  m_Name: DialogueSystem
+  m_Name: BottomDialogueSystem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -93,8 +94,26 @@ MonoBehaviour:
   m_GameObject: {fileID: 7262066351540048079}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 491ae2bacde9486e8bf1d6c5a03e2899, type: 3}
+  m_Script: {fileID: 11500000, guid: f7eb178a203d43c59c028f98564b2dc1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   charactersPerSecond: 60
-  focusContinueButton: 1
+--- !u!114 &9140000000000000002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7262066351540048079}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b83ea2d4b79740b5b3adf15a8c7e8f20, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxScreenHeight: 0.24
+  minHeight: 230
+  maxHeight: 250
+  maxWidth: 1540
+  bottomMargin: 18
+  horizontalMargin: 22
+  optionWidth: 420

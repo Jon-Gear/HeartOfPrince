@@ -1,0 +1,24 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="bottom-dialogue-overlay" class="hop-bottom-overlay">
+        <ui:VisualElement name="bottom-dialogue-safe-area" class="hop-bottom-safe-area">
+            <ui:VisualElement name="bottom-dialogue-shell" class="hop-bottom-shell">
+                <ui:VisualElement name="bottom-dialogue-card" class="hop-bottom-card">
+                    <ui:VisualElement class="hop-bottom-speaker-row">
+                        <ui:Label name="bottom-speaker" class="hop-bottom-speaker" />
+                        <ui:Label name="bottom-hint" class="hop-bottom-hint" />
+                    </ui:VisualElement>
+                    <ui:Label name="bottom-line" class="hop-bottom-line" />
+                    <ui:Button name="bottom-continue" text="Continue" class="hop-bottom-continue" />
+                </ui:VisualElement>
+                <ui:VisualElement name="bottom-option-panel" class="hop-bottom-option-panel">
+                    <ui:VisualElement class="hop-bottom-option-heading">
+                        <ui:Label name="bottom-options-title" class="hop-bottom-options-title" />
+                        <ui:Label name="bottom-options-counter" class="hop-bottom-options-counter" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="bottom-options-viewport" class="hop-bottom-options-viewport" />
+                    <ui:Label name="bottom-options-empty" class="hop-bottom-options-empty" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
