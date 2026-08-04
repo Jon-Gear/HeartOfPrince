@@ -35,6 +35,11 @@ namespace HeartOfPrince.Presentation
 
         private void OnEnable()
         {
+            if (view != null)
+            {
+                view.FocusedOptionChanged += OnFocusedOptionChanged;
+            }
+
             Refresh();
             UpdateVisibility(force: true);
         }
@@ -52,6 +57,7 @@ namespace HeartOfPrince.Presentation
 
             if (view != null)
             {
+                view.FocusedOptionChanged -= OnFocusedOptionChanged;
                 view.HideAll();
             }
         }
@@ -208,8 +214,124 @@ namespace HeartOfPrince.Presentation
                 emptyMessage: "No activities are currently available.",
                 closeOnSelection: false);
 
-            view.ClearDialogue();
-            view.OpenOptions(request, keepDialogueVisible: false);
+            ShowDecisionDialogue(
+                items.Count > 0 ? items[0] : null);
+            view.OpenOptions(request, keepDialogueVisible: true);
+        }
+
+        private void OnFocusedOptionChanged(OptionSelectionItem item)
+        {
+            if (selectionInProgress)
+            {
+                return;
+            }
+
+            ShowDecisionDialogue(item);
+        }
+
+        private void ShowDecisionDialogue(OptionSelectionItem? item)
+        {
+            if (view == null)
+            {
+                return;
+            }
+
+            if (item?.Payload is not ActivityOption option)
+            {
+                view.ShowDialogue(
+                    "Decision",
+                    "Choose how Prince spends this time.",
+                    hint: null);
+                return;
+            }
+
+            view.ShowDialogue(
+                option.DisplayName,
+                BuildDecisionText(option),
+                hint: null);
+        }
+
+        private string BuildDecisionText(ActivityOption option)
+        {
+            var lines = new List<string>();
+
+            string description = ResolveDecisionDescription(option);
+            if (!string.IsNullOrWhiteSpace(description))
+            {
+                lines.Add(description.Trim());
+            }
+
+            string duration = FormatDuration(
+                option.Request?.Activity?.DurationMinutes ?? 0);
+            if (!string.IsNullOrWhiteSpace(duration))
+            {
+                lines.Add($"Time: {duration}.");
+            }
+
+            if (!option.IsAvailable &&
+                !string.IsNullOrWhiteSpace(option.UnavailableReason))
+            {
+                lines.Add($"Unavailable: {option.UnavailableReason}");
+            }
+
+            return lines.Count > 0
+                ? string.Join("\n", lines)
+                : "Choose how Prince spends this time.";
+        }
+
+        private string ResolveDecisionDescription(ActivityOption option)
+        {
+            if (option?.Request?.Input is TalkActivityInput talkInput)
+            {
+                CharacterDefinition? character =
+                    GameSession.Instance?
+                        .Configuration?
+                        .ActivityCatalog?
+                        .FindCharacter(talkInput.CharacterId);
+
+                if (!string.IsNullOrWhiteSpace(
+                        character?.TalkDecisionDescription))
+                {
+                    return character.TalkDecisionDescription;
+                }
+            }
+
+            string? activityDescription =
+                option?.Request?.Activity?.DecisionDescription;
+
+            if (!string.IsNullOrWhiteSpace(activityDescription))
+            {
+                return activityDescription;
+            }
+
+            return "Choose how Prince spends this time.";
+        }
+
+        private static string FormatDuration(int minutes)
+        {
+            if (minutes <= 0)
+            {
+                return "No time passes";
+            }
+
+            int hours = minutes / 60;
+            int remainingMinutes = minutes % 60;
+            var parts = new List<string>();
+
+            if (hours > 0)
+            {
+                parts.Add(hours == 1 ? "1 hour" : $"{hours} hours");
+            }
+
+            if (remainingMinutes > 0)
+            {
+                parts.Add(
+                    remainingMinutes == 1
+                        ? "1 minute"
+                        : $"{remainingMinutes} minutes");
+            }
+
+            return string.Join(" ", parts);
         }
 
         private static string BuildOptionId(
