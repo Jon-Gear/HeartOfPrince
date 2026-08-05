@@ -54,6 +54,7 @@ namespace HeartOfPrince.Presentation
         }
 
         public event Action<OptionSelectionItem>? OptionConfirmed;
+        public event Action<OptionSelectionItem>? FocusedOptionChanged;
 
         public bool IsOpen => request != null;
 
@@ -69,6 +70,7 @@ namespace HeartOfPrince.Presentation
             titleLabel.text = request.Title;
 
             Render();
+            NotifyFocusedOptionChanged();
             panel.Focus();
         }
 
@@ -246,6 +248,7 @@ namespace HeartOfPrince.Presentation
             {
                 selectedIndex = index;
                 Render();
+                NotifyFocusedOptionChanged();
                 return;
             }
 
@@ -292,6 +295,19 @@ namespace HeartOfPrince.Presentation
                     options.Count - 1);
 
             Render();
+            NotifyFocusedOptionChanged();
+        }
+
+        private void NotifyFocusedOptionChanged()
+        {
+            if (options.Count == 0 ||
+                selectedIndex < 0 ||
+                selectedIndex >= options.Count)
+            {
+                return;
+            }
+
+            FocusedOptionChanged?.Invoke(options[selectedIndex]);
         }
 
         public bool TryHandleKeyDown(KeyCode keyCode)

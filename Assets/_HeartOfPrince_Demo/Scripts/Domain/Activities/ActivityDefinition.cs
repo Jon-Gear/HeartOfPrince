@@ -71,6 +71,9 @@ namespace HeartOfPrince.Domain
         [SerializeField] private string id;
         [SerializeField] private string displayName;
 
+        [TextArea, SerializeField]
+        private string decisionDescription;
+
         [Tooltip("Selects the runtime module that owns this activity's typed input.")]
         [SerializeField] private string runtimeModuleId;
 
@@ -89,6 +92,7 @@ namespace HeartOfPrince.Domain
         public string RuntimeModuleId => runtimeModuleId;
         public string DisplayName =>
             string.IsNullOrWhiteSpace(displayName) ? name : displayName;
+        public string DecisionDescription => decisionDescription;
         public int DurationMinutes => Mathf.Max(0, durationMinutes);
 
         public AvailabilityResult EvaluateAvailability(

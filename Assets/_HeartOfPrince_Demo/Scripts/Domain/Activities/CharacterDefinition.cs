@@ -11,6 +11,9 @@ namespace HeartOfPrince.Domain
         [SerializeField] private string id;
         [SerializeField] private string displayName;
 
+        [TextArea, SerializeField]
+        private string talkDecisionDescription;
+
         [SerializeField]
         private AvailabilityRule[] talkAvailabilityRules =
             Array.Empty<AvailabilityRule>();
@@ -18,6 +21,7 @@ namespace HeartOfPrince.Domain
         public string Id => id;
         public string DisplayName =>
             string.IsNullOrWhiteSpace(displayName) ? name : displayName;
+        public string TalkDecisionDescription => talkDecisionDescription;
 
         public AvailabilityResult EvaluateTalkAvailability(
             ActivityEvaluationContext context,

@@ -64,6 +64,7 @@ namespace HeartOfPrince.Presentation
 
         public event Action? ContinueRequested;
         public event Action<OptionSelectionItem>? OptionConfirmed;
+        public event Action<OptionSelectionItem>? FocusedOptionChanged;
 
         public bool HasDialogueText =>
             !string.IsNullOrWhiteSpace(lineLabel?.text);
@@ -91,6 +92,7 @@ namespace HeartOfPrince.Presentation
             if (carousel != null)
             {
                 carousel.OptionConfirmed -= OnCarouselOptionConfirmed;
+                carousel.FocusedOptionChanged -= OnCarouselFocusedOptionChanged;
             }
 
             HeartOfPrinceUIToolkit.DestroyPanelSettings(
@@ -246,6 +248,7 @@ namespace HeartOfPrince.Presentation
                 optionCounter);
 
             carousel.OptionConfirmed += OnCarouselOptionConfirmed;
+            carousel.FocusedOptionChanged += OnCarouselFocusedOptionChanged;
             continueButton.clicked += () => ContinueRequested?.Invoke();
             dialogueCard.RegisterCallback<PointerUpEvent>(
                 _ => ContinueRequested?.Invoke());
@@ -334,6 +337,17 @@ namespace HeartOfPrince.Presentation
             }
 
             OptionConfirmed?.Invoke(option);
+        }
+
+        private void OnCarouselFocusedOptionChanged(
+            OptionSelectionItem option)
+        {
+            if (option == null || !optionsVisible)
+            {
+                return;
+            }
+
+            FocusedOptionChanged?.Invoke(option);
         }
 
         private void UpdateModeClasses()
