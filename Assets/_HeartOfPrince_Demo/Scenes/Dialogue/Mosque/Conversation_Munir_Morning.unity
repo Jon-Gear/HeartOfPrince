@@ -442,12 +442,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 13254767}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: -10, z: 0}
+  m_LocalRotation: {x: -0.6862517, y: -0.17046584, z: 0.6862517, w: -0.17046584}
+  m_LocalPosition: {x: 8.837656, y: 4.6792994, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1114037114}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!114 &13254773
 MonoBehaviour:
@@ -461,40 +461,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a648582285c46cf4e857c4bef72907fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  directionaLight: {fileID: 13254769}
-  lightBeam: {fileID: 13254771}
-  sunBaseIntensity: 1
-  sunIntensityVariation: 1.5
-  sunColor:
-    serializedVersion: 2
-    key0: {r: 0, g: 0, b: 0, a: 1}
-    key1: {r: 1, g: 0.16001588, b: 0, a: 1}
-    key2: {r: 1, g: 0.68421054, b: 0, a: 0}
-    key3: {r: 0.9481132, g: 0.99738085, b: 1, a: 0}
-    key4: {r: 0, g: 0, b: 0, a: 0}
-    key5: {r: 0, g: 0, b: 0, a: 0}
-    key6: {r: 0, g: 0, b: 0, a: 0}
-    key7: {r: 0, g: 0, b: 0, a: 0}
-    ctime0: 0
-    ctime1: 7325
-    ctime2: 24672
-    ctime3: 65535
-    ctime4: 0
-    ctime5: 0
-    ctime6: 0
-    ctime7: 0
-    atime0: 0
-    atime1: 65535
-    atime2: 0
-    atime3: 0
-    atime4: 0
-    atime5: 0
-    atime6: 0
-    atime7: 0
-    m_Mode: 0
-    m_ColorSpace: -1
-    m_NumColorKeys: 4
-    m_NumAlphaKeys: 2
 --- !u!1 &16218531
 GameObject:
   m_ObjectHideFlags: 0
@@ -6215,70 +6181,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d48caa459cd4f5141aeb57db311665b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fogColor:
-    serializedVersion: 2
-    key0: {r: 0, g: 0, b: 0, a: 1}
-    key1: {r: 0.95686275, g: 0.6156863, b: 0.21568628, a: 1}
-    key2: {r: 0, g: 0, b: 0, a: 0}
-    key3: {r: 0, g: 0, b: 0, a: 0}
-    key4: {r: 0, g: 0, b: 0, a: 0}
-    key5: {r: 0, g: 0, b: 0, a: 0}
-    key6: {r: 0, g: 0, b: 0, a: 0}
-    key7: {r: 0, g: 0, b: 0, a: 0}
-    ctime0: 0
-    ctime1: 65535
-    ctime2: 0
-    ctime3: 0
-    ctime4: 0
-    ctime5: 0
-    ctime6: 0
-    ctime7: 0
-    atime0: 0
-    atime1: 65535
-    atime2: 0
-    atime3: 0
-    atime4: 0
-    atime5: 0
-    atime6: 0
-    atime7: 0
-    m_Mode: 0
-    m_ColorSpace: -1
-    m_NumColorKeys: 2
-    m_NumAlphaKeys: 2
-  fogDensityCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0.1
-      inSlope: -0.20006078
-      outSlope: -0.20006078
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.50470424
-      value: -0.0009715259
-      inSlope: 0.002524903
-      outSlope: 0.002524903
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.23380725
-      outWeight: 0.20192955
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: 0.0019615067
-      outSlope: 0.0019615067
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  sun: {fileID: 13254767}
 --- !u!1001 &301178374
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -16022,37 +15924,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5cd2e955fb7d4748a6ceb126c3ba165, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ambientColor:
-    serializedVersion: 2
-    key0: {r: 0.39607844, g: 0.39607844, b: 0.8509804, a: 1}
-    key1: {r: 0.8316383, g: 0.41215977, b: 0.13003884, a: 1}
-    key2: {r: 0.95686275, g: 0.6156863, b: 0.21568628, a: 0}
-    key3: {r: 1, g: 1, b: 1, a: 0}
-    key4: {r: 0, g: 0, b: 0, a: 0}
-    key5: {r: 0, g: 0, b: 0, a: 0}
-    key6: {r: 0, g: 0, b: 0, a: 0}
-    key7: {r: 0, g: 0, b: 0, a: 0}
-    ctime0: 0
-    ctime1: 11180
-    ctime2: 24641
-    ctime3: 65535
-    ctime4: 0
-    ctime5: 0
-    ctime6: 0
-    ctime7: 0
-    atime0: 0
-    atime1: 65535
-    atime2: 0
-    atime3: 0
-    atime4: 0
-    atime5: 0
-    atime6: 0
-    atime7: 0
-    m_Mode: 0
-    m_ColorSpace: -1
-    m_NumColorKeys: 4
-    m_NumAlphaKeys: 2
-  sun: {fileID: 13254767}
 --- !u!1 &706790965
 GameObject:
   m_ObjectHideFlags: 0
@@ -18531,8 +18402,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f55bbfca320c3c4c8e71d97f693df39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ambientColor: {r: 0, g: 0, b: 0, a: 1}
-  weight: 0.2
 --- !u!1001 &832687042
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -23145,7 +23014,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 13254772}
   - {fileID: 1303015200}
   m_Father: {fileID: 2034096258}
   m_LocalEulerAnglesHint: {x: -117.9, y: 90, z: 0}
@@ -23161,7 +23029,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68b3d9f5ed173c24bb71aa2623844ab9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  yRotationOffset: 90
 --- !u!1 &1116554461
 GameObject:
   m_ObjectHideFlags: 0
@@ -28049,40 +27916,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c65be6bc14c700c498ab0c99d23e0d75, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  directionaLight: {fileID: 1303015197}
-  lightBeam: {fileID: 1303015199}
-  moonBaseIntensity: 0.5
-  moonIntensityVariation: 0.1
-  moonColor:
-    serializedVersion: 2
-    key0: {r: 0, g: 0, b: 0, a: 1}
-    key1: {r: 0, g: 0.23943663, b: 1, a: 1}
-    key2: {r: 0, g: 0, b: 0, a: 0}
-    key3: {r: 0, g: 0, b: 0, a: 0}
-    key4: {r: 0, g: 0, b: 0, a: 0}
-    key5: {r: 0, g: 0, b: 0, a: 0}
-    key6: {r: 0, g: 0, b: 0, a: 0}
-    key7: {r: 0, g: 0, b: 0, a: 0}
-    ctime0: 0
-    ctime1: 65535
-    ctime2: 0
-    ctime3: 0
-    ctime4: 0
-    ctime5: 0
-    ctime6: 0
-    ctime7: 0
-    atime0: 0
-    atime1: 65535
-    atime2: 0
-    atime3: 0
-    atime4: 0
-    atime5: 0
-    atime6: 0
-    atime7: 0
-    m_Mode: 0
-    m_ColorSpace: -1
-    m_NumColorKeys: 2
-    m_NumAlphaKeys: 2
 --- !u!1 &1304735059
 GameObject:
   m_ObjectHideFlags: 0
@@ -42655,7 +42488,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2034096258
 Transform:
   m_ObjectHideFlags: 0
@@ -44778,6 +44611,7 @@ SceneRoots:
   m_Roots:
   - {fileID: 481759785}
   - {fileID: 1361651366}
+  - {fileID: 13254772}
   - {fileID: 2034096258}
   - {fileID: 481087556}
   - {fileID: 1179988808}
