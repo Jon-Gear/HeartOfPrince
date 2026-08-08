@@ -17,13 +17,23 @@ namespace HeartOfPrince.Domain
         [SerializeField, Range(0, 1439)]
         private int latestMinute = 1439;
 
+        [Tooltip("Optional. Variant only matches when this story flag is set.")]
+        [SerializeField] private string requiredFlag;
+
         public string SceneName => sceneName;
         public string TargetId => targetId;
+        public string RequiredFlag => requiredFlag;
 
         public bool Matches(
             ActivityEvaluationContext context,
             string requestedTargetId)
         {
+            if (!string.IsNullOrWhiteSpace(requiredFlag) &&
+                !context.State.HasFlag(requiredFlag))
+            {
+                return false;
+            }
+
             bool targetMatches =
                 string.IsNullOrWhiteSpace(targetId) ||
                 string.Equals(

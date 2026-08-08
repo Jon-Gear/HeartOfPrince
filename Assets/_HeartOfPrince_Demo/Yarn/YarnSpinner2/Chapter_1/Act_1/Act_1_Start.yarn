@@ -2,13 +2,23 @@
 ---
 Narrator: Chapter 1
 Narrator: Act 1
+Narrator: Prince wakes in a hospital room.
 
-===
+<<SetStoryFlag "in_hospital">>
+<<ClearStoryFlag "out_of_hospital">>
+<<ClearStoryFlag "seeking_creation">>
+<<SetStoryFlag "munir_talkable">>
 
+<<UnlockPonderTopic "Act1Complete">>
+<<UnlockPonderTopic "Act1HospitalBed">>
+<<UnlockPonderTopic "Act1MunirSon">>
 
-title: Chapter_1_Act_2
----
-Narrator: Chapter 1
-Narrator: Act 2
+<<UnlockConversationTopic "Munir" "PlayerToCharacter" "HospitalAskAboutHim">>
+<<UnlockConversationTopic "Munir" "PlayerToCharacter" "HospitalAskAboutHisFather">>
+<<UnlockConversationTopic "Munir" "PlayerToCharacter" "HospitalAskAboutTheAlleyCats">>
+<<UnlockConversationTopic "Munir" "CharacterToPlayer" "HospitalAboutHisFather">>
+<<UnlockConversationTopic "Munir" "CharacterToPlayer" "HospitalAboutTheFuture">>
+<<UnlockConversationTopic "Munir" "CharacterToPlayer" "HospitalAboutPrince">>
 
+<<CompleteActStart>>
 ===

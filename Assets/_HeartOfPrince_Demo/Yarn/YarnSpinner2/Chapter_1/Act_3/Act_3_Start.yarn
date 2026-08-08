@@ -1,0 +1,17 @@
+title: Chapter_1_Act_3_Start
+---
+Narrator: Chapter 1
+Narrator: Act 3
+Narrator: Prince searches for signs of creation in the world around him.
+
+<<SetStoryFlag "out_of_hospital">>
+<<ClearStoryFlag "in_hospital">>
+<<SetStoryFlag "seeking_creation">>
+<<ClearStoryFlag "munir_talkable">>
+
+<<UnlockPonderTopic "Act3Complete">>
+<<UnlockPonderTopic "Act3Creation">>
+<<UnlockPonderTopic "Act3Signs">>
+
+<<CompleteActStart>>
+===

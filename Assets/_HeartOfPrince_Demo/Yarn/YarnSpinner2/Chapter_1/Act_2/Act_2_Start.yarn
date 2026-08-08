@@ -1,0 +1,21 @@
+title: Chapter_1_Act_2_Start
+---
+Narrator: Chapter 1
+Narrator: Act 2
+Narrator: Prince settles into a new life outside the hospital.
+
+<<SetStoryFlag "out_of_hospital">>
+<<ClearStoryFlag "in_hospital">>
+<<ClearStoryFlag "seeking_creation">>
+<<SetStoryFlag "munir_talkable">>
+
+<<UnlockPonderTopic "Act2Complete">>
+<<UnlockPonderTopic "ReflectOnDuty">>
+<<UnlockPonderTopic "ReflectOnFamily">>
+<<UnlockPonderTopic "ReflectOnFaith">>
+<<UnlockPonderTopic "ReflectOnFuture">>
+<<UnlockPonderTopic "ReflectOnFear">>
+<<UnlockPonderTopic "ReflectOnMercy">>
+
+<<CompleteActStart>>
+===

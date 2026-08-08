@@ -23,6 +23,18 @@ namespace HeartOfPrince.Presentation
                     ActivityResult.Success());
         }
 
+        [YarnCommand("SetStoryFlag")]
+        public static void SetStoryFlag(string flag)
+        {
+            GameSession.Instance?.State.SetFlag(flag);
+        }
+
+        [YarnCommand("ClearStoryFlag")]
+        public static void ClearStoryFlag(string flag)
+        {
+            GameSession.Instance?.State.ClearFlag(flag);
+        }
+
         [YarnCommand("CompleteDayOpening")]
         public static void CompleteDayOpening()
         {

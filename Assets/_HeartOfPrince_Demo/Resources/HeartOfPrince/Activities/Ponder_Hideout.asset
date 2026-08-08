@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b47bb9b05d27401c8f765e23c824947a, type: 3}
+  m_Name: Ponder_Hideout
+  m_EditorClassIdentifier: HeartOfPrince.Domain::HeartOfPrince.Domain.ActivityDefinition
+  id: ponder-hideout
+  displayName: Ponder in the Hideout
+  decisionDescription: Give Prince space to sit with his thoughts in the hideout.
+  runtimeModuleId: no-input
+  durationMinutes: 360
+  sceneVariants:
+  - sceneName: Ponder_Morning
+    targetId: 
+    earliestMinute: 0
+    latestMinute: 779
+  - sceneName: Ponder_Evening
+    targetId: 
+    earliestMinute: 780
+    latestMinute: 1439
+  availabilityRules:
+  - {fileID: 11400000, guid: 37b2d4cad9d64a6aae374dd5f8d9ac0b, type: 2}
+  - {fileID: 11400000, guid: 9a1c2f7c0b6d4e3a9f8c1b2a3d4e5f60, type: 2}

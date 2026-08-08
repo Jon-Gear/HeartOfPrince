@@ -18,12 +18,19 @@ MonoBehaviour:
   runtimeModuleId: talk
   durationMinutes: 360
   sceneVariants:
+  - sceneName: Conversation_Munir_Hospital
+    targetId: Munir
+    earliestMinute: 0
+    latestMinute: 1439
+    requiredFlag: in_hospital
   - sceneName: Conversation_Munir_Morning
     targetId: Munir
     earliestMinute: 0
     latestMinute: 779
+    requiredFlag: out_of_hospital
   - sceneName: Conversation_Munir_Evening
     targetId: Munir
     earliestMinute: 780
     latestMinute: 1439
+    requiredFlag: out_of_hospital
   availabilityRules: []

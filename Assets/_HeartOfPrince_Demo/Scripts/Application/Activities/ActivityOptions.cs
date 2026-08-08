@@ -61,6 +61,11 @@ namespace HeartOfPrince.Application
         public IEnumerable<ActivityOptionDraft> GetOptions(
             ActivityEvaluationContext context)
         {
+            if (!activity.EvaluateAvailability(context, null).IsAvailable)
+            {
+                yield break;
+            }
+
             yield return new ActivityOptionDraft(
                 activity.DisplayName,
                 new ActivityRequest<NoActivityInput>(
@@ -101,6 +106,16 @@ namespace HeartOfPrince.Application
             foreach (CharacterDefinition character in characters)
             {
                 if (character == null)
+                {
+                    continue;
+                }
+
+                if (!character
+                        .EvaluateTalkAvailability(context, activity)
+                        .IsAvailable ||
+                    !activity
+                        .EvaluateAvailability(context, character.Id)
+                        .IsAvailable)
                 {
                     continue;
                 }

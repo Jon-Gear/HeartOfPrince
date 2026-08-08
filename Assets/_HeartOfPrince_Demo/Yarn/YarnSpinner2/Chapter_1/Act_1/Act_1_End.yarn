@@ -2,5 +2,10 @@
 ---
 Narrator: Chapter 1
 Narrator: Act 1
+Prince: I am leaving the hospital behind.
 
+<<ClearStoryFlag "in_hospital">>
+<<SetStoryFlag "out_of_hospital">>
+
+<<CompleteAct>>
 ===
