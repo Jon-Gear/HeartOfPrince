@@ -43,6 +43,8 @@ namespace HeartOfPrince.Domain
 
         public int ActCount => acts?.Length ?? 0;
 
+        public Act[] Acts => acts ?? Array.Empty<Act>();
+
         public CompletionCondition CompletionCondition =>
             completionCondition;
 

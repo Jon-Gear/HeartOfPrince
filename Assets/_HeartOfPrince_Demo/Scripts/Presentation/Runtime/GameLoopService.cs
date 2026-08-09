@@ -112,6 +112,17 @@ namespace HeartOfPrince.Presentation
             }
         }
 
+        private ActivityCatalog CurrentActivityCatalog
+        {
+            get
+            {
+                EnsureConfiguration();
+
+                return CurrentActDefinition.ActivityCatalog ??
+                    GameSession.Instance.Configuration.ActivityCatalog;
+            }
+        }
+
         private DayRules CurrentDayRules
         {
             get
@@ -196,6 +207,14 @@ namespace HeartOfPrince.Presentation
             {
                 session.Activities.SetDayRules(
                     CurrentDayRules);
+            }
+
+            if (session?.Activities != null &&
+                currentChapter != null &&
+                currentChapter.ActCount > 0)
+            {
+                session.ApplyActivityCatalog(
+                    CurrentActivityCatalog);
             }
 
             SyncInspector();
@@ -528,6 +547,8 @@ namespace HeartOfPrince.Presentation
 
             GameSession.Instance.Activities.SetDayRules(
                 CurrentDayRules);
+            GameSession.Instance.ApplyActivityCatalog(
+                CurrentActivityCatalog);
 
             SetPhase(GameLoopPhase.StartingAct);
             yield return LoadSceneRoutine(
@@ -712,8 +733,7 @@ namespace HeartOfPrince.Presentation
                 CurrentDayRules.WakeMinute;
 
             ActivityDefinition standaloneActivity =
-                GameSession.Instance.Configuration
-                    .ActivityCatalog
+                CurrentActivityCatalog
                     .FindActivityForScene(sceneName);
 
             if (standaloneActivity != null)
@@ -729,6 +749,8 @@ namespace HeartOfPrince.Presentation
 
             GameSession.Instance.Activities.SetDayRules(
                 CurrentDayRules);
+            GameSession.Instance.ApplyActivityCatalog(
+                CurrentActivityCatalog);
 
             if (string.Equals(
                     sceneName,
@@ -804,8 +826,7 @@ namespace HeartOfPrince.Presentation
             string sceneName)
         {
             ActivityCatalog catalog =
-                GameSession.Instance.Configuration
-                    .ActivityCatalog;
+                CurrentActivityCatalog;
 
             ActivityDefinition activity =
                 catalog.FindActivityForScene(sceneName);

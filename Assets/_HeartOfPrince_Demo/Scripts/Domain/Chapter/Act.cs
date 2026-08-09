@@ -22,6 +22,9 @@ namespace HeartOfPrince.Domain
         [SerializeField] private string dayEndScene;
         [SerializeField] private DayRules dayRules;
 
+        [Header("Act Activities")]
+        [SerializeField] private ActivityCatalog activityCatalog;
+
         [Header("Completion")]
         [SerializeField] private CompletionCondition completionCondition;
 
@@ -34,6 +37,7 @@ namespace HeartOfPrince.Domain
         public string DecisionScene => decisionScene;
         public string DayEndScene => dayEndScene;
         public DayRules DayRules => dayRules;
+        public ActivityCatalog ActivityCatalog => activityCatalog;
         public CompletionCondition CompletionCondition => completionCondition;
 
         public bool ContainsScene(string sceneName)

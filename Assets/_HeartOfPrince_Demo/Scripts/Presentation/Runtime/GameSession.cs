@@ -31,6 +31,7 @@ namespace HeartOfPrince.Presentation
         public ActivityQueryService ActivityQuery { get; private set; }
         public ActivityModuleRegistry ActivityModules { get; private set; }
         public GameLoopService GameLoop { get; private set; }
+        public ActivityCatalog ActiveActivityCatalog { get; private set; }
 
         [RuntimeInitializeOnLoadMethod(
             RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -110,8 +111,7 @@ namespace HeartOfPrince.Presentation
                     .ContainsScene(sceneName);
 
             bool isActivityScene =
-                gameConfiguration.ActivityCatalog != null &&
-                gameConfiguration.ActivityCatalog
+                gameConfiguration
                     .FindActivityForScene(sceneName) != null;
 
             return isBootstrap ||
@@ -147,6 +147,24 @@ namespace HeartOfPrince.Presentation
         {
             BuildRuntime();
             GameLoop?.BindToCurrentState();
+        }
+
+        public void ApplyActivityCatalog(ActivityCatalog catalog)
+        {
+            ActiveActivityCatalog =
+                catalog ?? Configuration.ActivityCatalog;
+
+            if (ActiveActivityCatalog == null)
+            {
+                return;
+            }
+
+            Activities.ResetRegistrations();
+            ActivityQuery.ClearProviders();
+            ActivityModules.Configure(
+                ActiveActivityCatalog,
+                Activities,
+                ActivityQuery);
         }
 
         private void ResolveConfiguration()
@@ -210,10 +228,7 @@ namespace HeartOfPrince.Presentation
             ActivityModules =
                 new ActivityModuleRegistry(modules);
 
-            ActivityModules.Configure(
-                catalog,
-                Activities,
-                ActivityQuery);
+            ApplyActivityCatalog(catalog);
         }
 
         private void EnsureGameLoopService()

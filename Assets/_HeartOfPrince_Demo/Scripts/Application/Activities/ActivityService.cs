@@ -31,6 +31,11 @@ namespace HeartOfPrince.Application
                 : throw new ArgumentNullException(nameof(rules));
         }
 
+        public void ResetRegistrations()
+        {
+            handlers.Clear();
+        }
+
         public ActivityEvaluationContext CreateContext()
         {
             return new ActivityEvaluationContext(state, dayRules);

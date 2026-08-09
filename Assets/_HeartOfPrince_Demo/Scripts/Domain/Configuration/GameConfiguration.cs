@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace HeartOfPrince.Domain
@@ -16,5 +17,34 @@ namespace HeartOfPrince.Domain
         public Chapter StartingChapter => startingChapter;
         public ActivityCatalog ActivityCatalog => activityCatalog;
         public GameStateDebugPreset InitialStatePreset => initialStatePreset;
+
+        public ActivityDefinition FindActivityForScene(string sceneName)
+        {
+            ActivityDefinition activity =
+                activityCatalog?.FindActivityForScene(sceneName);
+
+            if (activity != null || startingChapter == null)
+            {
+                return activity;
+            }
+
+            foreach (Act act in startingChapter.Acts)
+            {
+                if (act?.ActivityCatalog == null)
+                {
+                    continue;
+                }
+
+                activity =
+                    act.ActivityCatalog.FindActivityForScene(sceneName);
+
+                if (activity != null)
+                {
+                    return activity;
+                }
+            }
+
+            return null;
+        }
     }
 }

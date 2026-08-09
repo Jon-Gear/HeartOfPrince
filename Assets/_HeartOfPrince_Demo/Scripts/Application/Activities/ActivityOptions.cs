@@ -146,6 +146,11 @@ namespace HeartOfPrince.Application
                 provider ?? throw new ArgumentNullException(nameof(provider)));
         }
 
+        public void ClearProviders()
+        {
+            providers.Clear();
+        }
+
         public IReadOnlyList<ActivityOption> GetOptions()
         {
             var options = new List<ActivityOption>();

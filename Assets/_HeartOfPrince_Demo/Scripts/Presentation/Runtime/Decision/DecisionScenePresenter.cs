@@ -285,9 +285,16 @@ namespace HeartOfPrince.Presentation
             {
                 CharacterDefinition? character =
                     GameSession.Instance?
+                        .ActiveActivityCatalog?
+                        .FindCharacter(talkInput.CharacterId);
+
+                if (character == null)
+                {
+                    character = GameSession.Instance?
                         .Configuration?
                         .ActivityCatalog?
                         .FindCharacter(talkInput.CharacterId);
+                }
 
                 if (!string.IsNullOrWhiteSpace(
                         character?.TalkDecisionDescription))
